@@ -1,0 +1,277 @@
+'use strict';
+
+import {log as logger} from './Log.js';
+let log = logger.Logger('UserGroups');
+
+import {ajax} from './ajax.js';
+import {apiRequestString} from './ApiRouter.js';
+import {LoadingSpinner} from './LoadingSpinner.js';
+
+let React = require('react');
+
+const apiKey = window.zoteroConfig.apiKey;
+
+let accessMap = {
+	'all'     : {
+		'members' : 'Anyone can view, only members can edit',
+		'admins'  : 'Anyone can view, only admins can edit'
+	},
+	'members' : {
+		'members' : 'Only members can view and edit',
+		'admins'  : 'Only members can view, only admins can edit'
+	},
+	'admins'  : {
+		'members' : 'Only admins can view, only members can edit',
+		'admins'  : 'Only admins can view and edit'
+	}
+};
+
+let typeMap = {
+	'Private': 'Private',
+	'PublicOpen': 'Public, Open Membership',
+	'PublicClosed': 'Public, Closed Membership'
+};
+
+/*
+let groupIsWritable = function(group, userID) {
+	let admins = group.data.admins;
+	if(!admins){
+		admins = [];
+	}
+
+	switch(true){
+		case group.get('owner') == userID:
+			return true;
+		case (admins.indexOf(userID) != -1):
+			return true;
+		case ((group.data.libraryEditing == 'members') &&
+			(group.data.members) &&
+			(group.data.members.indexOf(userID) != -1)):
+			return true;
+		default:
+			return false;
+	}
+};
+*/
+
+let slugify = function(name){
+	var slug = name.trim();
+	slug = slug.toLowerCase();
+	slug = slug.replace( /[^a-z0-9 ._-]/g , '');
+	slug = slug.replace(/\s/g, '_');
+	
+	return slug;
+};
+	
+let groupViewUrl = function(group){
+	if(group.data.type == 'Private') {
+		return `/groups/${group.id}`;
+	} else {
+		let slug = slugify(group.data.name);
+		return `/groups/${slug}`;
+	}
+};
+
+let groupLibraryUrl = function(group){
+	return groupViewUrl(group) + '/items';
+};
+
+let groupImageUrl = function(groupID, size){
+	log.debug('groupImageUrl not implemented');
+	//TODO: port from library/Zotero/View/Helper/GroupImageSrc.php
+};
+
+let groupSettingsUrl = function(group){
+	return `/groups/${group.id}/settings`;
+};
+
+let groupMemberSettingsUrl = function(group){
+	return groupSettingsUrl(group) + '/members';
+};
+
+let groupLibrarySettingsUrl = function(group){
+	return groupSettingsUrl(group) + '/library';
+};
+
+let introVideo = React.createClass({
+	render:function(){
+		return (
+			<a href="/static/videos/group_intro.flv" id="screencast-link"> 
+				<img src="/static/images/group/playvideo.jpg" alt="Zotero screencast"/>
+			</a>
+		);
+	}
+});
+
+let GroupNugget = React.createClass({
+	render: function() {
+		let group = this.props.group;
+		let userID = this.props.userID;
+
+		let groupManageable = false;
+		let memberCount = 1; //owner
+
+		let members = group.data.members ? group.data.members : [];
+		let admins = group.data.admins ? group.data.admins : [];
+
+		memberCount += members.length;
+		memberCount += admins.length;
+		
+		if(userID && (userID == group.data.owner || (admins.includes(userID)))) {
+			groupManageable = true;
+		}
+		
+		let groupImage = null;
+		if(group.hasImage){
+			groupImage = (
+				<a href={groupViewUrl(group)} className="group-image">
+					<img src={groupImageUrl(group)} alt="" />
+				</a>
+			);
+		}
+
+		let manageLinks = null;
+		if(groupManageable){
+			manageLinks = (
+				<nav className="action-links">
+					<li><a href={groupSettingsUrl(group)}>Manage Profile</a></li>
+					<li><a href={groupMemberSettingsUrl(group)}>Manage Members</a></li>
+					<li><a href={groupLibrarySettingsUrl(group)}>Manage Library</a></li>
+				</nav>
+			);
+		}
+
+		let groupDescription = null;
+		if(group.data.description){
+			let markup = {__html: group.data.description};
+			groupDescription = (
+				<tr>
+					<th scope="row">Description</th> 
+					<td dangerouslySetInnerHTML={markup}></td>
+				</tr>
+			);
+		}
+
+		let libAccess = accessMap[group.data.libraryReading][group.data.libraryEditing];
+		if(group.data.type == 'Private' && group.data.libraryReading == 'all'){
+			libAccess = accessMap['members'][group.data.libraryEditing];
+		}
+
+		return (
+			<div key={group.groupID} className="nugget-group">
+				<div className="nugget-full">
+					{groupImage}
+					<div className="nugget-name">
+						<a href={groupViewUrl(group)}>{group.data.name}</a>
+					</div>
+					<nav id="group-library-link-nav" className="action-links">
+						<ul>
+						<li><a href={groupLibraryUrl(group)}>Group Library</a></li>
+						</ul>
+					</nav>
+					{manageLinks}
+					<table className="nugget-profile table">
+						<tbody>
+						<tr>
+							<th scope="row">Members</th>
+							<td>{memberCount}</td>
+						</tr>
+						{groupDescription}
+						<tr>
+							<th scope="row">Group Type</th>
+							<td>{typeMap[group.data.type]}</td>
+						</tr>
+						<tr>
+							<th scope="row">Group Library</th>
+							<td>
+								{libAccess}
+							</td>
+						</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		);
+	}
+});
+
+var UserGroups = React.createClass({
+	componentDidMount: function() {
+		let {userID} = Zotero.currentUser;
+		if(userID){
+			log.debug(`loading groups for user ${userID}`);
+			this.setState({loading:true});
+			let url = apiRequestString({
+				'target':'userGroups',
+				'libraryType':'user',
+				'libraryID': userID,
+				'order':'title'
+			});
+			let headers = {'Zotero-Api-Key':apiKey};
+			ajax({url: url, credentials:'omit', headers:headers}).then((resp)=>{
+				resp.json().then((data) => {
+					this.setState({
+						groups:data,
+						userID: userID,
+						loading:false,
+						groupsLoaded:true
+					});
+				});
+			});
+		}
+	},
+	getInitialState: function() {
+		return {
+			groups: [],
+			loading:false,
+			userID:false,
+			groupsLoaded:false
+		};
+	},
+	render: function() {
+		var reactInstance = this;
+		var groups = this.state.groups;
+		var userID = this.state.userID;
+
+		var groupNuggets = groups.map(function(group){
+			return (
+				<GroupNugget key={group.id} group={group} userID={userID} />
+			);
+		});
+
+		if(this.state.groupsLoaded && groups.length == 0) {
+			let nonUserLink = (
+				<span>
+					<a href="/user/register"><b>Sign up now</b></a> or <a href="/user/login">log in</a>
+				</span>
+			);
+			if(!Zotero.currentUser){
+				nonUserLink = null;
+			}
+			return (
+				<div className="sticky-note">
+					<h2>What can groups do for you?</h2>
+					<p>With groups, you collaborate remotely with project members, set
+					up web-based bibliographies for classes you teach, and so much more.
+					</p>
+					<ul>
+						<li><strong>Share</strong> your own work or sources you have discovered with others who are working in related areas.</li>
+						<li><strong>Collaborate</strong> with colleagues, publicly or privately, on ongoing research.</li>
+						<li><strong>Discover</strong> other people with similar interests and the sources they are citing.</li>
+					</ul>
+					<introVideo />
+					{nonUserLink}
+				</div>
+			);
+		}
+
+		return (
+			<div id="user-groups-div" className="user-groups">
+				{groupNuggets}
+				<LoadingSpinner loading={reactInstance.state.loading} />
+			</div>
+		);
+	}
+});
+
+export {UserGroups, GroupNugget};

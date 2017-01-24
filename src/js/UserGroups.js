@@ -93,12 +93,12 @@ let groupLibrarySettingsUrl = function(group){
 	return groupSettingsUrl(group) + '/library';
 };
 
-let introVideo = React.createClass({
-	render:function(){
+let IntroVideo = React.createClass({
+	render: function(){
 		return (
-			<a href="/static/videos/group_intro.flv" id="screencast-link"> 
-				<img src="/static/images/group/playvideo.jpg" alt="Zotero screencast"/>
-			</a>
+			<video id='group-intro-screencast' src="/static/videos/group_intro.m4v" controls='true' height='450px' poster='/static/images/group/playvideo.jpg'>
+				Sorry, your browser doesn't support embedded videos.
+			</video>
 		);
 	}
 });
@@ -197,7 +197,14 @@ let GroupNugget = React.createClass({
 
 var UserGroups = React.createClass({
 	componentDidMount: function() {
-		let {userID} = Zotero.currentUser;
+		let userID = false;
+		if(Zotero.currentUser){
+			userID = Zotero.currentUser.userID;
+		} else {
+			this.setState({
+				groupsLoaded:true
+			});
+		}
 		if(userID){
 			log.debug(`loading groups for user ${userID}`);
 			this.setState({loading:true});
@@ -240,13 +247,13 @@ var UserGroups = React.createClass({
 		});
 
 		if(this.state.groupsLoaded && groups.length == 0) {
-			let nonUserLink = (
-				<span>
-					<a href="/user/register"><b>Sign up now</b></a> or <a href="/user/login">log in</a>
-				</span>
-			);
+			let nonUserLink = null;
 			if(!Zotero.currentUser){
-				nonUserLink = null;
+				nonUserLink =  (
+					<span>
+						<a href="/user/register"><b>Sign up now</b></a> or <a href="/user/login">log in</a>
+					</span>
+				);
 			}
 			return (
 				<div className="sticky-note">
@@ -259,7 +266,7 @@ var UserGroups = React.createClass({
 						<li><strong>Collaborate</strong> with colleagues, publicly or privately, on ongoing research.</li>
 						<li><strong>Discover</strong> other people with similar interests and the sources they are citing.</li>
 					</ul>
-					<introVideo />
+					<IntroVideo />
 					{nonUserLink}
 				</div>
 			);

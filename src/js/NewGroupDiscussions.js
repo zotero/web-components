@@ -11,11 +11,13 @@ let React = require('react');
 
 let NewGroupDiscussions = React.createClass({
 	componentDidMount: function(){
-		ajax({url:'/groups/newgroupdiscussions'}).then((resp)=>{
-			resp.text().then((data) => {
-				this.setState({partial:data});
+		if(Zotero.currentUser){
+			ajax({url:'/groups/newgroupdiscussions'}).then((resp)=>{
+				resp.text().then((data) => {
+					this.setState({partial:data});
+				});
 			});
-		});
+		}
 	},
 	getInitialState: function(){
 		return {
@@ -23,6 +25,9 @@ let NewGroupDiscussions = React.createClass({
 		};
 	},
 	render: function() {
+		if(!Zotero.currentUser){
+			return null;
+		}
 		let partialHtml = {__html: this.state.partial};
 
 		return (

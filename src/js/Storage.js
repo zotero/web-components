@@ -350,6 +350,16 @@ var Storage = React.createClass({
 		let userSubscription = this.state.userSubscription;
 		let storageLevel = userSubscription.storageLevel;
 
+		let planQuota = this.state.planQuotas[storageLevel];
+		if(userSubscription.usage.total > planQuota) {
+			this.setState({
+				operationPending:false,
+				notification: 'Current usage exceeds plan quota.',
+				notificationClass: 'error'
+			});
+			return;
+		}
+		
 		//get stripe and charge for the current storage level
 		this.chargeSubscription(storageLevel);
 	},

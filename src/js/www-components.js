@@ -22,13 +22,16 @@ import {MakeEditable} from './MakeEditable.js';
 import {UserGroups} from './UserGroups.js';
 import {GroupInvitations} from './GroupInvitations.js';
 import {NewGroupDiscussions} from './NewGroupDiscussions.js';
+//import {InviteToGroups} from './InviteToGroups.js';
+import {InviteToGroups} from './ServerSideInviteToGroups.js';
 
 let ZoteroWWWComponents = {
 	Storage,
 	MakeEditable,
 	UserGroups,
 	GroupInvitations,
-	NewGroupDiscussions
+	NewGroupDiscussions,
+	InviteToGroups
 };
 
 globalScope.ZoteroWWWComponents = ZoteroWWWComponents;

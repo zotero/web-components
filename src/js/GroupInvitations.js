@@ -65,14 +65,16 @@ let GroupInvitation = React.createClass({
 
 let GroupInvitations = React.createClass({
 	componentDidMount: function(){
-		ajax({url:'/groups/invitations'}).then((resp)=>{
-			resp.json().then((data) => {
-				this.setState({
-					invitations:data.invitations,
-					invitationGroups:data.invitationGroups
+		if(Zotero.currentUser){
+			ajax({url:'/groups/invitations'}).then((resp)=>{
+				resp.json().then((data) => {
+					this.setState({
+						invitations:data.invitations,
+						invitationGroups:data.invitationGroups
+					});
 				});
 			});
-		});
+		}
 	},
 	getInitialState: function(){
 		return {

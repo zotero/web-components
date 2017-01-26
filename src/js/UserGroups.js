@@ -104,6 +104,11 @@ let IntroVideo = React.createClass({
 });
 
 let GroupNugget = React.createClass({
+	getDefaultProps: function(){
+		return {
+			titleOnly:false
+		};
+	},
 	render: function() {
 		let group = this.props.group;
 		let userID = this.props.userID;
@@ -116,6 +121,16 @@ let GroupNugget = React.createClass({
 
 		memberCount += members.length;
 		memberCount += admins.length;
+		
+		if(this.props.titleOnly){
+			return (
+				<div key={group.groupID}>
+					<div className="nugget-name">
+						<a href={groupViewUrl(group)}>{group.data.name} ({memberCount})</a>
+					</div>
+				</div>
+			);
+		}
 		
 		if(userID && (userID == group.data.owner || (admins.includes(userID)))) {
 			groupManageable = true;
@@ -198,7 +213,9 @@ let GroupNugget = React.createClass({
 var UserGroups = React.createClass({
 	componentDidMount: function() {
 		let userID = false;
-		if(Zotero.currentUser){
+		if(this.props.userID){
+			userID = this.props.userID;
+		} else if(Zotero.currentUser){
 			userID = Zotero.currentUser.userID;
 		} else {
 			this.setState({
@@ -227,6 +244,12 @@ var UserGroups = React.createClass({
 			});
 		}
 	},
+	getDefaultProps: function() {
+		return {
+			titleOnly:false,
+			userID:false
+		};
+	},
 	getInitialState: function() {
 		return {
 			groups: [],
@@ -236,16 +259,18 @@ var UserGroups = React.createClass({
 		};
 	},
 	render: function() {
-		var reactInstance = this;
-		var groups = this.state.groups;
-		var userID = this.state.userID;
+		let groups = this.state.groups;
+		let userID = this.state.userID;
+		let titleOnly = this.props.titleOnly;
 
+		//Nugget entry for each group
 		var groupNuggets = groups.map(function(group){
 			return (
-				<GroupNugget key={group.id} group={group} userID={userID} />
+				<GroupNugget key={group.id} group={group} userID={userID} titleOnly={titleOnly} />
 			);
 		});
 
+		//render group explainer text if the user has no groups (or is not logged in)
 		if(this.state.groupsLoaded && groups.length == 0) {
 			let nonUserLink = null;
 			if(!Zotero.currentUser){
@@ -275,7 +300,7 @@ var UserGroups = React.createClass({
 		return (
 			<div id="user-groups-div" className="user-groups">
 				{groupNuggets}
-				<LoadingSpinner loading={reactInstance.state.loading} />
+				<LoadingSpinner loading={this.state.loading} />
 			</div>
 		);
 	}

@@ -12,14 +12,7 @@ let React = require('react');
 
 const apiKey = window.zoteroConfig.apiKey;
 
-let slugify = function(name){
-	var slug = name.trim();
-	slug = slug.toLowerCase();
-	slug = slug.replace( /[^a-z0-9 ._-]/g , '');
-	slug = slug.replace(/\s/g, '_');
-	
-	return slug;
-};
+import {slugify} from './Utils.js';
 
 let groupViewUrl = function(group){
 	if(group.type == 'Private') {

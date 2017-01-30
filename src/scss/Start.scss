@@ -1,0 +1,95 @@
+div#start-container {
+	width: calc(100% + 80px);
+	margin-left:-40px;
+	
+	div.content {
+		width:80%;
+		margin-left:auto;
+		margin-right:auto;
+		text-align: center;
+	}
+
+	button, a.button {
+		color:white;
+		background-color: #38c;
+		border-color: #38c;
+		width:100%;
+		background-image:none;
+		font-size:1.5em;
+	}
+
+	div.arrow-down {
+		margin-top:-20px;
+	}
+}
+div#install-connector-section {
+	
+	padding-bottom:35px;
+
+	div.install-success-div {
+		width:50%;
+		margin:auto;
+		
+		h1 {
+			border: 3px solid #2a2;
+			border-radius: 6px;
+			padding:10px;
+			color:#2a2;
+			font-size: 20px;
+		}
+	}
+
+	#extension-icon-image {
+		margin-top:25px;
+	}
+}
+div#register-section {
+	background-color: rgba(0,0,0,.03);
+	padding-top:20px;
+	padding-bottom:20px;
+}
+div#register-form {
+	margin-left:auto;
+	margin-right:auto;
+	width:304px;
+	margin-bottom: 20px;
+
+	input {
+		width:100%;
+		margin-top:5px;
+		border-radius: 4px;
+		border-width: 1px;
+		font-size: 1.5em;
+	}
+
+	input:focus {
+		border-color: rgba(0,0,255,1);
+		border-radius: 2px;
+	}
+
+	p.valid {
+		color:rgba(0,150,0,1);
+	}
+	p.invalid {
+		color:rgba(200,0,0,1);
+	}
+}
+
+div#post-register-guide {
+	padding-top:20px;
+	padding-bottom:20px;
+}
+
+div#register-quick-links {
+	font-size: 1.3em;
+	text-align:center;
+
+	a {
+		text-decoration: none;
+	}
+
+	p {
+		margin:2px;
+	}
+}
+

@@ -40,7 +40,7 @@ function getBrowserify(dev) {
 	if(!bundle) {
 		bundle = browserify({
 			debug: !dev,
-			entries: './src/js/www-components.js',
+			entries: './src/js/web-components.js',
 			cache: {},
 			packageCache: {}
 		})
@@ -60,7 +60,7 @@ function getBrowserify(dev) {
 
 function getJS(dev) {
 	return getBrowserify(dev).bundle()
-		.pipe(source('www-components.js'))
+		.pipe(source('web-components.js'))
 		.pipe(buffer())
 		.pipe(plumber({errorHandler: onError}))
 		.pipe(gulpif(dev, sourcemaps.init({loadMaps: true})))
@@ -72,7 +72,7 @@ function getJS(dev) {
 }
 
 function getSass(dev) {
-	return gulp.src('./src/scss/www-components.scss')
+	return gulp.src('./src/scss/web-components.scss')
 		.pipe(plumber({errorHandler: onError}))
 		.pipe(gulpif(dev, sourcemaps.init({loadMaps: true})))
 		.pipe(sass())

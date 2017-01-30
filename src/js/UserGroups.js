@@ -9,6 +9,8 @@ import {LoadingSpinner} from './LoadingSpinner.js';
 
 let React = require('react');
 
+import {slugify} from './Utils.js';
+
 const apiKey = window.zoteroConfig.apiKey;
 
 let accessMap = {
@@ -54,15 +56,6 @@ let groupIsWritable = function(group, userID) {
 };
 */
 
-let slugify = function(name){
-	var slug = name.trim();
-	slug = slug.toLowerCase();
-	slug = slug.replace( /[^a-z0-9 ._-]/g , '');
-	slug = slug.replace(/\s/g, '_');
-	
-	return slug;
-};
-	
 let groupViewUrl = function(group){
 	if(group.data.type == 'Private') {
 		return `/groups/${group.id}`;

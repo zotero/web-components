@@ -163,7 +163,7 @@ let InstallConnectorPrompt = React.createClass({
 	},
 	getInitialState: function() {
 		return {
-			browser:'chrome'
+			browser:browser.name
 		};
 	},
 	render: function() {
@@ -255,8 +255,8 @@ let RegisterForm = React.createClass({
 					<h1>2. Register to take full advantage of Zotero</h1>
 					<p>If you haven't already created a Zotero account, please take a few moments to register now.
 					It's a <b>free</b> way to <a href="https://www.zotero.org/support/sync">sync and access your library from anywhere</a>,
-					and it lets you join <a href="https://www.zotero.org/support/groups">groups</a>
-					and <a href="https://www.zotero.org/support/sync#file_syncing">back up your all your attached files</a>.
+					and it lets you join <a href="https://www.zotero.org/support/groups">groups</a> and 
+					<a href="https://www.zotero.org/support/sync#file_syncing">back up your all your attached files</a>.
 					</p>
 					<div id='register-form'>
 						<input type='text' name='username' placeholder='Username' onChange={this.updateUsername}></input>

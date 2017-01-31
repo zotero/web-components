@@ -3,7 +3,8 @@
 import {log as logger} from './Log.js';
 var log = logger.Logger('ApiRouter');
 
-const base = window.zoteroConfig.baseApiUrl;
+const config = window.zoteroConfig;
+const base = config.baseApiUrl;
 
 let Validator = {
 	patterns: {
@@ -188,8 +189,8 @@ let apiQueryString = function(passedParams){
 	if(passedParams.hasOwnProperty('order') && passedParams['order'] == 'year'){
 		passedParams['order'] = 'date';
 	}
-	if(Zotero.config.sessionAuth) {
-		var sessionKey = Zotero.utils.readCookie(Zotero.config.sessionCookieName);
+	if(config.sessionAuth) {
+		var sessionKey = Zotero.utils.readCookie(config.sessionCookieName);
 		passedParams['session'] = sessionKey;
 	}
 	

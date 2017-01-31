@@ -86,7 +86,7 @@
             <!-- NEW START PAGE -->
             <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
-            <div id='react-register'></div>
+            <div id='react-start'></div>
 
             <script type="text/javascript" charset="utf-8" src="../build/web-components.js""></script>
 
@@ -94,7 +94,7 @@
                 jQuery(document).ready(function() {
                     window.registerElement = ReactDOM.render(
                         React.createElement(ZoteroWebComponents.Start, null),
-                        document.getElementById('react-register')
+                        document.getElementById('react-start')
                     );
                 });
             </script>

@@ -203,7 +203,35 @@ let GroupNugget = React.createClass({
 	}
 });
 
-var UserGroups = React.createClass({
+let GroupsExplainer = React.createClass({
+	render: function() {
+		let nonUserLink = null;
+		if(!Zotero.currentUser){
+			nonUserLink =  (
+				<span>
+					<a href="/user/register"><b>Sign up now</b></a> or <a href="/user/login">log in</a>
+				</span>
+			);
+		}
+		return (
+			<div className="sticky-note">
+				<h2>What can groups do for you?</h2>
+				<p>With groups, you collaborate remotely with project members, set
+				up web-based bibliographies for classes you teach, and so much more.
+				</p>
+				<ul>
+					<li><strong>Share</strong> your own work or sources you have discovered with others who are working in related areas.</li>
+					<li><strong>Collaborate</strong> with colleagues, publicly or privately, on ongoing research.</li>
+					<li><strong>Discover</strong> other people with similar interests and the sources they are citing.</li>
+				</ul>
+				<IntroVideo />
+				{nonUserLink}
+			</div>
+		);
+	}
+});
+
+let UserGroups = React.createClass({
 	componentDidMount: function() {
 		let userID = false;
 		if(this.props.userID){
@@ -265,29 +293,7 @@ var UserGroups = React.createClass({
 
 		//render group explainer text if the user has no groups (or is not logged in)
 		if(this.state.groupsLoaded && groups.length == 0) {
-			let nonUserLink = null;
-			if(!Zotero.currentUser){
-				nonUserLink =  (
-					<span>
-						<a href="/user/register"><b>Sign up now</b></a> or <a href="/user/login">log in</a>
-					</span>
-				);
-			}
-			return (
-				<div className="sticky-note">
-					<h2>What can groups do for you?</h2>
-					<p>With groups, you collaborate remotely with project members, set
-					up web-based bibliographies for classes you teach, and so much more.
-					</p>
-					<ul>
-						<li><strong>Share</strong> your own work or sources you have discovered with others who are working in related areas.</li>
-						<li><strong>Collaborate</strong> with colleagues, publicly or privately, on ongoing research.</li>
-						<li><strong>Discover</strong> other people with similar interests and the sources they are citing.</li>
-					</ul>
-					<IntroVideo />
-					{nonUserLink}
-				</div>
-			);
+			return <GroupsExplainer />;
 		}
 
 		return (

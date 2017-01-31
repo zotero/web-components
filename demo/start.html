@@ -88,17 +88,17 @@
 
             <div id='react-register'></div>
 
-            <script type="text/javascript" charset="utf-8" src="../build/www-components.js""></script>
+            <script type="text/javascript" charset="utf-8" src="../build/web-components.js""></script>
 
             <script type="text/javascript" charset="utf-8">
                 jQuery(document).ready(function() {
                     window.registerElement = ReactDOM.render(
-                        React.createElement(ZoteroWWWComponents.Start, null),
+                        React.createElement(ZoteroWebComponents.Start, null),
                         document.getElementById('react-register')
                     );
                 });
             </script>
-            <link rel="stylesheet" href="../build/www-components.css" type="text/css" media="screen" charset="utf-8"/>
+            <link rel="stylesheet" href="../build/web-components.css" type="text/css" media="screen" charset="utf-8"/>
 
             </div>
         </div>
@@ -131,9 +131,6 @@
             </div>
         </footer>
         
-        <script type="text/javascript" charset="utf-8" src="/static/library/globalize/globalize.js"></script>
-                                        <script type="text/javascript" charset="utf-8" src="/static/library/globalize/cultures/globalize.culture.en-US.js"></script>
-                                                
         <script type="text/javascript" charset="utf-8">
             if(typeof zoteroData == 'undefined'){
                 var zoteroData = {};
@@ -144,8 +141,9 @@
         </script>
         <!-- End zoteroLibrary modules. -->
         <script type="text/javascript" charset="utf-8">
-                Zotero.currentUser = {"userID":"10150","slug":"fcheslack"};
-                                    Zotero.prefs.server_javascript_enabled = false;
+            Zotero = {
+                currentUser: {"userID":"10150","slug":"fcheslack"}
+            };
         </script>
     </body>
 </html>

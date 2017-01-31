@@ -3,7 +3,7 @@
 import 'babel-polyfill';
 import 'whatwg-fetch';
 import {log as logger} from './Log.js';
-var log = logger.Logger('WWWComponents');
+var log = logger.Logger('WebComponents');
 
 var globalScope;
 if(typeof window === 'undefined') {
@@ -26,7 +26,7 @@ import {NewGroupDiscussions} from './NewGroupDiscussions.js';
 import {InviteToGroups} from './ServerSideInviteToGroups.js';
 import {Start} from './Start.js';
 
-let ZoteroWWWComponents = {
+let ZoteroWebComponents = {
 	Storage,
 	MakeEditable,
 	UserGroups,
@@ -36,6 +36,6 @@ let ZoteroWWWComponents = {
 	Start
 };
 
-globalScope.ZoteroWWWComponents = ZoteroWWWComponents;
+globalScope.ZoteroWebComponents = ZoteroWebComponents;
 
-export {ZoteroWWWComponents};
+export {ZoteroWebComponents};

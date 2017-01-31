@@ -300,6 +300,13 @@ var Storage = React.createClass({
 					planQuotas: data.planQuotas
 				});
 			});
+		}).catch((e)=>{
+			log.debug('Error retrieving subscription data');
+			log.debug(e);
+			this.setState({
+				notificationClass: 'error',
+				notification:'There was an error retrieving your subscription data'
+			});
 		});
 	},
 	getUserCustomer: function() {
@@ -308,6 +315,13 @@ var Storage = React.createClass({
 			log.debug(resp);
 			resp.json().then((data) => {
 				this.setState({stripeCustomer: data});
+			});
+		}).catch((e)=>{
+			log.debug('Error retrieving customer data');
+			log.debug(e);
+			this.setState({
+				notificationClass: 'error',
+				notification:'There was an error retrieving your subscription data'
 			});
 		});
 	},

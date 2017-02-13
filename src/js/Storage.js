@@ -275,6 +275,17 @@ let PreviewRow = React.createClass({
 
 var Storage = React.createClass({
 	componentDidMount: function(){
+		if(window.zoteroData.userSubscription && window.zoteroData.stripeCustomer){
+			//don't load new data if it's already been loaded serverside and included with the page
+			//instead just set the state with it
+			this.setState({
+				userSubscription: window.zoteroData.userSubscription,
+				storageGroups:window.zoteroData.storageGroups,
+				planQuotas: window.zoteroData.planQuotas,
+				stripeCustomer: window.zoteroData.stripeCustomer
+			});
+			return;
+		}
 		this.getSubscription();
 		this.getUserCustomer();
 	},

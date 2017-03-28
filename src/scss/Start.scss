@@ -75,6 +75,11 @@ div#register-form {
 	}
 }
 
+p#register-form-error {
+	background-color:$notification-error-color;
+	padding:3px;
+}
+
 div#post-register-guide {
 	padding-top:20px;
 	padding-bottom:20px;

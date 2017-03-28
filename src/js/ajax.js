@@ -34,13 +34,17 @@ let ajax = function(config){
 	});
 };
 
-let postFormData = function(url, data){
+let postFormData = function(url, data, config={}){
 	let fd = new FormData();
 	for(let key in data){
 		fd.append(key, data[key]);
 	}
 	
-	return ajax({url:url, type:'POST', data:fd});
+	config.url = url;
+	config.type = 'POST';
+	config.data = fd;
+	
+	return ajax(config);
 };
 
 export {ajax, postFormData};

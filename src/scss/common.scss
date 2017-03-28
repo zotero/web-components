@@ -1,6 +1,13 @@
 // Zotero style.css modifications
 // --------------------------------------------------
 
+//variables
+$notification-success-color: #dff0d8;
+$notification-success-border-color: #cfe0c8;
+
+$notification-error-color: #f0dfd8;
+$notification-error-border-color: #e0cfc8;
+
 // Fix in style.css
 .center {
 	width: 900px; // Fix width from 901px to 900px
@@ -18,7 +25,7 @@
 	width: 1px;
 }
 
-div.hidden {
+.hidden {
 	display:none;
 }
 

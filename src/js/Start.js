@@ -15,12 +15,18 @@ const operaDownloadUrl = window.zoteroConfig.operaDownloadUrl;
 
 const recaptchaSitekey = '6LfrWxMUAAAAADBGrtBnRzMB6FdUf4cXzZV5pH6W';
 
-const chromeExtensionImagePath = '../assets/start/images/chrome-extension.jpg';
-const firefoxExtensionImagePath = '../assets/start/images/firefox-extension.jpg';
-const safariExtensionImagePath = '../assets/start/images/safari-extension.jpg';
-const connectorButtonImagePath = '../assets/start/images/zotero-button.svg';
-const arrowDownGrayImagePath = '../assets/start/images/arrow-down-gray.svg';
-const arrowDownWhiteImagePath = '../assets/start/images/arrow-down-white.svg';
+const chromeExtensionImagePath = '../assets/images/start/chrome-extension.jpg';
+const firefoxExtensionImagePath = '../assets/images/start/firefox-extension.jpg';
+const safariExtensionImagePath = '../assets/images/start/safari-extension.jpg';
+const connectorButtonImagePath = '../assets/images/start/zotero-button.svg';
+const arrowDownGrayImagePath = '../assets/images/start/arrow-down-gray.svg';
+const arrowDownWhiteImagePath = '../assets/images/start/arrow-down-white.svg';
+
+const chromeBrowserImagePath = '../assets/images/theme/browser_icons/64-chrome.png';
+const firefoxBrowserImagePath = '../assets/images/theme/browser_icons/64-firefox.png';
+const safariBrowserImagePath = '../assets/images/theme/browser_icons/64-safari.png';
+const operaBrowserImagePath = '../assets/images/theme/browser_icons/64-opera.png';
+
 
 import {ajax, postFormData} from './ajax.js';
 import {slugify} from './Utils.js';
@@ -48,6 +54,11 @@ let ArrowDownWhite = React.createClass({
 });
 
 let InstallFirefoxButton = React.createClass({
+	getDefaultProps: function(){
+		return {
+			type:'button'
+		};
+	},
 	installFirefox: function(){
 		if (typeof InstallTrigger == 'undefined') {
 			return true;
@@ -63,13 +74,24 @@ let InstallFirefoxButton = React.createClass({
 		return false;
 	},
 	render: function() {
-		return (
-			<a className='button' onClick={this.installFirefox}>Install</a>
-		);
+		if(this.props.type == 'button'){
+			return (
+				<a className='button' onClick={this.installFirefox}>Install</a>
+			);
+		} else if(this.props.type == 'image') {
+			return (
+				<a onClick={this.installFirefox}><img src={firefoxBrowserImagePath} /></a>
+			);
+		}
 	}
 });
 
 let InstallChromeButton = React.createClass({
+	getDefaultProps: function(){
+		return {
+			type:'button'
+		};
+	},
 	installChrome: function(){
 		chrome.webstore.install(chromeInstallUrl, ()=>{
 			//success
@@ -78,29 +100,57 @@ let InstallChromeButton = React.createClass({
 		});
 	},
 	render: function() {
-		return (
-			<a className='button' onClick={this.installChrome}>Install</a>
-		);
+		if(this.props.type == 'button') {
+			return (
+				<a className='button' onClick={this.installChrome}>Install</a>
+			);
+		} else if(this.props.type == 'image') {
+			return (
+				<a onClick={this.installChrome}><img src={chromeBrowserImagePath} /></a>
+			);
+		}
 	}
 });
 
 let InstallSafariButton = React.createClass({
+	getDefaultProps: function(){
+		return {
+			type:'button'
+		};
+	},
 	installSafari: function(){
 	},
 	render: function() {
-		return (
-			<a href={safariDownloadUrl} id="safari-connector-download-button" class="button download-link">Install</a>
-		);
+		if(this.props.type == 'button') {
+			return (
+				<a href={safariDownloadUrl} id="safari-connector-download-button" className="button download-link">Install</a>
+			);
+		} else if(this.props.type == 'image'){
+			return (
+				<a onClick={this.installSafari}><img src={safariBrowserImagePath} /></a>
+			);
+		}
 	}
 });
 
 let InstallOperaButton = React.createClass({
-	installSafari: function(){
+	getDefaultProps: function(){
+		return {
+			type:'button'
+		};
+	},
+	installOpera: function(){
 	},
 	render: function() {
-		return (
-			<a href={operaDownloadUrl} id="opera-connector-download-button" class="button download-link">Install</a>
-		);
+		if(this.props.type == 'button') {
+			return (
+				<a href={operaDownloadUrl} id="opera-connector-download-button" className="button download-link">Install</a>
+			);
+		} else if(this.props.type == 'image') {
+			return (
+				<a onClick={this.installOpera}><img src={operaBrowserImagePath} /></a>
+			);
+		}
 	}
 });
 
@@ -110,17 +160,6 @@ let InstallButton = React.createClass({
 		let browserName = browser.name;
 		log.debug('InstallButton render');
 		log.debug(browserName);
-		/*
-		let firefoxVersion = "4.0.29.11";
-		let firefoxDisplayVersion = "4.0";
-		let firefoxDownload = "https://download.zotero.org/extension/zotero-$firefoxVersion.xpi";
-		let firefoxHash = "sha1:4d4c464d351a5c05d19746d271713670fe8939a8";
-
-		let chromeDownload = 'https://chrome.google.com/webstore/detail/ekhagklcjbdpajgpjgmbionohlpdbjgc';
-		let safariDownload = 'https://download.zotero.org/connector/safari/Zotero_Connector-4.0.28-1.safariextz';
-		let operaDownload = 'https://addons.opera.com/en/extensions/details/zotero-connector/?display=en';
-		let bookmarkletDownload = '/downloadbookmarklet';
-		*/
 		
 		switch(browserName){
 			case 'firefox':
@@ -156,6 +195,18 @@ let SafariExtensionIcon = React.createClass({
 	}
 });
 
+let AllExtensionsSection = React.createClass({
+	render:function(){
+		return (
+			<div id='all-extensions'>
+				<InstallChromeButton type='image' />
+				<InstallFirefoxButton type='image' />
+				<InstallSafariButton type='image' />
+			</div>
+		);
+	}
+});
+
 
 let InstallConnectorPrompt = React.createClass({
 	componentDidMount: function(){
@@ -163,8 +214,12 @@ let InstallConnectorPrompt = React.createClass({
 	},
 	getInitialState: function() {
 		return {
-			browser:browser.name
+			browser:browser.name,
+			showAllExtensions:false
 		};
+	},
+	showAllExtensions: function() {
+		this.setState({showAllExtensions:true});
 	},
 	render: function() {
 		let connectorText = '';
@@ -184,6 +239,12 @@ let InstallConnectorPrompt = React.createClass({
 				connectorImage = <SafariExtensionIcon />;
 				break;
 		}
+
+		let allExtensions = null;
+		if(this.state.showAllExtensions){
+			allExtensions = <AllExtensionsSection />;
+		}
+
 		return (
 			<div id='install-connector-section'>
 				<div className='content'>
@@ -197,7 +258,8 @@ let InstallConnectorPrompt = React.createClass({
 						<h1>1. Install the {connectorText}</h1>
 						<p>Zotero connectors allow you to save to Zotero directly from your web browser.</p>
 						{installButton}
-						<p><a href='#' onClick={this.showAllExtensions}>Not using {this.state.browser}? Show all extensions.</a></p>
+						<p><a onClick={this.showAllExtensions}>Not using {this.state.browser}? Show all extensions.</a></p>
+						{allExtensions}
 					</div>
 				</div>
 			</div>
@@ -205,23 +267,46 @@ let InstallConnectorPrompt = React.createClass({
 	}
 });
 
+let validateRegisterForm = function(data) {
+	if(data.email != data.email_confirm){
+		return {
+			valid:false,
+			reason:'emails must match'
+		};
+	}
+	if(data.password != data.password_confirm){
+		return {
+			valid:false,
+			reason:'passwords must match'
+		};
+	}
+	return {valid:true};
+};
+
 let RegisterForm = React.createClass({
-	componentDidMount: function(){
-	},
 	getInitialState: function() {
 		return {
-			username:'',
+			formData:{
+				username:'',
+				email:'',
+				email_confirm:'',
+				password:'',
+				password_confirm:''
+			},
 			usernameValid:false,
-			usernameMessage:''
+			usernameMessage:'',
+			formError:'',
+			registrationSuccessful:false
 		};
-	},
+	},/*
 	updateUsername: function(ev) {
+		let formData = this.state.formData;
 		let username = ev.target.value;
 		this.setState({
 			username:username,
 			usernameValid:false
 		});
-	},
+	},*/
 	checkUsername: function() {
 		let username = this.state.username;
 		let checkUrl = `/user/checkslug?username=${encodeURIComponent(username)}`;
@@ -238,6 +323,37 @@ let RegisterForm = React.createClass({
 			});
 		}).catch(()=>{
 			//TODO:error JS notification
+		});
+	},
+	handleChange: function(ev){
+		let formData = this.state.formData;
+		formData[ev.target.name] = ev.target.value;
+
+		this.setState({formData:formData});
+		if(ev.target.name == 'username'){
+			this.setState({usernameValid:false, usernameMessage:''});
+		}
+	},
+	register: function() {
+		let formData = this.state.formData;
+		//validate form
+		let validated = validateRegisterForm(formData);
+		if(!validated.valid){
+			//show error
+			this.setState({formError:validated.reason});
+			return;
+		}
+		//submit form
+		let registerUrl = '/user/registerasync';
+		postFormData(registerUrl, formData).then((resp)=>{
+			resp.json().then((data)=>{
+				if(data.success === false){
+					this.setState({formError:data.error});
+				}
+				this.setState({registrationSuccessful:true});
+			});
+		}).catch(()=>{
+			this.setState({formError:'Error processing registration'});
 		});
 	},
 	render: function() {
@@ -259,13 +375,14 @@ let RegisterForm = React.createClass({
 					<a href="https://www.zotero.org/support/sync#file_syncing">back up your all your attached files</a>.
 					</p>
 					<div id='register-form'>
-						<input type='text' name='username' placeholder='Username' onChange={this.updateUsername}></input>
+						<input type='text' name='username' placeholder='Username' onChange={this.handleChange}></input>
 						<p className={previewClass}>{profileUrl}</p>
-						<input type='text' name='email' placeholder='Email'></input>
-						<input type='text' name='email_confirm' placeholder='Confirm Email'></input>
-						<input type='text' name='password' placeholder='Password'></input>
-						<input type='text' name='password_confirm' placeholder='Verify Password'></input>
+						<input type='email' name='email' placeholder='Email' onChange={this.handleChange}></input>
+						<input type='email' name='email_confirm' placeholder='Confirm Email' onChange={this.handleChange}></input>
+						<input type='password' name='password' placeholder='Password' onChange={this.handleChange}></input>
+						<input type='password' name='password_confirm' placeholder='Verify Password' onChange={this.handleChange}></input>
 						<div className="g-recaptcha" data-sitekey={recaptchaSitekey}></div>
+						<p id="register-form-error" className={this.state.formError? '' : 'hidden'}>{this.state.formError}</p>
 						<button type='button' onClick={this.register}>Register</button>
 					</div>
 				</div>
@@ -317,9 +434,9 @@ let Start = React.createClass({
 	render: function() {
 		return (
 			<div id='start-container'>
-				<InstallConnectorPrompt />
-				<RegisterForm />
-				<PostRegisterGuide />
+				<InstallConnectorPrompt ref='installConnectorPrompt' />
+				<RegisterForm ref='registerForm' />
+				<PostRegisterGuide ref='postRegisterGuide' />
 			</div>
 		);
 	}

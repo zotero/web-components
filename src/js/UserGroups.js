@@ -214,9 +214,9 @@ let GroupsExplainer = React.createClass({
 			);
 		}
 		return (
-			<div className="sticky-note">
+			<div id="group-explainer">
 				<h2>What can groups do for you?</h2>
-				<p>With groups, you collaborate remotely with project members, set
+				<p>With groups, you can collaborate remotely with project members, set
 				up web-based bibliographies for classes you teach, and so much more.
 				</p>
 				<ul>

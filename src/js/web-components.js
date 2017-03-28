@@ -30,6 +30,7 @@ import {CreateGroup} from './CreateGroup.js';
 import {ApiKeyEditor} from './ApiKeyEditor.js';
 import {pageReady, jsError} from './Utils.js';
 import {cycleTestCases} from './TestUtils.js';
+import {Combined} from './GlobalSearch/Combined.js';
 
 let ZoteroWebComponents = {
 	Storage,
@@ -45,7 +46,8 @@ let ZoteroWebComponents = {
 	ApiKeyEditor,
 	pageReady,
 	jsError,
-	cycleTestCases
+	cycleTestCases,
+	Combined
 };
 
 globalScope.ZoteroWebComponents = ZoteroWebComponents;

@@ -25,6 +25,7 @@ import {NewGroupDiscussions} from './NewGroupDiscussions.js';
 //import {InviteToGroups} from './InviteToGroups.js';
 import {InviteToGroups} from './ServerSideInviteToGroups.js';
 import {Start} from './Start.js';
+import {CreateGroup} from './CreateGroup.js';
 
 let ZoteroWebComponents = {
 	Storage,
@@ -33,7 +34,8 @@ let ZoteroWebComponents = {
 	GroupInvitations,
 	NewGroupDiscussions,
 	InviteToGroups,
-	Start
+	Start,
+	CreateGroup
 };
 
 globalScope.ZoteroWebComponents = ZoteroWebComponents;

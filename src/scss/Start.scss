@@ -73,6 +73,10 @@ div#register-form {
 	p.invalid {
 		color:rgba(200,0,0,1);
 	}
+
+	[name=password_confirm] {
+		margin-bottom:5px;
+	}
 }
 
 p#register-form-error {

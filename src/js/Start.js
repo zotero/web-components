@@ -15,17 +15,19 @@ const operaDownloadUrl = window.zoteroConfig.operaDownloadUrl;
 
 const recaptchaSitekey = '6LfrWxMUAAAAADBGrtBnRzMB6FdUf4cXzZV5pH6W';
 
-const chromeExtensionImagePath = '../assets/images/start/chrome-extension.jpg';
-const firefoxExtensionImagePath = '../assets/images/start/firefox-extension.jpg';
-const safariExtensionImagePath = '../assets/images/start/safari-extension.jpg';
-const connectorButtonImagePath = '../assets/images/start/zotero-button.svg';
-const arrowDownGrayImagePath = '../assets/images/start/arrow-down-gray.svg';
-const arrowDownWhiteImagePath = '../assets/images/start/arrow-down-white.svg';
+const imagePath = 'static/images';
 
-const chromeBrowserImagePath = '../assets/images/theme/browser_icons/64-chrome.png';
-const firefoxBrowserImagePath = '../assets/images/theme/browser_icons/64-firefox.png';
-const safariBrowserImagePath = '../assets/images/theme/browser_icons/64-safari.png';
-const operaBrowserImagePath = '../assets/images/theme/browser_icons/64-opera.png';
+const chromeExtensionImagePath = imagePath + '/start/chrome-extension.jpg';
+const firefoxExtensionImagePath = imagePath + '/start/firefox-extension.jpg';
+const safariExtensionImagePath = imagePath + '/start/safari-extension.jpg';
+const connectorButtonImagePath = imagePath + '/start/zotero-button.svg';
+const arrowDownGrayImagePath = imagePath + '/start/arrow-down-gray.svg';
+const arrowDownWhiteImagePath = imagePath + '/start/arrow-down-white.svg';
+
+const chromeBrowserImagePath = imagePath + '/theme/browser_icons/64-chrome.png';
+const firefoxBrowserImagePath = imagePath + '/theme/browser_icons/64-firefox.png';
+const safariBrowserImagePath = imagePath + '/theme/browser_icons/64-safari.png';
+const operaBrowserImagePath = imagePath + '/theme/browser_icons/64-opera.png';
 
 
 import {ajax, postFormData} from './ajax.js';
@@ -293,35 +295,35 @@ let RegisterForm = React.createClass({
 				password:'',
 				password_confirm:''
 			},
-			usernameValid:false,
+			usernameValidity:'undecided',
 			usernameMessage:'',
 			formError:'',
 			registrationSuccessful:false
 		};
-	},/*
-	updateUsername: function(ev) {
-		let formData = this.state.formData;
-		let username = ev.target.value;
-		this.setState({
-			username:username,
-			usernameValid:false
-		});
-	},*/
+	},
 	checkUsername: function() {
-		let username = this.state.username;
-		let checkUrl = `/user/checkslug?username=${encodeURIComponent(username)}`;
-		ajax(checkUrl).then((response)=>{
+		let username = this.state.formData.username;
+		if(username.indexOf('@') != -1){
+			this.setState({
+				usernameValidity:'invalid',
+				usernameMessage: 'Your email address can be used to log in to your Zotero account, but not as your username.'
+			});
+			return;
+		}
+		let checkUrl = `/user/checkusername?username=${encodeURIComponent(username)}`;
+		ajax({url:checkUrl}).then((response)=>{
 			response.json().then((data)=>{
 				if(data.valid){
-					this.setState({usernameValid:true});
+					this.setState({usernameValidity:'valid'});
 				} else {
 					this.setState({
-						usernameValid:false,
+						usernameValidity:'invalid',
 						usernameMessage: 'Username is not available'
 					});
 				}
 			});
 		}).catch(()=>{
+			this.setState({formError:'Error checking username'});
 			//TODO:error JS notification
 		});
 	},
@@ -331,7 +333,7 @@ let RegisterForm = React.createClass({
 
 		this.setState({formData:formData});
 		if(ev.target.name == 'username'){
-			this.setState({usernameValid:false, usernameMessage:''});
+			this.setState({usernameValidity:'undecided', usernameMessage:''});
 		}
 	},
 	register: function() {
@@ -358,11 +360,11 @@ let RegisterForm = React.createClass({
 	},
 	render: function() {
 		let slug = '<username>';
-		if(this.state.username) {
-			slug = slugify(this.state.username);
+		if(this.state.formData.username) {
+			slug = slugify(this.state.formData.username);
 		}
 		let profileUrl = `https://www.zotero.org/${slug}`;
-		let previewClass = 'profile-preview ' + (this.state.usernameValid ? 'valid' : 'invalid');
+		let previewClass = 'profile-preview ' + this.state.usernameValidity;
 		
 		return (
 			<div id='register-section'>
@@ -375,8 +377,9 @@ let RegisterForm = React.createClass({
 					<a href="https://www.zotero.org/support/sync#file_syncing">back up your all your attached files</a>.
 					</p>
 					<div id='register-form'>
-						<input type='text' name='username' placeholder='Username' onChange={this.handleChange}></input>
+						<input type='text' name='username' placeholder='Username' onChange={this.handleChange} onBlur={this.checkUsername}></input>
 						<p className={previewClass}>{profileUrl}</p>
+						<p className='usernameMessage'>{this.state.usernameMessage}</p>
 						<input type='email' name='email' placeholder='Email' onChange={this.handleChange}></input>
 						<input type='email' name='email_confirm' placeholder='Confirm Email' onChange={this.handleChange}></input>
 						<input type='password' name='password' placeholder='Password' onChange={this.handleChange}></input>

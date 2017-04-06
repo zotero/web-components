@@ -208,9 +208,9 @@ let GroupsExplainer = React.createClass({
 		let nonUserLink = null;
 		if(!Zotero.currentUser){
 			nonUserLink =  (
-				<span>
+				<div className="login-links">
 					<a href="/user/register"><b>Sign up now</b></a> or <a href="/user/login">log in</a>
-				</span>
+				</div>
 			);
 		}
 		return (

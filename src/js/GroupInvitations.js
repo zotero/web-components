@@ -1,11 +1,9 @@
 'use strict';
 
-import {log as logger} from './Log.js';
-let log = logger.Logger('GroupInvitations');
+//import {log as logger} from './Log.js';
+//let log = logger.Logger('GroupInvitations');
 
 import {ajax, postFormData} from './ajax.js';
-import {apiRequestString} from './ApiRouter.js';
-import {LoadingSpinner} from './LoadingSpinner.js';
 
 let React = require('react');
 
@@ -28,20 +26,25 @@ let groupDeclineUrl = function(group, token){
 	return `/groups/${group.id}/decline/${token}`;
 };
 
-let GroupInvitation = React.createClass({
-	acceptInvitation: function(){
+class GroupInvitation extends React.Component{
+	constructor(props){
+		super(props);
+		this.acceptInvitation = this.acceptInvitation.bind(this);
+		this.declineInvitation = this.declineInvitation.bind(this);
+	}
+	acceptInvitation(){
 		let group = this.props.group;
 		let invitation = this.props.invitation;
 		let url = groupJoinUrl(group);
 		postFormData(url, {token:invitation.token});
-	},
-	declineInvitation: function(){
+	}
+	declineInvitation(){
 		let group = this.props.group;
 		let invitation = this.props.invitation;
 		let url = groupDeclineUrl(group, invitation.token);
 		postFormData(url, {token:invitation.token});
-	},
-	render: function(){
+	}
+	render(){
 		let group = this.props.group;
 
 		return (
@@ -51,13 +54,20 @@ let GroupInvitation = React.createClass({
 					<button type="button" onClick={this.acceptInvitation}>Join</button>
 					<button type="button" onClick={this.declineInvitation}>Ignore</button>
 				</div>
-            </li>
-        );
+			</li>
+		);
 	}
-});
+}
 
-let GroupInvitations = React.createClass({
-	componentDidMount: function(){
+class GroupInvitations extends React.Component{
+	constructor(props){
+		super(props);
+		this.state = {
+			invitations:[],
+			invitationGroups:[]
+		};
+	}
+	componentDidMount(){
 		if(Zotero.currentUser){
 			ajax({url:'/groups/invitations'}).then((resp)=>{
 				resp.json().then((data) => {
@@ -68,14 +78,8 @@ let GroupInvitations = React.createClass({
 				});
 			});
 		}
-	},
-	getInitialState: function(){
-		return {
-			invitations:[],
-			invitationGroups:[]
-		};
-	},
-	render: function() {
+	}
+	render() {
 		let invitationGroups = this.state.invitationGroups;
 		let invitations = this.state.invitations;
 		let invitationNodes = invitations.map((invitation)=>{
@@ -95,6 +99,6 @@ let GroupInvitations = React.createClass({
 			</div>
 		);
 	}
-});
+}
 
 export {GroupInvitations};

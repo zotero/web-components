@@ -1,16 +1,20 @@
 'use strict';
 
-import {log as logger} from './Log.js';
-let log = logger.Logger('NewGroupDiscussions');
+//import {log as logger} from './Log.js';
+//let log = logger.Logger('NewGroupDiscussions');
 
-import {ajax, postFormData} from './ajax.js';
-import {apiRequestString} from './ApiRouter.js';
-import {LoadingSpinner} from './LoadingSpinner.js';
+import {ajax} from './ajax.js';
 
 let React = require('react');
 
-let NewGroupDiscussions = React.createClass({
-	componentDidMount: function(){
+class NewGroupDiscussions extends React.Component{
+	constructor(props){
+		super(props);
+		this.state = {
+			partial:''
+		};
+	}
+	componentDidMount(){
 		if(Zotero.currentUser){
 			ajax({url:'/groups/newgroupdiscussions'}).then((resp)=>{
 				resp.text().then((data) => {
@@ -18,13 +22,8 @@ let NewGroupDiscussions = React.createClass({
 				});
 			});
 		}
-	},
-	getInitialState: function(){
-		return {
-			partial:''
-		};
-	},
-	render: function() {
+	}
+	render() {
 		if(!Zotero.currentUser){
 			return null;
 		}
@@ -37,6 +36,6 @@ let NewGroupDiscussions = React.createClass({
 			</div>
 		);
 	}
-});
+}
 
 export {NewGroupDiscussions};

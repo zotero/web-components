@@ -8,6 +8,7 @@ import {apiRequestString} from './ApiRouter.js';
 import {LoadingSpinner} from './LoadingSpinner.js';
 
 let React = require('react');
+const {Component} = React;
 
 import {slugify} from './Utils.js';
 
@@ -86,23 +87,18 @@ let groupLibrarySettingsUrl = function(group){
 	return groupSettingsUrl(group) + '/library';
 };
 
-let IntroVideo = React.createClass({
-	render: function(){
+class IntroVideo extends Component{
+	render(){
 		return (
 			<video id='group-intro-screencast' src="/static/videos/group_intro.m4v" controls='true' height='450px' poster='/static/images/group/playvideo.jpg'>
 				Sorry, your browser doesn't support embedded videos.
 			</video>
 		);
 	}
-});
+}
 
-let GroupNugget = React.createClass({
-	getDefaultProps: function(){
-		return {
-			titleOnly:false
-		};
-	},
-	render: function() {
+class GroupNugget extends Component{
+	render(){
 		let group = this.props.group;
 		let userID = this.props.userID;
 
@@ -201,10 +197,11 @@ let GroupNugget = React.createClass({
 			</div>
 		);
 	}
-});
+}
+GroupNugget.defaultProps = {titleOnly:false};
 
-let GroupsExplainer = React.createClass({
-	render: function() {
+class GroupsExplainer extends Component{
+	render(){
 		let nonUserLink = null;
 		if(!Zotero.currentUser){
 			nonUserLink =  (
@@ -229,10 +226,19 @@ let GroupsExplainer = React.createClass({
 			</div>
 		);
 	}
-});
+}
 
-let UserGroups = React.createClass({
-	componentDidMount: function() {
+class UserGroups extends Component{
+	constructor(props){
+		super(props);
+		this.state = {
+			groups: [],
+			loading:false,
+			userID:false,
+			groupsLoaded:false
+		};
+	}
+	componentDidMount(){
 		let userID = false;
 		if(this.props.userID){
 			userID = this.props.userID;
@@ -264,22 +270,8 @@ let UserGroups = React.createClass({
 				});
 			});
 		}
-	},
-	getDefaultProps: function() {
-		return {
-			titleOnly:false,
-			userID:false
-		};
-	},
-	getInitialState: function() {
-		return {
-			groups: [],
-			loading:false,
-			userID:false,
-			groupsLoaded:false
-		};
-	},
-	render: function() {
+	}
+	render(){
 		let groups = this.state.groups;
 		let userID = this.state.userID;
 		let titleOnly = this.props.titleOnly;
@@ -303,6 +295,10 @@ let UserGroups = React.createClass({
 			</div>
 		);
 	}
-});
+}
+UserGroups.defaultProps =  {
+	titleOnly:false,
+	userID:false
+};
 
 export {UserGroups, GroupNugget};

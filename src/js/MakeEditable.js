@@ -4,14 +4,14 @@
 //var log = logger.Logger('MakeEditable');
 
 const React = require('react');
+const {Component} = React;
 
-let MakeEditable = React.createClass({
-	getDefaultProps: function(){
-		return {
-			target: false
-		};
-	},
-	makeEditable: function(){
+class MakeEditable extends Component {
+	constructor(props){
+		super(props);
+		this.makeEditable = this.makeEditable.bind(this);
+	}
+	makeEditable(){
 		let el;
 		if(this.props.target){
 			el = document.querySelector(this.props.target);
@@ -27,12 +27,16 @@ let MakeEditable = React.createClass({
 			sel.removeAllRanges();
 			sel.addRange(range);
 		}
-	},
-	render: function(){
+	}
+	render(){
 		return (
 			<button onClick={this.makeEditable}>Edit</button>
 		);
 	}
-});
+}
+
+MakeEditable.defaultProps = {
+	target: false
+};
 
 export {MakeEditable};

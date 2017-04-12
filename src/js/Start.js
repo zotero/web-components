@@ -4,7 +4,7 @@ import {log as logger} from './Log.js';
 let log = logger.Logger('StartComponent');
 
 const React = require('react');
-const {Component, PropTypes} = React;
+const {Component} = React;
 
 const firefoxVersion = window.zoteroConfig.firefoxVersion;
 const firefoxHash = window.zoteroConfig.firefoxHash;
@@ -35,33 +35,28 @@ import {slugify} from './Utils.js';
 
 let browser = require('detect-browser');
 
-let ArrowDownGray = React.createClass({
-	render:function(){
+class ArrowDownGray extends Component{
+	render(){
 		return (
 			<div className='arrow-down'>
 				<img src={arrowDownGrayImagePath} />
 			</div>
 		);
 	}
-});
+}
 
-let ArrowDownWhite = React.createClass({
-	render:function(){
+class ArrowDownWhite extends Component{
+	render(){
 		return (
 			<div className='arrow-down'>
 				<img src={arrowDownWhiteImagePath} />
 			</div>
 		);
 	}
-});
+}
 
-let InstallFirefoxButton = React.createClass({
-	getDefaultProps: function(){
-		return {
-			type:'button'
-		};
-	},
-	installFirefox: function(){
+class InstallFirefoxButton extends Component{
+	installFirefox(){
 		if (typeof InstallTrigger == 'undefined') {
 			return true;
 		}
@@ -72,10 +67,10 @@ let InstallFirefoxButton = React.createClass({
 			}
 		};
 
-		InstallTrigger.install(params);
+		window.InstallTrigger.install(params);
 		return false;
-	},
-	render: function() {
+	}
+	render(){
 		if(this.props.type == 'button'){
 			return (
 				<a className='button' onClick={this.installFirefox}>Install</a>
@@ -86,22 +81,18 @@ let InstallFirefoxButton = React.createClass({
 			);
 		}
 	}
-});
+}
+InstallFirefoxButton.defaultProps = {type:'button'};
 
-let InstallChromeButton = React.createClass({
-	getDefaultProps: function(){
-		return {
-			type:'button'
-		};
-	},
-	installChrome: function(){
-		chrome.webstore.install(chromeInstallUrl, ()=>{
+class InstallChromeButton extends Component{
+	installChrome(){
+		window.chrome.webstore.install(chromeInstallUrl, ()=>{
 			//success
 		}, ()=>{
 			//failure
 		});
-	},
-	render: function() {
+	}
+	render(){
 		if(this.props.type == 'button') {
 			return (
 				<a className='button' onClick={this.installChrome}>Install</a>
@@ -112,17 +103,13 @@ let InstallChromeButton = React.createClass({
 			);
 		}
 	}
-});
+}
+InstallChromeButton.defaultProps = {type:'button'};
 
-let InstallSafariButton = React.createClass({
-	getDefaultProps: function(){
-		return {
-			type:'button'
-		};
-	},
-	installSafari: function(){
-	},
-	render: function() {
+class InstallSafariButton extends Component{
+	installSafari(){
+	}
+	render(){
 		if(this.props.type == 'button') {
 			return (
 				<a href={safariDownloadUrl} id="safari-connector-download-button" className="button download-link">Install</a>
@@ -133,17 +120,13 @@ let InstallSafariButton = React.createClass({
 			);
 		}
 	}
-});
+}
+InstallSafariButton.defaultProps = {type:'button'};
 
-let InstallOperaButton = React.createClass({
-	getDefaultProps: function(){
-		return {
-			type:'button'
-		};
-	},
-	installOpera: function(){
-	},
-	render: function() {
+class InstallOperaButton extends Component{
+	installOpera(){
+	}
+	render(){
 		if(this.props.type == 'button') {
 			return (
 				<a href={operaDownloadUrl} id="opera-connector-download-button" className="button download-link">Install</a>
@@ -154,11 +137,11 @@ let InstallOperaButton = React.createClass({
 			);
 		}
 	}
-});
+}
+InstallOperaButton.defaultProps = {type:'button'};
 
-
-let InstallButton = React.createClass({
-	render: function() {
+class InstallButton extends Component{
+	render(){
 		let browserName = browser.name;
 		log.debug('InstallButton render');
 		log.debug(browserName);
@@ -177,28 +160,28 @@ let InstallButton = React.createClass({
 				return null;
 		}
 	}
-});
+}
 
-let ChromeExtensionIcon = React.createClass({
-	render: function(){
+class ChromeExtensionIcon extends Component{
+	render(){
 		return <img className='extensionIconImage' src={chromeExtensionImagePath} />;
 	}
-});
+}
 
-let FirefoxExtensionIcon = React.createClass({
-	render: function(){
+class FirefoxExtensionIcon extends Component{
+	render(){
 		return <img className='extensionIconImage' src={firefoxExtensionImagePath} />;
 	}
-});
+}
 
-let SafariExtensionIcon = React.createClass({
-	render: function(){
+class SafariExtensionIcon extends Component{
+	render(){
 		return <img className='extensionIconImage' src={safariExtensionImagePath} />;
 	}
-});
+}
 
-let AllExtensionsSection = React.createClass({
-	render:function(){
+class AllExtensionsSection extends Component{
+	render(){
 		return (
 			<div id='all-extensions'>
 				<InstallChromeButton type='image' />
@@ -207,23 +190,25 @@ let AllExtensionsSection = React.createClass({
 			</div>
 		);
 	}
-});
+}
 
 
-let InstallConnectorPrompt = React.createClass({
-	componentDidMount: function(){
-		//detect browser and set correct browser image
-	},
-	getInitialState: function() {
-		return {
+class InstallConnectorPrompt extends Component{
+	constructor(props){
+		super(props);
+		this.state = {
 			browser:browser.name,
 			showAllExtensions:false
 		};
-	},
-	showAllExtensions: function() {
+		this.showAllExtensions = this.showAllExtensions.bind(this);
+	}
+	componentDidMount(){
+		//detect browser and set correct browser image
+	}
+	showAllExtensions(){
 		this.setState({showAllExtensions:true});
-	},
-	render: function() {
+	}
+	render(){
 		let connectorText = '';
 		let connectorImage = null;
 		let installButton = <InstallButton browser='chrome' />;
@@ -267,7 +252,7 @@ let InstallConnectorPrompt = React.createClass({
 			</div>
 		);
 	}
-});
+}
 
 let validateRegisterForm = function(data) {
 	if(data.email != data.email_confirm){
@@ -285,9 +270,10 @@ let validateRegisterForm = function(data) {
 	return {valid:true};
 };
 
-let RegisterForm = React.createClass({
-	getInitialState: function() {
-		return {
+class RegisterForm extends Component{
+	constructor(props){
+		super(props);
+		this.state = {
 			formData:{
 				username:'',
 				email:'',
@@ -300,8 +286,11 @@ let RegisterForm = React.createClass({
 			formError:'',
 			registrationSuccessful:false
 		};
-	},
-	checkUsername: function() {
+		this.checkUsername = this.checkUsername.bind(this);
+		this.handleChange = this.handleChange.bind(this);
+		this.register = this.register.bind(this);
+	}
+	checkUsername(){
 		let username = this.state.formData.username;
 		if(username.indexOf('@') != -1){
 			this.setState({
@@ -326,8 +315,8 @@ let RegisterForm = React.createClass({
 			this.setState({formError:'Error checking username'});
 			//TODO:error JS notification
 		});
-	},
-	handleChange: function(ev){
+	}
+	handleChange(ev){
 		let formData = this.state.formData;
 		formData[ev.target.name] = ev.target.value;
 
@@ -335,8 +324,8 @@ let RegisterForm = React.createClass({
 		if(ev.target.name == 'username'){
 			this.setState({usernameValidity:'undecided', usernameMessage:''});
 		}
-	},
-	register: function() {
+	}
+	register(){
 		let formData = this.state.formData;
 		//validate form
 		let validated = validateRegisterForm(formData);
@@ -357,8 +346,8 @@ let RegisterForm = React.createClass({
 		}).catch(()=>{
 			this.setState({formError:'Error processing registration'});
 		});
-	},
-	render: function() {
+	}
+	render(){
 		let slug = '<username>';
 		if(this.state.formData.username) {
 			slug = slugify(this.state.formData.username);
@@ -392,16 +381,10 @@ let RegisterForm = React.createClass({
 			</div>
 		);
 	}
-});
+}
 
-let PostRegisterGuide = React.createClass({
-	componentDidMount: function(){
-	},
-	getInitialState: function() {
-		return {
-		};
-	},
-	render: function() {
+class PostRegisterGuide extends Component{
+	render(){
 		let quickStartGuideUrl = '/support/quickstartguide';
 		return (
 			<div id='post-register-guide' className='content'>
@@ -421,20 +404,10 @@ let PostRegisterGuide = React.createClass({
 			</div>
 		);
 	}
-});
+}
 
-
-let Start = React.createClass({
-	componentDidMount: function(){
-	},
-	getInitialState: function() {
-		return {
-		};
-	},
-	checkUsername: function() {
-
-	},
-	render: function() {
+class Start extends Component{
+	render(){
 		return (
 			<div id='start-container'>
 				<InstallConnectorPrompt ref='installConnectorPrompt' />
@@ -443,6 +416,6 @@ let Start = React.createClass({
 			</div>
 		);
 	}
-});
+}
 
 export {Start};

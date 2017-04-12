@@ -10,25 +10,24 @@ let React = require('react');
 
 const config = window.zoteroConfig;
 
-var CreateGroup = React.createClass({
-	componentWillMount: function() {
-	},
-	getDefaultProps: function() {
-	},
-	getInitialState: function() {
-		return {
+class CreateGroup extends React.Component{
+	constructor(props){
+		super(props);
+		this.state = {
 			name: '',
 			type: 'PublicOpen',
 			checkingName:false,
 			nameValid:null,
 			preview:''
 		};
-	},
-	changeType: function(evt) {
+		this.changeType = this.changeType.bind(this);
+		this.changeName = this.changeName.bind(this);
+	}
+	changeType(evt) {
 		this.setState({type:evt.target.value});
 		this.changeName();
-	},
-	changeName: function(evt) {
+	}
+	changeName(evt) {
 		if(evt){
 			this.setState({name:evt.target.value, nameValid:null});
 		}
@@ -47,8 +46,8 @@ var CreateGroup = React.createClass({
 			}
 		}, 300);
 		this.setState({timer:timeout});
-	},
-	render: function() {
+	}
+	render() {
 		let slugPreview = '';
 		if(this.state.type == 'Private') {
 			slugPreview = `Group URL: ${config.baseZoteroWebsiteUrl}/groups/<number>`;
@@ -119,6 +118,6 @@ var CreateGroup = React.createClass({
 			</div>    
 		);
 	}
-});
+}
 
 export {CreateGroup};

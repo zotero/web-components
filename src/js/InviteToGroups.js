@@ -12,8 +12,22 @@ let React = require('react');
 const apiKey = window.zoteroConfig.apiKey;
 
 //component to list groups a user can invite another user to
-let InviteToGroups = React.createClass({
-	componentDidMount: function() {
+class InviteToGroups extends React.Component{
+	constructor(props){
+		super(props);
+		this.state = {
+			userGroups: [],
+			inviteeGroups: [],
+			invitableGroups: [],
+			invitationsSent: [],
+			userGroupsLoaded:false,
+			inviteeGroupsLoaded:false,
+			selectedGroup:false
+		};
+		this.updateSelectedGroup = this.updateSelectedGroup.bind(this);
+		this.inviteToGroup = this.inviteToGroup.bind(this);
+	}
+	componentDidMount() {
 		let userID = false;
 		let inviteeUserID = this.props.inviteeUserID;
 		if(this.props.userID){
@@ -66,37 +80,19 @@ let InviteToGroups = React.createClass({
 			});
 		});
 
-	},
-	getDefaultProps: function() {
-		return {
-			titleOnly:false,
-			userID:false,
-			inviteeUserID: false
-		};
-	},
-	getInitialState: function() {
-		return {
-			userGroups: [],
-			inviteeGroups: [],
-			invitableGroups: [],
-			invitationsSent: [],
-			userGroupsLoaded:false,
-			inviteeGroupsLoaded:false,
-			selectedGroup:false
-		};
-	},
-	updateSelectedGroup: function(evt) {
+	}
+	updateSelectedGroup(evt) {
 		this.setState({selectedGroup:evt.target.value});
-	},
-	inviteToGroup: function() {
+	}
+	inviteToGroup() {
 		let groupID = this.state.selectedGroup;
 		log.debug(`invite to ${groupID}`);
 		//TODO:actually send invite
 		let invitationsSent = this.state.invitationsSent;
 		invitationsSent.push(groupID);
 		this.setState({invitationsSent});
-	},
-	render: function() {
+	}
+	render() {
 		log.debug('InviteToGroups render');
 		if(!this.state.userGroupsLoaded || !this.state.inviteeGroupsLoaded){
 			return null;
@@ -143,6 +139,11 @@ let InviteToGroups = React.createClass({
 			</div>
 		);
 	}
-});
+}
+InviteToGroups.defaultProps = {
+	titleOnly:false,
+	userID:false,
+	inviteeUserID: false
+};
 
 export {InviteToGroups};

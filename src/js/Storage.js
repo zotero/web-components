@@ -4,7 +4,8 @@ import {log as logger} from './Log.js';
 var log = logger.Logger('StorageComponent');
 
 const React = require('react');
-const {Component, PropTypes} = React;
+const {Component} = React;
+import PropTypes from 'prop-types';
 
 import {ajax, postFormData} from './ajax.js';
 
@@ -124,17 +125,17 @@ StoragePlanRow.propTypes = {
 	}).isRequired
 };
 
-let InstitutionProvides = React.createClass({
-	render: function(){
+class InstitutionProvides extends Component {
+	render(){
 		let institution = this.props.institution;
 		return (
 			<p>{institution.name} provides {institution.storageQuota} MB for {institution.email}</p>
 		);
 	}
-});
+}
 
-let InstitutionalRow = React.createClass({
-	render: function(){
+class InstitutionalRow extends Component {
+	render(){
 		let institutions = this.props.institutions;
 		if(!institutions) {
 			return null;
@@ -152,10 +153,10 @@ let InstitutionalRow = React.createClass({
 		}
 		return null;
 	}
-});
+}
 
-let StorageMeter = React.createClass({
-	render: function(){
+class StorageMeter extends Component {
+	render(){
 		let quota = this.props.quota;
 		let quotaPercentage = this.props.quotaPercentage;
 		if(quota == 1000000) {
@@ -168,20 +169,20 @@ let StorageMeter = React.createClass({
 			</div>
 		);
 	}
-});
+}
 
-let GroupUsage = React.createClass({
-	render: function(){
+class GroupUsage extends Component {
+	render(){
 		let group = this.props.group;
 		let usage = this.props.usage;
 		return (
 			<p>{group.title} - {usage} MB</p>
 		);
 	}
-});
+}
 
-let PaymentRow = React.createClass({
-	render: function() {
+class PaymentRow extends Component {
+	render() {
 		if(!this.props.defaultSource || !this.props.userSubscription.recur){
 			let paymentButton = <button className="btn" onClick={this.props.updateCardHandler}>Enable Automatic Renewal</button>;
 
@@ -213,10 +214,10 @@ let PaymentRow = React.createClass({
 			</tr>
 		);
 	}
-});
+}
 
-let NextPaymentRow = React.createClass({
-	render: function() {
+class NextPaymentRow extends Component {
+	render() {
 		let userSubscription = this.props.userSubscription;
 		let dateFormatOptions = {year: 'numeric', month: 'long', day: 'numeric'};
 		let d = new Date(parseInt(userSubscription.expirationDate)*1000);
@@ -246,10 +247,10 @@ let NextPaymentRow = React.createClass({
 				</tr>);
 		}
 	}
-});
+}
 
-let PreviewRow = React.createClass({
-	render: function() {
+class PreviewRow extends Component {
+	render() {
 		let storageLevel = this.props.storageLevel;
 		if(!storageLevel){
 			return null;
@@ -271,10 +272,33 @@ let PreviewRow = React.createClass({
 			);
 		}
 	}
-});
+}
 
-var Storage = React.createClass({
-	componentDidMount: function(){
+class Storage extends Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			userSubscription:null,
+			storageGroups:[],
+			planQuotas:{},
+			stripeCustomer:null,
+			operationPending:false,
+			notificationClass:'',
+			notification:''
+		};
+
+		this.getSubscription = this.getSubscription.bind(this);
+		this.getUserCustomer = this.getUserCustomer.bind(this);
+		this.previewPlan = this.previewPlan.bind(this);
+		this.unpreviewPlan = this.unpreviewPlan.bind(this);
+		this.selectPlan = this.selectPlan.bind(this);
+		this.renewNow = this.renewNow.bind(this);
+		this.updateSubscription = this.updateSubscription.bind(this);
+		this.chargeSubscription = this.chargeSubscription.bind(this);
+		this.updatePayment = this.updatePayment.bind(this);
+		this.cancelRecur = this.cancelRecur.bind(this);
+	}
+	componentDidMount(){
 		if(window.zoteroData.userSubscription && window.zoteroData.stripeCustomer){
 			//don't load new data if it's already been loaded serverside and included with the page
 			//instead just set the state with it
@@ -288,19 +312,8 @@ var Storage = React.createClass({
 		}
 		this.getSubscription();
 		this.getUserCustomer();
-	},
-	getInitialState: function() {
-		return {
-			userSubscription:null,
-			storageGroups:[],
-			planQuotas:{},
-			stripeCustomer:null,
-			operationPending:false,
-			notificationClass:'',
-			notification:''
-		};
-	},
-	getSubscription: function() {
+	}
+	getSubscription() {
 		log.debug('getSubscription');
 		ajax({url:'/storage/usersubscription'}).then((resp) => {
 			log.debug(resp);
@@ -319,8 +332,8 @@ var Storage = React.createClass({
 				notification:'There was an error retrieving your subscription data'
 			});
 		});
-	},
-	getUserCustomer: function() {
+	}
+	getUserCustomer() {
 		log.debug('getUserCustomer');
 		ajax({url:'/storage/getusercustomer'}).then((resp) => {
 			log.debug(resp);
@@ -335,15 +348,15 @@ var Storage = React.createClass({
 				notification:'There was an error retrieving your subscription data'
 			});
 		});
-	},
-	previewPlan: function(evt) {
+	}
+	previewPlan(evt) {
 		let storageLevel = evt.target.getAttribute('data-storagelevel');
 		this.setState({previewStorageLevel:storageLevel});
-	},
-	unpreviewPlan: function() {
+	}
+	unpreviewPlan() {
 		this.setState({previewStorageLevel:null});
-	},
-	selectPlan: function(evt) {
+	}
+	selectPlan(evt) {
 		this.setState({operationPending:true});
 		let storageLevel = evt.target.getAttribute('data-storagelevel');
 		let userSubscription = this.state.userSubscription;
@@ -369,8 +382,8 @@ var Storage = React.createClass({
 			//just update storage plan without charging
 			this.updateSubscription(storageLevel);
 		}
-	},
-	renewNow: function() {
+	}
+	renewNow() {
 		this.setState({operationPending:true});
 		let userSubscription = this.state.userSubscription;
 		let storageLevel = userSubscription.storageLevel;
@@ -387,8 +400,8 @@ var Storage = React.createClass({
 		
 		//get stripe and charge for the current storage level
 		this.chargeSubscription(storageLevel);
-	},
-	updateSubscription: function(storageLevel=false) {
+	}
+	updateSubscription(storageLevel=false) {
 		if(storageLevel === false) {
 			throw 'no storageLevel set for updateSubscription';
 		}
@@ -411,8 +424,8 @@ var Storage = React.createClass({
 				notificationClass: 'error'
 			});
 		});
-	},
-	chargeSubscription: function(storageLevel=false) {
+	}
+	chargeSubscription(storageLevel=false) {
 		if(storageLevel === false) {
 			throw 'no storageLevel set for updateSubscription';
 		}
@@ -460,8 +473,8 @@ var Storage = React.createClass({
 		};
 
 		stripeHandler(descriptions[storageLevel], tokenHandler, closedHandler);
-	},
-	updatePayment: function() {
+	}
+	updatePayment() {
 		this.setState({operationPending:true});
 		let tokenHandler = (token) => {
 			// You can access the token ID with `token.id`.
@@ -496,8 +509,8 @@ var Storage = React.createClass({
 		};
 
 		stripeHandler('', tokenHandler, closedHandler);
-	},
-	cancelRecur: function(){
+	}
+	cancelRecur(){
 		this.setState({operationPending:true});
 
 		postFormData('/storage/cancelautorenew').then((resp) => {
@@ -518,8 +531,8 @@ var Storage = React.createClass({
 			this.getSubscription();
 			this.getUserCustomer();
 		});
-	},
-	render: function() {
+	}
+	render() {
 		window.StorageComponent = this;
 		let reactInstance = this;
 		if(this.state.userSubscription === null){
@@ -659,6 +672,6 @@ var Storage = React.createClass({
 			</div>
 		);
 	}
-});
+}
 
 export {Storage};

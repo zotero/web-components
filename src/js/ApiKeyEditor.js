@@ -8,7 +8,7 @@ const React = require('react');
 const {Component} = React;
 import PropTypes from 'prop-types';
 
-import {RadioGroup, Radio} from 'react-radio-group';
+import {RadioGroup, Radio} from './react-radio-group.js';
 import {ajax} from './ajax.js';
 
 let stringToBool = function(val){

@@ -24,11 +24,23 @@ let groupViewUrl = function(group){
 };
 
 //component to list groups a user can invite another user to
-let InviteToGroups = React.createClass({
-	componentDidMount: function() {
+class InviteToGroups extends React.Component{
+	constructor(props){
+		super(props);
+		this.state = {
+			memberGroups: [],
+			invitedGroups: [],
+			invitableGroups: [],
+			loaded:false
+		};
+		this.loadGroupInfo = this.loadGroupInfo.bind(this);
+		this.updateSelectedGroup = this.updateSelectedGroup.bind(this);
+		this.inviteToGroup = this.inviteToGroup.bind(this);
+	}
+	componentDidMount() {
 		this.loadGroupInfo();
-	},
-	loadGroupInfo: function() {
+	}
+	loadGroupInfo() {
 		let userID = this.props.inviteeUserID;
 		let url = `/user/${userID}/groupsjson`;
 		ajax({url: url}).then((resp)=>{
@@ -41,26 +53,11 @@ let InviteToGroups = React.createClass({
 				});
 			});
 		});
-	},
-	getDefaultProps: function() {
-		return {
-			titleOnly:false,
-			userID:false,
-			inviteeUserID: false
-		};
-	},
-	getInitialState: function() {
-		return {
-			memberGroups: [],
-			invitedGroups: [],
-			invitableGroups: [],
-			loaded:false
-		};
-	},
-	updateSelectedGroup: function(evt) {
+	}
+	updateSelectedGroup(evt) {
 		this.setState({selectedGroup:evt.target.value});
-	},
-	inviteToGroup: function() {
+	}
+	inviteToGroup() {
 		let groupID = this.state.selectedGroup;
 		log.debug(`invite to ${groupID}`);
 		//TODO:actually send invite
@@ -78,8 +75,8 @@ let InviteToGroups = React.createClass({
 			invitedGroups:invitedGroups,
 			invitableGroups:invitableGroups
 		});
-	},
-	render: function() {
+	}
+	render() {
 		log.debug('InviteToGroups render');
 		if(!this.state.loaded){
 			return null;
@@ -132,6 +129,11 @@ let InviteToGroups = React.createClass({
 			</div>
 		);
 	}
-});
+}
+InviteToGroups.defaultProps = {
+	titleOnly:false,
+	userID:false,
+	inviteeUserID: false
+};
 
 export {InviteToGroups};

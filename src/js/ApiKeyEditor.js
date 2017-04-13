@@ -10,7 +10,12 @@ import PropTypes from 'prop-types';
 
 import {RadioGroup, Radio} from './react-radio-group.js';
 import {ajax} from './ajax.js';
-import {buildUrl} from 'wwwroutes.js';
+import {buildUrl} from './wwwroutes.js';
+import {Notifier} from './Notifier.js';
+
+let scrollToTop = function() {
+	window.scrollBy(0, -5000);
+};
 
 let stringToBool = function(val){
 	if(val === '0') {
@@ -355,10 +360,15 @@ class ApiKeyEditor extends Component {
 		}
 		let saveUrl = buildUrl('saveKey', {key:editKey.key});
 		ajax({url:saveUrl, type:'POST', data:JSON.stringify(key)}).then((resp)=>{
+			scrollToTop();
 			if(!resp.ok){
 				log.error('Error saving key');
 			}
 			resp.json().then((data) => {
+				if(data.success){
+					this.setState({notification: {type:'success', message:'Key Saved'}});
+				}
+				log.debug(data);
 			});
 		});
 	}
@@ -379,9 +389,14 @@ class ApiKeyEditor extends Component {
 			});
 		}
 
+		let notifier = null;
+		if(this.state.notification){
+			notifier = <Notifier {...this.state.notification} />;
+		}
 		return (
 			<div className='key-editor'>
 				<h1>Edit Key</h1>
+				{notifier}
 				<label htmlFor='name'>Key Name
 					<input type='text' placeholder='Key Name' name='name' id='name' onChange={this.changeName} value={this.state.name} />
 				</label>

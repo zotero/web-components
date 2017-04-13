@@ -8,6 +8,7 @@ const {Component} = React;
 import PropTypes from 'prop-types';
 
 import {ajax, postFormData} from './ajax.js';
+import {Notifier} from './Notifier.js';
 
 let priceCents = {'1':0,'2':2000,'3':6000,'4':10000,'5':24000,'6':12000};
 let plans = [
@@ -36,7 +37,6 @@ let plans = [
 		discountedPrice: '$96'
 	}	
 ];
-
 
 var calculateRemainingValue = function(expiration=Date.now(), storageLevel=2) {
 	log.debug(expiration);
@@ -283,8 +283,7 @@ class Storage extends Component {
 			planQuotas:{},
 			stripeCustomer:null,
 			operationPending:false,
-			notificationClass:'',
-			notification:''
+			notification:null
 		};
 
 		this.getSubscription = this.getSubscription.bind(this);
@@ -327,10 +326,10 @@ class Storage extends Component {
 		}).catch((e)=>{
 			log.debug('Error retrieving subscription data');
 			log.debug(e);
-			this.setState({
-				notificationClass: 'error',
-				notification:'There was an error retrieving your subscription data'
-			});
+			this.setState({notification:{
+				type: 'error',
+				message: 'There was an error retrieving your subscription data'
+			}});
 		});
 	}
 	getUserCustomer() {
@@ -343,10 +342,10 @@ class Storage extends Component {
 		}).catch((e)=>{
 			log.debug('Error retrieving customer data');
 			log.debug(e);
-			this.setState({
-				notificationClass: 'error',
-				notification:'There was an error retrieving your subscription data'
-			});
+			this.setState({notification:{
+				type: 'error',
+				message: 'There was an error retrieving your subscription data'
+			}});
 		});
 	}
 	previewPlan(evt) {
@@ -367,8 +366,10 @@ class Storage extends Component {
 		if(userSubscription.usage.total > planQuota) {
 			this.setState({
 				operationPending:false,
-				notification: 'Current usage exceeds plan quota.',
-				notificationClass: 'error'
+				notification:{
+					type: 'error',
+					message: 'Current usage exceeds plan quota.'
+				}
 			});
 			return;
 		}
@@ -392,8 +393,10 @@ class Storage extends Component {
 		if(userSubscription.usage.total > planQuota) {
 			this.setState({
 				operationPending:false,
-				notification: 'Current usage exceeds plan quota.',
-				notificationClass: 'error'
+				notification: {
+					type: 'error',
+					message: 'Current usage exceeds plan quota.'
+				}
 			});
 			return;
 		}
@@ -413,15 +416,19 @@ class Storage extends Component {
 			this.getSubscription();
 			this.setState({
 				operationPending:false,
-				notification: 'Success',
-				notificationClass: 'success'
+				notification: {
+					type:'success',
+					message: 'Success'
+				}
 			});
 		}).catch((e) => {
 			log.error(e);
 			this.setState({
 				operationPending:false,
-				notification: 'Error updating subscription. Please try again in a few minutes.',
-				notificationClass: 'error'
+				notification: {
+					type: 'error',
+					message: 'Error updating subscription. Please try again in a few minutes.'
+				}
 			});
 		});
 	}
@@ -450,15 +457,19 @@ class Storage extends Component {
 				log.debug(resp);
 				this.setState({
 					operationPending:false,
-					notification: 'Success',
-					notificationClass: 'success'
+					notification: {
+						type: 'success',
+						message: 'Success'
+					}
 				});
 			}).catch((resp) => {
 				log.debug(resp);
 				this.setState({
 					operationPending:false,
-					notification: 'Error updating subscription. Please try again in a few minutes.',
-					notificationClass: 'error'
+					notification: {
+						type: 'error',
+						message: 'Error updating subscription. Please try again in a few minutes.'
+					}
 				});
 			}).then(()=>{
 				this.getSubscription();
@@ -486,15 +497,19 @@ class Storage extends Component {
 				log.debug(resp);
 				this.setState({
 					operationPending:false,
-					notification: 'Success',
-					notificationClass: 'success'
+					notification: {
+						type: 'success',
+						message: 'Success'
+					}
 				});
 			}).catch((resp) => {
 				log.debug(resp);
 				this.setState({
 					operationPending:false,
-					notification: 'Error updating payment method. Please try again in a few minutes.',
-					notificationClass: 'error'
+					notification: {
+						type: 'error',
+						message: 'Error updating payment method. Please try again in a few minutes.'
+					}
 				});
 			}).then(()=>{
 				this.getSubscription();
@@ -517,15 +532,19 @@ class Storage extends Component {
 			log.debug(resp);
 			this.setState({
 				operationPending:false,
-				notification: 'Success',
-				notificationClass: 'success'
+				notification: {
+					type: 'success',
+					message: 'Success'
+				}
 			});
 		}).catch((resp) => {
 			log.debug(resp);
 			this.setState({
 				operationPending:false,
-				notification: 'Error updating payment method. Please try again in a few minutes.',
-				notificationClass: 'error'
+				notification: {
+					type: 'error',
+					message: 'Error updating payment method. Please try again in a few minutes.'
+				}
 			});
 		}).then(()=>{
 			this.getSubscription();
@@ -617,7 +636,7 @@ class Storage extends Component {
 		return (
 			<div className='storage-container'>
 				{modalSpinner}
-				<div className={'storage-notification ' + this.state.notificationClass}>{this.state.notification}</div>
+				<Notifier {...this.state.notification} />
 				<div className='user-storage'>
 					<div className='current-storage flex-section'>
 						<div className='section-header'>

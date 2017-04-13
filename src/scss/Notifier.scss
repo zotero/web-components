@@ -1,0 +1,21 @@
+div.notifier {
+    margin:4px;
+    padding:8px;
+    border-radius: 4px;
+    display:none;
+}
+div.notifier.success {
+    background-color: $notification-success-color;
+    border-color: $notification-success-border-color;
+    display:block;
+}
+div.notifier.info {
+    background-color: $notification-info-color;
+    border-color: $notification-info-border-color;
+    display:block;
+}
+div.notifier.error {
+    background-color: $notification-error-color;
+    border-color: $notification-error-border-color;
+    display:block;
+}

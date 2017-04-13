@@ -6,7 +6,7 @@ let log = logger.Logger('StartComponent');
 const React = require('react');
 const {Component} = React;
 
-const firefoxVersion = window.zoteroConfig.firefoxVersion;
+//const firefoxVersion = window.zoteroConfig.firefoxVersion;
 const firefoxHash = window.zoteroConfig.firefoxHash;
 const firefoxDownload = window.zoteroConfig.firefoxDownload;
 const chromeInstallUrl = window.zoteroConfig.chromeInstallUrl;
@@ -32,6 +32,7 @@ const operaBrowserImagePath = imagePath + '/theme/browser_icons/64-opera.png';
 
 import {ajax, postFormData} from './ajax.js';
 import {slugify} from './Utils.js';
+import {buildUrl} from './wwwroutes.js';
 
 let browser = require('detect-browser');
 
@@ -299,7 +300,7 @@ class RegisterForm extends Component{
 			});
 			return;
 		}
-		let checkUrl = `/user/checkusername?username=${encodeURIComponent(username)}`;
+		let checkUrl = buildUrl('checkUsername', {username});
 		ajax({url:checkUrl}).then((response)=>{
 			response.json().then((data)=>{
 				if(data.valid){
@@ -335,7 +336,7 @@ class RegisterForm extends Component{
 			return;
 		}
 		//submit form
-		let registerUrl = '/user/registerasync';
+		let registerUrl = buildUrl('registerAsync');
 		postFormData(registerUrl, formData).then((resp)=>{
 			resp.json().then((data)=>{
 				if(data.success === false){
@@ -352,7 +353,7 @@ class RegisterForm extends Component{
 		if(this.state.formData.username) {
 			slug = slugify(this.state.formData.username);
 		}
-		let profileUrl = `https://www.zotero.org/${slug}`;
+		let profileUrl = buildUrl('profileUrl', {slug});
 		let previewClass = 'profile-preview ' + this.state.usernameValidity;
 		
 		return (
@@ -385,7 +386,7 @@ class RegisterForm extends Component{
 
 class PostRegisterGuide extends Component{
 	render(){
-		let quickStartGuideUrl = '/support/quickstartguide';
+		let quickStartGuideUrl = buildUrl('quickstartGuide');
 		return (
 			<div id='post-register-guide' className='content'>
 				<ArrowDownGray />

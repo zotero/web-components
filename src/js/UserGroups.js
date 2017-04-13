@@ -6,11 +6,10 @@ let log = logger.Logger('UserGroups');
 import {ajax} from './ajax.js';
 import {apiRequestString} from './ApiRouter.js';
 import {LoadingSpinner} from './LoadingSpinner.js';
+import {buildUrl} from './wwwroutes.js';
 
 let React = require('react');
 const {Component} = React;
-
-import {slugify} from './Utils.js';
 
 const apiKey = window.zoteroConfig.apiKey;
 
@@ -57,36 +56,6 @@ let groupIsWritable = function(group, userID) {
 };
 */
 
-let groupViewUrl = function(group){
-	if(group.data.type == 'Private') {
-		return `/groups/${group.id}`;
-	} else {
-		let slug = slugify(group.data.name);
-		return `/groups/${slug}`;
-	}
-};
-
-let groupLibraryUrl = function(group){
-	return groupViewUrl(group) + '/items';
-};
-
-let groupImageUrl = function(groupID, size){
-	log.debug('groupImageUrl not implemented');
-	//TODO: port from library/Zotero/View/Helper/GroupImageSrc.php
-};
-
-let groupSettingsUrl = function(group){
-	return `/groups/${group.id}/settings`;
-};
-
-let groupMemberSettingsUrl = function(group){
-	return groupSettingsUrl(group) + '/members';
-};
-
-let groupLibrarySettingsUrl = function(group){
-	return groupSettingsUrl(group) + '/library';
-};
-
 class IntroVideo extends Component{
 	render(){
 		return (
@@ -115,7 +84,7 @@ class GroupNugget extends Component{
 			return (
 				<div key={group.groupID}>
 					<div className="nugget-name">
-						<a href={groupViewUrl(group)}>{group.data.name} ({memberCount})</a>
+						<a href={buildUrl('groupView', {group})}>{group.data.name} ({memberCount})</a>
 					</div>
 				</div>
 			);
@@ -128,8 +97,8 @@ class GroupNugget extends Component{
 		let groupImage = null;
 		if(group.hasImage){
 			groupImage = (
-				<a href={groupViewUrl(group)} className="group-image">
-					<img src={groupImageUrl(group)} alt="" />
+				<a href={buildUrl('groupView', {group})} className="group-image">
+					<img src={buildUrl('groupImageUrl', {groupID:group.groupID, purpose:'profile'})} alt="" />
 				</a>
 			);
 		}
@@ -138,9 +107,9 @@ class GroupNugget extends Component{
 		if(groupManageable){
 			manageLinks = (
 				<nav className="action-links">
-					<li><a href={groupSettingsUrl(group)}>Manage Profile</a></li>
-					<li><a href={groupMemberSettingsUrl(group)}>Manage Members</a></li>
-					<li><a href={groupLibrarySettingsUrl(group)}>Manage Library</a></li>
+					<li><a href={buildUrl('groupSettings', {group})}>Manage Profile</a></li>
+					<li><a href={buildUrl('groupMemberSettings', {group})}>Manage Members</a></li>
+					<li><a href={buildUrl('groupLibrarySettings', {group})}>Manage Library</a></li>
 				</nav>
 			);
 		}
@@ -166,11 +135,11 @@ class GroupNugget extends Component{
 				<div className="nugget-full">
 					{groupImage}
 					<div className="nugget-name">
-						<a href={groupViewUrl(group)}>{group.data.name}</a>
+						<a href={buildUrl('groupView', {group})}>{group.data.name}</a>
 					</div>
 					<nav id="group-library-link-nav" className="action-links">
 						<ul>
-						<li><a href={groupLibraryUrl(group)}>Group Library</a></li>
+						<li><a href={buildUrl('groupLibrary', {group})}>Group Library</a></li>
 						</ul>
 					</nav>
 					{manageLinks}

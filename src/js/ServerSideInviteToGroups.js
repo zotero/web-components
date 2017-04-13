@@ -4,24 +4,10 @@ import {log as logger} from './Log.js';
 let log = logger.Logger('InviteToGroups');
 
 import {ajax} from './ajax.js';
-import {apiRequestString} from './ApiRouter.js';
-import {LoadingSpinner} from './LoadingSpinner.js';
-import {GroupNugget} from './UserGroups.js';
 
 let React = require('react');
 
-const apiKey = window.zoteroConfig.apiKey;
-
-import {slugify} from './Utils.js';
-
-let groupViewUrl = function(group){
-	if(group.type == 'Private') {
-		return `/groups/${group.id}`;
-	} else {
-		let slug = slugify(group.name);
-		return `/groups/${slug}`;
-	}
-};
+import {buildUrl} from './wwwroutes.js';
 
 //component to list groups a user can invite another user to
 class InviteToGroups extends React.Component{
@@ -107,7 +93,7 @@ class InviteToGroups extends React.Component{
 				return (
 					<div key={group.id}>
 						<div className="nugget-name">
-							<a href={groupViewUrl(group)}>{group.name}</a>
+							<a href={buildUrl('groupView', {group})}>{group.name}</a>
 						</div>
 					</div>
 				);

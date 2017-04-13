@@ -10,6 +10,7 @@ import PropTypes from 'prop-types';
 
 import {RadioGroup, Radio} from './react-radio-group.js';
 import {ajax} from './ajax.js';
+import {buildUrl} from 'wwwroutes.js';
 
 let stringToBool = function(val){
 	if(val === '0') {
@@ -352,7 +353,7 @@ class ApiKeyEditor extends Component {
 				all: key.access.groups['all']
 			};
 		}
-		let saveUrl = `/settings/savekey?key=${editKey.key}`;
+		let saveUrl = buildUrl('saveKey', {key:editKey.key});
 		ajax({url:saveUrl, type:'POST', data:JSON.stringify(key)}).then((resp)=>{
 			if(!resp.ok){
 				log.error('Error saving key');

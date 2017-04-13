@@ -1,10 +1,11 @@
 'use strict';
 
-import {log as logger} from './Log.js';
-let log = logger.Logger('CreateGroup');
+//import {log as logger} from './Log.js';
+//let log = logger.Logger('CreateGroup');
 
 import {ajax} from './ajax.js';
 import {slugify, readCookie} from './Utils.js';
+import {buildUrl} from './wwwroutes.js';
 
 let React = require('react');
 
@@ -38,7 +39,7 @@ class CreateGroup extends React.Component{
 
 			if(groupType != 'Private'){
 				// Poll the server with the input value
-				ajax({url:`${config.baseWebsiteUrl}/groups/checkname?input=${this.state.name}`}).then((resp)=>{
+				ajax({url:buildUrl('checkGroupName', {name:this.state.name})}).then((resp)=>{
 					resp.json().then((data) => {
 						this.setState({nameValid:data.valid});
 					});

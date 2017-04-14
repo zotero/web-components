@@ -33,6 +33,7 @@ const operaBrowserImagePath = imagePath + '/theme/browser_icons/64-opera.png';
 import {ajax, postFormData} from './ajax.js';
 import {slugify} from './Utils.js';
 import {buildUrl} from './wwwroutes.js';
+import {Notifier} from './Notifier.js';
 
 let browser = require('detect-browser');
 
@@ -259,17 +260,27 @@ let validateRegisterForm = function(data) {
 	if(data.email != data.email_confirm){
 		return {
 			valid:false,
+			field:'email',
 			reason:'emails must match'
 		};
 	}
 	if(data.password != data.password_confirm){
 		return {
 			valid:false,
+			field:'password',
 			reason:'passwords must match'
 		};
 	}
 	return {valid:true};
 };
+
+class FormFieldErrorMessage extends Component {
+	render() {
+		return (
+			<p className='form-field-error'>{this.props.message}</p>
+		);
+	}
+}
 
 class RegisterForm extends Component{
 	constructor(props){
@@ -284,7 +295,7 @@ class RegisterForm extends Component{
 			},
 			usernameValidity:'undecided',
 			usernameMessage:'',
-			formError:'',
+			formErrors:{},
 			registrationSuccessful:false
 		};
 		this.checkUsername = this.checkUsername.bind(this);
@@ -313,8 +324,8 @@ class RegisterForm extends Component{
 				}
 			});
 		}).catch(()=>{
-			this.setState({formError:'Error checking username'});
-			//TODO:error JS notification
+			let formErrors = {username: 'Error checking username'};
+			this.setState({formErrors});
 		});
 	}
 	handleChange(ev){
@@ -332,23 +343,43 @@ class RegisterForm extends Component{
 		let validated = validateRegisterForm(formData);
 		if(!validated.valid){
 			//show error
-			this.setState({formError:validated.reason});
+			let formErrors = {};
+			formErrors[validated.field] = validated.reason;
+			this.setState({formErrors});
 			return;
 		}
 		//submit form
 		let registerUrl = buildUrl('registerAsync');
 		postFormData(registerUrl, formData).then((resp)=>{
+			log.debug('successfulish response');
 			resp.json().then((data)=>{
-				if(data.success === false){
-					this.setState({formError:data.error});
-				}
+				if(data.success)
 				this.setState({registrationSuccessful:true});
 			});
-		}).catch(()=>{
-			this.setState({formError:'Error processing registration'});
+		}).catch((resp)=>{
+			log.debug('caught response');
+			resp.json().then((data)=>{
+				if(data.success === false){
+					let formErrors = {};
+					for(let ind in data.messages){
+						let messages = [];
+						for(let subind in data.messages[ind]){
+							let m = data.messages[ind][subind];
+							messages.push(m);
+						}
+						formErrors[ind] = messages.join(', ');
+					}
+					this.setState({formErrors});
+				}
+			}).catch((e)=>{
+				log.debug('failed decoding json in caught register response');
+				log.debug(e);
+				this.setState({formError:'Error processing registration'});
+			});
 		});
 	}
 	render(){
+		log.debug('RegisterForm render');
 		let slug = '<username>';
 		if(this.state.formData.username) {
 			slug = slugify(this.state.formData.username);
@@ -356,6 +387,32 @@ class RegisterForm extends Component{
 		let profileUrl = buildUrl('profileUrl', {slug});
 		let previewClass = 'profile-preview ' + this.state.usernameValidity;
 		
+		let currentUser = window.Zotero.currentUser;
+		if(currentUser) {
+			return (
+				<div id='register-section'>
+					<div className='content'>
+						<ArrowDownWhite />
+						<h1>2. Start syncing to take full advantage of Zotero</h1>
+						<div>
+							<p>It looks like you've already created an account. Now that you've installed Zotero, you can use it to&nbsp;
+								<a href="https://www.zotero.org/support/sync">sync and access your library from anywhere</a>.
+								It also lets you join <a href="https://www.zotero.org/support/groups">groups</a> and&nbsp;
+								<a href="https://www.zotero.org/support/sync#file_syncing">back up your all your attached files</a>.</p>
+						</div>
+					</div>
+				</div>
+			);
+		}
+
+		let notifier = null;
+		if(this.state.registrationSuccessful){
+			let message = 'Thanks for registering. We\'ve sent an email to activate your account.';
+			notifier = <Notifier type='success' message={message} />;
+		} else if(this.state.formError){
+			notifier = <Notifier type='error' message={this.state.formError} />;
+		}
+
 		return (
 			<div id='register-section'>
 				<div className='content'>
@@ -370,12 +427,18 @@ class RegisterForm extends Component{
 						<input type='text' name='username' placeholder='Username' onChange={this.handleChange} onBlur={this.checkUsername}></input>
 						<p className={previewClass}>{profileUrl}</p>
 						<p className='usernameMessage'>{this.state.usernameMessage}</p>
+						<FormFieldErrorMessage message={this.state.formErrors['username']} />
 						<input type='email' name='email' placeholder='Email' onChange={this.handleChange}></input>
+						<FormFieldErrorMessage message={this.state.formErrors['email']} />
 						<input type='email' name='email_confirm' placeholder='Confirm Email' onChange={this.handleChange}></input>
+						<FormFieldErrorMessage message={this.state.formErrors['email2']} />
 						<input type='password' name='password' placeholder='Password' onChange={this.handleChange}></input>
+						<FormFieldErrorMessage message={this.state.formErrors['password']} />
 						<input type='password' name='password_confirm' placeholder='Verify Password' onChange={this.handleChange}></input>
+						<FormFieldErrorMessage message={this.state.formErrors['password2']} />
 						<div className="g-recaptcha" data-sitekey={recaptchaSitekey}></div>
-						<p id="register-form-error" className={this.state.formError? '' : 'hidden'}>{this.state.formError}</p>
+						<FormFieldErrorMessage message={this.state.formErrors['recaptcha']} />
+						{notifier}
 						<button type='button' onClick={this.register}>Register</button>
 					</div>
 				</div>

@@ -1,5 +1,8 @@
 'use strict';
 
+//import {log as logger} from './Log.js';
+//var log = logger.Logger('Utils');
+
 let slugify = function(name){
 	var slug = name.trim();
 	slug = slug.toLowerCase();
@@ -121,4 +124,20 @@ let readCookie = function(name) {
 	return null;
 };
 
-export {slugify, parseQuery, buildQuery, querystring, parseSearchString, readCookie};
+//check window's zoteroData object for initial state for react components
+let loadInitialState = function(defaultState = {}) {
+	if(window.zoteroData && window.zoteroData.state){
+		return Object.assign({}, window.zoteroData.state);
+	}
+	return Object.assign({}, defaultState);
+};
+
+let pageReady = function(fn) {
+	if (document.readyState != 'loading'){
+		fn();
+	} else {
+		document.addEventListener('DOMContentLoaded', fn);
+	}
+};
+
+export {slugify, parseQuery, buildQuery, querystring, parseSearchString, readCookie, loadInitialState, pageReady};

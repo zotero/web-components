@@ -34,7 +34,11 @@ let buildUrl = function(name, params){
 		case 'groupLibrarySettings':
 			return `/groups/${params.group.id}/settings/library`;
 		case 'saveKey':
-			return `/settings/savekey?key=${params.key}`;
+			if(params.key){
+				return `/settings/savekey?key=${params.key}`;
+			} else {
+				return `/settings/savekey`;
+			}
 		case 'checkGroupName':
 			return `/groups/checkname?input=${params.name}`;
 		case 'checkUsername':

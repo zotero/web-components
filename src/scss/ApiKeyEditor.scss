@@ -1,4 +1,6 @@
 div.key-editor {
+	width:500px;
+	margin:auto;
 	margin-bottom:20px;
 
 	ul {
@@ -26,4 +28,11 @@ div.key-editor {
 			margin-bottom:0;
 		}
 	}
+}
+
+#oauth_verifier {
+	font-size:x-large;
+	background:#CBF7CA;
+	padding:25px;
+	text-align:center;
 }

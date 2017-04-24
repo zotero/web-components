@@ -12,15 +12,16 @@ import {RadioGroup, Radio} from './react-radio-group.js';
 import {ajax} from './ajax.js';
 import {buildUrl} from './wwwroutes.js';
 import {Notifier} from './Notifier.js';
+import {querystring, parseQuery, loadInitialState} from './Utils.js';
 
 let scrollToTop = function() {
 	window.scrollBy(0, -5000);
 };
 
 let stringToBool = function(val){
-	if(val === '0') {
+	if(val === '0' || val === 0) {
 		return false;
-	} else if(val === '1') {
+	} else if(val === '1' || val === 1) {
 		return true;
 	}
 	log.error(`unexpected value in stringToBool: ${val}`);
@@ -61,6 +62,72 @@ let accessShape = PropTypes.shape({
 	write: PropTypes.bool,
 	groups: PropTypes.object
 }).isRequired;
+
+//TODO: identity request
+//TODO: Accept default permissions for oauth requests
+//TODO: redirect oauth on key creation
+//TODO: Specify requesting application when oauth request
+//TODO: complete handshake with verifier instead of forwarding if OOB
+//TODO: display key when created and/or change url to editing new key, or forward to manage keys
+
+let defaultValue = function(v, def){
+	if(typeof v === 'undefined'){
+		return def;
+	}
+	if(v === null){
+		return def;
+	}
+	return v;
+};
+
+let requestedPermissions = function(userGroups = []) {
+	let href = window.document.location.href;
+	let qs = querystring(href);
+	let queryVars = parseQuery(qs);
+	let access = {
+		library: stringToBool(defaultValue(queryVars['library_access'], 1)),
+		notes: stringToBool(defaultValue(queryVars['notes_access'], 0)),
+		write: stringToBool(defaultValue(queryVars['write_access'], 0)),
+		groups: {
+			all: defaultValue(queryVars['all_groups'], 'none')
+		}
+	};
+
+	for(let key in userGroups) {
+		let group = userGroups[key];
+		let varname = `group_${group.groupID}`;
+		if(queryVars[varname] && queryVars[varname] != 'none'){
+			access.groups[group.groupID] = queryVars[varname];
+		}
+	}
+
+	return access;
+};
+
+class AcceptOAuth extends Component {
+	render() {
+		return (
+			<div className='oauth-options'>
+				<button type='button'>Accept Defaults</button>
+				<button type='button'>Change Permissions</button>
+			</div>
+		);
+	}
+}
+
+class OAuthVerify extends Component {
+	render() {
+		let applicationName = window.zoteroData.oauthClientName;
+		let verifier = window.zoteroData.oauthVerifier;
+		return (
+			<div>
+				<h1>Access Granted</h1>
+				<p>To complete the transaction, return to {applicationName} and enter the verification code below.</p>
+				<div id="oauth_verifier">{verifier}</div>
+			</div>
+		);
+	}
+}
 
 //human readable summary of currently selected permissions
 class PermissionsSummary extends Component {
@@ -113,6 +180,10 @@ class PermissionsSummary extends Component {
 					summary.push(<li key={`group_${id}_read`}>Access to read library for group '{groupName}'</li>);
 				}
 			}
+		}
+
+		if(summary.length == 0){
+			summary.push(<li key='empty_permssions'>No additional permissions selected</li>);
 		}
 
 		return <div id='key-permissions-summary'><ul>{summary}</ul></div>;
@@ -266,13 +337,9 @@ class IndividualGroupPermissions extends Component {
 
 	render(){
 		log.debug('IndividualGroupPermissions render');
-		//let groupID = this.props.groupID;
-		//let userGroups = this.props.userGroups;
-		//log.debug(userGroups);
-		let group = this.props.group;// userGroups[groupID];
+		let group = this.props.group;
 		let groupID = group.groupID;
 		let groupName = group.name;
-		//let groupName = this.props.groupName;
 		let radioName = `group_${groupID}`;
 		let selectedValue = this.props.access.groups[groupID];
 		if(!selectedValue){
@@ -281,20 +348,20 @@ class IndividualGroupPermissions extends Component {
 
 		return (
 			<li>
-				<label htmlFor="group_1">{groupName}
+				<label htmlFor={`group_${groupID}`}>{groupName}
 					<RadioGroup name={radioName} selectedValue={selectedValue} onChange={this.handleChange}>
 						<label htmlFor={radioName+'none'}>
-							<Radio value="none" id={radioName+'none'} className="radio" />
+							<Radio value="none" id={radioName+'_none'} className="radio" />
 							None
 						</label>
 						<br />
 						<label htmlFor={radioName+'read'}>
-							<Radio value="read" id={radioName+'read'} className="radio" />
+							<Radio value="read" id={radioName+'_read'} className="radio" />
 							Read Only
 						</label>
 						<br />
 						<label htmlFor={radioName+'write'}>
-							<Radio value="write" id={radioName+'write'} className="radio" />
+							<Radio value="write" id={radioName+'_write'} className="radio" />
 							Read/Write
 						</label>
 					</RadioGroup>
@@ -305,28 +372,108 @@ class IndividualGroupPermissions extends Component {
 	}
 }
 
+
+class AcceptDefaults extends Component {
+	render(){
+		return (
+			<div>
+				<button type='button' onClick={this.props.acceptDefaults}>Accept Defaults</button>
+				<button type='button' onClick={this.props.editPermissions}>Edit Permissions</button>
+			</div>
+		);
+	}
+}
+
+class KeyAccessEditor extends Component {
+	render(){
+		let access = this.props.access;
+		let userGroups = this.props.userGroups;
+		let updateAccess = this.props.updateAccess;
+		let changePerGroup = this.props.changePerGroup;
+
+		let individualGroupNodes = null;
+		if(this.props.perGroup){
+			individualGroupNodes = userGroups.map((group) => {
+				let groupID = group.groupID;
+				return <IndividualGroupPermissions key={groupID} groupID={groupID} group={group} access={access} updateAccess={updateAccess} />;
+			});
+		}
+
+		return (
+			<div>
+				<PersonalLibraryPermissions access={access} updateAccess={updateAccess} />
+				<AllGroupsPermissions access={access} updateAccess={updateAccess} />
+				<fieldset>
+					<legend>Specific Groups</legend>
+					<ul>
+						<li><label htmlFor="individual_groups">Per Group Permissions
+								<input name="individual_groups" className="checkbox" type="checkbox" onChange={changePerGroup} checked={this.props.perGroup} />
+							</label>
+							<p className="hint">Set group by group permissions for this key</p>
+						</li>
+					</ul>
+					<ul>
+						{individualGroupNodes}
+					</ul>
+				</fieldset>
+			</div>
+		);
+	}
+}
+
 class ApiKeyEditor extends Component {
 	constructor(props) {
 		super(props);
-		if(window.zoteroData){
-			let editKey = window.zoteroData.editKey;
+		let defaultState = {
+			defaultsPending:false
+		};
+		defaultState = loadInitialState(defaultState);
+		this.state = defaultState;
+		
+		if(this.state.editKey){
+			//set up initial state for an existing key
+			let editKey = this.state.editKey;
 			let access = boolAccess(editKey.access);
 			let perGroup = false;
 			let accessGroupIDs = Object.keys(access['groups']);
-			for(let groupID in accessGroupIDs){
+			for(let groupID of accessGroupIDs){
 				if(groupID != 'all'){
 					perGroup = true;
+					break;
 				}
 			}
-			
-			this.state = {
-				editKey: editKey,
-				access: access,
-				name: editKey.name,
-				userGroups: window.zoteroData.userGroups,
-				perGroup: perGroup
-			};
+
+			this.state.access = access;
+			this.state.name = editKey.name;
+			this.state.perGroup = perGroup;
+		} else {
+			//set up initial state for new key, including checking for permissions requested
+			//in query params
+			this.state.access = requestedPermissions(this.state.userGroups);
+
+			if(this.state.oauthClientName) {
+				this.state.defaultsPending = true;
+			}
+
+			let perGroup = false;
+			let accessGroupIDs = Object.keys(this.state.access['groups']);
+			for(let groupID of accessGroupIDs){
+				if(groupID != 'all'){
+					perGroup = true;
+					break;
+				}
+			}
+			this.state.perGroup = perGroup;
+
+			let queryVars = parseQuery(querystring(window.document.location.href));
+			if(queryVars['name']){
+				this.state.name = queryVars['name'];
+			} else if(this.state.oauthClientName) {
+				this.state.name = this.state.oauthClientName;
+			}
 		}
+
+		//bind callback functions to component
 		this.updateAccess = this.updateAccess.bind(this);
 		this.changePerGroup = this.changePerGroup.bind(this);
 		this.saveKey = this.saveKey.bind(this);
@@ -346,20 +493,25 @@ class ApiKeyEditor extends Component {
 	}
 
 	saveKey(){
-		let editKey = this.state.editKey;
-		let key = {
-			key: editKey.key,
+		let key;
+		if(this.state.editKey){
+			key = editKey.key;
+		}
+
+		let keyObject = {
+			key:key,
 			name: this.state.name,
 			access: this.state.access
 		};
+
 		//if perGroup is off, don't send anything other than the 'all' setting
 		if(!this.state.perGroup){
-			key.access.groups = {
-				all: key.access.groups['all']
+			keyObject.access.groups = {
+				all: keyObject.access.groups['all']
 			};
 		}
-		let saveUrl = buildUrl('saveKey', {key:editKey.key});
-		ajax({url:saveUrl, type:'POST', data:JSON.stringify(key)}).then((resp)=>{
+		let saveUrl = buildUrl('saveKey', {key:key});
+		ajax({url:saveUrl, type:'POST', withSession:true, data:JSON.stringify(keyObject)}).then((resp)=>{
 			scrollToTop();
 			if(!resp.ok){
 				log.error('Error saving key');
@@ -367,6 +519,20 @@ class ApiKeyEditor extends Component {
 			resp.json().then((data) => {
 				if(data.success){
 					this.setState({notification: {type:'success', message:'Key Saved'}});
+					let queryVars = parseQuery(querystring(window.document.location.href));
+
+					//check for redirect used in private feed url flow and forward if present
+					if(queryVars['redirect']){
+						let target = queryVars['redirect'];
+						if(target.includes('?')){
+							target = target + `&key=${data.updatedKey.key}`;
+						} else {
+							target = target + `?key=${data.updatedKey.key}`;
+						}
+						window.location.href = target;
+					}
+				} else {
+					this.setState({notification: {type:'error', message:'Error saving key'}});
 				}
 				log.debug(data);
 			});
@@ -377,16 +543,29 @@ class ApiKeyEditor extends Component {
 		this.setState({perGroup: evt.target.checked});
 	}
 	render() {
-		let userGroups = this.state.userGroups;
-		let access = this.state.access;
-		log.debug(userGroups);
-		
-		let individualGroupNodes = null;
-		if(this.state.perGroup){
-			individualGroupNodes = userGroups.map((group) => {
-				let groupID = group.groupID;
-				return <IndividualGroupPermissions key={groupID} groupID={groupID} group={group} access={access} updateAccess={this.updateAccess} />;
-			});
+		let title = <h1>New Key</h1>;
+		if(this.state.editKey){
+			title = <h1>Edit Key</h1>;
+		}
+
+		let requesterNode = null;
+		let defaultAccepter = null;
+		if(this.state.oauthClientName){
+			requesterNode = (<div>
+				<h2>An application would like to connect to your account</h2>
+				<p>The application '{this.state.oauthClientName}' would like to access your account.</p>
+			</div>);
+		}
+
+		let editingSection = (<KeyAccessEditor
+			access={this.state.access}
+			updateAccess={this.updateAccess}
+			userGroups={this.state.userGroups}
+			perGroup={this.state.perGroup}
+			changePerGroup={this.changePerGroup}
+		/>);
+		if(this.state.defaultsPending){
+			editingSection = <AcceptDefaults />;
 		}
 
 		let notifier = null;
@@ -395,28 +574,17 @@ class ApiKeyEditor extends Component {
 		}
 		return (
 			<div className='key-editor'>
-				<h1>Edit Key</h1>
+				{title}
 				{notifier}
+				{requesterNode}
 				<label htmlFor='name'>Key Name
 					<input type='text' placeholder='Key Name' name='name' id='name' onChange={this.changeName} value={this.state.name} />
 				</label>
 
 				<PermissionsSummary access={this.state.access} userGroups={this.state.userGroups} />
 
-				<PersonalLibraryPermissions access={this.state.access} updateAccess={this.updateAccess} />
-				<AllGroupsPermissions access={this.state.access} updateAccess={this.updateAccess} />
-				<fieldset>
-					<legend>Specific Groups</legend>
-					<ul>
-						<li><label htmlFor="individual_groups">Per Group Permissions
-							<input name="individual_groups" className="checkbox" type="checkbox" onChange={this.changePerGroup} checked={this.state.perGroup} /></label>
-							<p className="hint">Set group by group permissions for this key</p>
-						</li>
-					</ul>
-					<ul>
-						{individualGroupNodes}
-					</ul>
-				</fieldset>
+				{editingSection}
+
 				<button type='button' onClick={this.saveKey}>Save Key</button>
 				<button type='button'>Revoke Key</button>
 			</div>

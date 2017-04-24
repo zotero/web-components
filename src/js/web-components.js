@@ -27,6 +27,7 @@ import {InviteToGroups} from './ServerSideInviteToGroups.js';
 import {Start} from './Start.js';
 import {CreateGroup} from './CreateGroup.js';
 import {ApiKeyEditor} from './ApiKeyEditor.js';
+import {pageReady} from './Utils.js';
 
 let ZoteroWebComponents = {
 	Storage,
@@ -37,7 +38,8 @@ let ZoteroWebComponents = {
 	InviteToGroups,
 	Start,
 	CreateGroup,
-	ApiKeyEditor
+	ApiKeyEditor,
+	pageReady
 };
 
 globalScope.ZoteroWebComponents = ZoteroWebComponents;

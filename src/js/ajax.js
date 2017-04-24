@@ -3,11 +3,21 @@
 import {log as logger} from './Log.js';
 var log = logger.Logger('ajax');
 
+import {readCookie} from './Utils.js';
+
+const zoteroConfig = window.zoteroConfig;
+
 //perform a network request defined by config, and return a promise for a Response
 //resolve with a successful status (200-300) reject, but with the same Response object otherwise
 let ajax = function(config){
 	config = Object.assign({type:'GET', credentials:'include'}, config);
+
+	//get headers from config, or blank, and optionally add auth header for session postback
 	let headersInit = config.headers || {};
+	if(config.withSession){
+		let sessionCookie = readCookie(zoteroConfig.sessionCookieName);
+		headersInit.Authorization = sessionCookie;
+	}
 	let headers = new Headers(headersInit);
 
 	var request = new Request(config.url, {
@@ -17,7 +27,7 @@ let ajax = function(config){
 		credentials:config.credentials,
 		body:config.data
 	});
-	
+
 	return fetch(request).then(function(response){
 		if (response.status >= 200 && response.status < 300) {
 			log.debug('200-300 response: resolving Net.ajax promise', 3);

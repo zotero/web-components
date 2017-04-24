@@ -6,16 +6,19 @@ let log = logger.Logger('StartComponent');
 const React = require('react');
 const {Component} = React;
 
+const config = window.zoteroConfig;
+const installData = config.installData;
+
 //const firefoxVersion = window.zoteroConfig.firefoxVersion;
-const firefoxHash = window.zoteroConfig.firefoxHash;
-const firefoxDownload = window.zoteroConfig.firefoxDownload;
-const chromeInstallUrl = window.zoteroConfig.chromeInstallUrl;
-const safariDownloadUrl = window.zoteroConfig.safariDownloadUrl;
-const operaDownloadUrl = window.zoteroConfig.operaDownloadUrl;
+const firefoxHash = installData.firefoxHash;
+const firefoxDownload = installData.firefoxDownload;
+const chromeInstallUrl = installData.chromeInstallUrl;
+const safariDownloadUrl = installData.safariDownloadUrl;
+const operaDownloadUrl = installData.operaDownloadUrl;
 
-const recaptchaSitekey = '6LfrWxMUAAAAADBGrtBnRzMB6FdUf4cXzZV5pH6W';
+const recaptchaSitekey = config.recaptchaSitekey;
 
-const imagePath = 'static/images';
+const imagePath = config.imagePath;
 
 const chromeExtensionImagePath = imagePath + '/start/chrome-extension.jpg';
 const firefoxExtensionImagePath = imagePath + '/start/firefox-extension.jpg';
@@ -88,17 +91,19 @@ InstallFirefoxButton.defaultProps = {type:'button'};
 
 class InstallChromeButton extends Component{
 	installChrome(){
-		window.chrome.webstore.install(chromeInstallUrl, ()=>{
+		//window.chrome.webstore.install();
+		/*
+		window.chrome.webstore.install(undefined, ()=>{
 			//success
 		}, ()=>{
 			//failure
 		});
+		*/
 	}
 	render(){
 		if(this.props.type == 'button') {
-			return (
-				<a className='button' onClick={this.installChrome}>Install</a>
-			);
+			return <a href={chromeInstallUrl} id="safari-connector-download-button" className="button download-link">Install</a>;
+			//return <a className='button' onClick={this.installChrome}>Install</a>;
 		} else if(this.props.type == 'image') {
 			return (
 				<a onClick={this.installChrome}><img src={chromeBrowserImagePath} /></a>

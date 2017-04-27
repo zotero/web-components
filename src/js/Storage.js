@@ -223,7 +223,7 @@ class NextPaymentRow extends Component {
 		let d = new Date(parseInt(userSubscription.expirationDate)*1000);
 		let formattedExpirationDate = d.toLocaleDateString('en-US', dateFormatOptions);
 
-		if(userSubscription.recur){
+		if(userSubscription.recur && d > Date.now()){
 			return (
 				<tr>
 					<th>Next Payment</th>
@@ -244,7 +244,8 @@ class NextPaymentRow extends Component {
 					<td>
 						<p>Plan will revert to free tier if not renewed</p>
 					</td>
-				</tr>);
+				</tr>
+			);
 		}
 	}
 }
@@ -298,7 +299,7 @@ class Storage extends Component {
 		this.cancelRecur = this.cancelRecur.bind(this);
 	}
 	componentDidMount(){
-		if(window.zoteroData.userSubscription && window.zoteroData.stripeCustomer){
+		if((typeof(window.zoteroData.userSubscription) !== 'undefined') && (typeof(window.zoteroData.stripeCustomer) !== 'undefined')){
 			//don't load new data if it's already been loaded serverside and included with the page
 			//instead just set the state with it
 			this.setState({
@@ -486,6 +487,21 @@ class Storage extends Component {
 		stripeHandler(descriptions[storageLevel], tokenHandler, closedHandler);
 	}
 	updatePayment() {
+		let userSubscription = this.state.userSubscription;
+		let storageLevel = userSubscription.storageLevel;
+
+		let planQuota = this.state.planQuotas[storageLevel];
+		if(userSubscription.usage.total > planQuota) {
+			this.setState({
+				operationPending:false,
+				notification: {
+					type: 'error',
+					message: 'Current usage exceeds plan quota.'
+				}
+			});
+			return;
+		}
+
 		this.setState({operationPending:true});
 		let tokenHandler = (token) => {
 			// You can access the token ID with `token.id`.

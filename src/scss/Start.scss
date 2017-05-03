@@ -10,9 +10,9 @@ div#start-container {
 	}
 
 	button, a.button {
-		color:white;
-		background-color: #38c;
-		border-color: #38c;
+		color:$white;
+		background-color: $button-blue;
+		border-color: $button-blue;
 		width:100%;
 		background-image:none;
 		font-size:1.5em;
@@ -21,14 +21,11 @@ div#start-container {
 	div.arrow-down {
 		margin-top:-20px;
 	}
-}
-div#install-connector-section {
-	
-	padding-bottom:35px;
 
 	div.install-success-div {
 		width:50%;
 		margin:auto;
+		text-align: center;
 		
 		h1 {
 			border: 3px solid #2a2;
@@ -38,24 +35,28 @@ div#install-connector-section {
 			font-size: 20px;
 		}
 	}
+}
+div#install-connector-section {
+	
+	padding-bottom:35px;
 
 	#extension-icon-image {
 		margin-top:25px;
 	}
 }
 div#register-section {
-	background-color: rgba(0,0,0,.03);
+	background-color: $smoke;
 	padding-top:20px;
 	padding-bottom:20px;
 }
 div#register-form {
 	margin-left:auto;
 	margin-right:auto;
-	width:304px;
+	width:308px;
 	margin-bottom: 20px;
 
 	input {
-		width:100%;
+		width:95%;
 		margin-top:5px;
 		border-radius: 4px;
 		border-width: 1px;
@@ -63,20 +64,30 @@ div#register-form {
 	}
 
 	input:focus {
-		border-color: rgba(0,0,255,1);
+		border-color: $input-focus-blue;
 		border-radius: 2px;
 	}
 
 	p.valid {
-		color:rgba(0,150,0,1);
+		color:$valid-green;
 	}
 	p.invalid {
-		color:rgba(200,0,0,1);
+		color:$invalid-red;
 	}
 
 	[name=password_confirm] {
 		margin-bottom:5px;
 	}
+}
+
+div.vertical-hidable {
+	transition: all 500ms ease-in;
+	max-height:500px;
+	overflow-y: hidden;
+}
+
+div.vertical-hidable.hiding {
+	max-height:0px;
 }
 
 p#register-form-error {
@@ -103,5 +114,22 @@ div#register-quick-links {
 }
 
 p.form-field-error {
-	color: rgba(200,0,0,1);
+	color: $invalid-red;
+}
+
+div.download-full {
+	display:inline-block;
+	//width:200px;
+	margin-left:10px;
+	margin-right:10px;
+	text-align: center;
+	font-size: smaller;
+
+	img {
+		width:48px;
+	}
+
+	.browser-text {
+		margin-bottom:20px;
+	}
 }

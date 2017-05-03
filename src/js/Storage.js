@@ -484,7 +484,7 @@ class Storage extends Component {
 			});
 		};
 
-		stripeHandler(descriptions[storageLevel], tokenHandler, closedHandler);
+		window.stripeHandler(descriptions[storageLevel], tokenHandler, closedHandler);
 	}
 	updatePayment() {
 		let userSubscription = this.state.userSubscription;
@@ -539,7 +539,7 @@ class Storage extends Component {
 			});
 		};
 
-		stripeHandler('', tokenHandler, closedHandler);
+		window.stripeHandler('', tokenHandler, closedHandler);
 	}
 	cancelRecur(){
 		this.setState({operationPending:true});

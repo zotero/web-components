@@ -49,6 +49,8 @@ let buildUrl = function(name, params){
 			return `${baseZoteroWebsiteUrl}/${params.slug}`;
 		case 'quickstartGuide':
 			return '/support/quickstartguide';
+		case 'pluginSupport':
+			return '/support/plugins';
 	}
 };
 

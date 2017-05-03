@@ -22,7 +22,7 @@ div.key-editor {
 	#key-permissions-summary {
 		margin:4px;
 		padding:4px;
-		background-color:rgba(0,0,0,.05);
+		background-color:$smoke;
 
 		ul, li {
 			margin-bottom:0;
@@ -32,7 +32,7 @@ div.key-editor {
 
 #oauth_verifier {
 	font-size:x-large;
-	background:#CBF7CA;
+	background:$notification-success-color;
 	padding:25px;
 	text-align:center;
 }

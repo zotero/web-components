@@ -2,8 +2,8 @@
 
 import 'babel-polyfill';
 import 'whatwg-fetch';
-import {log as logger} from './Log.js';
-var log = logger.Logger('WebComponents');
+//import {log as logger} from './Log.js';
+//var log = logger.Logger('WebComponents');
 
 var globalScope;
 if(typeof window === 'undefined') {
@@ -25,9 +25,12 @@ import {NewGroupDiscussions} from './NewGroupDiscussions.js';
 //import {InviteToGroups} from './InviteToGroups.js';
 import {InviteToGroups} from './ServerSideInviteToGroups.js';
 import {Start} from './Start.js';
+import {Downloads} from './Downloads.js';
+import {ExtensionsPicker} from './ExtensionsPicker.js';
 import {CreateGroup} from './CreateGroup.js';
 import {ApiKeyEditor} from './ApiKeyEditor.js';
 import {pageReady} from './Utils.js';
+import {cycleTestCases} from './TestUtils.js';
 
 let ZoteroWebComponents = {
 	Storage,
@@ -37,9 +40,12 @@ let ZoteroWebComponents = {
 	NewGroupDiscussions,
 	InviteToGroups,
 	Start,
+	Downloads,
+	ExtensionsPicker,
 	CreateGroup,
 	ApiKeyEditor,
-	pageReady
+	pageReady,
+	cycleTestCases
 };
 
 globalScope.ZoteroWebComponents = ZoteroWebComponents;

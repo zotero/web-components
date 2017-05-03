@@ -1,0 +1,91 @@
+div#downloads-container {
+	div.flex-container {
+		display:-webkit-flex;
+		display:flex;
+	}
+
+	div.flex-section {
+		-webkit-flex:1 1 45%;
+		flex:1 1 45%;
+		min-width: 350px;
+	}
+	
+	div#download-standalone-section, div#download-connector-section {
+		background-color: $smoke;
+
+		text-align: center;
+		padding-top:20px;
+		padding-bottom:30px;
+		padding-left:30px;
+		padding-right:30px;
+
+		margin-bottom:10px;
+	}
+
+	div#download-connector-section {
+		margin-left:30px;
+	}
+
+	#plugins-image {
+		float:left;
+		margin-right:35px;
+	}
+	div#download-plugins-section {
+		width:50%;
+		margin-left:auto;
+		margin-right:auto;
+		margin-top:25px;
+		margin-bottom:20px;
+	}
+
+	.downloadImage {
+		margin:auto;
+	}
+
+	.downloadConnectorImage {
+		margin-top:12px; //difference in height between connector and Zotero image
+	}
+
+	div.downloadButton {
+		display:block;
+		margin:20px;
+	}
+	button, a.button {
+		color:$white;
+		background-color: $button-blue;
+		border-color: $button-blue;
+		width:100%;
+		background-image:none;
+		font-size:1.5em;
+		padding: 8px 20px;
+	}
+
+	ul.other-versions {
+		padding-left:0;
+
+		list-style: none;
+
+		li {
+			display:inline-block;
+			margin-left:0.4em;
+		}
+		li:not(:last-child)::after {
+			content: " ·";
+			color:$slate;
+			padding:0 0.2em;
+		}
+	}
+}
+
+@media all and (max-width: 640px) {
+	div#downloads-container {
+		.flex-container{
+			-webkit-flex-direction: column;
+			flex-direction: column;
+		}
+
+		div#download-connector-section {
+			margin-left:0px;
+		}
+	}
+}

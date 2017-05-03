@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="116" height="120" viewBox="0 0 116 120">
+  <defs>
+    <linearGradient id="a" data-name="Unbenannter Verlauf 4" x1="66.318" y1="43.29" x2="36.068" y2="110.165" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ddd"/>
+      <stop offset="1" stop-color="gray"/>
+    </linearGradient>
+    <linearGradient id="b" x1="22.27" y1="23.366" x2="-7.98" y2="90.241" xlink:href="#a"/>
+    <linearGradient id="c" data-name="Unbenannter Verlauf 12" x1="49.698" y1="43.04" x2="80.032" y2="110.04" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e5e5e5"/>
+      <stop offset="1" stop-color="#b3b3b3"/>
+    </linearGradient>
+    <linearGradient id="d" x1="93.627" y1="23.152" x2="123.96" y2="90.152" xlink:href="#c"/>
+    <linearGradient id="e" x1="86.88" y1="0.063" x2="86.88" y2="26.159" xlink:href="#c"/>
+    <linearGradient id="f" x1="29.12" y1="0.063" x2="29.12" y2="26.159" xlink:href="#c"/>
+    <linearGradient id="g" x1="36.536" y1="22.933" x2="50.953" y2="56.766" xlink:href="#c"/>
+    <radialGradient id="h" data-name="Unbenannter Verlauf 9" cx="-38265.216" cy="-22960.079" r="229.123" gradientTransform="translate(4385.308 2675.881) scale(0.113)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e0e0dd"/>
+      <stop offset="1" stop-color="#8c8c8c"/>
+    </radialGradient>
+    <linearGradient id="i" x1="80.199" y1="23.16" x2="64.283" y2="57.326" xlink:href="#a"/>
+    <filter id="j" x="-800" y="-800" width="1600" height="1600" name="blur">
+      <feGaussianBlur stdDeviation="2"/>
+    </filter>
+    <linearGradient id="m" data-name="Unbenannter Verlauf 25" x1="58.363" y1="28.412" x2="58.363" y2="69.063" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#c92727"/>
+      <stop offset="1" stop-color="#8a1616"/>
+    </linearGradient>
+    <linearGradient id="n" data-name="Unbenannter Verlauf 80" x1="58.363" y1="24.442" x2="58.363" y2="27.938" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#df3535"/>
+      <stop offset="0.5" stop-color="#e03636"/>
+      <stop offset="1" stop-color="#ea4040"/>
+    </linearGradient>
+    <linearGradient id="o" data-name="Unbenannter Verlauf 36" x1="41.661" y1="48.454" x2="61.05" y2="48.454" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#991919"/>
+      <stop offset="0.509" stop-color="#971919"/>
+      <stop offset="0.692" stop-color="#901717"/>
+      <stop offset="0.823" stop-color="#851414"/>
+      <stop offset="0.928" stop-color="#741010"/>
+      <stop offset="1" stop-color="#630c0c"/>
+    </linearGradient>
+    <linearGradient id="p" data-name="Unbenannter Verlauf 76" x1="65.395" y1="55.702" x2="65.395" y2="59.093" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ab1617"/>
+      <stop offset="0.5" stop-color="#ae191a"/>
+      <stop offset="1" stop-color="#c23435"/>
+    </linearGradient>
+    <linearGradient id="q" data-name="Unbenannter Verlauf 73" x1="57.918" y1="54.592" x2="65.981" y2="58.352" gradientUnits="userSpaceOnUse">
+      <stop offset="0.062"/>
+      <stop offset="0.104" stop-color="#262626"/>
+      <stop offset="0.181" stop-color="#676767"/>
+      <stop offset="0.254" stop-color="#9d9d9d"/>
+      <stop offset="0.322" stop-color="#c8c8c8"/>
+      <stop offset="0.383" stop-color="#e6e6e6"/>
+      <stop offset="0.435" stop-color="#f8f8f8"/>
+      <stop offset="0.471" stop-color="#fff"/>
+    </linearGradient>
+    <linearGradient id="r" data-name="Unbenannter Verlauf 74" x1="41.806" y1="27.904" x2="75.065" y2="27.904" gradientUnits="userSpaceOnUse">
+      <stop offset="0.344" stop-color="#ff6364"/>
+      <stop offset="0.56" stop-color="#ff6566"/>
+      <stop offset="0.637" stop-color="#ff6c6d"/>
+      <stop offset="0.693" stop-color="#ff7778"/>
+      <stop offset="0.738" stop-color="#ff8889"/>
+      <stop offset="0.776" stop-color="#ff9e9f"/>
+      <stop offset="0.81" stop-color="#ffb9b9"/>
+      <stop offset="0.836" stop-color="#ffd4d4"/>
+      <stop offset="0.964" stop-color="#ffd4d4"/>
+      <stop offset="1" stop-color="#ff6364" stop-opacity="0.5"/>
+    </linearGradient>
+    <radialGradient id="s" data-name="Unbenannter Verlauf 86" cx="1613.657" cy="-3383.015" r="1.94" gradientTransform="translate(-3997.343 1167.72) scale(2.521 0.337)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset="0.977" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="t" data-name="Unbenannter Verlauf 29" x1="58.363" y1="69.309" x2="58.363" y2="79.584" gradientUnits="userSpaceOnUse">
+      <stop offset="0.04" stop-color="#8a1616"/>
+      <stop offset="0.06" stop-color="#8a1616" stop-opacity="0.921"/>
+      <stop offset="0.13" stop-color="#8a1616" stop-opacity="0.676"/>
+      <stop offset="0.208" stop-color="#8a1616" stop-opacity="0.465"/>
+      <stop offset="0.295" stop-color="#8a1616" stop-opacity="0.293"/>
+      <stop offset="0.393" stop-color="#8a1616" stop-opacity="0.162"/>
+      <stop offset="0.51" stop-color="#8a1616" stop-opacity="0.069"/>
+      <stop offset="0.664" stop-color="#8a1616" stop-opacity="0.015"/>
+      <stop offset="1" stop-color="#8a1616" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <title>Zeichenfläche 1</title>
+  <g style="isolation: isolate">
+    <g>
+      <g>
+        <polygon points="58 79.63 58 79.633 58 79.631 57.997 79.63 58 79.63 58 78.533 31.543 66.544 29.12 66.543 29.123 66.545 29.12 66.544 29.12 106.913 58 120 58 119.996 58 120 59 118.449 59 80.275 58 79.63" fill="url(#a)"/>
+        <polygon points="29.12 66.543 30.12 64.992 30.12 26.818 29.12 26.174 29.12 25.076 2.663 13.087 0.24 13.087 0.241 13.088 0.24 13.087 0.24 53.456 29.12 66.544 29.12 66.543 29.12 66.543" fill="url(#b)"/>
+      </g>
+      <g>
+        <polygon points="86.879 66.544 84.459 66.543 58 78.533 58 79.63 58.005 79.629 58 79.631 58 120 86.88 106.913 86.88 66.544 86.88 66.544 86.88 66.544 86.88 66.544 86.879 66.544" fill="url(#c)"/>
+        <polygon points="115.76 13.088 115.76 13.088 115.76 13.088 115.76 13.087 115.759 13.088 113.339 13.087 86.88 25.076 86.88 26.174 86.88 26.174 85.88 26.819 85.88 64.992 86.88 66.543 86.88 66.544 115.76 53.456 115.76 13.088" fill="url(#d)"/>
+      </g>
+      <g>
+        <polygon points="86.88 26.174 115.76 13.087 86.88 0 58 13.087 58 13.087 58 13.087 58 13.087 58 13.087 59 14.638 85.88 26.819 86.88 26.174 86.879 26.174 86.88 26.174" fill="url(#e)"/>
+        <polygon points="58 13.087 57.999 13.087 29.12 0 0.24 13.087 29.12 26.174 29.12 26.174 29.12 26.174 30.12 26.818 57 14.638 58 13.087 58 13.087 58 13.087 58 13.087" fill="url(#f)"/>
+      </g>
+      <polygon points="59 14.638 58 13.087 58 13.087 29.12 26.174 29.12 66.544 29.121 66.543 29.12 66.544 31.543 66.544 58 54.554 58 53.456 58 53.456 59 52.812 59 14.638" fill="url(#g)"/>
+      <polygon points="86.88 66.544 58 79.631 29.12 66.544 58 53.457 86.88 66.544" fill="url(#h)"/>
+      <polygon points="86.88 66.543 86.88 66.544 86.88 26.174 58 13.087 58 53.456 58 54.554 84.459 66.543 86.88 66.544 86.88 66.543" fill="url(#i)"/>
+      <g filter="url(#j)">
+        <rect x="41.661" y="68.5" width="33.403" height="1" fill="#c92727"/>
+      </g>
+      <g filter="url(#j)">
+        <ellipse cx="75.065" cy="65.487" rx="0.888" ry="4.218" fill="#c92727"/>
+      </g>
+      <g filter="url(#j)">
+        <ellipse cx="41.661" cy="65.487" rx="0.888" ry="4.218" fill="#c92727"/>
+      </g>
+      <polygon points="41.661 27.94 75.065 27.94 75.065 37.816 55.725 59.129 75.065 59.129 75.065 69.004 41.661 69.004 41.661 59.092 61.05 37.816 41.661 37.816 41.661 27.94" fill="url(#m)"/>
+      <polygon points="41.661 27.94 44.784 24.346 71.978 24.346 75.065 27.94 41.661 27.94" fill="url(#n)"/>
+      <polygon points="61.05 37.816 58.98 37.816 43.077 55.389 41.661 59.092 61.05 37.816" fill="url(#o)"/>
+      <polygon points="75.065 59.129 72.015 55.607 58.92 55.607 55.725 59.129 75.065 59.129" fill="url(#p)"/>
+      <polygon points="75.065 59.129 72.015 55.607 58.92 55.607 55.725 59.129 75.065 59.129" opacity="0.5" fill="url(#q)" style="mix-blend-mode: multiply"/>
+      <rect x="41.806" y="27.831" width="33.259" height="0.145" fill="url(#r)"/>
+      <ellipse cx="70.175" cy="27.904" rx="4.89" ry="0.654" opacity="0.4" fill="url(#s)"/>
+      <line x1="61.05" y1="37.816" x2="41.661" y2="59.093" fill="none" stroke="#cc4040" stroke-miterlimit="10" stroke-width="0.2"/>
+      <line x1="75.065" y1="59.129" x2="55.725" y2="59.129" fill="none" stroke="#cf5454" stroke-miterlimit="10" stroke-width="0.2"/>
+      <polygon points="75.065 71.898 58 79.631 41.661 72.227 41.661 69.004 75.065 69.004 75.065 71.898" opacity="0.9" fill="url(#t)"/>
+      <line x1="41.661" y1="69.004" x2="75.065" y2="69.004" fill="none" stroke="#741212" stroke-miterlimit="10" stroke-width="0.2"/>
+    </g>
+  </g>
+</svg>

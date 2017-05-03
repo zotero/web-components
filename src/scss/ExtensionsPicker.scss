@@ -1,0 +1,102 @@
+body.extensions {
+	div#content .center {
+		background:$smoke;
+	}
+}
+
+div#extensions-container {
+	width: calc(100% + 80px);
+	margin-left:-40px;
+	margin-top:-30px;
+	padding-top:40px;
+	padding-bottom:30px;
+	
+	//background: rgba(0,0,0,.03);
+
+	div.content {
+		width:80%;
+		margin-left:auto;
+		margin-right:auto;
+		text-align: center;
+	}
+
+	button, a.button {
+		color:$white;
+		background-color: #38c;
+		border-color: #38c;
+		width:100%;
+		background-image:none;
+		font-size:1.5em;
+		padding: 8px 20px;
+	}
+
+	div.installButton{
+		margin:20px;
+	}
+
+	div#all-extensions {
+		button, a.button {
+			color:$white;
+			background-color: #38c;
+			border-color: #38c;
+			width:100%;
+			background-image:none;
+			font-size:1em;
+			padding: 8px 15px;
+		}
+
+		div.installButton{
+			margin:20px;
+		}
+	}
+}
+
+div.get-standalone-container {
+	margin-top:-60px;
+	margin-right:-50px;
+}
+
+div.get-standalone-aside {
+	width:200px;
+	text-align: right;
+	margin-left:auto;
+}
+
+div#explain-connector{
+	width: calc(100% + 80px);
+	margin-left:-40px;
+	padding-top:25px;
+
+	//background-color:rgba(0,0,0,0.03);
+	background-color:$white;
+	
+	div.content {
+		width:80%;
+		margin-left:auto;
+		margin-right:auto;
+		text-align: center;
+	}
+
+	div.flex-container {
+		display:-webkit-flex;
+		display:flex;
+	}
+
+	div.flex-section {
+		-webkit-flex:1 1 45%;
+		flex:1 1 30%;
+		min-width: 150px;
+	}
+
+	#connector-features{
+		padding-top:30px;
+		margin-top:10px;
+		margin-bottom:50px;
+	}
+
+	#connector-section3{
+		border-top:1px solid $silver;
+		padding-top:30px;
+		padding-bottom:50px;
+	}
+}

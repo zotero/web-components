@@ -32,21 +32,16 @@
                 </h1>
             
             <div id="login-links">
-                                    Welcome, <a href="/fcheslack">Faolan C-P</a>
-                    <a href="https://zotero.live/settings/">Settings</a>
-                    <a href="https://forums.zotero.live/messages/inbox">
-                                                    <strong>Inbox (8)</strong>
-                                            </a>
-                    <a href="/download">Download</a>
-                    <a href="/user/logout/">Log Out</a>
-                            </div>
+                    <a href="https://www.zotero.org/user/login/" title="Log In">Log In</a>
+                    <a href="https://www.zotero.org/user/register/" title="Register">Register</a>
+            </div>
             
             <a href="/settings/storage?ref=usb" class="button" id="purchase-storage-link"><img src="../assets/images/theme/archive.png" /> Upgrade Storage</a>
             
             <div id="navbar" class="container">
                 <nav id="sitenav">
                     <ul>
-                    <li class='selected'><a href="/">Home</a></li>
+                    <li ><a href="/">Home</a></li>
                     <li ><a href="https://zotero.live/fcheslack/items">My Library</a></li>
                     <li ><a href="/groups/">Groups</a></li>
                     <li ><a href="/people/">People</a></li>
@@ -87,10 +82,127 @@
 
             <script type="text/javascript" charset="utf-8">
                 ZoteroWebComponents.pageReady(function() {
-                    window.registerElement = ReactDOM.render(
+                    window.startElement = ReactDOM.render(
                         React.createElement(ZoteroWebComponents.Start, null),
                         document.getElementById('react-start')
                     );
+
+                    let testStates = {
+                        test1: {
+                            formData:{
+                                username:'zotero@zotero.org',
+                                email:'',
+                                email2:'',
+                                password:'',
+                                password2:''
+                            },
+                            usernameValidity:'invalid',
+                            usernameMessage: 'Your email address can be used to log in to your Zotero account, but not as your username.',
+                            registrationSuccessful:false
+                        },
+                        test2: {
+                            formData:{
+                                username:'valid-username',
+                                email:'',
+                                email2:'',
+                                password:'',
+                                password2:''
+                            },
+                            usernameValidity:'valid',
+                            usernameMessage: '',
+                            registrationSuccessful:false
+                        },
+                        test3: {
+                            formData:{
+                                username:'fcheslack',
+                                email:'',
+                                email2:'',
+                                password:'',
+                                password2:''
+                            },
+                            usernameValidity:'invalid',
+                            usernameMessage: 'Username is not available',
+                            registrationSuccessful:false
+                        },
+                        test4: {
+                            formData:{
+                                username:'fcheslack',
+                                email:'email@email.com',
+                                email2:'email2@email.com',
+                                password:'',
+                                password2:''
+                            },
+                            usernameValidity:'invalid',
+                            usernameMessage: 'Username is not available',
+                            registrationSuccessful:false
+                        },
+                        test5: {
+                            formData:{
+                                username:'valid',
+                                email:'email@email.com',
+                                email2:'email2@email.com',
+                                password:'',
+                                password2:''
+                            },
+                            formErrors:{
+                                email:['emails must match']
+                            },
+                            usernameValidity:'valid',
+                            usernameMessage: '',
+                            registrationSuccessful:false
+                        },
+                        test6: {
+                            formData:{
+                                username:'valid',
+                                email:'email@email.com',
+                                email2:'email@email.com',
+                                password:'',
+                                password2:''
+                            },
+                            usernameValidity:'valid',
+                            usernameMessage: '',
+                            registrationSuccessful:true
+                        },
+                        test7: {
+                            formData:{
+                                username:'valid',
+                                email:'email@email.com',
+                                email2:'email2@email.com',
+                                password:'',
+                                password2:''
+                            },
+                            formErrors:{},
+                            formError:'Error processing registration',
+                            usernameValidity:'valid',
+                            usernameMessage: '',
+                            registrationSuccessful:false
+                        },
+                        test8: {
+                            formData:{
+                                username:'valid',
+                                email:'email@email.com',
+                                email2:'email2@email.com',
+                                password:'',
+                                password2:''
+                            },
+                            formErrors:{},
+                            formError:'',
+                            usernameValidity:'valid',
+                            usernameMessage: '',
+                            registrationSuccessful:false,
+                        }
+                    };
+
+                    let testCase = testStates['test1'];
+                    if(window.location.hash.length > 0){
+                        let testLabel = window.location.hash.substr(1);
+                        testCase = testStates[testLabel];
+                    }
+                    let registerForm = window.startElement.refs.registerForm;
+                    registerForm.setState(Object.assign({}, registerForm.state, testCase));
+
+                    ZoteroWebComponents.cycleTestCases(registerForm, testStates);
+                    
                 });
             </script>
             <link rel="stylesheet" href="../build/web-components.css" type="text/css" media="screen" charset="utf-8"/>

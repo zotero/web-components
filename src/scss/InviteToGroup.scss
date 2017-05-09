@@ -1,0 +1,25 @@
+div#invite-to-group {
+	clear:both;
+	margin-top:10px;
+	margin-bottom:5px;
+	padding-top:10px;
+	border-top: 2px solid $silver;
+
+	.vertical-expandable {
+		margin-top:8px;
+	}
+
+	select {
+		margin-top:8px;
+		margin-bottom:8px;
+	}
+
+	button {
+		margin-top:8px;
+	}
+
+	ul {
+		list-style: none;
+		padding-left:0px;
+	}
+}

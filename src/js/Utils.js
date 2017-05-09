@@ -140,4 +140,12 @@ let pageReady = function(fn) {
 	}
 };
 
-export {slugify, parseQuery, buildQuery, querystring, parseSearchString, readCookie, loadInitialState, pageReady};
+let jsError = function(msg) {
+	let li = document.createElement('li');
+	li.setAttribute('class', 'jsNotificationMessage-error');
+	let newContent = document.createTextNode(msg);
+	li.appendChild(newContent);
+	document.querySelector('#js-message #js-message-list').appendChild(li);
+};
+
+export {slugify, parseQuery, buildQuery, querystring, parseSearchString, readCookie, loadInitialState, pageReady, jsError};

@@ -10,15 +10,19 @@ let baseZoteroWebsiteUrl = config.baseZoteroWebsiteUrl;
 
 let buildUrl = function(name, params){
 	switch(name){
+		case 'groupCreate':
+			return `/groups/new`;
+		case 'groupInvite':
+			return `/groups/inviteuser`;
 		case 'groupJoin':
-			return `/groups/${params.group.id}/join`;
+			return `/groups/${params.group.data.id}/join`;
 		case 'groupDecline':
-			return `/groups/${params.group.id}/decline/${params.token}`;
+			return `/groups/${params.group.data.id}/decline/${params.token}`;
 		case 'groupView':
-			if(params.group.type == 'Private') {
-				return `/groups/${params.group.id}`;
+			if(params.group.data.type == 'Private') {
+				return `/groups/${params.group.data.id}`;
 			} else {
-				let slug = slugify(params.group.name);
+				let slug = slugify(params.group.data.name);
 				return `/groups/${slug}`;
 			}
 		case 'groupLibrary':{
@@ -28,11 +32,11 @@ let buildUrl = function(name, params){
 		case 'groupImage':
 			return groupImageSrc(params.groupID, params.purpose);
 		case 'groupSettings':
-			return `/groups/${params.group.id}/settings`;
+			return `/groups/${params.group.data.id}/settings`;
 		case 'groupMemberSettings':
-			return `/groups/${params.group.id}/settings/members`;
+			return `/groups/${params.group.data.id}/settings/members`;
 		case 'groupLibrarySettings':
-			return `/groups/${params.group.id}/settings/library`;
+			return `/groups/${params.group.data.id}/settings/library`;
 		case 'saveKey':
 			if(params.key){
 				return `/settings/savekey?key=${params.key}`;
@@ -51,6 +55,10 @@ let buildUrl = function(name, params){
 			return '/support/quickstartguide';
 		case 'pluginSupport':
 			return '/support/plugins';
+		case 'extensions':
+			return '/extensions';
+		case 'download':
+			return '/downloads';
 	}
 };
 

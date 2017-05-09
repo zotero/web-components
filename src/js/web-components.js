@@ -22,14 +22,13 @@ import {MakeEditable} from './MakeEditable.js';
 import {UserGroups} from './UserGroups.js';
 import {GroupInvitations} from './GroupInvitations.js';
 import {NewGroupDiscussions} from './NewGroupDiscussions.js';
-//import {InviteToGroups} from './InviteToGroups.js';
-import {InviteToGroups} from './ServerSideInviteToGroups.js';
+import {InviteToGroups} from './InviteToGroups.js';
 import {Start} from './Start.js';
 import {Downloads} from './Downloads.js';
 import {ExtensionsPicker} from './ExtensionsPicker.js';
 import {CreateGroup} from './CreateGroup.js';
 import {ApiKeyEditor} from './ApiKeyEditor.js';
-import {pageReady} from './Utils.js';
+import {pageReady, jsError} from './Utils.js';
 import {cycleTestCases} from './TestUtils.js';
 
 let ZoteroWebComponents = {
@@ -45,6 +44,7 @@ let ZoteroWebComponents = {
 	CreateGroup,
 	ApiKeyEditor,
 	pageReady,
+	jsError,
 	cycleTestCases
 };
 

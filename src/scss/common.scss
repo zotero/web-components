@@ -24,6 +24,10 @@ $invalid-red: rgb(200,0,0);
 	width: 900px; // Fix width from 901px to 900px
 }
 
+#content .center.container {
+	min-height:500px;
+}
+
 // Add helper class
 .visually-hidden {
 	border: 0;

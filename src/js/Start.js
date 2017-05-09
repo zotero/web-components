@@ -9,11 +9,7 @@ const {Component} = React;
 const config = window.zoteroConfig;
 const installData = config.installData;
 
-const firefoxHash = installData.firefoxHash;
-const firefoxDownload = installData.firefoxDownload;
-const chromeInstallUrl = installData.chromeDownload;
-const safariDownloadUrl = installData.safariDownloadUrl;
-const operaDownloadUrl = installData.operaDownloadUrl;
+const {firefoxHash, firefoxDownload, chromeDownload, safariDownload, operaDownload} = installData;
 
 const recaptchaSitekey = config.recaptchaSitekey;
 
@@ -40,6 +36,7 @@ import {slugify} from './Utils.js';
 import {buildUrl} from './wwwroutes.js';
 import {Notifier} from './Notifier.js';
 import {BrowserDetect} from './browserdetect.js';
+import {VerticalExpandable} from './VerticalExpandable.js';
 
 let browser = BrowserDetect.browser;
 
@@ -113,18 +110,18 @@ class InstallChromeButton extends Component{
 	}
 	render(){
 		if(this.props.type == 'button') {
-			return <a href={chromeInstallUrl} id="chrome-connector-download-button" className="button download-link">Install</a>;
+			return <a href={chromeDownload} id="chrome-connector-download-button" className="button download-link">Install</a>;
 			//return <a className='button' onClick={this.installChrome}>Install</a>;
 		} else if(this.props.type == 'image') {
 			return (
-				<a href={chromeInstallUrl} onClick={this.installChrome}><img src={chromeBrowserImagePath} /></a>
+				<a href={chromeDownload} onClick={this.installChrome}><img src={chromeBrowserImagePath} /></a>
 			);
 		} else if(this.props.type == 'full') {
 			return (
 				<div className='download-full'>
 					<div className='browser-image'><img src={chromeBrowserImagePath} /></div>
 					<div className='browser-text'><b>Chrome extension</b></div>
-					<div className='install-button'><a href={chromeInstallUrl} id="chrome-connector-download-button" className="button download-link">Install</a></div>
+					<div className='install-button'><a href={chromeDownload} id="chrome-connector-download-button" className="button download-link">Install</a></div>
 				</div>
 			);
 		}
@@ -138,18 +135,18 @@ class InstallSafariButton extends Component{
 	render(){
 		if(this.props.type == 'button') {
 			return (
-				<a href={safariDownloadUrl} id="safari-connector-download-button" className="button download-link">Install</a>
+				<a href={safariDownload} id="safari-connector-download-button" className="button download-link">Install</a>
 			);
 		} else if(this.props.type == 'image'){
 			return (
-				<a href={safariDownloadUrl} onClick={this.installSafari}><img src={safariBrowserImagePath} /></a>
+				<a href={safariDownload} onClick={this.installSafari}><img src={safariBrowserImagePath} /></a>
 			);
 		} else if(this.props.type == 'full') {
 			return (
 				<div className='download-full'>
 					<div className='browser-image'><img src={safariBrowserImagePath} /></div>
 					<div className='browser-text'><b>Safari extension</b></div>
-					<a href={safariDownloadUrl} id="safari-connector-download-button" className="button download-link">Install</a>
+					<a href={safariDownload} id="safari-connector-download-button" className="button download-link">Install</a>
 				</div>
 			);
 		}
@@ -163,18 +160,18 @@ class InstallOperaButton extends Component{
 	render(){
 		if(this.props.type == 'button') {
 			return (
-				<a href={operaDownloadUrl} id="opera-connector-download-button" className="button download-link">Install</a>
+				<a href={operaDownload} id="opera-connector-download-button" className="button download-link">Install</a>
 			);
 		} else if(this.props.type == 'image') {
 			return (
-				<a href={operaDownloadUrl} onClick={this.installOpera}><img src={operaBrowserImagePath} /></a>
+				<a href={operaDownload} onClick={this.installOpera}><img src={operaBrowserImagePath} /></a>
 			);
 		} else if(this.props.type == 'full') {
 			return (
 				<div className='download-full'>
 					<div className='browser-image'><img src={operaBrowserImagePath} /></div>
 					<div className='browser-text'><b>Opera extension</b></div>
-					<a href={operaDownloadUrl} id="opera-connector-download-button" className="button download-link">Install</a>
+					<a href={operaDownload} id="opera-connector-download-button" className="button download-link">Install</a>
 				</div>
 			);
 		}
@@ -284,7 +281,7 @@ class InstallConnectorPrompt extends Component{
 			getStandaloneSection = (
 				<div className='get-standalone-container'>
 					<div className='get-standalone-aside'>
-						<p><a href='/downloads'>Get Zotero Standalone</a><br />
+						<p><a href={buildUrl('download')}>Get Zotero Standalone</a><br />
 						Zotero Standalone runs as a separate application and plugs into your choice of browser.</p>
 					</div>
 				</div>
@@ -472,27 +469,29 @@ class RegisterForm extends Component{
 			);
 		}
 
-		let hideClasses = 'vertical-hidable';
+		/*let hideClasses = 'vertical-hidable';
 		if(this.state.registrationSuccessful){
 			hideClasses += ' hiding';
-		}
+		}*/
 		let registerForm = (
-			<div id='register-form' className={hideClasses}>
-				<input type='text' name='username' placeholder='Username' onChange={this.handleChange} onBlur={this.checkUsername} value={formData.username}></input>
-				<p className={previewClass}>{profileUrl}</p>
-				<p className='usernameMessage'>{this.state.usernameMessage}</p>
-				<FormFieldErrorMessage message={this.state.formErrors['username']} />
-				<input type='email' name='email' placeholder='Email' onChange={this.handleChange} value={formData.email}></input>
-				<FormFieldErrorMessage message={this.state.formErrors['email']} />
-				<input type='email' name='email2' placeholder='Confirm Email' onChange={this.handleChange} value={formData.email2}></input>
-				<FormFieldErrorMessage message={this.state.formErrors['email2']} />
-				<input type='password' name='password' placeholder='Password' onChange={this.handleChange} value={formData.password}></input>
-				<FormFieldErrorMessage message={this.state.formErrors['password']} />
-				<input type='password' name='password2' placeholder='Verify Password' onChange={this.handleChange} value={formData.password2}></input>
-				<FormFieldErrorMessage message={this.state.formErrors['password2']} />
-				<div className="g-recaptcha" data-sitekey={recaptchaSitekey}></div>
-				<FormFieldErrorMessage message={this.state.formErrors['recaptcha']} />
-				<button type='button' onClick={this.register}>Register</button>
+			<div id='register-form'>
+				<VerticalExpandable expand={!this.state.registrationSuccessful}>
+					<input type='text' name='username' placeholder='Username' onChange={this.handleChange} onBlur={this.checkUsername} value={formData.username}></input>
+					<p className={previewClass}>{profileUrl}</p>
+					<p className='usernameMessage'>{this.state.usernameMessage}</p>
+					<FormFieldErrorMessage message={this.state.formErrors['username']} />
+					<input type='email' name='email' placeholder='Email' onChange={this.handleChange} value={formData.email}></input>
+					<FormFieldErrorMessage message={this.state.formErrors['email']} />
+					<input type='email' name='email2' placeholder='Confirm Email' onChange={this.handleChange} value={formData.email2}></input>
+					<FormFieldErrorMessage message={this.state.formErrors['email2']} />
+					<input type='password' name='password' placeholder='Password' onChange={this.handleChange} value={formData.password}></input>
+					<FormFieldErrorMessage message={this.state.formErrors['password']} />
+					<input type='password' name='password2' placeholder='Verify Password' onChange={this.handleChange} value={formData.password2}></input>
+					<FormFieldErrorMessage message={this.state.formErrors['password2']} />
+					<div className="g-recaptcha" data-sitekey={recaptchaSitekey}></div>
+					<FormFieldErrorMessage message={this.state.formErrors['recaptcha']} />
+					<button type='button' onClick={this.register}>Register</button>
+				</VerticalExpandable>
 			</div>
 		);
 

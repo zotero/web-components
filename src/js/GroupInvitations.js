@@ -1,7 +1,7 @@
 'use strict';
 
-//import {log as logger} from './Log.js';
-//let log = logger.Logger('GroupInvitations');
+import {log as logger} from './Log.js';
+let log = logger.Logger('GroupInvitations');
 
 import {ajax, postFormData} from './ajax.js';
 
@@ -9,9 +9,31 @@ let React = require('react');
 
 import {buildUrl} from './wwwroutes.js';
 
+let phpgroupToGroup = function(phpgroup){
+	log.debug('phpgroupToGroup');
+	let group = {
+		id: phpgroup.id,
+		data: {
+			id: phpgroup.id,
+			name: phpgroup.name,
+			type: phpgroup.type,
+			owner: phpgroup.owner,
+			description: phpgroup.description,
+			members: phpgroup.memberIDs,
+			admins: phpgroup.adminIDs,
+			libraryReading: phpgroup.libraryReading,
+			libraryEditing: phpgroup.libraryEditing
+		}
+	};
+	return group;
+};
+
 class GroupInvitation extends React.Component{
 	constructor(props){
 		super(props);
+		this.state = {
+			done:false
+		};
 		this.acceptInvitation = this.acceptInvitation.bind(this);
 		this.declineInvitation = this.declineInvitation.bind(this);
 	}
@@ -19,20 +41,27 @@ class GroupInvitation extends React.Component{
 		let group = this.props.group;
 		let invitation = this.props.invitation;
 		let url = buildUrl('groupJoin', {group});
-		postFormData(url, {token:invitation.token});
+		postFormData(url, {token:invitation.token}).then(()=>{
+			this.setState({done:true});
+		});
 	}
 	declineInvitation(){
 		let group = this.props.group;
 		let invitation = this.props.invitation;
 		let url = buildUrl('groupDecline', {group, token:invitation.token});
-		postFormData(url, {token:invitation.token});
+		postFormData(url, {token:invitation.token}).then(()=>{
+			this.setState({done:true});
+		});
 	}
 	render(){
+		if(this.state.done){
+			return null;
+		}
 		let group = this.props.group;
 
 		return (
-			<li><strong className="group-title"><a href={buildUrl('groupView', {group})}>{group.name}</a></strong> 
-				<span className="group-description">{group.description}</span>
+			<li><strong className="group-title"><a href={buildUrl('groupView', {group})}>{group.data.name}</a></strong> 
+				{/*<span className="group-description">{group.data.description}</span>*/}
 				<div className="group-buttons">
 					<button type="button" onClick={this.acceptInvitation}>Join</button>
 					<button type="button" onClick={this.declineInvitation}>Ignore</button>
@@ -49,14 +78,22 @@ class GroupInvitations extends React.Component{
 			invitations:[],
 			invitationGroups:[]
 		};
+		this.loadInvitations = this.loadInvitations.bind(this);
 	}
 	componentDidMount(){
+		this.loadInvitations();
+	}
+	loadInvitations() {
 		if(Zotero.currentUser){
 			ajax({url:'/groups/invitations'}).then((resp)=>{
 				resp.json().then((data) => {
+					let invitationGroups = {};
+					data.invitations.forEach((val) => {
+						invitationGroups[val.groupID] = phpgroupToGroup(data.invitationGroups[val.groupID]);
+					});
 					this.setState({
 						invitations:data.invitations,
-						invitationGroups:data.invitationGroups
+						invitationGroups:invitationGroups
 					});
 				});
 			});

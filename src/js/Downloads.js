@@ -9,10 +9,10 @@ const {Component} = React;
 const config = window.zoteroConfig;
 const installData = config.installData;
 
-const windowsDownloadUrl = installData.windowsDownloadUrl;
-const macDownloadUrl = installData.macDownloadUrl;
-const linux32DownloadUrl = installData.linux32DownloadUrl;
-const linux64DownloadUrl = installData.linux64DownloadUrl;
+const windowsDownloadUrl = installData.windowsDownload;
+const macDownloadUrl = installData.macDownload;
+const linux32DownloadUrl = installData.linux32Download;
+const linux64DownloadUrl = installData.linux64Download;
 
 const imagePath = config.imagePath;
 
@@ -113,7 +113,7 @@ class DownloadConnector extends Component {
 				<h1>Browser Extension</h1>
 				<div className='install-connector-section'>
 					<p>Get Zotero connectors for your browser</p>
-					<div className='downloadButton'><a className='button'>Download</a></div>
+					<div className='downloadButton'><a href={buildUrl('extensions')} className='button'>Download</a></div>
 					<p>The Zotero Connector automatically senses content as you browse the web and allows you to save it to Zotero with a single click.</p>
 				</div>
 			</div>

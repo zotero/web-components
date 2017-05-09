@@ -10,6 +10,7 @@ import {buildUrl} from './wwwroutes.js';
 
 let React = require('react');
 const {Component} = React;
+import PropTypes from 'prop-types';
 
 const apiKey = window.zoteroConfig.apiKey;
 
@@ -82,7 +83,7 @@ class GroupNugget extends Component{
 		
 		if(this.props.titleOnly){
 			return (
-				<div key={group.groupID}>
+				<div key={group.id}>
 					<div className="nugget-name">
 						<a href={buildUrl('groupView', {group})}>{group.data.name} ({memberCount})</a>
 					</div>
@@ -98,7 +99,7 @@ class GroupNugget extends Component{
 		if(group.hasImage){
 			groupImage = (
 				<a href={buildUrl('groupView', {group})} className="group-image">
-					<img src={buildUrl('groupImageUrl', {groupID:group.groupID, purpose:'profile'})} alt="" />
+					<img src={buildUrl('groupImageUrl', {groupID:group.id, purpose:'profile'})} alt="" />
 				</a>
 			);
 		}
@@ -131,7 +132,7 @@ class GroupNugget extends Component{
 		}
 
 		return (
-			<div key={group.groupID} className="nugget-group">
+			<div className="nugget-group">
 				<div className="nugget-full">
 					{groupImage}
 					<div className="nugget-name">
@@ -168,6 +169,17 @@ class GroupNugget extends Component{
 	}
 }
 GroupNugget.defaultProps = {titleOnly:false};
+GroupNugget.propTypes = {
+	group: PropTypes.shape({
+		id: PropTypes.number.isRequired,
+		data: PropTypes.shape({
+			id: PropTypes.number.isRequired,
+			name: PropTypes.string.isRequired,
+			type: PropTypes.string.isRequired
+		}).isRequired
+	}).isRequired
+};
+
 
 class GroupsExplainer extends Component{
 	render(){

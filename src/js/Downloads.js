@@ -16,11 +16,11 @@ const linux64DownloadUrl = installData.linux64Download;
 
 const imagePath = config.imagePath;
 
-const standaloneImagePath = imagePath + '/downloads/zotero-icon.jpg';
-const standaloneImagePath2x = imagePath + '/downloads/zotero-icon@2x.jpg';
+const standaloneImagePath = imagePath + '/downloads/zotero-icon.png';
+const standaloneImagePath2x = imagePath + '/downloads/zotero-icon@2x.png';
 
-const browserExtensionImagePath = imagePath + '/downloads/browser-extension.jpg';
-const browserExtensionImagePath2x = imagePath + '/downloads/browser-extension@2x.jpg';
+const browserExtensionImagePath = imagePath + '/downloads/browser-extension.png';
+const browserExtensionImagePath2x = imagePath + '/downloads/browser-extension@2x.png';
 
 const pluginsIconImagePath = imagePath + '/downloads/plugins-icon.svg';
 

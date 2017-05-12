@@ -1,0 +1,109 @@
+div#install-connector {
+	
+	font-size:16px;
+
+	h1 {
+		font-size:36px;
+	}
+
+	padding-bottom:35px;
+
+	figure.browser-plus-extension {
+		margin:0;
+
+		img {
+			vertical-align: middle;
+		}
+	}
+
+	span.icon-plus {
+		display:inline-block;
+		width:48px;
+		height:48px;
+		//base-64 encoded icon-plus.svg
+		background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MCA0MCI+PHBvbHlnb24gZmlsbD0iI0U2RTZFNiIgcG9pbnRzPSIyNCwxNiAyNCwwIDE2LDAgMTYsMTYgMCwxNiAwLDI0IDE2LDI0IDE2LDQwIDI0LDQwIDI0LDI0IDQwLDI0IDQwLDE2ICIvPjwvc3ZnPg==") no-repeat 0 0;
+		//background: url("../assets/images/extensions/icon-plus.svg") no-repeat 0 0;
+		vertical-align: middle;
+		margin: 0 3px 0 16px;
+	}
+
+	#extension-icon-image {
+		margin-top:25px;
+	}
+
+	div.download-full {
+		display:inline-block;
+		margin:10px;
+		text-align: center;
+		font-size: smaller;
+
+		img {
+			width:48px;
+		}
+
+		.browser-text {
+			margin-bottom:20px;
+		}
+	}
+
+	.install-connector>button, a.btn {
+		font-size:20px;
+		text-decoration: none;
+		color:$white;
+		background-color: $button-blue;
+		border-color: $button-blue;
+		min-width:160px;
+		background-image:none;
+		padding: 9px 23px;
+	}
+
+	div.installButton{
+		margin:40px;
+	}
+
+	div#all-extensions {
+		button, a.btn {
+			color:$white;
+			background-color: $button-blue;
+			border-color: $button-blue;
+			min-width:100px;
+			background-image:none;
+			font-size:1em;
+			padding: 8px 15px;
+		}
+
+		div.installButton{
+			margin:20px;
+		}
+	}
+
+	p.showExtensions {
+		margin-top:-40px;
+	}
+
+	div.get-standalone-container {
+		margin-top:-30px;
+		margin-right:-50px;
+	}
+
+	div.get-standalone-aside {
+		width:200px;
+		text-align: right;
+		margin-left:auto;
+	}
+
+	@media all and (max-width: 640px) {
+		p.showExtensions {
+			margin-top:20px;
+		}
+
+		div.get-standalone-container {
+			margin-top:60px;
+			margin-right:0;
+		}
+		div.get-standalone-aside {
+			width:100%;
+			text-align: center;
+		}
+	}
+}

@@ -8,7 +8,7 @@ div#start-container {
 		margin-right:auto;
 		text-align: center;
 	}
-
+	/*
 	button, a.button {
 		color:$white;
 		background-color: $button-blue;
@@ -17,7 +17,7 @@ div#start-container {
 		background-image:none;
 		font-size:1.5em;
 	}
-
+	*/
 	div.arrow-down {
 		margin-top:-20px;
 	}
@@ -35,13 +35,9 @@ div#start-container {
 			font-size: 20px;
 		}
 	}
-}
-div#install-connector-section {
-	
-	padding-bottom:35px;
 
-	#extension-icon-image {
-		margin-top:25px;
+	p.showExtensions {
+		margin-top:20px;
 	}
 }
 div#register-section {
@@ -80,16 +76,6 @@ div#register-form {
 	}
 }
 
-div.vertical-hidable {
-	transition: all 500ms ease-in;
-	max-height:500px;
-	overflow-y: hidden;
-}
-
-div.vertical-hidable.hiding {
-	max-height:0px;
-}
-
 p#register-form-error {
 	background-color:$notification-error-color;
 	padding:3px;
@@ -115,21 +101,4 @@ div#register-quick-links {
 
 p.form-field-error {
 	color: $invalid-red;
-}
-
-div.download-full {
-	display:inline-block;
-	//width:200px;
-	margin-left:10px;
-	margin-right:10px;
-	text-align: center;
-	font-size: smaller;
-
-	img {
-		width:48px;
-	}
-
-	.browser-text {
-		margin-bottom:20px;
-	}
 }

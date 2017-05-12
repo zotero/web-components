@@ -7,38 +7,39 @@ const React = require('react');
 const {Component} = React;
 
 const config = window.zoteroConfig;
-const installData = config.installData;
+//const installData = config.installData;
 
-const {firefoxHash, firefoxDownload, chromeDownload, safariDownload, operaDownload} = installData;
+//const {firefoxHash, firefoxDownload, chromeDownload, safariDownload, operaDownload} = installData;
 
 const recaptchaSitekey = config.recaptchaSitekey;
 
 const imagePath = config.imagePath;
 
-const chromeExtensionImagePath = imagePath + '/start/chrome-extension.jpg';
-const firefoxExtensionImagePath = imagePath + '/start/firefox-extension.jpg';
-const safariExtensionImagePath = imagePath + '/start/safari-extension.jpg';
-const chromeExtension2xImagePath = imagePath + '/start/chrome-extension@2x.jpg';
-const firefoxExtension2xImagePath = imagePath + '/start/firefox-extension@2x.jpg';
-const safariExtension2xImagePath = imagePath + '/start/safari-extension@2x.jpg';
+// const chromeExtensionImagePath = imagePath + '/start/chrome-extension.jpg';
+// const firefoxExtensionImagePath = imagePath + '/start/firefox-extension.jpg';
+// const safariExtensionImagePath = imagePath + '/start/safari-extension.jpg';
+// const chromeExtension2xImagePath = imagePath + '/start/chrome-extension@2x.jpg';
+// const firefoxExtension2xImagePath = imagePath + '/start/firefox-extension@2x.jpg';
+// const safariExtension2xImagePath = imagePath + '/start/safari-extension@2x.jpg';
 const connectorButtonImagePath = imagePath + '/start/zotero-button.svg';
 const arrowDownGrayImagePath = imagePath + '/start/arrow-down-gray.svg';
 const arrowDownWhiteImagePath = imagePath + '/start/arrow-down-white.svg';
 
-const chromeBrowserImagePath = imagePath + '/theme/browser_icons/64-chrome.png';
-const firefoxBrowserImagePath = imagePath + '/theme/browser_icons/64-firefox.png';
-const safariBrowserImagePath = imagePath + '/theme/browser_icons/64-safari.png';
-const operaBrowserImagePath = imagePath + '/theme/browser_icons/64-opera.png';
+// const chromeBrowserImagePath = imagePath + '/theme/browser_icons/64-chrome.png';
+// const firefoxBrowserImagePath = imagePath + '/theme/browser_icons/64-firefox.png';
+// const safariBrowserImagePath = imagePath + '/theme/browser_icons/64-safari.png';
+// const operaBrowserImagePath = imagePath + '/theme/browser_icons/64-opera.png';
 
 
 import {ajax, postFormData} from './ajax.js';
 import {slugify} from './Utils.js';
 import {buildUrl} from './wwwroutes.js';
 import {Notifier} from './Notifier.js';
-import {BrowserDetect} from './browserdetect.js';
+//import {BrowserDetect} from './browserdetect.js';
 import {VerticalExpandable} from './VerticalExpandable.js';
+import {InstallConnectorPrompt} from './InstallConnector.js';
 
-let browser = BrowserDetect.browser;
+//let browser = BrowserDetect.browser;
 
 class ArrowDownGray extends Component{
 	render(){
@@ -59,262 +60,6 @@ class ArrowDownWhite extends Component{
 		);
 	}
 }
-
-class InstallFirefoxButton extends Component{
-	installFirefox(){
-		if (typeof InstallTrigger == 'undefined') {
-			return true;
-		}
-		let params = {
-			'Zotero': {
-				URL: firefoxDownload,
-				Hash: firefoxHash
-			}
-		};
-
-		window.InstallTrigger.install(params);
-		return false;
-	}
-	render(){
-		if(this.props.type == 'button'){
-			return (
-				<a href={firefoxDownload} className='button' onClick={this.installFirefox}>Install</a>
-			);
-		} else if(this.props.type == 'image') {
-			return (
-				<a href={firefoxDownload} onClick={this.installFirefox}><img src={firefoxBrowserImagePath} /></a>
-			);
-		} else if(this.props.type == 'full') {
-			return (
-				<div className='download-full'>
-					<div className='browser-image'><img src={firefoxBrowserImagePath} /></div>
-					<div className='browser-text'><b>Firefox extension</b></div>
-					<div><a href={firefoxDownload} className='button' onClick={this.installFirefox}>Install</a></div>
-				</div>
-			);
-		}
-	}
-}
-InstallFirefoxButton.defaultProps = {type:'button'};
-
-class InstallChromeButton extends Component{
-	installChrome(){
-		//window.chrome.webstore.install();
-		/*
-		window.chrome.webstore.install(undefined, ()=>{
-			//success
-		}, ()=>{
-			//failure
-		});
-		*/
-	}
-	render(){
-		if(this.props.type == 'button') {
-			return <a href={chromeDownload} id="chrome-connector-download-button" className="button download-link">Install</a>;
-			//return <a className='button' onClick={this.installChrome}>Install</a>;
-		} else if(this.props.type == 'image') {
-			return (
-				<a href={chromeDownload} onClick={this.installChrome}><img src={chromeBrowserImagePath} /></a>
-			);
-		} else if(this.props.type == 'full') {
-			return (
-				<div className='download-full'>
-					<div className='browser-image'><img src={chromeBrowserImagePath} /></div>
-					<div className='browser-text'><b>Chrome extension</b></div>
-					<div className='install-button'><a href={chromeDownload} id="chrome-connector-download-button" className="button download-link">Install</a></div>
-				</div>
-			);
-		}
-	}
-}
-InstallChromeButton.defaultProps = {type:'button'};
-
-class InstallSafariButton extends Component{
-	installSafari(){
-	}
-	render(){
-		if(this.props.type == 'button') {
-			return (
-				<a href={safariDownload} id="safari-connector-download-button" className="button download-link">Install</a>
-			);
-		} else if(this.props.type == 'image'){
-			return (
-				<a href={safariDownload} onClick={this.installSafari}><img src={safariBrowserImagePath} /></a>
-			);
-		} else if(this.props.type == 'full') {
-			return (
-				<div className='download-full'>
-					<div className='browser-image'><img src={safariBrowserImagePath} /></div>
-					<div className='browser-text'><b>Safari extension</b></div>
-					<a href={safariDownload} id="safari-connector-download-button" className="button download-link">Install</a>
-				</div>
-			);
-		}
-	}
-}
-InstallSafariButton.defaultProps = {type:'button'};
-
-class InstallOperaButton extends Component{
-	installOpera(){
-	}
-	render(){
-		if(this.props.type == 'button') {
-			return (
-				<a href={operaDownload} id="opera-connector-download-button" className="button download-link">Install</a>
-			);
-		} else if(this.props.type == 'image') {
-			return (
-				<a href={operaDownload} onClick={this.installOpera}><img src={operaBrowserImagePath} /></a>
-			);
-		} else if(this.props.type == 'full') {
-			return (
-				<div className='download-full'>
-					<div className='browser-image'><img src={operaBrowserImagePath} /></div>
-					<div className='browser-text'><b>Opera extension</b></div>
-					<a href={operaDownload} id="opera-connector-download-button" className="button download-link">Install</a>
-				</div>
-			);
-		}
-	}
-}
-InstallOperaButton.defaultProps = {type:'button'};
-
-class InstallButton extends Component{
-	render(){
-		let browserName = browser;
-		log.debug('InstallButton render');
-		log.debug(browserName);
-		
-		switch(browserName){
-			case 'Firefox':
-				return <InstallFirefoxButton />;
-			case 'Chrome':
-				return <InstallChromeButton />;
-			case 'Safari':
-				return <InstallSafariButton />;
-			case 'Opera':
-				return <InstallOperaButton />;
-			default:
-				//TODO: unknown browser download?
-				return null;
-		}
-	}
-}
-
-class ChromeExtensionIcon extends Component{
-	render(){
-		return <img className='extensionIconImage' src={chromeExtensionImagePath} srcSet={`${chromeExtension2xImagePath} 2x`} />;
-	}
-}
-
-class FirefoxExtensionIcon extends Component{
-	render(){
-		return <img className='extensionIconImage' src={firefoxExtensionImagePath} srcSet={`${firefoxExtension2xImagePath} 2x`} />;
-	}
-}
-
-class SafariExtensionIcon extends Component{
-	render(){
-		return <img className='extensionIconImage' src={safariExtensionImagePath} srcSet={`${safariExtension2xImagePath} 2x`} />;
-	}
-}
-
-class AllExtensionsSection extends Component{
-	render(){
-		return (
-			<div id='all-extensions'>
-				<InstallChromeButton type='full' />
-				<InstallFirefoxButton type='full' />
-				<InstallSafariButton type='full' />
-				<InstallOperaButton type='full' />
-			</div>
-		);
-	}
-}
-
-
-class InstallConnectorPrompt extends Component{
-	constructor(props){
-		super(props);
-		this.state = {
-			browser:browser,
-			showAllExtensions:false
-		};
-		this.showAllExtensions = this.showAllExtensions.bind(this);
-	}
-	componentDidMount(){
-		//detect browser and set correct browser image
-	}
-	showAllExtensions(evt){
-		this.setState({showAllExtensions:true});
-		evt.preventDefault();
-	}
-	render(){
-		let connectorText = '';
-		let connectorImage = null;
-		let installButton = <InstallButton browser='chrome' />;
-		switch(this.state.browser){
-			case 'Chrome':
-				connectorText = 'Chrome Extension';
-				connectorImage = <ChromeExtensionIcon />;
-				break;
-			case 'Firefox':
-				connectorText = 'Firefox Extension';
-				connectorImage = <FirefoxExtensionIcon />;
-				break;
-			case 'Safari':
-				connectorText = 'Safari Extension';
-				connectorImage = <SafariExtensionIcon />;
-				break;
-		}
-
-		let showExtensionsLink = <p><a href='#' onClick={this.showAllExtensions}>Not using {this.state.browser}? Show all extensions.</a></p>;
-
-		let allExtensions = null;
-		if(this.state.showAllExtensions){
-			showExtensionsLink = <p>&nbsp;</p>;
-			allExtensions = <AllExtensionsSection />;
-		}
-
-		let getStandaloneSection = null;
-		if(this.props.showStandalone) {
-			getStandaloneSection = (
-				<div className='get-standalone-container'>
-					<div className='get-standalone-aside'>
-						<p><a href={buildUrl('download')}>Get Zotero Standalone</a><br />
-						Zotero Standalone runs as a separate application and plugs into your choice of browser.</p>
-					</div>
-				</div>
-			);
-		}
-
-		return (
-			<div id='install-connector-section'>
-				<div className='content'>
-					<div className='browser-client-icons'>
-						{connectorImage}
-					</div>
-					<div className='install-connector'>
-						<h1>1. Install the {connectorText}</h1>
-						<p>Zotero connectors allow you to save to Zotero directly from your web browser.</p>
-						<div className='installButton'>
-							{installButton}
-						</div>
-						{showExtensionsLink}
-
-						{getStandaloneSection}
-
-						{allExtensions}
-					</div>
-				</div>
-			</div>
-		);
-	}
-}
-
-InstallConnectorPrompt.defaultProps = {
-	showStandalone:false
-};
 
 let validateRegisterForm = function(data) {
 	if(data.email != data.email2){
@@ -469,10 +214,6 @@ class RegisterForm extends Component{
 			);
 		}
 
-		/*let hideClasses = 'vertical-hidable';
-		if(this.state.registrationSuccessful){
-			hideClasses += ' hiding';
-		}*/
 		let registerForm = (
 			<div id='register-form'>
 				<VerticalExpandable expand={!this.state.registrationSuccessful}>
@@ -551,7 +292,7 @@ class Start extends Component{
 				<div className='install-success-div'>
 					<h1>Success! You installed Zotero!</h1>
 				</div>
-				<InstallConnectorPrompt ref='installConnectorPrompt' />
+				<InstallConnectorPrompt ref='installConnectorPrompt' numbered={true} />
 				<RegisterForm ref='registerForm' />
 				<PostRegisterGuide ref='postRegisterGuide' />
 			</div>

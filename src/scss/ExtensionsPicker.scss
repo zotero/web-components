@@ -4,79 +4,56 @@ body.extensions {
 	}
 }
 
+@keyframes slide-in {
+	0% {
+		transform: translateY(-30px);
+		opacity: 0;
+	}
+
+	100% {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}
+
+div#extensions-page-container {
+	margin: 0 -40px;
+	animation: slide-in 0.8s ease;
+
+	* {
+		box-sizing: border-box;
+	}
+
+	div.content {
+		width:80%;
+		margin-left:auto;
+		margin-right:auto;
+		text-align: center;
+	}
+
+	h1 {
+		font-size:36px;
+	}
+
+	h2 {
+		font-size: 30px;
+	}
+}
+
 div#extensions-container {
-	width: calc(100% + 80px);
-	margin-left:-40px;
 	margin-top:-30px;
 	padding-top:40px;
 	padding-bottom:30px;
-	
-	//background: rgba(0,0,0,.03);
 
-	div.content {
-		width:80%;
-		margin-left:auto;
-		margin-right:auto;
-		text-align: center;
-	}
-
-	button, a.button {
-		color:$white;
-		background-color: #38c;
-		border-color: #38c;
-		width:100%;
-		background-image:none;
-		font-size:1.5em;
-		padding: 8px 20px;
-	}
-
-	div.installButton{
-		margin:20px;
-	}
-
-	div#all-extensions {
-		button, a.button {
-			color:$white;
-			background-color: #38c;
-			border-color: #38c;
-			width:100%;
-			background-image:none;
-			font-size:1em;
-			padding: 8px 15px;
-		}
-
-		div.installButton{
-			margin:20px;
-		}
-	}
-}
-
-div.get-standalone-container {
-	margin-top:-60px;
-	margin-right:-50px;
-}
-
-div.get-standalone-aside {
-	width:200px;
-	text-align: right;
-	margin-left:auto;
+	background: $smoke; // IE9 fallback
+	background: linear-gradient(transparent, $smoke);
 }
 
 div#explain-connector{
-	width: calc(100% + 80px);
-	margin-left:-40px;
 	padding-top:25px;
-
-	//background-color:rgba(0,0,0,0.03);
 	background-color:$white;
+	font-size:16px;
 	
-	div.content {
-		width:80%;
-		margin-left:auto;
-		margin-right:auto;
-		text-align: center;
-	}
-
 	div.flex-container {
 		display:-webkit-flex;
 		display:flex;
@@ -86,17 +63,34 @@ div#explain-connector{
 		-webkit-flex:1 1 45%;
 		flex:1 1 30%;
 		min-width: 150px;
+		padding:10px;
 	}
 
 	#connector-features{
 		padding-top:30px;
 		margin-top:10px;
 		margin-bottom:50px;
+
+		p {
+			font-size:12px;
+		}
 	}
 
 	#connector-section3{
 		border-top:1px solid $silver;
 		padding-top:30px;
 		padding-bottom:50px;
+
+		p {
+			font-size:12px;
+		}
+	}
+
+	@media all and (max-width: 640px) {
+	    div.flex-container {
+	        -webkit-flex-direction: column;
+	        flex-direction: column;
+	    }
 	}
 }
+

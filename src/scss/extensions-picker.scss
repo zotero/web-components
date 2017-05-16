@@ -12,12 +12,6 @@
 		text-align: center;
 		position: relative;
 
-		.line {
-			@media (min-width: $screen-sm-min) {
-				display: block;
-			}
-		}
-
 		.lead {
 			margin-bottom: 34px; // 40px
 		}

@@ -19,26 +19,25 @@ const {firefoxHash, firefoxDownload, chromeDownload, safariDownload, operaDownlo
 
 const imagePath = config.imagePath;
 
-/*
-const chromeExtensionImagePath = imagePath + '/start/chrome-extension.jpg';
-const firefoxExtensionImagePath = imagePath + '/start/firefox-extension.jpg';
-const safariExtensionImagePath = imagePath + '/start/safari-extension.jpg';
-const chromeExtension2xImagePath = imagePath + '/start/chrome-extension@2x.jpg';
-const firefoxExtension2xImagePath = imagePath + '/start/firefox-extension@2x.jpg';
-const safariExtension2xImagePath = imagePath + '/start/safari-extension@2x.jpg';
-*/
-
 const zoteroIconImagePath = imagePath + '/extensions/zotero-icon.png';
 const zoteroIcon2xImagePath = imagePath + '/extensions/zotero-icon-2x.png';
 
-const chromeBrowserImagePath = imagePath + '/extensions/chrome-icon.png';
-const chromeBrowser2xImagePath = imagePath + '/extensions/chrome-icon-2x.png';
-const firefoxBrowserImagePath = imagePath + '/extensions/firefox-icon.png';
-const firefoxBrowser2xImagePath = imagePath + '/extensions/firefox-icon-2x.png';
-const safariBrowserImagePath = imagePath + '/extensions/safari-icon.png';
-const safariBrowser2xImagePath = imagePath + '/extensions/safari-icon-2x.png';
-const operaBrowserImagePath = imagePath + '/theme/browser_icons/64-opera.png';
-const operaBrowser2xImagePath = imagePath + '/theme/browser_icons/64-opera.png';
+class BrowserIcon extends Component {
+	render() {
+		let browserImagePath = imagePath + '/extensions/';
+		browserImagePath += this.props.browser + '-icon';
+		if(this.props.size == 'small'){
+			browserImagePath += '-small';
+		} else if(this.props.size == 'large'){
+			browserImagePath += '-large';
+		}
+		let browserImagePath2x = browserImagePath + '-2x.png';
+		browserImagePath += '.png';
+
+		let p = {...this.props, src:browserImagePath, srcSet:`${browserImagePath2x} 2x`, className:'browser-icon'};
+		return (<img {...p} />);
+	}
+}
 
 class InstallFirefoxButton extends Component{
 	installFirefox(){
@@ -62,12 +61,12 @@ class InstallFirefoxButton extends Component{
 			);
 		} else if(this.props.type == 'image') {
 			return (
-				<a href={firefoxDownload} onClick={this.installFirefox}><img src={firefoxBrowserImagePath} srcSet={`${firefoxBrowser2xImagePath} 2x`} /></a>
+				<a href={firefoxDownload} onClick={this.installFirefox}><BrowserIcon browser='firefox' /></a>
 			);
 		} else if(this.props.type == 'full') {
 			return (
 				<div className='download-full'>
-					<div className='browser-image'><img src={firefoxBrowserImagePath} srcSet={`${firefoxBrowser2xImagePath} 2x`} /></div>
+					<div className='browser-image'><BrowserIcon browser='firefox' /></div>
 					<h3>Firefox extension</h3>
 					<div><a href={firefoxDownload} className='btn' onClick={this.installFirefox}>Install</a></div>
 				</div>
@@ -94,12 +93,12 @@ class InstallChromeButton extends Component{
 			//return <a className='button' onClick={this.installChrome}>Install</a>;
 		} else if(this.props.type == 'image') {
 			return (
-				<a href={chromeDownload} onClick={this.installChrome}><img src={chromeBrowserImagePath} srcSet={`${chromeBrowser2xImagePath} 2x`} /></a>
+				<a href={chromeDownload} onClick={this.installChrome}><BrowserIcon browser="chrome" /></a>
 			);
 		} else if(this.props.type == 'full') {
 			return (
 				<div className='download-full'>
-					<div className='browser-image'><img src={chromeBrowserImagePath} srcSet={`${chromeBrowser2xImagePath} 2x`} /></div>
+					<div className='browser-image'><BrowserIcon browser="chrome" /></div>
 					<h3>Chrome extension</h3>
 					<div className='install-button'><a href={chromeDownload} id="chrome-connector-download-button" className="btn download-link">Install</a></div>
 				</div>
@@ -119,12 +118,12 @@ class InstallSafariButton extends Component{
 			);
 		} else if(this.props.type == 'image'){
 			return (
-				<a href={safariDownload} onClick={this.installSafari}><img src={safariBrowserImagePath} srcSet={`${safariBrowser2xImagePath} 2x`} /></a>
+				<a href={safariDownload} onClick={this.installSafari}><BrowserIcon browser='safari' /></a>
 			);
 		} else if(this.props.type == 'full') {
 			return (
 				<div className='download-full'>
-					<div className='browser-image'><img src={safariBrowserImagePath} srcSet={`${safariBrowser2xImagePath} 2x`} /></div>
+					<div className='browser-image'><BrowserIcon browser='safari' /></div>
 					<h3>Safari extension</h3>
 					<a href={safariDownload} id="safari-connector-download-button" className="btn download-link">Install</a>
 				</div>
@@ -144,12 +143,12 @@ class InstallOperaButton extends Component{
 			);
 		} else if(this.props.type == 'image') {
 			return (
-				<a href={operaDownload} onClick={this.installOpera}><img src={operaBrowserImagePath} srcSet={`${operaBrowser2xImagePath} 2x`} /></a>
+				<a href={operaDownload} onClick={this.installOpera}><BrowserIcon browser='opera' /></a>
 			);
 		} else if(this.props.type == 'full') {
 			return (
 				<div className='download-full'>
-					<div className='browser-image'><img src={operaBrowserImagePath} srcSet={`${operaBrowser2xImagePath} 2x`} /></div>
+					<div className='browser-image'><BrowserIcon browser='opera' /></div>
 					<h3>Opera extension</h3>
 					<a href={operaDownload} id="opera-connector-download-button" className="btn download-link">Install</a>
 				</div>
@@ -181,18 +180,15 @@ class InstallButton extends Component{
 	}
 }
 
-class ChromeExtensionIcon extends Component{
+class BrowserExtensionIcon extends Component{
 	render(){
 		return (
 			<figure className="browser-plus-extension">
-				<img
-					src={chromeBrowserImagePath}
-					alt="Google Chrome"
+				<BrowserIcon
+					browser={this.props.browser}
+					size="large"
 					width="128"
-					height="128"
-					className="browser-icon"
-					srcSet={`${chromeBrowser2xImagePath} 2x`}
-				/>
+					height="128" />
 				<span className="icon-plus"></span>
 				<img
 					src={zoteroIconImagePath}
@@ -204,61 +200,6 @@ class ChromeExtensionIcon extends Component{
 				/>
 			</figure>
 		);
-	}
-}
-
-class FirefoxExtensionIcon extends Component{
-	render(){
-		return (
-			<figure className="browser-plus-extension">
-				<img
-					src={firefoxBrowserImagePath}
-					alt="Mozilla Firefox"
-					width="128"
-					height="128"
-					className="browser-icon"
-					srcSet={`${firefoxBrowser2xImagePath} 2x`}
-				/><span> </span>
-				<span className="icon-plus"> </span>
-				<span> </span>
-				<img
-					src={zoteroIconImagePath}
-					alt="Zotero Extension"
-					width="144"
-					height="144"
-					className="zotero-icon"
-					srcSet={`${zoteroIcon2xImagePath} 2x`}
-				/>
-			</figure>
-		);
-		//return <img className='extensionIconImage' src={firefoxExtensionImagePath} srcSet={`${firefoxExtension2xImagePath} 2x`} />;
-	}
-}
-
-class SafariExtensionIcon extends Component{
-	render(){
-		return (
-			<figure className="browser-plus-extension">
-				<img
-					src={safariBrowserImagePath}
-					alt="Safari"
-					width="128"
-					height="128"
-					className="browser-icon"
-					srcSet={`${safariBrowser2xImagePath} 2x`}
-				/>
-				<span className="icon-plus"></span>
-				<img
-					src={zoteroIconImagePath}
-					alt="Zotero Extension"
-					width="144"
-					height="144"
-					className="zotero-icon"
-					srcSet={`${zoteroIcon2xImagePath} 2x`}
-				/>
-			</figure>
-		);
-		//return <img className='extensionIconImage' src={safariExtensionImagePath} srcSet={`${safariExtension2xImagePath} 2x`} />;
 	}
 }
 
@@ -301,23 +242,34 @@ class InstallConnectorPrompt extends Component{
 		switch(this.state.browser){
 			case 'Chrome':
 				connectorText = 'Chrome Extension';
-				connectorImage = <ChromeExtensionIcon />;
+				connectorImage = <BrowserExtensionIcon browser='chrome' />;
 				break;
 			case 'Firefox':
 				connectorText = 'Firefox Extension';
-				connectorImage = <FirefoxExtensionIcon />;
+				connectorImage = <BrowserExtensionIcon browser='firefox' />;
 				break;
 			case 'Safari':
 				connectorText = 'Safari Extension';
-				connectorImage = <SafariExtensionIcon />;
+				connectorImage = <BrowserExtensionIcon browser='safari' />;
+				break;
+			case 'Opera':
+				connectorText = 'Opera Extension';
+				connectorImage = <BrowserExtensionIcon browser='opera' />;
 				break;
 		}
 
 		let showExtensionsLink = <p className='show-extensions'/>;
 		if(!this.state.showAllExtensions) {
+			let otherBrowsers = ['chrome', 'firefox', 'safari', 'opera'].filter((browser)=>{return browser.toLowerCase() != this.state.browser.toLowerCase();});
+			let otherBrowserImages = otherBrowsers.map((browser)=>{
+				return <BrowserIcon browser={browser} size="small" width="32" height="32" />;
+			});
+
 			showExtensionsLink = (
 				<p className='show-extensions'>
-					Not using {this.state.browser}?<br />
+					{otherBrowserImages}
+					Not using {this.state.browser}?
+					<br />
 					<a href='#' onClick={this.showAllExtensions}>Show all extensions</a>
 				</p>
 			);

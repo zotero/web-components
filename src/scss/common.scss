@@ -1,7 +1,15 @@
-// Zotero style.css modifications
+//
+// Variables
 // --------------------------------------------------
 
-//variables
+// Colors
+
+$white:				 #fff;
+$gray-light:		#e6e6e6;
+$gray-lightest: #f6f6f6;
+
+$link-color: #38c;
+
 $notification-success-color: #dff0d8;
 $notification-success-border-color: #cfe0c8;
 
@@ -13,11 +21,23 @@ $notification-error-border-color: #e0cfc8;
 
 $button-blue: #38c;
 
-$input-focus-blue:rgb(0,0,255);
+$input-focus-blue: rgb(0,0,255);
 
 $valid-green: rgb(0,150,0);
 $invalid-red: rgb(200,0,0);
 
+// Grid & breakpoints
+
+$grid-gutter-width: 30px;
+$grid-gutter-compact: 20px;
+$grid-gutter-loose: 40px;
+$screen-xs-max: 767px;
+$screen-sm-min: 768px;
+
+
+
+// Zotero style.css modifications
+// --------------------------------------------------
 
 // Fix in style.css
 .center {
@@ -25,7 +45,7 @@ $invalid-red: rgb(200,0,0);
 }
 
 #content .center.container {
-	min-height:500px;
+	min-height: 500px;
 }
 
 // Add helper class
@@ -41,21 +61,21 @@ $invalid-red: rgb(200,0,0);
 }
 
 .hidden {
-	display:none;
+	display: none;
 }
 
 a {
-	cursor:pointer;
+	cursor: pointer;
 }
 
 // Style email inputs the same as text/password
 input[type="email"] {
-	display:block;
-	padding:4px;
+	display: block;
+	padding: 4px;
 	border-radius: 4px;
-	border:1px solid rgba(0,0,0,.2);
+	border: 1px solid rgba(0,0,0,.2);
 }
 
 button, a.button {
-	font-weight:normal;
+	font-weight: normal;
 }

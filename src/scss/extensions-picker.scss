@@ -1,0 +1,118 @@
+//
+// Extensions picker
+// --------------------------------------------------
+
+#extensions-picker {
+
+	// Jumbotron
+	.jumbotron {
+		background: $gray-lightest; // IE9 fallback
+		background: linear-gradient(transparent, $gray-lightest);
+		padding: 36px 0 80px;
+		text-align: center;
+		position: relative;
+
+		.line {
+			@media (min-width: $screen-sm-min) {
+				display: block;
+			}
+		}
+
+		.btn {
+			font-size: 20px;
+			min-width: 160px;
+			padding: 9px 23px;
+			border-radius: 4px;
+		}
+
+		.show-extensions,
+		.get-zotero-standalone {
+			font-size: 16px;
+			line-height: 22px;
+			margin: 16px 0 0;
+
+			@media (min-width: $screen-sm-min) {
+				position: absolute;
+			}
+
+		}
+
+		.show-extensions {
+			@media (min-width: $screen-sm-min) {
+				left: 40px;
+				bottom: 18px;
+				text-align: left;
+			}
+
+			img {
+				position: relative;
+				top: 2px;
+			}
+		}
+
+		.get-zotero-standalone {
+			margin-top: 32px;
+
+			@media (min-width: $screen-sm-min) {
+				right: 40px;
+				bottom: 18px;
+				text-align: right;
+			}
+		}
+	}
+
+	.browser-plus-extension {
+		margin: 0;
+
+		img {
+			vertical-align: middle;
+		}
+
+		.icon-plus {
+			display: inline-block;
+			width: 48px;
+			height: 48px;
+			background: url("../assets/images/extensions/icon-plus.svg") no-repeat 0 0;
+			vertical-align: middle;
+			margin: 0 3px 0 16px;
+		}
+
+		@media (max-width: $screen-xs-max) {
+			.browser-icon {
+				width: 64px;
+				height: 64px;
+			}
+
+			.icon-plus {
+				width: 24px;
+				height: 24px;
+				margin-left: 8px;
+			}
+
+			.zotero-icon {
+				width: 72px;
+				height: 72px;
+			}
+		}
+	}
+
+  // Other browsers
+  .all-extensions {
+    h3 {
+      font-size: 16px;
+      margin: 3px 0 13px 0;
+    }
+
+    ul {
+      text-align: center;
+      margin: 30px 0 -30px;
+      padding: 0;
+
+      li {
+        display: inline-block;
+        padding: 0 $grid-gutter-width;
+        margin-bottom: 30px;
+      }
+    }
+  }
+}

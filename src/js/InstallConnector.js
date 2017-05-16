@@ -266,6 +266,7 @@ class AllExtensionsSection extends Component{
 	render(){
 		return (
 			<section className='all-extensions'>
+				<h2 className="visually-hidden">All extensions</h2>
 				<ul>
 					<li><InstallChromeButton type='full' /></li>
 					<li><InstallFirefoxButton type='full' /></li>
@@ -317,7 +318,7 @@ class InstallConnectorPrompt extends Component{
 			showExtensionsLink = (
 				<p className='show-extensions'>
 					Not using {this.state.browser}?<br />
-					<a href='#' onClick={this.showAllExtensions}>Show all extensions.</a>
+					<a href='#' onClick={this.showAllExtensions}>Show all extensions</a>
 				</p>
 			);
 		}
@@ -335,7 +336,7 @@ class InstallConnectorPrompt extends Component{
 			getStandaloneSection = (
 				<p className='get-zotero-standalone'>
 					<a href={buildUrl('download')}>Get Zotero Standalone</a><br/>
-					Zotero Standalone runs as a separate application and plugs into your choice of browser.
+					Available for Mac, Windows, and Linux
 				</p>
 			);
 		}

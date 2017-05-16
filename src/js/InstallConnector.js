@@ -35,6 +35,7 @@ class BrowserIcon extends Component {
 		browserImagePath += '.png';
 
 		let p = {...this.props, src:browserImagePath, srcSet:`${browserImagePath2x} 2x`, className:'browser-icon'};
+		delete p.browser;
 		return (<img {...p} />);
 	}
 }
@@ -77,20 +78,19 @@ class InstallFirefoxButton extends Component{
 InstallFirefoxButton.defaultProps = {type:'button'};
 
 class InstallChromeButton extends Component{
-	installChrome(){
-		//window.chrome.webstore.install();
-		/*
-		window.chrome.webstore.install(undefined, ()=>{
-			//success
-		}, ()=>{
-			//failure
-		});
-		*/
+	installChrome(evt){
+		if(typeof window.chrome !== 'undefined'){
+			evt.preventDefault();
+			window.chrome.webstore.install(undefined, ()=>{
+				//success
+			}, ()=>{
+				//failure
+			});
+		}
 	}
 	render(){
 		if(this.props.type == 'button') {
-			return <a href={chromeDownload} id="chrome-connector-download-button" className="btn download-link">Install</a>;
-			//return <a className='button' onClick={this.installChrome}>Install</a>;
+			return <a href={chromeDownload} onClick={this.installChrome} id="chrome-connector-download-button" className="btn download-link">Install</a>;
 		} else if(this.props.type == 'image') {
 			return (
 				<a href={chromeDownload} onClick={this.installChrome}><BrowserIcon browser="chrome" /></a>
@@ -205,14 +205,24 @@ class BrowserExtensionIcon extends Component{
 
 class AllExtensionsSection extends Component{
 	render(){
+		let otherBrowsers = ['chrome', 'firefox', 'safari', 'opera'].filter((browser)=>{
+			return browser != this.props.except;
+		});
+
+		let installButtons = {
+			'chrome': <li key='chrome'><InstallChromeButton type='full' /></li>,
+			'firefox': <li key='firefox'><InstallFirefoxButton type='full' /></li>,
+			'safari': <li key='safari'><InstallSafariButton type='full' /></li>,
+			'opera': <li key='opera'><InstallOperaButton type='full' /></li>
+		};
+		let installNodes = otherBrowsers.map((browser)=>{
+			return installButtons[browser];
+		});
 		return (
 			<section className='all-extensions'>
 				<h2 className="visually-hidden">All extensions</h2>
 				<ul>
-					<li><InstallChromeButton type='full' /></li>
-					<li><InstallFirefoxButton type='full' /></li>
-					<li><InstallSafariButton type='full' /></li>
-					<li><InstallOperaButton type='full' /></li>
+					{installNodes}
 				</ul>
 			</section>
 		);
@@ -262,7 +272,7 @@ class InstallConnectorPrompt extends Component{
 		if(!this.state.showAllExtensions) {
 			let otherBrowsers = ['chrome', 'firefox', 'safari', 'opera'].filter((browser)=>{return browser.toLowerCase() != this.state.browser.toLowerCase();});
 			let otherBrowserImages = otherBrowsers.map((browser)=>{
-				return <BrowserIcon browser={browser} size="small" width="32" height="32" />;
+				return <BrowserIcon key={browser} browser={browser} size="small" width="32" height="32" />;
 			});
 
 			showExtensionsLink = (
@@ -278,7 +288,7 @@ class InstallConnectorPrompt extends Component{
 		let allExtensions = (
 			<div>
 				<VerticalExpandable expand={this.state.showAllExtensions}>
-					<AllExtensionsSection />
+					<AllExtensionsSection except={this.state.browser.toLowerCase()} />
 				</VerticalExpandable>
 			</div>
 		);

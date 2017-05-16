@@ -1,96 +1,287 @@
-body.extensions {
-	div#content .center {
-		background:$smoke;
-	}
-}
+//
+// Zotero extensions styles
+// --------------------------------------------------
 
-@keyframes slide-in {
-	0% {
-		transform: translateY(-30px);
-		opacity: 0;
-	}
+$white:				 #fff;
+$gray-light:		#e6e6e6;
+$gray-lightest: #f6f6f6;
 
-	100% {
-		transform: translateY(0);
-		opacity: 1;
-	}
-}
+$link-color: #38c;
 
-div#extensions-page-container {
+$grid-gutter-width: 30px;
+$grid-gutter-compact: 20px;
+$grid-gutter-loose: 40px;
+$screen-xs-max: 767px;
+$screen-sm-min: 768px;
+
+.extensions {
 	margin: 0 -40px;
-	animation: slide-in 0.8s ease;
 
 	* {
 		box-sizing: border-box;
 	}
 
-	div.content {
-		width:80%;
-		margin-left:auto;
-		margin-right:auto;
+
+	// Grid
+
+	.container {
+		padding: 0 ($grid-gutter-width / 2);
+
+		@media (min-width: $screen-sm-min) {
+			padding: 0 80px;
+		}
+	}
+
+	.row {
+		margin: 0 (-$grid-gutter-width / 2);
+
+		&.compact {
+			margin: 0 (-$grid-gutter-compact / 2);
+		}
+
+		&.loose {
+			margin: 0 (-$grid-gutter-loose / 2);
+		}
+	}
+
+	.col-4, .col-6 {
+		padding: 0 ($grid-gutter-width / 2);
+
+		@media (min-width: $screen-sm-min) {
+			float: left;
+		}
+	}
+
+	.col-4 {
+		@media (min-width: $screen-sm-min) {
+			width: calc(33%);
+		}
+	}
+
+	.col-6 {
+		@media (min-width: $screen-sm-min) {
+			width: 50%;
+		}
+	}
+
+	.row.compact {
+		.col-4, .col-6 {
+			padding: 0 ($grid-gutter-compact / 2);
+		}
+	}
+
+	.row.loose {
+		.col-4, .col-6 {
+			padding: 0 ($grid-gutter-loose / 2);
+		}
+	}
+
+
+	// Extensions styles
+
+	h1, h2, h3 {
+		line-height: 1.1;
+	}
+
+	h1, h2 {
 		text-align: center;
 	}
 
 	h1 {
-		font-size:36px;
+		font-size: 24px;
+		margin: 27px auto 34px; // 48px 40px
+
+		@media (min-width: $screen-sm-min) {
+			font-size: 36px;
+			letter-spacing: -1px;
+		}
 	}
 
 	h2 {
-		font-size: 30px;
-	}
-}
+		font-size: 20px;
+		color: inherit;
 
-div#extensions-container {
-	margin-top:-30px;
-	padding-top:40px;
-	padding-bottom:30px;
-
-	background: $smoke; // IE9 fallback
-	background: linear-gradient(transparent, $smoke);
-}
-
-div#explain-connector{
-	padding-top:25px;
-	background-color:$white;
-	font-size:16px;
-	
-	div.flex-container {
-		display:-webkit-flex;
-		display:flex;
-	}
-
-	div.flex-section {
-		-webkit-flex:1 1 45%;
-		flex:1 1 30%;
-		min-width: 150px;
-		padding:10px;
-	}
-
-	#connector-features{
-		padding-top:30px;
-		margin-top:10px;
-		margin-bottom:50px;
-
-		p {
-			font-size:12px;
+		@media (min-width: $screen-sm-min) {
+			font-size: 30px;
+			margin: 48px 0 16px;
+			letter-spacing: -0.5px;
 		}
 	}
 
-	#connector-section3{
-		border-top:1px solid $silver;
-		padding-top:30px;
-		padding-bottom:50px;
+	h3 {
+		font-size: 16px;
+		margin: 31px 0 14px;
 
-		p {
-			font-size:12px;
+		@media (min-width: $screen-sm-min) {
+			font-size: 24px;
+			letter-spacing: -0.3px;
 		}
 	}
 
-	@media all and (max-width: 640px) {
-	    div.flex-container {
-	        -webkit-flex-direction: column;
-	        flex-direction: column;
-	    }
-	}
-}
+	.lead {
+		font-size: 16px;
+		line-height: 1.5;
+		text-align: center;
+		margin: 0 auto;
 
+		@media (min-width: $screen-sm-min) {
+			width: 80%;
+		}
+	}
+
+	hr {
+		border: 0;
+		border-top: 1px solid $gray-light;
+		margin: 0;
+	}
+
+	.btn {
+		color: $white;
+		background: $link-color;
+		text-decoration: none;
+		border-radius: 3px;
+		padding: 5px 15px;
+
+		&:hover {
+			background: darken($link-color, 5%);
+		}
+	}
+
+	// Jumbotron
+	.jumbotron {
+		background: $gray-lightest; // IE9 fallback
+		background: linear-gradient(transparent, $gray-lightest);
+		padding: 36px 0 80px;
+		text-align: center;
+		position: relative;
+
+		.line {
+			@media (min-width: $screen-sm-min) {
+				display: block;
+			}
+		}
+
+		.btn {
+			font-size: 20px;
+			min-width: 160px;
+			padding: 9px 23px;
+			border-radius: 4px;
+		}
+
+		.show-extensions,
+		.get-zotero-standalone {
+			font-size: 16px;
+			line-height: 22px;
+			margin: 16px 0 0;
+
+			@media (min-width: $screen-sm-min) {
+				position: absolute;
+			}
+
+		}
+
+		.show-extensions {
+			@media (min-width: $screen-sm-min) {
+				left: 40px;
+				bottom: 18px;
+				text-align: left;
+			}
+
+			img {
+				position: relative;
+				top: 2px;
+			}
+		}
+
+		.get-zotero-standalone {
+			margin-top: 32px;
+
+			@media (min-width: $screen-sm-min) {
+				right: 40px;
+				bottom: 18px;
+				text-align: right;
+				width: 250px;
+			}
+		}
+	}
+
+	.browser-plus-extension {
+		margin: 0;
+
+		img {
+			vertical-align: middle;
+		}
+
+		.icon-plus {
+			display: inline-block;
+			width: 48px;
+			height: 48px;
+			background: url("../assets/images/extensions/icon-plus.svg") no-repeat 0 0;
+			vertical-align: middle;
+			margin: 0 3px 0 16px;
+		}
+
+		@media (max-width: $screen-xs-max) {
+			.browser-icon {
+				width: 64px;
+				height: 64px;
+			}
+
+			.icon-plus {
+				width: 24px;
+				height: 24px;
+				margin-left: 8px;
+			}
+
+			.zotero-icon {
+				width: 72px;
+				height: 72px;
+			}
+		}
+	}
+
+  // Other browsers
+  .all-extensions {
+    //display: none;
+
+    &.active {
+      display: block;
+    }
+
+    h3 {
+      font-size: 16px;
+      margin: 3px 0 13px 0;
+    }
+
+    ul {
+      text-align: center;
+      margin: 30px 0 -30px;
+      padding: 0;
+
+      li {
+        display: inline-block;
+        padding: 0 $grid-gutter-width;
+        margin-bottom: 30px;
+      }
+    }
+  }
+
+  // Features
+  .features {
+    padding-bottom: 41px; // 60px
+
+    img {
+      display: block;
+      margin: 54px auto 0;
+      max-width: 100%;
+      width: 100%;
+      height: auto;
+    }
+  }
+
+  .features-1 {
+    h2 {
+      margin-top: 69px; // 80px
+    }
+  }
+}

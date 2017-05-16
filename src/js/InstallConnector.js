@@ -68,7 +68,7 @@ class InstallFirefoxButton extends Component{
 			return (
 				<div className='download-full'>
 					<div className='browser-image'><img src={firefoxBrowserImagePath} srcSet={`${firefoxBrowser2xImagePath} 2x`} /></div>
-					<div className='browser-text'><b>Firefox extension</b></div>
+					<h3>Firefox extension</h3>
 					<div><a href={firefoxDownload} className='btn' onClick={this.installFirefox}>Install</a></div>
 				</div>
 			);
@@ -100,7 +100,7 @@ class InstallChromeButton extends Component{
 			return (
 				<div className='download-full'>
 					<div className='browser-image'><img src={chromeBrowserImagePath} srcSet={`${chromeBrowser2xImagePath} 2x`} /></div>
-					<div className='browser-text'><b>Chrome extension</b></div>
+					<h3>Chrome extension</h3>
 					<div className='install-button'><a href={chromeDownload} id="chrome-connector-download-button" className="btn download-link">Install</a></div>
 				</div>
 			);
@@ -125,7 +125,7 @@ class InstallSafariButton extends Component{
 			return (
 				<div className='download-full'>
 					<div className='browser-image'><img src={safariBrowserImagePath} srcSet={`${safariBrowser2xImagePath} 2x`} /></div>
-					<div className='browser-text'><b>Safari extension</b></div>
+					<h3>Safari extension</h3>
 					<a href={safariDownload} id="safari-connector-download-button" className="btn download-link">Install</a>
 				</div>
 			);
@@ -150,7 +150,7 @@ class InstallOperaButton extends Component{
 			return (
 				<div className='download-full'>
 					<div className='browser-image'><img src={operaBrowserImagePath} srcSet={`${operaBrowser2xImagePath} 2x`} /></div>
-					<div className='browser-text'><b>Opera extension</b></div>
+					<h3>Opera extension</h3>
 					<a href={operaDownload} id="opera-connector-download-button" className="btn download-link">Install</a>
 				</div>
 			);
@@ -164,7 +164,7 @@ class InstallButton extends Component{
 		let browserName = browser;
 		log.debug('InstallButton render');
 		log.debug(browserName);
-		
+
 		switch(browserName){
 			case 'Firefox':
 				return <InstallFirefoxButton />;
@@ -265,12 +265,14 @@ class SafariExtensionIcon extends Component{
 class AllExtensionsSection extends Component{
 	render(){
 		return (
-			<div id='all-extensions'>
-				<InstallChromeButton type='full' />
-				<InstallFirefoxButton type='full' />
-				<InstallSafariButton type='full' />
-				<InstallOperaButton type='full' />
-			</div>
+			<section className='all-extensions'>
+				<ul>
+					<li><InstallChromeButton type='full' /></li>
+					<li><InstallFirefoxButton type='full' /></li>
+					<li><InstallSafariButton type='full' /></li>
+					<li><InstallOperaButton type='full' /></li>
+				</ul>
+			</section>
 		);
 	}
 }
@@ -310,11 +312,12 @@ class InstallConnectorPrompt extends Component{
 				break;
 		}
 
-		let showExtensionsLink = <p className='showExtensions'>&nbsp;</p>;
+		let showExtensionsLink = <p className='show-extensions'/>;
 		if(!this.state.showAllExtensions) {
 			showExtensionsLink = (
-				<p className='showExtensions'>
-					<a href='#' onClick={this.showAllExtensions}>Not using {this.state.browser}? Show all extensions.</a>
+				<p className='show-extensions'>
+					Not using {this.state.browser}?<br />
+					<a href='#' onClick={this.showAllExtensions}>Show all extensions.</a>
 				</p>
 			);
 		}
@@ -330,12 +333,10 @@ class InstallConnectorPrompt extends Component{
 		let getStandaloneSection = null;
 		if(this.props.showStandalone) {
 			getStandaloneSection = (
-				<div className='get-standalone-container'>
-					<div className='get-standalone-aside'>
-						<p><a href={buildUrl('download')}>Get Zotero Standalone</a><br />
-						Zotero Standalone runs as a separate application and plugs into your choice of browser.</p>
-					</div>
-				</div>
+				<p className='get-zotero-standalone'>
+					<a href={buildUrl('download')}>Get Zotero Standalone</a><br/>
+					Zotero Standalone runs as a separate application and plugs into your choice of browser.
+				</p>
 			);
 		}
 
@@ -345,18 +346,20 @@ class InstallConnectorPrompt extends Component{
 		}
 
 		return (
-			<div id='install-connector'>
-				<div className='content'>
-					{connectorImage}
-					<div className='install-connector'>
-						<h1>{headerText}</h1>
-						<p>Zotero connectors allow you to save to Zotero directly from your web browser.</p>
-						{installButton}
-						{getStandaloneSection}
-						{showExtensionsLink}
-						{allExtensions}
+			<div>
+				<div className="jumbotron">
+					<div className="container">
+						{connectorImage}
+						<div className='install-connector'>
+							<h1>{headerText}</h1>
+							{/*<p>Zotero connectors allow you to save to Zotero directly from your web browser.</p>*/}
+							{installButton}
+							{getStandaloneSection}
+							{showExtensionsLink}
+						</div>
 					</div>
 				</div>
+				{allExtensions}
 			</div>
 		);
 	}

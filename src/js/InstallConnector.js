@@ -353,7 +353,9 @@ class InstallConnectorPrompt extends Component{
 						{connectorImage}
 						<div className='install-connector'>
 							<h1>{headerText}</h1>
-							{/*<p>Zotero connectors allow you to save to Zotero directly from your web browser.</p>*/}
+							<p className="lead">
+								<span className="line">Zotero Connectors allow you to save to Zotero</span>
+								<span className="line">directly from your web browser.</span></p>
 							{installButton}
 							{getStandaloneSection}
 							{showExtensionsLink}

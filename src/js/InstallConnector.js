@@ -277,8 +277,8 @@ class InstallConnectorPrompt extends Component{
 
 			showExtensionsLink = (
 				<p className='show-extensions'>
-					{otherBrowserImages} <br />
-					Not using {this.state.browser}? <br />
+					{otherBrowserImages}<br />
+					Not using {this.state.browser}?<br />
 					<a href='#' onClick={this.showAllExtensions}>Show all extensions</a>
 				</p>
 			);

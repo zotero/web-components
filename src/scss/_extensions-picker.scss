@@ -8,9 +8,13 @@
 	.jumbotron {
 		background: $gray-lightest; // IE9 fallback
 		background: linear-gradient($white, $gray-lightest);
-		padding: 20px 0 80px;
+		padding: 28px 0 48px;
 		text-align: center;
 		position: relative;
+
+		@media (min-width: $screen-sm-min) {
+			padding: 20px 0 80px;
+		}
 
 		.lead {
 			margin-bottom: 34px; // 40px
@@ -101,23 +105,23 @@
 		}
 	}
 
-  // Other browsers
-  .all-extensions {
-    h3 {
-      font-size: 16px;
-      margin: 3px 0 13px 0;
-    }
+	// Other browsers
+	.all-extensions {
+		h3 {
+			font-size: 16px;
+			margin: 3px 0 13px 0;
+		}
 
-    ul {
-      text-align: center;
-      margin: 30px 0 -30px;
-      padding: 0;
+		ul {
+			text-align: center;
+			margin: 30px 0 -30px;
+			padding: 0;
 
-      li {
-        display: inline-block;
-        padding: 0 $grid-gutter-width;
-        margin-bottom: 30px;
-      }
-    }
-  }
+			li {
+				display: inline-block;
+				padding: 0 $grid-gutter-width;
+				margin-bottom: 30px;
+			}
+		}
+	}
 }

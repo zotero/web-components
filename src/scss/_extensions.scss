@@ -107,20 +107,22 @@
 	h2 {
 		font-size: 20px;
 		color: inherit;
-		margin: 48px 0 16px;
+		margin: 32px 0 16px; // 40px
 
 		@media (min-width: $screen-sm-min) {
 			font-size: 30px;
+			margin-top: 48px;
 			letter-spacing: -0.5px;
 		}
 	}
 
 	h3 {
 		font-size: 16px;
-		margin: 31px 0 14px;
+		margin: 22px 0 14px;
 
 		@media (min-width: $screen-sm-min) {
 			font-size: 24px;
+			margin-top: 31px;
 			letter-spacing: -0.3px;
 		}
 	}
@@ -156,20 +158,32 @@
 
   // Features
   .features {
-    padding-bottom: 41px; // 60px
+	  padding-bottom: 21px;
+
+	  @media (min-width: $screen-sm-min) {
+    	padding-bottom: 41px; // 60px
+		}
 
     img {
       display: block;
-      margin: 54px auto 0;
+      margin: 34px auto 0; // 40px
       max-width: 100%;
       width: 100%;
       height: auto;
+
+      @media (min-width: $screen-sm-min) {
+	      margin-top: 54px;
+      }
     }
   }
 
   .features-1 {
     h2 {
-      margin-top: 69px; // 80px
+			margin-top: 45px; // 53px (2/3)
+
+	    @media (min-width: $screen-sm-min) {
+      	margin-top: 69px; // 80px
+      }
     }
   }
 }

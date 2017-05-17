@@ -19,8 +19,8 @@ const {firefoxHash, firefoxDownload, chromeDownload, safariDownload, operaDownlo
 
 const imagePath = config.imagePath;
 
-const zoteroIconImagePath = imagePath + '/extensions/zotero-icon.png';
-const zoteroIcon2xImagePath = imagePath + '/extensions/zotero-icon-2x.png';
+const zoteroIconImagePath = imagePath + '/extensions/zotero-icon-large.png';
+const zoteroIcon2xImagePath = imagePath + '/extensions/zotero-icon-large@2x.png';
 
 class BrowserIcon extends Component {
 	render() {
@@ -31,7 +31,7 @@ class BrowserIcon extends Component {
 		} else if(this.props.size == 'large'){
 			browserImagePath += '-large';
 		}
-		let browserImagePath2x = browserImagePath + '-2x.png';
+		let browserImagePath2x = browserImagePath + '@2x.png';
 		browserImagePath += '.png';
 
 		let p = {...this.props, src:browserImagePath, srcSet:`${browserImagePath2x} 2x`, className:'browser-icon'};
@@ -193,8 +193,8 @@ class BrowserExtensionIcon extends Component{
 				<img
 					src={zoteroIconImagePath}
 					alt="Zotero Extension"
-					width="144"
-					height="144"
+					width="128"
+					height="140"
 					className="zotero-icon"
 					srcSet={`${zoteroIcon2xImagePath} 2x`}
 				/>
@@ -277,9 +277,8 @@ class InstallConnectorPrompt extends Component{
 
 			showExtensionsLink = (
 				<p className='show-extensions'>
-					{otherBrowserImages}
-					Not using {this.state.browser}?
-					<br />
+					{otherBrowserImages} <br />
+					Not using {this.state.browser}? <br />
 					<a href='#' onClick={this.showAllExtensions}>Show all extensions</a>
 				</p>
 			);
@@ -297,7 +296,15 @@ class InstallConnectorPrompt extends Component{
 		if(this.props.showStandalone) {
 			getStandaloneSection = (
 				<p className='get-zotero-standalone'>
-					<a href={buildUrl('download')}>Get Zotero Standalone</a><br/>
+					<img
+						width="32"
+						height="35"
+						src="../assets/images/extensions/zotero-icon-small.png"
+						srcSet="../assets/images/extensions/zotero-icon-small@2x.png 2x"
+						alt=""/>
+					<br />
+					<a href={buildUrl('download')}>Get Zotero Standalone</a>
+					<br/>
 					Available for Mac, Windows, and Linux
 				</p>
 			);

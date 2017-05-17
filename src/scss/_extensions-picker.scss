@@ -42,9 +42,12 @@
 				text-align: left;
 			}
 
-			img {
-				position: relative;
-				top: 2px;
+			.browser-icon {
+				margin-bottom: -2px;
+
+				& + .browser-icon {
+					margin-left: 4px;
+				}
 			}
 		}
 
@@ -55,6 +58,10 @@
 				right: 40px;
 				bottom: 18px;
 				text-align: right;
+			}
+
+			img {
+				margin-bottom: -4px;
 			}
 		}
 	}
@@ -72,7 +79,7 @@
 			height: 48px;
 			background: url("../assets/images/extensions/icon-plus.svg") no-repeat 0 0;
 			vertical-align: middle;
-			margin: 0 3px 0 16px;
+			margin: 0 15px 0 16px;
 		}
 
 		@media (max-width: $screen-xs-max) {

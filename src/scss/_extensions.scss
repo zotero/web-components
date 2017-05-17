@@ -107,10 +107,10 @@
 	h2 {
 		font-size: 20px;
 		color: inherit;
+		margin: 48px 0 16px;
 
 		@media (min-width: $screen-sm-min) {
 			font-size: 30px;
-			margin: 48px 0 16px;
 			letter-spacing: -0.5px;
 		}
 	}

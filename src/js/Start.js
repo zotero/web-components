@@ -7,39 +7,21 @@ const React = require('react');
 const {Component} = React;
 
 const config = window.zoteroConfig;
-//const installData = config.installData;
-
-//const {firefoxHash, firefoxDownload, chromeDownload, safariDownload, operaDownload} = installData;
 
 const recaptchaSitekey = config.recaptchaSitekey;
 
 const imagePath = config.imagePath;
 
-// const chromeExtensionImagePath = imagePath + '/start/chrome-extension.jpg';
-// const firefoxExtensionImagePath = imagePath + '/start/firefox-extension.jpg';
-// const safariExtensionImagePath = imagePath + '/start/safari-extension.jpg';
-// const chromeExtension2xImagePath = imagePath + '/start/chrome-extension@2x.jpg';
-// const firefoxExtension2xImagePath = imagePath + '/start/firefox-extension@2x.jpg';
-// const safariExtension2xImagePath = imagePath + '/start/safari-extension@2x.jpg';
 const connectorButtonImagePath = imagePath + '/start/zotero-button.svg';
 const arrowDownGrayImagePath = imagePath + '/start/arrow-down-gray.svg';
 const arrowDownWhiteImagePath = imagePath + '/start/arrow-down-white.svg';
-
-// const chromeBrowserImagePath = imagePath + '/theme/browser_icons/64-chrome.png';
-// const firefoxBrowserImagePath = imagePath + '/theme/browser_icons/64-firefox.png';
-// const safariBrowserImagePath = imagePath + '/theme/browser_icons/64-safari.png';
-// const operaBrowserImagePath = imagePath + '/theme/browser_icons/64-opera.png';
-
 
 import {ajax, postFormData} from './ajax.js';
 import {slugify} from './Utils.js';
 import {buildUrl} from './wwwroutes.js';
 import {Notifier} from './Notifier.js';
-//import {BrowserDetect} from './browserdetect.js';
 import {VerticalExpandable} from './VerticalExpandable.js';
 import {InstallConnectorPrompt} from './InstallConnector.js';
-
-//let browser = BrowserDetect.browser;
 
 class ArrowDownGray extends Component{
 	render(){

@@ -176,6 +176,15 @@
 				margin-top: 54px;
 			}
 		}
+
+		.magnifier {
+			@media (max-width: $screen-xs-max) {
+				width: 160px;
+				height: 160px;
+			}
+
+			// todo: define size on sm+ size
+		}
 	}
 
 	.features-1 {

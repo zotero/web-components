@@ -3,23 +3,25 @@
 //import {log as logger} from './Log.js';
 //let log = logger.Logger('VerticalExpandable');
 
-var React = require('react');
+const React = require('react');
+const {Component} = React;
+import {VelocityComponent} from 'velocity-react';
 
-class VerticalExpandable extends React.Component{
+class VerticalExpandable extends Component{
 	render() {
-		let className = 'vertical-expandable';
-		if(this.props.expand){
-			className += ' expand';
+		if(!this.props.expand) {
+			return null;
 		}
 		return (
-			<div className={className}>
+			<VelocityComponent animation='slideDown' duration={this.props.duration} runOnMount={true}>
 				{this.props.children}
-			</div>
+			</VelocityComponent>
 		);
 	}
 }
 VerticalExpandable.defaultProps = {
-	expanded:false
+	expand:false,
+	duration:300
 };
 
 export {VerticalExpandable};

@@ -1,5 +1,5 @@
 div.vertical-expandable {
-	transition: all 750ms ease-in;
+	transition: all 300ms ease-in-out;
 	max-height:0px;
 	overflow-y: hidden;
 }

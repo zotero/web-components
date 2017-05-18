@@ -9,6 +9,8 @@ const {Component} = React;
 import {buildUrl} from './wwwroutes.js';
 import {BrowserDetect} from './browserdetect.js';
 import {VerticalExpandable} from './VerticalExpandable.js';
+import classnames from 'classnames';
+//import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
 
 let browser = BrowserDetect.browser;
 
@@ -21,6 +23,14 @@ const imagePath = config.imagePath;
 
 const zoteroIconImagePath = imagePath + '/extensions/zotero-icon-large.png';
 const zoteroIcon2xImagePath = imagePath + '/extensions/zotero-icon-large@2x.png';
+
+let Delay = function(delay, val) {
+	return new Promise(function (resolve) {
+		setTimeout(function () {
+			resolve(val);
+		}, delay);
+	});
+};
 
 class BrowserIcon extends Component {
 	render() {
@@ -242,8 +252,11 @@ class InstallConnectorPrompt extends Component{
 		//detect browser and set correct browser image
 	}
 	showAllExtensions(evt){
-		this.setState({showAllExtensions:true});
+		this.setState({showingAllExtensions:true});
 		evt.preventDefault();
+		Delay(400).then(()=>{
+			this.setState({allExtensionsShown:true});
+		});
 	}
 	render(){
 		let connectorText = '';
@@ -268,25 +281,22 @@ class InstallConnectorPrompt extends Component{
 				break;
 		}
 
-		let showExtensionsLink = <p className='show-extensions'/>;
-		if(!this.state.showAllExtensions) {
-			let otherBrowsers = ['chrome', 'firefox', 'safari', 'opera'].filter((browser)=>{return browser.toLowerCase() != this.state.browser.toLowerCase();});
-			let otherBrowserImages = otherBrowsers.map((browser)=>{
-				return <BrowserIcon key={browser} browser={browser} size="small" width="32" height="32" />;
-			});
+		let otherBrowsers = ['chrome', 'firefox', 'safari', 'opera'].filter((browser)=>{return browser.toLowerCase() != this.state.browser.toLowerCase();});
+		let otherBrowserImages = otherBrowsers.map((browser)=>{
+			return <BrowserIcon key={browser} browser={browser} size="small" width="32" height="32" />;
+		});
 
-			showExtensionsLink = (
-				<p className='show-extensions'>
-					{otherBrowserImages}<br />
-					Not using {this.state.browser}?<br />
-					<a href='#' onClick={this.showAllExtensions}>Show all extensions</a>
-				</p>
-			);
-		}
+		let showExtensionsLink = (
+			<p className={classnames('show-extensions', {fadeOut:this.state.showingAllExtensions, 'visually-hidden':this.state.allExtensionsShown})}>
+				{otherBrowserImages}<br />
+				Not using {this.state.browser}?<br />
+				<a href='#' onClick={this.showAllExtensions}>Show all extensions</a>
+			</p>
+		);
 
 		let allExtensions = (
 			<div>
-				<VerticalExpandable expand={this.state.showAllExtensions}>
+				<VerticalExpandable expand={this.state.allExtensionsShown}>
 					<AllExtensionsSection except={this.state.browser.toLowerCase()} />
 				</VerticalExpandable>
 			</div>

@@ -96,10 +96,11 @@
 
 	h1 {
 		font-size: 24px;
-		margin: 27px auto 16px; // 48px
+		margin: 19px auto 16px; // 32px
 
 		@media (min-width: $screen-sm-min) {
 			font-size: 36px;
+			margin-top: 27px; // 48px
 			letter-spacing: -1px;
 		}
 	}

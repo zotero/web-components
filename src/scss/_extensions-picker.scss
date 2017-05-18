@@ -17,7 +17,11 @@
 		}
 
 		.lead {
-			margin-bottom: 34px; // 40px
+			margin-bottom: 21px; // 27px
+
+			@media (min-width: $screen-sm-min) {
+				margin-bottom: 34px; // 40px
+			}
 		}
 
 		.btn {
@@ -44,6 +48,11 @@
 				left: 40px;
 				bottom: 18px;
 				text-align: left;
+			}
+
+			&.fade-out {
+				opacity: 0;
+				transition: opacity 0.4s ease-in-out;
 			}
 
 			.browser-icon {
@@ -123,22 +132,5 @@
 				margin-bottom: 30px;
 			}
 		}
-	}
-
-	@keyframes fadeOut {
-		from {
-			opacity: 1;
-		}
-
-		to {
-			opacity: 0;
-		}
-	}
-
-	.fadeOut {
-		animation-name: fadeOut;
-		animation-duration: 400ms;
-		animation-timing-function: ease-in-out;
-		opacity:0;
 	}
 }

@@ -1,9 +1,9 @@
-div.vertical-expandable {
-	transition: all 300ms ease-in-out;
+.vertical-expandable {
+	transition: all 400ms ease-in-out;
 	max-height:0px;
 	overflow-y: hidden;
-}
 
-div.vertical-expandable.expand {
-	max-height:500px;
+	&.expand {
+		max-height: 500px;
+	}
 }

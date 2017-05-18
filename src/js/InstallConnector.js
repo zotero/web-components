@@ -10,7 +10,6 @@ import {buildUrl} from './wwwroutes.js';
 import {BrowserDetect} from './browserdetect.js';
 import {VerticalExpandable} from './VerticalExpandable.js';
 import classnames from 'classnames';
-//import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
 
 let browser = BrowserDetect.browser;
 
@@ -21,9 +20,6 @@ const {firefoxHash, firefoxDownload, chromeDownload, safariDownload, operaDownlo
 
 const imagePath = config.imagePath;
 
-const zoteroIconImagePath = imagePath + '/extensions/zotero-icon-large.png';
-const zoteroIcon2xImagePath = imagePath + '/extensions/zotero-icon-large@2x.png';
-
 let Delay = function(delay, val) {
 	return new Promise(function (resolve) {
 		setTimeout(function () {
@@ -31,6 +27,24 @@ let Delay = function(delay, val) {
 		}, delay);
 	});
 };
+
+class ZoteroIcon extends Component {
+	render() {
+		let iconImagePath = imagePath + '/extensions/zotero-icon';
+		if(this.props.size == 'small'){
+			iconImagePath += '-small';
+		} else if(this.props.size == 'large'){
+			iconImagePath += '-large';
+		}
+		let iconImagePath2x = iconImagePath + '@2x.png';
+		iconImagePath += '.png';
+
+		let p = {...this.props, src:iconImagePath, srcSet:`${iconImagePath2x} 2x`, className:'zotero-icon'};
+		delete p.browser;
+		return (<img {...p} />);
+	}
+}
+
 
 class BrowserIcon extends Component {
 	render() {
@@ -200,13 +214,11 @@ class BrowserExtensionIcon extends Component{
 					width="128"
 					height="128" />
 				<span className="icon-plus"></span>
-				<img
-					src={zoteroIconImagePath}
+				<ZoteroIcon
 					alt="Zotero Extension"
 					width="128"
 					height="140"
 					className="zotero-icon"
-					srcSet={`${zoteroIcon2xImagePath} 2x`}
 				/>
 			</figure>
 		);
@@ -295,7 +307,7 @@ class InstallConnectorPrompt extends Component{
 		);
 
 		let allExtensions = (
-			<div>
+			<div id='all-extensions'>
 				<VerticalExpandable expand={this.state.allExtensionsShown}>
 					<AllExtensionsSection except={this.state.browser.toLowerCase()} />
 				</VerticalExpandable>
@@ -306,11 +318,10 @@ class InstallConnectorPrompt extends Component{
 		if(this.props.showStandalone) {
 			getStandaloneSection = (
 				<p className='get-zotero-standalone'>
-					<img
+					<ZoteroIcon
+						size="small"
 						width="32"
 						height="35"
-						src="../assets/images/extensions/zotero-icon-small.png"
-						srcSet="../assets/images/extensions/zotero-icon-small@2x.png 2x"
 						alt=""/>
 					<br />
 					<a href={buildUrl('download')}>Get Zotero Standalone</a>

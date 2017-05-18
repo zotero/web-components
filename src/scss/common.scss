@@ -4,9 +4,10 @@
 
 // Colors
 
-$white:				 #fff;
+$white:				  #fff;
 $gray-light:		#e6e6e6;
 $gray-lightest: #f6f6f6;
+$slate:         #777;
 
 $link-color: #38c;
 
@@ -44,6 +45,12 @@ $screen-sm-min: 768px;
 	width: 900px; // Fix width from 901px to 900px
 }
 
+// Lighter font rendering in OS X / macOS
+body {
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
 #content .center.container {
 	min-height: 500px;
 }
@@ -78,4 +85,60 @@ input[type="email"] {
 
 button, a.button {
 	font-weight: normal;
+}
+
+
+// Grid
+// --------------------------------------------------
+
+.row {
+	margin: 0 (-$grid-gutter-width / 2);
+
+	&.compact {
+		@media (min-width: $screen-sm-min) {
+			margin: 0 (-$grid-gutter-compact / 2);
+		}
+	}
+
+	&.loose {
+		@media (min-width: $screen-sm-min) {
+			margin: 0 (-$grid-gutter-loose / 2);
+		}
+	}
+}
+
+.col-4, .col-6 {
+	padding: 0 ($grid-gutter-width / 2);
+
+	@media (min-width: $screen-sm-min) {
+		float: left;
+	}
+}
+
+.col-4 {
+	@media (min-width: $screen-sm-min) {
+		width: calc(33%);
+	}
+}
+
+.col-6 {
+	@media (min-width: $screen-sm-min) {
+		width: 50%;
+	}
+}
+
+.row.compact {
+	.col-4, .col-6 {
+		@media (min-width: $screen-sm-min) {
+			padding: 0 ($grid-gutter-compact / 2);
+		}
+	}
+}
+
+.row.loose {
+	.col-4, .col-6 {
+		@media (min-width: $screen-sm-min) {
+			padding: 0 ($grid-gutter-loose / 2);
+		}
+	}
 }

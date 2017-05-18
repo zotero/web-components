@@ -1,91 +1,167 @@
-div#downloads-container {
-	div.flex-container {
-		display:-webkit-flex;
-		display:flex;
+.downloads {
+	margin: 0 -40px;
+
+	.container {
+		padding: 0 15px;
+
+		@media (min-width: $screen-sm-min) {
+			padding: 0 40px;
+		}
 	}
 
-	div.flex-section {
-		-webkit-flex:1 1 45%;
-		flex:1 1 45%;
-		min-width: 350px;
+	* {
+		box-sizing: border-box;
 	}
-	
-	div#download-standalone-section, div#download-connector-section {
-		background-color: $smoke;
 
+	a {
+		color: $link-color;
+		text-decoration: none;
+
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+
+	h1 {
+		line-height: 1.1;
+	}
+
+	.btn {
+		color: $white;
+		background: $link-color;
+		text-decoration: none;
+		font-size: 20px;
+		min-width: 160px;
+		padding: 9px 23px;
+		border-radius: 4px;
+
+		&:hover {
+			background: darken($link-color, 5%);
+			text-decoration: none;
+		}
+	}
+
+	.jumbotron {
 		text-align: center;
-		padding-top:20px;
-		padding-bottom:30px;
-		padding-left:30px;
-		padding-right:30px;
+		margin-top: 60px; // 96px
+		line-height: 24px;
 
-		margin-bottom:10px;
-	}
-
-	div#download-connector-section {
-		margin-left:30px;
-	}
-
-	#plugins-image {
-		float:left;
-		margin-right:35px;
-	}
-	div#download-plugins-section {
-		width:50%;
-		margin-left:auto;
-		margin-right:auto;
-		margin-top:25px;
-		margin-bottom:20px;
-	}
-
-	.downloadImage {
-		margin:auto;
-	}
-
-	.downloadConnectorImage {
-		margin-top:12px; //difference in height between connector and Zotero image
-	}
-
-	div.downloadButton {
-		display:block;
-		margin:20px;
-	}
-	button, a.button {
-		color:$white;
-		background-color: $button-blue;
-		border-color: $button-blue;
-		width:100%;
-		background-image:none;
-		font-size:1.5em;
-		padding: 8px 20px;
-	}
-
-	ul.other-versions {
-		padding-left:0;
-
-		list-style: none;
-
-		li {
-			display:inline-block;
-			margin-left:0.4em;
-		}
-		li:not(:last-child)::after {
-			content: " ·";
-			color:$slate;
-			padding:0 0.2em;
-		}
-	}
-}
-
-@media all and (max-width: 640px) {
-	div#downloads-container {
-		.flex-container{
-			-webkit-flex-direction: column;
-			flex-direction: column;
+		@media (min-width: $screen-sm-min) {
+			display: flex;
 		}
 
-		div#download-connector-section {
-			margin-left:0px;
+		h1 {
+			font-size: 36px;
+			margin-bottom: 8px;
+			letter-spacing: -1px;
+		}
+
+		.lead {
+			font-size: 16px;
+			line-height: 1.5;
+			margin: 0 auto 34px; // 40px
+		}
+	}
+
+	.standalone,
+	.connector {
+		flex: 1 1 0;
+		background-color: $gray-lightest;
+		background-image: linear-gradient($white 0%, $gray-lightest 33%);
+		padding: 0 20px 75px; // 96px
+
+		@media (min-width: $screen-sm-min) {
+			padding: {
+				left: 0;
+				right: 0;
+			}
+			margin: 0 20px;
+		}
+	}
+
+	.download-image {
+		display: block;
+		margin: auto;
+	}
+
+	.standalone {
+		.download-image {
+			margin-bottom: 29px; // 48px
+		}
+
+		.other-versions {
+			color: $slate;
+			margin: 37px 0 0 0;
+		}
+
+		.os-list {
+			list-style-type: none;
+			padding: 0;
+			margin: 0;
+
+			li {
+				display: inline;
+
+				& + li:before {
+					content: "·";
+					margin: 0 4px;
+				}
+			}
+		}
+	}
+
+	.connector {
+		.download-image {
+			margin-bottom: 39px; // align h1
+		}
+
+		.description {
+			font-size: 14px;
+			margin-top: 14px;
+			color: $slate;
+
+			@media (min-width: $screen-sm-min) {
+				width: 75%;
+				margin-left: auto;
+				margin-right: auto;
+			}
+		}
+	}
+
+	.plugins {
+		text-align: center;
+		margin: 60px 0 60px 0;
+
+		h1 {
+			font-size: 30px;
+			margin: 0 0 8px 0;
+		}
+
+		p {
+			font-size: 16px;
+			line-height: 1.5;
+			margin: 0;
+
+			@media (min-width: $screen-sm-min) {
+				max-width: 500px;
+			}
+		}
+	}
+
+	.plugins-container {
+		display: inline-block;
+		vertical-align: top;
+
+		@media (min-width: $screen-sm-min) {
+			text-align: left;
+			margin-left: 80px;
+		}
+	}
+
+	.plugins-icon {
+		@media (min-width: $screen-sm-min) {
+			float: left;
+			margin-right: 40px;
 		}
 	}
 }

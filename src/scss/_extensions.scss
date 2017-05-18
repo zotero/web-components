@@ -39,50 +39,6 @@
 		}
 	}
 
-	.row {
-		margin: 0 (-$grid-gutter-width / 2);
-
-		&.compact {
-			margin: 0 (-$grid-gutter-compact / 2);
-		}
-
-		&.loose {
-			margin: 0 (-$grid-gutter-loose / 2);
-		}
-	}
-
-	.col-4, .col-6 {
-		padding: 0 ($grid-gutter-width / 2);
-
-		@media (min-width: $screen-sm-min) {
-			float: left;
-		}
-	}
-
-	.col-4 {
-		@media (min-width: $screen-sm-min) {
-			width: calc(33%);
-		}
-	}
-
-	.col-6 {
-		@media (min-width: $screen-sm-min) {
-			width: 50%;
-		}
-	}
-
-	.row.compact {
-		.col-4, .col-6 {
-			padding: 0 ($grid-gutter-compact / 2);
-		}
-	}
-
-	.row.loose {
-		.col-4, .col-6 {
-			padding: 0 ($grid-gutter-loose / 2);
-		}
-	}
-
 
 	// Extensions styles
 

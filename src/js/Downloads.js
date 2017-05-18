@@ -30,7 +30,7 @@ import {BrowserDetect} from './browserdetect.js';
 
 class DownloadStandaloneButton extends Component {
 	render(){
-		return (<div className='downloadButton'><a className='button' href={this.props.href}>Download</a></div>);
+		return (<div className='downloadButton'><a className='btn' href={this.props.href}>Download</a></div>);
 	}
 }
 
@@ -84,23 +84,23 @@ class DownloadStandalone extends Component {
 				}
 				break;
 		}
-		
+
 		let otherNodes = otherVersions.map((os)=>{
 			let downloadUrl = standaloneDownloadUrls[os];
 			return <OtherDownloadLinkListItem key={os} OS={os} href={downloadUrl} />;
 		});
 
 		return (
-			<div id='download-standalone-section' className='flex-section'>
-				<img className='downloadImage' src={standaloneImagePath} srcSet={`${standaloneImagePath2x} 2x`} />
+			<section className='standalone'>
+				<img className='download-image' src={standaloneImagePath} srcSet={`${standaloneImagePath2x} 2x`} />
 				<h1>Zotero 5.0 for {OSLabel}</h1>
-				<p>Your personal research assistant</p>
+				<p className='lead'>Your personal research assistant</p>
 				{featuredButton}
-				<p>Other versions</p>
-				<ul className='other-versions'>
+				<p className='other-versions'>Other versions</p>
+				<ul className='os-list'>
 					{otherNodes}
 				</ul>
-			</div>
+			</section>
 		);
 	}
 }
@@ -108,15 +108,15 @@ class DownloadStandalone extends Component {
 class DownloadConnector extends Component {
 	render(){
 		return (
-			<div id='download-connector-section' className='flex-section'>
-				<img className='downloadImage downloadConnectorImage' src={browserExtensionImagePath} srcSet={`${browserExtensionImagePath2x} 2x`} />
+			<section className='connector'>
+				<img className='download-image' src={browserExtensionImagePath} srcSet={`${browserExtensionImagePath2x} 2x`} />
 				<h1>Browser Extension</h1>
 				<div className='install-connector-section'>
-					<p>Get Zotero connectors for your browser</p>
-					<div className='downloadButton'><a href={buildUrl('extensions')} className='button'>Download</a></div>
-					<p>The Zotero Connector automatically senses content as you browse the web and allows you to save it to Zotero with a single click.</p>
+					<p className='lead'>Get Zotero connectors for your browser</p>
+					<div className='downloadButton'><a href={buildUrl('extensions')} className='btn'>Download</a></div>
+					<p className='description'>The Zotero Connector automatically senses content as you browse the web and allows you to save it to Zotero with a single click.</p>
 				</div>
-			</div>
+			</section>
 		);
 	}
 }
@@ -124,16 +124,17 @@ class DownloadConnector extends Component {
 class DownloadPlugins extends Component {
 	render(){
 		return (
-			<div id='download-plugins-section' className='flex-container'>
-				<div className='flex-section'>
-					<img id='plugins-image' className='downloadImage' src={pluginsIconImagePath} />
+			<section className='plugins'>
+				<div className='plugins-container clearfix'>
+					<img className='plugins-icon' src={pluginsIconImagePath} />
 					<h1>Plugins</h1>
-					<p>Install one of the many third-party plugins and become even more productive.</p>
-					<p><a href={buildUrl('pluginSupport')}>Browse Plugins</a></p>
+					<p>
+						Install one of the many third-party plugins and become even more productive.<br />
+					  <a href={buildUrl('pluginSupport')}>Browse Plugins</a>
+					</p>
 				</div>
-			</div>
+			</section>
 		);
-	
 	}
 }
 
@@ -146,12 +147,14 @@ class Downloads extends Component{
 		let arch = (navigator.userAgent.indexOf('x86_64') != -1) ? 'x86_64' : 'x86';
 
 		return (
-			<div id='downloads-container'>
-				<div className='flex-container'>
-					<DownloadStandalone featuredOS={featuredOS} arch={arch} />
-					<DownloadConnector featuredBrowser={featuredBrowser} />
+			<div className='downloads'>
+				<div className="container">
+					<div className='row loose jumbotron'>
+						<DownloadStandalone featuredOS={featuredOS} arch={arch} />
+						<DownloadConnector featuredBrowser={featuredBrowser} />
+					</div>
+					<DownloadPlugins />
 				</div>
-				<DownloadPlugins />
 			</div>
 		);
 	}

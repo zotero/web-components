@@ -25,10 +25,14 @@
 		}
 
 		.btn {
-			font-size: 20px;
+			font-size: 16px;
 			min-width: 160px;
 			padding: 9px 23px;
 			border-radius: 4px;
+
+			@media (min-width: $screen-sm-min) {
+				font-size: 20px;
+			}
 		}
 
 		.show-extensions,

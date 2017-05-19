@@ -23,6 +23,7 @@
 	}
 
 	h1 {
+		margin: 0;
 		line-height: 1.1;
 	}
 
@@ -30,10 +31,14 @@
 		color: $white;
 		background: $link-color;
 		text-decoration: none;
-		font-size: 20px;
+		font-size: 16px;
 		min-width: 160px;
 		padding: 9px 23px;
 		border-radius: 4px;
+
+		@media (min-width: 1040px) {
+			font-size: 20px;
+		}
 
 		&:hover {
 			background: darken($link-color, 5%);
@@ -51,15 +56,24 @@
 		}
 
 		h1 {
-			font-size: 36px;
+			font-size: 30px;
 			margin-bottom: 8px;
 			letter-spacing: -1px;
+
+			@media (min-width: 1040px) {
+				font-size: 36px;
+			}
 		}
 
 		.lead {
-			font-size: 16px;
-			line-height: 1.5;
-			margin: 0 auto 34px; // 40px
+			font-size: 14px;
+			line-height: 24px;
+			margin: 0 auto 20px; // 27px
+
+			@media (min-width: 1040px) {
+				font-size: 16px;
+				margin-bottom: 34px; // 40px
+			}
 		}
 	}
 
@@ -68,13 +82,10 @@
 		flex: 1 1 0;
 		background-color: $gray-lightest;
 		background-image: linear-gradient($white 0%, $gray-lightest 33%);
-		padding: 0 20px 75px; // 96px
+		padding: 0 20px 57px; // 64px
 
 		@media (min-width: $screen-sm-min) {
-			padding: {
-				left: 0;
-				right: 0;
-			}
+			padding: 0 20px 89px; // 96px
 			margin: 0 20px;
 		}
 	}
@@ -86,7 +97,11 @@
 
 	.standalone {
 		.download-image {
-			margin-bottom: 29px; // 48px
+			margin-bottom: 14px; // 32px
+
+			@media (min-width: 1040px) {
+				margin-bottom: 29px; // 48px
+			}
 		}
 
 		.other-versions {
@@ -104,33 +119,43 @@
 
 				& + li:before {
 					content: "·";
-					margin: 0 4px;
+					margin: 0 8px;
 				}
 			}
 		}
 	}
 
 	.connector {
+		padding-top: 64px;
+
+		@media (min-width: $screen-sm-min) {
+			padding-top: 0;
+		}
+
 		.download-image {
-			margin-bottom: 39px; // align h1
+			margin-bottom: 24px;
+
+			@media (min-width: 1040px) {
+				margin-bottom: 39px; // align h1
+			}
 		}
 
 		.description {
 			font-size: 14px;
-			margin-top: 14px;
+			margin: 14px auto 0;
 			color: $slate;
 
 			@media (min-width: $screen-sm-min) {
-				width: 75%;
-				margin-left: auto;
-				margin-right: auto;
+				max-width: 370px;
+				padding: 0 20px;
 			}
 		}
 	}
 
 	.plugins {
 		text-align: center;
-		margin: 60px 0 60px 0;
+		margin: 52px 0 51px 0; // 64px
+		padding: 0 5px;
 
 		h1 {
 			font-size: 30px;
@@ -159,6 +184,8 @@
 	}
 
 	.plugins-icon {
+		margin-bottom: 15px; // 32px
+
 		@media (min-width: $screen-sm-min) {
 			float: left;
 			margin-right: 40px;

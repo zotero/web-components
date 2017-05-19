@@ -6,18 +6,15 @@
 const React = require('react');
 const {Component} = React;
 
+import {ZoteroIcon} from './Icons.js';
+import classnames from 'classnames';
+
 const config = window.zoteroConfig;
 const installData = config.installData;
 
-const windowsDownloadUrl = installData.windowsDownload;
-const macDownloadUrl = installData.macDownload;
-const linux32DownloadUrl = installData.linux32Download;
-const linux64DownloadUrl = installData.linux64Download;
+const {windowsDownload, macDownload, linux32Download, linux64Download} = installData;
 
 const imagePath = config.imagePath;
-
-const standaloneImagePath = imagePath + '/downloads/zotero-icon.png';
-const standaloneImagePath2x = imagePath + '/downloads/zotero-icon@2x.png';
 
 const browserExtensionImagePath = imagePath + '/downloads/browser-extension.png';
 const browserExtensionImagePath2x = imagePath + '/downloads/browser-extension@2x.png';
@@ -47,13 +44,17 @@ class OtherDownloadLinkListItem extends Component {
 class DownloadStandalone extends Component {
 	render(){
 		let standaloneDownloadUrls = {
-			Windows: windowsDownloadUrl,
-			'Mac OS X': macDownloadUrl,
-			'Linux i686': linux32DownloadUrl,
-			'Linux x86_64': linux64DownloadUrl
+			'Windows': windowsDownload,
+			'Mac OS X': macDownload,
+			'Linux i686': linux32Download,
+			'Linux x86_64': linux64Download
 		};
 
 		let featuredOS = this.props.featuredOS;
+		if(!['Windows', 'Mac', 'Linux'].includes(featuredOS)){
+			featuredOS = 'Windows';
+		}
+
 		let featuredButton;
 		let otherVersions = [
 			'Windows',
@@ -62,6 +63,7 @@ class DownloadStandalone extends Component {
 			'Linux x86_64'
 		];
 		let OSLabel = featuredOS;
+		let versionNote = null;
 
 		switch(featuredOS) {
 			case 'Windows':
@@ -71,6 +73,21 @@ class DownloadStandalone extends Component {
 			case 'Mac':
 				featuredButton = <DownloadStandaloneButton href={standaloneDownloadUrls['Mac']} />;
 				otherVersions.splice(1, 1);
+				if(this.props.oldMac){
+					versionNote = (
+						<p style={{'fontSize': '12px', 'fontStyle': 'italic'}}>
+							Please note: The latest
+							version of Zotero will not run on macOS 10.6, which is no longer supported by any major
+							browser maker and no longer receives security updates from Apple. To install an outdated
+							version of Zotero, click the link above, or upgrade to macOS 10.11 (El Capitan) or later to
+							install the latest version. You can also use Zotero for Firefox with 
+							{' '}
+							<a href="https://www.mozilla.org/en-US/firefox/organizations/">Firefox 45 ESR</a>
+							{' '}
+							until June 2017.
+						</p>
+					);
+				}
 				break;
 			case 'Linux':
 				if(this.props.arch == 'x86_64'){
@@ -92,7 +109,13 @@ class DownloadStandalone extends Component {
 
 		return (
 			<section className='standalone'>
-				<img className='download-image' src={standaloneImagePath} srcSet={`${standaloneImagePath2x} 2x`} />
+				<ZoteroIcon
+					size='large'
+					alt='Zotero Extension'
+					className='download-image'
+					width='147'
+					height='160'
+				/>
 				<h1>Zotero 5.0 for {OSLabel}</h1>
 				<p className='lead'>Your personal research assistant</p>
 				{featuredButton}
@@ -100,6 +123,7 @@ class DownloadStandalone extends Component {
 				<ul className='os-list'>
 					{otherNodes}
 				</ul>
+				{versionNote}
 			</section>
 		);
 	}
@@ -130,7 +154,7 @@ class DownloadPlugins extends Component {
 					<h1>Plugins</h1>
 					<p>
 						Install one of the many third-party plugins and become even more productive.<br />
-					  <a href={buildUrl('pluginSupport')}>Browse Plugins</a>
+						<a href={buildUrl('pluginSupport')}>Browse Plugins</a>
 					</p>
 				</div>
 			</section>
@@ -139,19 +163,27 @@ class DownloadPlugins extends Component {
 }
 
 class Downloads extends Component{
+	constructor(props){
+		super(props);
+		this.state = {
+			featuredOS:BrowserDetect.OS,
+			featuredBrowser:BrowserDetect.browser,
+			arch:((navigator.userAgent.indexOf('x86_64') != -1) ? 'x86_64' : 'x86'),
+			oldMac: installData.oldMac,
+			mobile: navigator.userAgent.includes('mobile')
+		};
+	}
 	render(){
 		window.BrowserDetect = BrowserDetect;
 
-		let featuredOS = BrowserDetect.OS;
-		let featuredBrowser = BrowserDetect.browser;
-		let arch = (navigator.userAgent.indexOf('x86_64') != -1) ? 'x86_64' : 'x86';
+		let {featuredOS, featuredBrowser, arch, oldMac} = this.state;
 
 		return (
-			<div className='downloads'>
+			<div className={classnames('downloads', this.state.mobile?'mobile':'')}>
 				<div className="container">
 					<div className='row loose jumbotron'>
-						<DownloadStandalone featuredOS={featuredOS} arch={arch} />
-						<DownloadConnector featuredBrowser={featuredBrowser} />
+						<DownloadStandalone featuredOS={featuredOS} arch={arch} ref='downloadStandalone' oldMac={oldMac} />
+						<DownloadConnector featuredBrowser={featuredBrowser} ref='downloadConnector' />
 					</div>
 					<DownloadPlugins />
 				</div>

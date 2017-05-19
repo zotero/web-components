@@ -8,6 +8,7 @@ let BrowserDetect = {
 		this.browser = this.searchString(this.dataBrowser) || 'An unknown browser';
 		this.version = this.searchVersion(navigator.userAgent) || this.searchVersion(navigator.appVersion) || 'an unknown version';
 		this.OS = this.searchString(this.dataOS) || 'an unknown OS';
+		this.oldMac = (this.OS == 'Mac' && navigator.userAgent.contains('OS X 10.6;'));
 	},
 	searchString: function searchString(data) {
 		for (var i = 0; i < data.length; i++) {

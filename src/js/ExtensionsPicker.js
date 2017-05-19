@@ -6,13 +6,13 @@ let log = logger.Logger('ExtensionsPicker');
 const React = require('react');
 const {Component} = React;
 
-import {InstallConnectorPrompt} from './Start.js';
+import {InstallConnectorPrompt} from './InstallConnector.js';
 
 class ExtensionsPicker extends Component {
 	render(){
 		return (
 			<div id='extensions-container'>
-				<InstallConnectorPrompt showStandalone={true} />
+				<InstallConnectorPrompt showStandalone={true} ref="installConnectorPrompt" />
 			</div>
 		);
 	}

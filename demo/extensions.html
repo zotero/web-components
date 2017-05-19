@@ -143,10 +143,51 @@
 
 			<script type="text/javascript" charset="utf-8">
 				ZoteroWebComponents.pageReady(function() {
-					window.registerElement = ReactDOM.render(
+					window.extensionsPickerElement = ReactDOM.render(
 						React.createElement(ZoteroWebComponents.ExtensionsPicker, null),
 						document.getElementById('extensions-picker')
 					);
+
+					let tests = {
+						test1: function(){
+							window.extensionsPickerElement.refs.installConnectorPrompt.setState({
+								browser:'Safari',
+								oldSafari:true
+							});
+						},
+						test2: function(){
+							window.extensionsPickerElement.refs.installConnectorPrompt.setState({
+								browser:'Safari',
+								oldSafari:false
+							});
+						},
+						test3: function(){
+							window.extensionsPickerElement.refs.installConnectorPrompt.setState({
+								browser:'Chrome',
+								oldSafari:false
+							});
+						},
+						test4: function(){
+							window.extensionsPickerElement.refs.installConnectorPrompt.setState({
+								browser:'Firefox'
+							});
+						},
+						test5: function(){
+							window.extensionsPickerElement.refs.installConnectorPrompt.setState({
+								browser:'Opera',
+							});
+						},
+					};
+
+					let testCase = tests['test1'];
+					if(window.location.hash.length > 0){
+						let testLabel = window.location.hash.substr(1);
+						testCase = tests[testLabel];
+					}
+
+					testCase();
+
+					ZoteroWebComponents.cycleTestFuncs(tests);
 				});
 			</script>
 			<link rel="stylesheet" href="../build/web-components.css" type="text/css" media="screen" charset="utf-8"/>

@@ -9,16 +9,14 @@ const {Component} = React;
 import {buildUrl} from './wwwroutes.js';
 import {BrowserDetect} from './browserdetect.js';
 import {VerticalExpandable} from './VerticalExpandable.js';
+import {ZoteroIcon, BrowserIcon} from './Icons.js';
 import classnames from 'classnames';
-
-let browser = BrowserDetect.browser;
 
 const config = window.zoteroConfig;
 const installData = config.installData;
 
 const {firefoxHash, firefoxDownload, chromeDownload, safariDownload, operaDownload} = installData;
 
-const imagePath = config.imagePath;
 
 let Delay = function(delay, val) {
 	return new Promise(function (resolve) {
@@ -27,42 +25,6 @@ let Delay = function(delay, val) {
 		}, delay);
 	});
 };
-
-class ZoteroIcon extends Component {
-	render() {
-		let iconImagePath = imagePath + '/extensions/zotero-icon';
-		if(this.props.size == 'small'){
-			iconImagePath += '-small';
-		} else if(this.props.size == 'large'){
-			iconImagePath += '-large';
-		}
-		let iconImagePath2x = iconImagePath + '@2x.png';
-		iconImagePath += '.png';
-
-		let p = {...this.props, src:iconImagePath, srcSet:`${iconImagePath2x} 2x`, className:'zotero-icon'};
-		delete p.browser;
-		return (<img {...p} />);
-	}
-}
-
-
-class BrowserIcon extends Component {
-	render() {
-		let browserImagePath = imagePath + '/extensions/';
-		browserImagePath += this.props.browser + '-icon';
-		if(this.props.size == 'small'){
-			browserImagePath += '-small';
-		} else if(this.props.size == 'large'){
-			browserImagePath += '-large';
-		}
-		let browserImagePath2x = browserImagePath + '@2x.png';
-		browserImagePath += '.png';
-
-		let p = {...this.props, src:browserImagePath, srcSet:`${browserImagePath2x} 2x`, className:'browser-icon'};
-		delete p.browser;
-		return (<img {...p} />);
-	}
-}
 
 class InstallFirefoxButton extends Component{
 	installFirefox(){
@@ -184,18 +146,16 @@ InstallOperaButton.defaultProps = {type:'button'};
 
 class InstallButton extends Component{
 	render(){
-		let browserName = browser;
-		log.debug('InstallButton render');
-		log.debug(browserName);
+		let browserName = this.props.browser;
 
-		switch(browserName){
-			case 'Firefox':
+		switch(browserName.toLowerCase()){
+			case 'firefox':
 				return <InstallFirefoxButton />;
-			case 'Chrome':
+			case 'chrome':
 				return <InstallChromeButton />;
-			case 'Safari':
+			case 'safari':
 				return <InstallSafariButton />;
-			case 'Opera':
+			case 'opera':
 				return <InstallOperaButton />;
 			default:
 				//TODO: unknown browser download?
@@ -215,6 +175,7 @@ class BrowserExtensionIcon extends Component{
 					height="128" />
 				<span className="icon-plus"></span>
 				<ZoteroIcon
+					size="large"
 					alt="Zotero Extension"
 					width="128"
 					height="140"
@@ -255,7 +216,8 @@ class InstallConnectorPrompt extends Component{
 	constructor(props){
 		super(props);
 		this.state = {
-			browser:browser,
+			browser:BrowserDetect.browser,
+			oldSafari:installData.oldSafari,
 			showAllExtensions:false
 		};
 		this.showAllExtensions = this.showAllExtensions.bind(this);
@@ -274,6 +236,7 @@ class InstallConnectorPrompt extends Component{
 		let connectorText = '';
 		let connectorImage = null;
 		let installButton = <InstallButton browser='chrome' />;
+		let versionNote = null;
 		switch(this.state.browser){
 			case 'Chrome':
 				connectorText = 'Chrome Extension';
@@ -286,6 +249,16 @@ class InstallConnectorPrompt extends Component{
 			case 'Safari':
 				connectorText = 'Safari Extension';
 				connectorImage = <BrowserExtensionIcon browser='safari' />;
+				if(this.state.oldSafari){
+					versionNote = (
+						<p className='version-note'>
+							Please note: The link above is for an outdated version of the Safari extension,
+							as the latest version is not compatible with your version of macOS.
+							For the best experience, please upgrade to macOS 10.11 or later and reinstall
+							the Safari extension from this page.
+						</p>
+					);
+				}
 				break;
 			case 'Opera':
 				connectorText = 'Opera Extension';
@@ -347,6 +320,7 @@ class InstallConnectorPrompt extends Component{
 								<span className="line">Zotero Connectors allow you to save to Zotero</span>
 								<span className="line">directly from your web browser.</span></p>
 							{installButton}
+							{versionNote}
 							{getStandaloneSection}
 							{showExtensionsLink}
 						</div>

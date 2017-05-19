@@ -1,6 +1,6 @@
 'use strict';
 
-import 'babel-polyfill';
+//import 'babel-polyfill';
 import 'whatwg-fetch';
 //import {log as logger} from './Log.js';
 //var log = logger.Logger('WebComponents');
@@ -29,7 +29,7 @@ import {ExtensionsPicker} from './ExtensionsPicker.js';
 import {CreateGroup} from './CreateGroup.js';
 import {ApiKeyEditor} from './ApiKeyEditor.js';
 import {pageReady, jsError} from './Utils.js';
-import {cycleTestCases} from './TestUtils.js';
+import {cycleTestCases, cycleTestFuncs} from './TestUtils.js';
 import {Combined} from './GlobalSearch/Combined.js';
 
 let ZoteroWebComponents = {
@@ -47,6 +47,7 @@ let ZoteroWebComponents = {
 	pageReady,
 	jsError,
 	cycleTestCases,
+	cycleTestFuncs,
 	Combined
 };
 

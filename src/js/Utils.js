@@ -148,4 +148,12 @@ let jsError = function(msg) {
 	document.querySelector('#js-message #js-message-list').appendChild(li);
 };
 
-export {slugify, parseQuery, buildQuery, querystring, parseSearchString, readCookie, loadInitialState, pageReady, jsError};
+let Delay = function(delay, val) {
+	return new Promise(function (resolve) {
+		setTimeout(function () {
+			resolve(val);
+		}, delay);
+	});
+};
+
+export {slugify, parseQuery, buildQuery, querystring, parseSearchString, readCookie, loadInitialState, pageReady, jsError, Delay};

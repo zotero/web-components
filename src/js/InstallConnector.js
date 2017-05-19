@@ -11,20 +11,12 @@ import {BrowserDetect} from './browserdetect.js';
 import {VerticalExpandable} from './VerticalExpandable.js';
 import {ZoteroIcon, BrowserIcon} from './Icons.js';
 import classnames from 'classnames';
+import {Delay} from './Utils.js';
 
 const config = window.zoteroConfig;
 const installData = config.installData;
 
 const {firefoxHash, firefoxDownload, chromeDownload, safariDownload, operaDownload} = installData;
-
-
-let Delay = function(delay, val) {
-	return new Promise(function (resolve) {
-		setTimeout(function () {
-			resolve(val);
-		}, delay);
-	});
-};
 
 class InstallFirefoxButton extends Component{
 	installFirefox(){

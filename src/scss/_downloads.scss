@@ -79,7 +79,9 @@
 
 	.standalone,
 	.connector {
-		flex: 1 1 0;
+		flex-grow: 1;
+		flex-shrink: 1;
+		flex-basis: 0;
 		background-color: $gray-lightest;
 		background-image: linear-gradient($white 0%, $gray-lightest 33%);
 		padding: 0 20px 57px; // 64px
@@ -92,7 +94,20 @@
 
 	.download-image {
 		display: block;
-		margin: auto;
+		margin: 0 auto;
+	}
+
+	.version-note {
+		font-size: 12px;
+		line-height: 1.42857143; // Reset
+		color: $slate;
+		border-top: 1px solid #e6e6e6;
+		margin: 33px 0 -36px 0;
+		padding-top: 6px;
+
+		@media (min-width: $screen-sm-min) {
+			margin-bottom: -68px;
+		}
 	}
 
 	.standalone {

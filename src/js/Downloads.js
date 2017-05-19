@@ -75,12 +75,12 @@ class DownloadStandalone extends Component {
 				otherVersions.splice(1, 1);
 				if(this.props.oldMac){
 					versionNote = (
-						<p style={{'fontSize': '12px', 'fontStyle': 'italic'}}>
+						<p className='version-note'>
 							Please note: The latest
 							version of Zotero will not run on macOS 10.6, which is no longer supported by any major
 							browser maker and no longer receives security updates from Apple. To install an outdated
 							version of Zotero, click the link above, or upgrade to macOS 10.11 (El Capitan) or later to
-							install the latest version. You can also use Zotero for Firefox with 
+							install the latest version. You can also use Zotero for Firefox with
 							{' '}
 							<a href="https://www.mozilla.org/en-US/firefox/organizations/">Firefox 45 ESR</a>
 							{' '}
@@ -135,11 +135,10 @@ class DownloadConnector extends Component {
 			<section className='connector'>
 				<img className='download-image' src={browserExtensionImagePath} srcSet={`${browserExtensionImagePath2x} 2x`} />
 				<h1>Browser Extension</h1>
-				<div className='install-connector-section'>
-					<p className='lead'>Get Zotero connectors for your browser</p>
-					<div className='downloadButton'><a href={buildUrl('extensions')} className='btn'>Download</a></div>
-					<p className='description'>The Zotero Connector automatically senses content as you browse the web and allows you to save it to Zotero with a single click.</p>
-				</div>
+				<p className='lead'>Get Zotero connectors for your browser</p>
+				<div className='downloadButton'><a href={buildUrl('extensions')} className='btn'>Download</a></div>
+				<p className='description'>The Zotero Connector automatically senses content as you browse the web and allows you to save it to Zotero with a single click.</p>
+				<p className='version-note'>Please note: The link above is for an outdated version of the Safari extension, as the latest version is not compatible with your version of macOS. For the best experience, please upgrade to macOS 10.11 or later and reinstall the Safari extension from this page.</p>
 			</section>
 		);
 	}

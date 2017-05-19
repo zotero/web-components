@@ -1,6 +1,6 @@
 'use strict';
 
-//import 'babel-polyfill';
+import 'babel-polyfill';
 import 'whatwg-fetch';
 //import {log as logger} from './Log.js';
 //var log = logger.Logger('WebComponents');

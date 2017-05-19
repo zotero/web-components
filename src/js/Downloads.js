@@ -174,8 +174,6 @@ class Downloads extends Component{
 		};
 	}
 	render(){
-		window.BrowserDetect = BrowserDetect;
-
 		let {featuredOS, featuredBrowser, arch, oldMac} = this.state;
 
 		return (

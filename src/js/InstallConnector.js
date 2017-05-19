@@ -291,7 +291,7 @@ class InstallConnectorPrompt extends Component{
 					<br />
 					<a href={buildUrl('download')}>Get Zotero Standalone</a>
 					<br/>
-					Available for Mac, Windows, and Linux
+					for Mac, Windows, and Linux
 				</p>
 			);
 		}

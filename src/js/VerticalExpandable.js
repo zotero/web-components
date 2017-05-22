@@ -9,12 +9,25 @@ import {VelocityComponent} from 'velocity-react';
 
 class VerticalExpandable extends Component{
 	render() {
-		if(!this.props.expand) {
-			return null;
+		if(!this.props.expand){
+			return (
+				<VelocityComponent
+					duration={this.props.duration}
+					runOnMount={false}>
+					<div style={{display:'none'}}>
+						{this.props.children}
+					</div>
+				</VelocityComponent>
+			);
 		}
 		return (
-			<VelocityComponent animation='slideDown' duration={this.props.duration} runOnMount={true}>
-				{this.props.children}
+			<VelocityComponent
+				animation='slideDown'
+				duration={this.props.duration}
+				runOnMount={false}>
+				<div style={{display:'block'}}>
+					{this.props.children}
+				</div>
 			</VelocityComponent>
 		);
 	}

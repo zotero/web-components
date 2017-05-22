@@ -115,7 +115,7 @@ class InviteToGroups extends React.Component{
 			resp.json().then((data) => {
 				if(data.success){
 					let invitationsSent = this.state.invitationsSent;
-					invitationsSent.push(groupID);
+					invitationsSent.push(parseInt(groupID));
 					this.setState({invitationsSent});
 				} else {
 					throw data;
@@ -141,7 +141,7 @@ class InviteToGroups extends React.Component{
 			let members = group.data.members ? group.data.members : [];
 			let admins = group.data.admins ? group.data.admins : [];
 			// if viewer is group admin (has invite permissions) or group is open
-			if(admins.includes(userID) || (group.data.owner === userID) || (group.data.type == 'PublicOpen')){
+			if(admins.includes(userID) || (group.data.owner === userID)){ //|| (group.data.type == 'PublicOpen') ? Should any user be able to invite others to a public open group?
 				// profileUser not already Member
 				if(!admins.includes(inviteeUserID) && !members.includes(inviteeUserID) && group.data.owner !== inviteeUserID){
 					//check if user already has invite
@@ -170,9 +170,22 @@ class InviteToGroups extends React.Component{
 		this.state.userGroups.forEach((group)=>{
 			groupMap[group.id] = group;
 		});
-		
+
+		//populate list of groups user has permission to send invites for, and profileUser is not already
+		//a member or has an invitation pending
 		let invitableGroups = this.calculateInvitable(this.state.userGroups, this.state.alreadyInvited);
 		if(invitableGroups !== false){
+			//filter out invitableGroups that user has just invited profileUser to
+			invitableGroups = invitableGroups.filter((group)=>{
+				if(this.state.invitationsSent.includes(group.id)){
+					return false;
+				}
+				return true;
+			});
+
+			//if there are any invitable groups, make an invite section with options
+			//otherwise inform user that profileUser has already been invited, or user has no groups
+			//to issue invites for
 			if(invitableGroups.length > 0){
 				let inviteOptions = invitableGroups.map((group)=>{
 					return <option key={group.id} value={group.id} label={group.data.name}>{group.data.name}</option>;

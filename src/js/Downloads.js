@@ -138,7 +138,6 @@ class DownloadConnector extends Component {
 				<p className='lead'>Get Zotero connectors for your browser</p>
 				<div className='downloadButton'><a href={buildUrl('extensions')} className='btn'>Download</a></div>
 				<p className='description'>The Zotero Connector automatically senses content as you browse the web and allows you to save it to Zotero with a single click.</p>
-				<p className='version-note'>Please note: The link above is for an outdated version of the Safari extension, as the latest version is not compatible with your version of macOS. For the best experience, please upgrade to macOS 10.11 or later and reinstall the Safari extension from this page.</p>
 			</section>
 		);
 	}

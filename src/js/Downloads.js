@@ -5,6 +5,7 @@
 
 const React = require('react');
 const {Component} = React;
+const flexibility = require('flexibility');
 
 import {ZoteroIcon} from './Icons.js';
 import classnames from 'classnames';
@@ -170,6 +171,9 @@ class Downloads extends Component{
 			oldMac: installData.oldMac,
 			mobile: navigator.userAgent.includes('mobile')
 		};
+	}
+	componentDidMount(){
+		flexibility(document.documentElement);
 	}
 	render(){
 		let {featuredOS, featuredBrowser, arch, oldMac} = this.state;

@@ -1,7 +1,10 @@
 'use strict';
 
-//import {log as logger} from './Log.js';
-//var log = logger.Logger('Utils');
+import {log as logger} from './Log.js';
+var log = logger.Logger('Utils');
+
+import striptags from 'striptags';
+const maxFieldSummaryLength = window.zoteroConfig.maxFieldSummaryLength;
 
 let slugify = function(name){
 	var slug = name.trim();
@@ -148,6 +151,14 @@ let jsError = function(msg) {
 	document.querySelector('#js-message #js-message-list').appendChild(li);
 };
 
+let jsSuccess = function(msg) {
+	let li = document.createElement('li');
+	li.setAttribute('class', 'jsNotificationMessage-confirm');
+	let newContent = document.createTextNode(msg);
+	li.appendChild(newContent);
+	document.querySelector('#js-message #js-message-list').appendChild(li);
+};
+
 let Delay = function(delay, val) {
 	return new Promise(function (resolve) {
 		setTimeout(function () {
@@ -156,4 +167,173 @@ let Delay = function(delay, val) {
 	});
 };
 
-export {slugify, parseQuery, buildQuery, querystring, parseSearchString, readCookie, loadInitialState, pageReady, jsError, Delay};
+let getItemField = function(key, item){
+	switch(key) {
+		case 'title':
+			var title = '';
+			if(item.data.itemType == 'note'){
+				var len = 120;
+				var notetext = striptags(item.data.note);
+				var firstNewline = notetext.indexOf('\n');
+				if((firstNewline != -1) && firstNewline < len){
+					return notetext.substr(0, firstNewline);
+				}
+				else {
+					return notetext.substr(0, len);
+				}
+			} else {
+				title = item.data.title;
+			}
+			if(title === ''){
+				return '[Untitled]';
+			}
+			return title;
+		case 'creatorSummary':
+		case 'creator':
+			if(typeof item.meta.creatorSummary !== 'undefined'){
+				return item.meta.creatorSummary;
+			}
+			return '';
+		case 'year':
+			if(item.parsedDate) {
+				return item.parsedDate.getFullYear();
+			}
+			return '';
+	}
+
+	if(key in item.data){
+		return item.data[key];
+	} else if(key in item.meta){
+		return item.meta[key];
+	} else if(item.hasOwnProperty(key)){
+		return item[key];
+	}
+
+	return null;
+};
+
+//parse a Zotero API date
+let parseApiDate = function(datestr){
+	var re = /([0-9]+)-([0-9]+)-([0-9]+)T([0-9]+):([0-9]+):([0-9]+)Z/;
+	var matches = re.exec(datestr);
+	if(matches === null){
+		log.error(`error parsing api date: ${datestr}`, 2);
+		return null;
+	} else{
+		var date = new Date(Date.UTC(matches[1], matches[2]-1, matches[3], matches[4], matches[5], matches[6]));
+		return date;
+	}
+};
+
+//take an item (Zotero API v3 format) and output a named field for display
+let formatItemField = function(field, item, trim=false){
+	var intlOptions = {
+		year: 'numeric',
+		month: 'numeric',
+		day: 'numeric',
+		hour: 'numeric',
+		minute: 'numeric',
+		second: 'numeric',
+		hour12: false
+	};
+
+	var formatDate;
+	if(Intl) {
+		var dateFormatter = new Intl.DateTimeFormat(undefined, intlOptions);
+		formatDate = dateFormatter.format;
+	} else {
+		formatDate = function(date) {
+			return date.toLocaleString();
+		};
+	}
+
+	var trimLength = 0;
+	var formattedString = '';
+	var date;
+	if(maxFieldSummaryLength[field]){
+		trimLength = maxFieldSummaryLength[field];
+	}
+	switch(field){
+		case 'itemType':
+			formattedString = Zotero.localizations.typeMap[item.data.itemType];
+			break;
+		case 'dateModified':
+			if(!item.data['dateModified']){
+				formattedString = '';
+			}
+			date = parseApiDate(item.data['dateModified']);
+			if(date){
+				formattedString = formatDate(date);
+			} else{
+				formattedString = item.data['dateModified'];
+			}
+			break;
+		case 'dateAdded':
+			if(!item.data['dateAdded']){
+				formattedString = '';
+			}
+			date = parseApiDate(item.data['dateAdded']);
+			if(date){
+				formattedString = formatDate(date);
+			} else{
+				formattedString = item.data['dateAdded'];
+			}
+			break;
+		case 'title':
+			formattedString = getItemField('title', item);
+			break;
+		case 'creator':
+		case 'creatorSummary':
+			formattedString = getItemField('creatorSummary', item);
+			break;
+		case 'addedBy':
+			if(item.meta.createdByUser){
+				if(item.meta.createdByUser.name !== '') {
+					formattedString = item.meta.createdByUser.name;
+				} else {
+					formattedString = item.meta.createdByUser.username;
+				}
+			}
+			break;
+		case 'modifiedBy':
+			if(item.meta.lastModifiedByUser){
+				if(item.meta.lastModifiedByUser.name !== ''){
+					formattedString = item.meta.lastModifiedByUser.name;
+				} else {
+					formattedString = item.meta.lastModifiedByUser.username;
+				}
+			}
+			break;
+		default:
+		{
+			let fv = getItemField(field, item);
+			if(fv !== null && fv !== undefined) {
+				formattedString = fv;
+			}
+		}
+	}
+	if(typeof formattedString == 'undefined'){
+		log.error('formattedString for ' + field + ' undefined');
+		log.error(item);
+	}
+	if(trim) {
+		return trimString(formattedString, trimLength);
+	} else{
+		return formattedString;
+	}
+};
+
+let trimString = function(s, trimLength=35){
+	var formattedString = s;
+	if(typeof s == 'undefined'){
+		log.error('formattedString passed to trimString was undefined.');
+		return '';
+	}
+	if((trimLength > 0) && (formattedString.length > trimLength) ) {
+		return formattedString.slice(0, trimLength) + '…';
+	} else{
+		return formattedString;
+	}
+};
+
+export {slugify, parseQuery, buildQuery, querystring, parseSearchString, readCookie, loadInitialState, pageReady, jsError, jsSuccess, Delay, formatItemField};

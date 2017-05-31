@@ -27,6 +27,8 @@ import {Start} from './Start.js';
 import {Downloads} from './Downloads.js';
 import {ExtensionsPicker} from './ExtensionsPicker.js';
 import {CreateGroup} from './CreateGroup.js';
+import {GroupInfo} from './GroupInfo.js';
+import {RecentItems} from './RecentItems.js';
 import {ApiKeyEditor} from './ApiKeyEditor.js';
 import {pageReady, jsError} from './Utils.js';
 import {cycleTestCases, cycleTestFuncs} from './TestUtils.js';
@@ -43,6 +45,8 @@ let ZoteroWebComponents = {
 	Downloads,
 	ExtensionsPicker,
 	CreateGroup,
+	GroupInfo,
+	RecentItems,
 	ApiKeyEditor,
 	pageReady,
 	jsError,

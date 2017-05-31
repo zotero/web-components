@@ -14,7 +14,7 @@ let Validator = {
 		//'tag': /^[^#]*$/,
 		'libraryID': /^[0-9]+$/,
 		'libraryType': /^(user|group|)$/,
-		'target': /^(items?|collections?|tags|children|deleted|userGroups|key|settings|publications)$/,
+		'target': /^(items?|collections?|tags|children|deleted|userGroups|key|settings|publications|group)$/,
 		'targetModifier': /^(top|file|file\/view)$/,
 		
 		//get params
@@ -154,6 +154,9 @@ let apiRequestUrl = function(params){
 			break;
 		case 'publications':
 			url += '/publications/items';
+			break;
+		case 'group':
+			url = `${base}/groups/${params.libraryID}`;
 			break;
 		default:
 			return false;

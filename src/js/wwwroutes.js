@@ -16,8 +16,14 @@ let buildUrl = function(name, params){
 			return `/groups/inviteuser`;
 		case 'groupJoin':
 			return `/groups/${params.group.data.id}/join`;
+		case 'groupLeave':
+			return `/groups/${params.group.data.id}/leave`;
 		case 'groupDecline':
 			return `/groups/${params.group.data.id}/decline/${params.token}`;
+		case 'groupAcceptOwnership':
+			return `/groups/${params.group.data.id}/acceptownership`;
+		case 'groupDeclineInvitation':
+			return `/groups/${params.group.data.id}/decline`;
 		case 'groupView':
 			if(params.group.data.type == 'Private') {
 				return `/groups/${params.group.data.id}`;
@@ -47,6 +53,14 @@ let buildUrl = function(name, params){
 			return `/groups/checkname?input=${params.name}`;
 		case 'checkUsername':
 			return `/user/checkusername?username=${encodeURIComponent(params.username)}`;
+		case 'itemUrl':
+			if(params.item.library.type == 'group'){
+				return `/groups/${params.item.library.id}/${slugify(params.item.library.name)}/items/itemKey/${params.item.key}`;
+			} else if(params.item.library.type == 'user'){
+				return `/${slugify(params.item.library.name)}/items/itemKey/${params.item.key}`;
+			} else {
+				throw new Error('Unknown library type');
+			}
 		case 'registerAsync':
 			return '/user/registerasync';
 		case 'profileUrl':
@@ -60,6 +74,7 @@ let buildUrl = function(name, params){
 		case 'download':
 			return '/downloads';
 	}
+	throw new Error('Unknown route in buildUrl');
 };
 
 let groupImageSrc = function(groupID, purpose) {

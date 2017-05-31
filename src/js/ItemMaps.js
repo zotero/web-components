@@ -1,7 +1,7 @@
 'use strict';
 
-import {log as logger} from './Log.js';
-var log = logger.Logger('ItemMaps');
+//import {log as logger} from './Log.js';
+//var log = logger.Logger('ItemMaps');
 
 var ItemMaps = {};
 
@@ -117,7 +117,8 @@ ItemMaps.fieldMap = {
 	'note'					: 'Note',
 	'numChildren'			: '# of Children',
 	'addedBy'				: 'Added By',
-	'creator'				: 'Creator'
+	'creator'				: 'Creator',
+	'creatorSummary'		: 'Creators'
 };
 
 ItemMaps.typeMap = {
@@ -346,4 +347,4 @@ ItemMaps.cslTypeMap = {
 
 ItemMaps.citePaperJournalArticleURL = false;
 
-module.exports = ItemMaps;
+export {ItemMaps};

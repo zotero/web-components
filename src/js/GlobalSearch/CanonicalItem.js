@@ -4,7 +4,7 @@ import {log as logger} from '../Log.js';
 let log = logger.Logger('GlobalSearch:CanonicalSearchResult');
 
 let React = require('react');
-let ItemMaps = require('../ItemMaps');
+import {ItemMaps} from '../ItemMaps.js';
 
 import {ajax} from '../ajax.js';
 import JSONTree from 'react-json-tree';

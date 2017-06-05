@@ -4,7 +4,7 @@
 //let log = logger.Logger('LibraryItemSearchResult');
 
 let React = require('react');
-let ItemMaps = require('../ItemMaps');
+import {ItemMaps} from '../ItemMaps.js';
 
 class LibraryItem extends React.Component{
 	constructor(props){

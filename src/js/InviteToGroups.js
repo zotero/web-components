@@ -12,8 +12,6 @@ import {jsError} from './Utils.js';
 
 let React = require('react');
 
-const apiKey = window.zoteroConfig.apiKey;
-
 //component to list groups a user can invite another user to
 class InviteToGroups extends React.Component{
 	constructor(props){
@@ -45,9 +43,6 @@ class InviteToGroups extends React.Component{
 			return;
 		}
 
-		//headers for all requests
-		let headers = {'Zotero-Api-Key':apiKey};
-		
 		//load groups of user
 		let userGroupsUrl = apiRequestString({
 			'target':'userGroups',
@@ -55,7 +50,7 @@ class InviteToGroups extends React.Component{
 			'libraryID': userID,
 			'order':'title'
 		});
-		let userGroupsPromise = ajax({url: userGroupsUrl, credentials:'omit', headers:headers}).then((resp)=>{
+		let userGroupsPromise = ajax({url: userGroupsUrl, credentials:'omit'}).then((resp)=>{
 			return resp.json().then((data) => {
 				this.setState({
 					userGroups:data,
@@ -70,7 +65,7 @@ class InviteToGroups extends React.Component{
 		//load list of groups user has already been invited to
 		let alreadyInvitedUrl = `/user/${inviteeUserID}/alreadyinvited`;
 		
-		let alreadyInvitedPromise = ajax({url: alreadyInvitedUrl, headers:headers}).then((resp)=>{
+		let alreadyInvitedPromise = ajax({url: alreadyInvitedUrl}).then((resp)=>{
 			return resp.json().then((data) => {
 				this.setState({
 					alreadyInvited:data.alreadyInvited,

@@ -13,23 +13,7 @@ import classnames from 'classnames';
 import striptags from 'striptags';
 
 let React = require('react');
-/*
-let addMemberToGroup = function(group, userID) {
-	if(Array.isArray(group.members)){
-		group.members.push(userID);
-	} else {
-		group.members = [userID];
-	}
-};
 
-let removeMemberFromGroup = function(group, userID) {
-	if(Array.isArray(group.members)){
-		group.members = group.members.filter((val)=>{
-			return val != userID;
-		});
-	}
-};
-*/
 let allGroupMembers = function(group) {
 	let members = group.data.hasOwnProperty('members') ? group.data.members : [];
 	let admins = group.data.hasOwnProperty('admins') ? group.data.admins : [];

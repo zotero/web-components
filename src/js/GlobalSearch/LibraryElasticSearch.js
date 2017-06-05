@@ -17,14 +17,12 @@ let locationState = new LocationState();
 const baseSearchUrl = config.baseGlobalApiUrl;
 const baseApiUrl = 'https://api.zotero.org';
 
-var librarySearchUrl = function(type, entityID, query, apikey=''){
-	log.debug(apikey);
-	return `${baseSearchUrl}/${type}/${entityID}/items?q=${query}&key=${apikey}`;
+var librarySearchUrl = function(type, entityID, query){
+	return `${baseSearchUrl}/${type}/${entityID}/items?q=${query}`;
 };
 
-var savedSearchUrl = function(type, entityID, searchkey, apikey=''){
-	log.debug(apikey);
-	return `${baseApiUrl}/${type}/${entityID}/searches/${searchkey}?key=${apikey}`;
+var savedSearchUrl = function(type, entityID, searchkey){
+	return `${baseApiUrl}/${type}/${entityID}/searches/${searchkey}`;
 };
 
 var LibraryElasticSearch = React.createClass({
@@ -72,33 +70,19 @@ var LibraryElasticSearch = React.createClass({
 	loadSavedSearches: function(){
 		let type = this.state.libraryType;
 		let entityID = this.state.entityID;
-		let apiKey = '';
-		if(window.zoteroData && window.zoteroData.apiKey) {
-			apiKey = window.zoteroData.apiKey;
-		}
-
-		let url = `${baseApiUrl}/${type}/${entityID}/searches?key=${apiKey}`;
+		let url = `${baseApiUrl}/${type}/${entityID}/searches`;
 		ajax({url:url}).then((resp) => {
 			return resp.json().then((data) => {
-				log.debug('got searches');
-				log.debug(data);
 				this.setState({savedSearches:data});
 			});
 		});
 	},
 	search: function(evt=false){
-		log.debug('search');
-		log.debug(this.state);
 		if(evt){
 			evt.preventDefault();
 		}
 
-		let apiKey = '';
-		if(window.zoteroData && window.zoteroData.apiKey) {
-			apiKey = window.zoteroData.apiKey;
-		}
-		
-		let searchUrl = librarySearchUrl(this.state.libraryType, this.state.entityID, this.state.search, apiKey);
+		let searchUrl = librarySearchUrl(this.state.libraryType, this.state.entityID, this.state.search);
 		
 		if(this.state.searchkey != '') {
 			log.debug('using saved search');
@@ -124,7 +108,7 @@ var LibraryElasticSearch = React.createClass({
 			});
 			/*
 			//load saved search by key from api, the POST it to the search server
-			let ssurl = savedSearchUrl(this.state.libraryType, this.state.entityID, this.state.search, apiKey);
+			let ssurl = savedSearchUrl(this.state.libraryType, this.state.entityID, this.state.search);
 			ajax({url:ssurl}).then((resp) => {
 				//return just the saved search
 				log.debug(resp);

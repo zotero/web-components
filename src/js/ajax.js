@@ -6,6 +6,7 @@ var log = logger.Logger('ajax');
 import {readCookie} from './Utils.js';
 
 const zoteroConfig = window.zoteroConfig;
+const apiKey = zoteroConfig.apiKey;
 
 //perform a network request defined by config, and return a promise for a Response
 //resolve with a successful status (200-300) reject, but with the same Response object otherwise
@@ -17,6 +18,8 @@ let ajax = function(config){
 	if(config.withSession){
 		let sessionCookie = readCookie(zoteroConfig.sessionCookieName);
 		headersInit.Authorization = sessionCookie;
+	} else if(apiKey != ''){
+		headersInit['Zotero-Api-Key'] = apiKey;
 	}
 	let headers = new Headers(headersInit);
 

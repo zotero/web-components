@@ -103,7 +103,7 @@ let apiRequestUrl = function(params){
 				return url;
 			}
 			else if(params.collectionKey.indexOf(',') !== -1){
-				
+				//noop
 			}
 			else if(params.target != 'collections'){
 				url += '/collections/' + params.collectionKey;

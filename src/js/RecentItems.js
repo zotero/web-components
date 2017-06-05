@@ -12,8 +12,6 @@ import {LoadingSpinner} from './LoadingSpinner.js';
 
 let React = require('react');
 
-const apiKey = window.zoteroConfig.apiKey;
-
 class ItemTypeIcon extends React.PureComponent{
 	render(){
 		let c = `sprite-icon sprite-treeitem-${this.props.itemType} left`;
@@ -59,9 +57,8 @@ let loadRecentItems = function(group){
 		limit:10,
 		order:'dateModified'
 	});
-	let headers = {'Zotero-Api-Key':apiKey};
-
-	return ajax({url:url, credentials:'omit', headers:headers});
+	
+	return ajax({url:url, credentials:'omit'});
 };
 
 class RecentItems extends React.Component{
@@ -100,7 +97,7 @@ class RecentItems extends React.Component{
 				</th>
 			);
 		});
-		
+
 		let totalResults = null;
 		if(this.state.totalResults === 0){
 			totalResults = <p>There are no items in this collection</p>;

@@ -12,8 +12,6 @@ let React = require('react');
 const {Component} = React;
 import PropTypes from 'prop-types';
 
-const apiKey = window.zoteroConfig.apiKey;
-
 let accessMap = {
 	'all'     : {
 		'members' : 'Anyone can view, only members can edit',
@@ -239,8 +237,7 @@ class UserGroups extends Component{
 				'libraryID': userID,
 				'order':'title'
 			});
-			let headers = {'Zotero-Api-Key':apiKey};
-			ajax({url: url, credentials:'omit', headers:headers}).then((resp)=>{
+			ajax({url: url, credentials:'omit'}).then((resp)=>{
 				resp.json().then((data) => {
 					this.setState({
 						groups:data,

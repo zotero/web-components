@@ -68,7 +68,7 @@ class RecentItems extends React.Component{
 		this.state = {
 			loading:false,
 			items:this.props.items,
-			totalResults:this.props.totalResults
+			totalResults:parseInt(this.props.totalResults, 10)
 		};
 	}
 	componentWillMount() {

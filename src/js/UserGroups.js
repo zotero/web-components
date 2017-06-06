@@ -262,7 +262,7 @@ class UserGroups extends Component{
 		});
 
 		//render group explainer text if the user has no groups (or is not logged in)
-		if(this.state.groupsLoaded && groups.length == 0) {
+		if(this.state.groupsLoaded && groups.length == 0 && !titleOnly) {
 			return <GroupsExplainer />;
 		}
 

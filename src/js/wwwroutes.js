@@ -24,13 +24,10 @@ let buildUrl = function(name, params){
 			return `/groups/${params.group.data.id}/acceptownership`;
 		case 'groupDeclineInvitation':
 			return `/groups/${params.group.data.id}/decline`;
-		case 'groupView':
-			if(params.group.data.type == 'Private') {
-				return `/groups/${params.group.data.id}`;
-			} else {
-				let slug = slugify(params.group.data.name);
-				return `/groups/${slug}`;
-			}
+		case 'groupView':{
+			let slug = slugify(params.group.data.name);
+			return `/groups/${params.group.data.id}/${slug}`;
+		}
 		case 'groupLibrary':{
 			let groupView = buildUrl('groupView', params);
 			return `${groupView}/items`;

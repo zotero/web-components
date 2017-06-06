@@ -5,6 +5,7 @@ var log = logger.Logger('ApiRouter');
 
 const config = window.zoteroConfig;
 const base = config.baseApiUrl;
+import {readCookie} from './Utils.js';
 
 let Validator = {
 	patterns: {
@@ -193,7 +194,7 @@ let apiQueryString = function(passedParams){
 		passedParams['order'] = 'date';
 	}
 	if(config.sessionAuth) {
-		var sessionKey = Zotero.utils.readCookie(config.sessionCookieName);
+		var sessionKey = readCookie(config.sessionCookieName);
 		passedParams['session'] = sessionKey;
 	}
 	

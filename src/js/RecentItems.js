@@ -9,6 +9,8 @@ import {apiRequestString} from './ApiRouter.js';
 import {formatItemField} from './Utils.js';
 import {buildUrl} from './wwwroutes.js';
 import {LoadingSpinner} from './LoadingSpinner.js';
+import {groupIsReadable} from './GroupInfo.js';
+import {jsError} from './Utils.js';
 
 let React = require('react');
 
@@ -72,13 +74,23 @@ class RecentItems extends React.Component{
 		};
 	}
 	componentWillMount() {
-		if(this.state.items.length == 0){
+		let group = this.props.group;
+		//load items iff we have access
+		let userID = null;
+		if(Zotero.currentUser){
+			userID = Zotero.currentUser.userID;
+		}
+
+		if(groupIsReadable(group, userID) && this.state.items.length == 0){
 			this.setState({loading:true});
 			loadRecentItems(this.props.group).then((resp)=>{
 				resp.json().then((data) => {
 					let totalResults = resp.headers.get('Total-Results');
 					this.setState({loading:false, items:data, totalResults:totalResults});
 				});
+			}).catch(()=>{
+				this.setState({loading:false});
+				jsError('There was an error loading the group library. Please try again in a few minutes');
 			});
 		}
 	}

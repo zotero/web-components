@@ -318,4 +318,4 @@ class GroupInfo extends React.Component{
 	}
 }
 
-export {GroupMembershipActions, GroupInfo};
+export {GroupMembershipActions, GroupInfo, groupIsReadable};

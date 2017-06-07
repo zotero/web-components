@@ -21,10 +21,6 @@ var librarySearchUrl = function(type, entityID, query){
 	return `${baseSearchUrl}/${type}/${entityID}/items?q=${query}`;
 };
 
-var savedSearchUrl = function(type, entityID, searchkey){
-	return `${baseApiUrl}/${type}/${entityID}/searches/${searchkey}`;
-};
-
 var LibraryElasticSearch = React.createClass({
 	componentDidMount: function(){
 		if(this.state.search != ''){

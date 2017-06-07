@@ -1,7 +1,7 @@
 'use strict';
 
-import {log as logger} from './Log.js';
-let log = logger.Logger('RecentItems');
+//import {log as logger} from './Log.js';
+//let log = logger.Logger('RecentItems');
 
 import {ItemMaps} from './ItemMaps.js';
 import {ajax} from './ajax.js';
@@ -85,17 +85,23 @@ class RecentItems extends React.Component{
 			this.setState({loading:true});
 			loadRecentItems(this.props.group).then((resp)=>{
 				resp.json().then((data) => {
-					let totalResults = resp.headers.get('Total-Results');
+					let totalResults = parseInt(resp.headers.get('Total-Results'));
 					this.setState({loading:false, items:data, totalResults:totalResults});
 				});
 			}).catch(()=>{
 				this.setState({loading:false});
 				jsError('There was an error loading the group library. Please try again in a few minutes');
 			});
+		} else {
+			this.setState({notReadable:true});
 		}
 	}
 	render() {
-		log.debug(this.state.items);
+		if(this.state.notReadable === true){
+			return (
+				<p>Library will be viewable after joining this group.</p>
+			);
+		}
 		let itemRows = this.state.items.map((item)=>{
 			return (
 				<RecentItemRow key={item.key} displayFields={this.props.displayFields} item={item} />
@@ -110,9 +116,23 @@ class RecentItems extends React.Component{
 			);
 		});
 
+		let table = (
+			<table id='field-table' ref="itemsTable" className='wide-items-table table table-striped'>
+				<thead>
+					<tr>
+						{headers}
+					</tr>
+				</thead>
+				<tbody>
+					{itemRows}
+				</tbody>
+			</table>
+		);
+
 		let totalResults = null;
 		if(this.state.totalResults === 0){
-			totalResults = <p>There are no items in this collection</p>;
+			table = null;
+			totalResults = <p>There are not yet any items in this collection</p>;
 		} else if(this.state.totalResults){
 			totalResults = (
 				<p>See all {this.state.totalResults} items for this group in the <a href={buildUrl('groupLibrary', {group:this.props.group})}>Group Library</a>.
@@ -122,16 +142,7 @@ class RecentItems extends React.Component{
 
 		return (
 			<div>
-				<table id='field-table' ref="itemsTable" className='wide-items-table table table-striped'>
-					<thead>
-						<tr>
-							{headers}
-						</tr>
-					</thead>
-					<tbody>
-						{itemRows}
-					</tbody>
-				</table>
+				{table}
 				{totalResults}
 				<LoadingSpinner loading={this.state.loading} />
 			</div>

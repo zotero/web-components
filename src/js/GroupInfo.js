@@ -1,11 +1,11 @@
 'use strict';
 
-import {log as logger} from './Log.js';
-let log = logger.Logger('GroupInfo');
+//import {log as logger} from './Log.js';
+//let log = logger.Logger('GroupInfo');
 
 import {Notifier} from './Notifier.js';
 import {ajax, postFormData} from './ajax.js';
-import {LoadingSpinner} from './LoadingSpinner.js';
+//import {LoadingSpinner} from './LoadingSpinner.js';
 import {buildUrl} from './wwwroutes.js';
 import {apiRequestString} from './ApiRouter.js';
 import {jsError, jsSuccess} from './Utils.js';
@@ -140,13 +140,13 @@ class GroupMembershipActions extends React.Component{
 		});
 	}
 	ignoreInvite(){
-		log.debug('ignoreInvite');
+		//log.debug('ignoreInvite');
 		if(!this.state.pending || (this.state.pending.invitation != '1')){
 			throw new Error('ignoreInvite called without pending invitation');
 		}
 		let token = this.state.pending.token;
 		let ignoreUrl = buildUrl('groupDeclineInvitation', {group:this.props.group, token:token});
-		log.debug(`posting ignore: ${ignoreUrl}`);
+		//log.debug(`posting ignore: ${ignoreUrl}`);
 		postFormData(ignoreUrl, {ajax:true, token:token}).then((resp)=>{
 			return resp.json().then((data) => {
 				if(data.success === true){
@@ -166,7 +166,7 @@ class GroupMembershipActions extends React.Component{
 		}
 		let group = this.props.group;
 		let member = allGroupMembers(group).includes(Zotero.currentUser.userID);
-		log.debug(`member is ${member} in GroupMembershipActions render`);
+		//log.debug(`member is ${member} in GroupMembershipActions render`);
 
 		let controls = null;
 		if(group.data.owner == Zotero.currentUser.userID){
@@ -225,16 +225,17 @@ class GroupInfo extends React.Component{
 		this.refreshGroup = this.refreshGroup.bind(this);
 	}
 	refreshGroup(){
-		log.debug('GroupInfo refreshGroup');
+		//log.debug('GroupInfo refreshGroup');
 		let groupID = this.props.group.id;
 		let groupUrl = apiRequestString({target:'group', libraryType:'group', libraryID:groupID});
 		ajax({url:groupUrl, credentials:'omit'}).then((resp)=>{
-			log.debug(resp);
+			//log.debug(resp);
 			resp.json().then((data)=>{
 				this.setState({group:data});
 			});
 		}).catch(()=>{
-			log.debug('error refreshing group');
+			jsError('There was an error loading the updated group information');
+			//log.debug('error refreshing group');
 		});
 	}
 	render(){

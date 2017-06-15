@@ -2,7 +2,7 @@
 // Extensions picker
 // --------------------------------------------------
 
-#extensions-picker {
+.extensions-picker {
 
 	// Jumbotron
 	.jumbotron {
@@ -105,7 +105,7 @@
 			display: inline-block;
 			width: 48px;
 			height: 48px;
-			background: url("../assets/images/extensions/icon-plus.svg") no-repeat 0 0;
+			background: url($staticPath + "/images/extensions/icon-plus.svg") no-repeat 0 0;
 			vertical-align: middle;
 			margin: 0 15px 0 16px;
 		}

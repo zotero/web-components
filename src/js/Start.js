@@ -213,7 +213,7 @@ class RegisterForm extends Component{
 					<FormFieldErrorMessage message={this.state.formErrors['password2']} />
 					<div className="g-recaptcha" data-sitekey={recaptchaSitekey}></div>
 					<FormFieldErrorMessage message={this.state.formErrors['recaptcha']} />
-					<button type='button' onClick={this.register}>Register</button>
+					<button type='button' className='btn' onClick={this.register}>Register</button>
 				</VerticalExpandable>
 			</div>
 		);
@@ -274,7 +274,9 @@ class Start extends Component{
 				<div className='install-success-div'>
 					<h1>Success! You installed Zotero!</h1>
 				</div>
-				<InstallConnectorPrompt ref='installConnectorPrompt' numbered={true} />
+				<div className='extensions-picker'>
+					<InstallConnectorPrompt ref='installConnectorPrompt' numbered={true} />
+				</div>
 				<RegisterForm ref='registerForm' />
 				<PostRegisterGuide ref='postRegisterGuide' />
 			</div>

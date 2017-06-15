@@ -11,7 +11,7 @@ import {InstallConnectorPrompt} from './InstallConnector.js';
 class ExtensionsPicker extends Component {
 	render(){
 		return (
-			<div id='extensions-container'>
+			<div id='extensions-container' className='extensions-picker'>
 				<InstallConnectorPrompt showStandalone={true} ref="installConnectorPrompt" />
 			</div>
 		);

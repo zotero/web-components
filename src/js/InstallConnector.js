@@ -264,7 +264,7 @@ class InstallConnectorPrompt extends Component{
 		});
 
 		let showExtensionsLink = (
-			<p className={classnames('show-extensions', {'fade-out':this.state.showingAllExtensions, 'visually-hidden':this.state.allExtensionsShown})}>
+			<p className={classnames('show-extensions', {'fade-out':this.state.showingAllExtensions})}>
 				{otherBrowserImages}<br />
 				Not using {this.state.browser}?<br />
 				<a href='#' onClick={this.showAllExtensions}>Show all extensions</a>

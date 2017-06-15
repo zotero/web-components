@@ -58,7 +58,7 @@ let groupIsWritable = function(group, userID) {
 class IntroVideo extends Component{
 	render(){
 		return (
-			<video id='group-intro-screencast' src="/static/videos/group_intro.m4v" controls='true' height='450px' poster='/static/images/group/playvideo.jpg'>
+			<video id='group-intro-screencast' src="static/videos/group_intro.m4v" controls='true' height='450px' poster='static/images/group/playvideo.jpg'>
 				Sorry, your browser doesn't support embedded videos.
 			</video>
 		);
@@ -216,8 +216,12 @@ class UserGroups extends Component{
 			userID:false,
 			groupsLoaded:false
 		};
+		this.loadGroups = this.loadGroups.bind(this);
 	}
-	componentDidMount(){
+	loadGroups(evt){
+		if(evt){
+			evt.preventDefault();
+		}
 		let userID = false;
 		if(this.props.userID){
 			userID = this.props.userID;
@@ -229,25 +233,33 @@ class UserGroups extends Component{
 			});
 		}
 		if(userID){
-			log.debug(`loading groups for user ${userID}`);
 			this.setState({loading:true});
 			let url = apiRequestString({
 				'target':'userGroups',
 				'libraryType':'user',
 				'libraryID': userID,
-				'order':'title'
+				'order':'title',
+				'limit':25,
+				'start':(this.state.groupsLoaded ? this.state.groups.length : 0)
 			});
 			ajax({url: url, credentials:'omit'}).then((resp)=>{
+				let totalResults = parseInt(resp.headers.get('Total-Results'));
 				resp.json().then((data) => {
+					let groups = this.state.groups;
+					groups = groups.concat(data);
 					this.setState({
-						groups:data,
+						groups:groups,
 						userID: userID,
 						loading:false,
-						groupsLoaded:true
+						groupsLoaded:true,
+						totalResults:totalResults
 					});
 				});
 			});
 		}
+	}
+	componentDidMount(){
+		this.loadGroups();
 	}
 	render(){
 		let groups = this.state.groups;
@@ -261,6 +273,11 @@ class UserGroups extends Component{
 			);
 		});
 
+		let moreLink = null;
+		if(this.state.groupsLoaded && this.state.totalResults > groups.length){
+			moreLink = <a href='#' onClick={this.loadGroups}>More</a>;
+		}
+
 		//render group explainer text if the user has no groups (or is not logged in)
 		if(this.state.groupsLoaded && groups.length == 0 && !titleOnly) {
 			return <GroupsExplainer />;
@@ -270,6 +287,7 @@ class UserGroups extends Component{
 			<div id="user-groups-div" className="user-groups">
 				{groupNuggets}
 				<LoadingSpinner loading={this.state.loading} />
+				{moreLink}
 			</div>
 		);
 	}

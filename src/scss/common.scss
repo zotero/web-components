@@ -49,7 +49,8 @@ $screen-sm-min: 768px;
 }
 
 // Lighter font rendering in OS X / macOS
-body {
+[data-reactroot],
+.extensions {
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }

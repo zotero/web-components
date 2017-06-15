@@ -1,7 +1,10 @@
+div#start-container.extensions {
+	animation:none;
+}
 div#start-container {
 	width: calc(100% + 80px);
 	margin-left:-40px;
-	
+
 	div.content {
 		width:80%;
 		margin-left:auto;
@@ -29,8 +32,8 @@ div#start-container {
 		color: $white;
 		background: $link-color;
 		text-decoration: none;
-		border-radius: 3px;
-		padding: 5px 15px;
+		border-radius: 4px;
+		padding: 9px 23px;
 
 		&:hover {
 			background: darken($link-color, 5%);

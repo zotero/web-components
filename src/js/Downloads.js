@@ -174,6 +174,7 @@ class Downloads extends Component{
 	}
 	componentDidMount(){
 		flexibility(document.documentElement);
+		document.documentElement.className += ' react-mounted';
 	}
 	render(){
 		let {featuredOS, featuredBrowser, arch, oldMac} = this.state;

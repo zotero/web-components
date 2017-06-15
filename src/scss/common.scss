@@ -4,7 +4,14 @@
 
 // Paths
 $staticPath: '../assets';
+//$staticPath: '/static';
 
+html .react {
+	display:none;
+}
+html.react-mounted .react {
+	display:block;
+}
 // Colors
 
 $white:				  #fff;

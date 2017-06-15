@@ -268,9 +268,12 @@ class PostRegisterGuide extends Component{
 }
 
 class Start extends Component{
+	componentDidMount(){
+		document.documentElement.className += ' react-mounted';
+	}
 	render(){
 		return (
-			<div id='start-container'>
+			<div id='start-container' className='extensions react'>
 				<div className='install-success-div'>
 					<h1>Success! You installed Zotero!</h1>
 				</div>

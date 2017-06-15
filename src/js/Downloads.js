@@ -134,7 +134,7 @@ class DownloadConnector extends Component {
 	render(){
 		return (
 			<section className='connector'>
-				<img className='download-image' src={browserExtensionImagePath} srcSet={`${browserExtensionImagePath2x} 2x`} />
+				<img className='download-image' width='162' height='150' src={browserExtensionImagePath} srcSet={`${browserExtensionImagePath2x} 2x`} />
 				<h1>Browser Extension</h1>
 				<p className='lead'>Get Zotero connectors for your browser</p>
 				<div className='downloadButton'><a href={buildUrl('extensions')} className='btn'>Download</a></div>
@@ -149,7 +149,7 @@ class DownloadPlugins extends Component {
 		return (
 			<section className='plugins'>
 				<div className='plugins-container clearfix'>
-					<img className='plugins-icon' src={pluginsIconImagePath} />
+					<img className='plugins-icon' width='116' height='120' src={pluginsIconImagePath} />
 					<h1>Plugins</h1>
 					<p>
 						Install one of the many third-party plugins and become even more productive.<br />

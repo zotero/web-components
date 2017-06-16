@@ -111,7 +111,7 @@ class DownloadStandalone extends Component {
 		return (
 			<section className='standalone'>
 				<ZoteroIcon
-					size='large'
+					context='downloads'
 					alt='Zotero Extension'
 					className='download-image'
 					width='147'

@@ -167,6 +167,7 @@ class BrowserExtensionIcon extends Component{
 					height="128" />
 				<span className="icon-plus"></span>
 				<ZoteroIcon
+					context='extensions'
 					size="large"
 					alt="Zotero Extension"
 					width="128"
@@ -284,6 +285,7 @@ class InstallConnectorPrompt extends Component{
 			getStandaloneSection = (
 				<p className='get-zotero-standalone'>
 					<ZoteroIcon
+						context='extensions'
 						size="small"
 						width="32"
 						height="35"

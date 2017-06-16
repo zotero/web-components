@@ -14,6 +14,12 @@ const imagePath = config.imagePath;
 class ZoteroIcon extends Component {
 	render() {
 		let iconImagePath = imagePath + '/extensions/zotero-icon';
+		//allow specific context for icon if needed
+		if(this.props.context == 'extensions') {
+			iconImagePath = imagePath + '/extensions/zotero-icon';
+		} else if(this.props.context == 'downloads') {
+			iconImagePath = imagePath + '/downloads/zotero-icon';
+		}
 		if(this.props.size == 'small'){
 			iconImagePath += '-small';
 		} else if(this.props.size == 'large'){
@@ -24,6 +30,7 @@ class ZoteroIcon extends Component {
 
 		let p = {...this.props, src:iconImagePath, srcSet:`${iconImagePath2x} 2x`, className:classnames('zotero-icon', this.props.className)};
 		delete p.browser;
+		delete p.context;
 		return (<img {...p} />);
 	}
 }

@@ -4,6 +4,9 @@
 //let log = logger.Logger('NewGroupDiscussions');
 
 import {ajax} from './ajax.js';
+import {getCurrentUser} from './Utils.js';
+
+const currentUser = getCurrentUser();
 
 let React = require('react');
 
@@ -15,7 +18,7 @@ class NewGroupDiscussions extends React.Component{
 		};
 	}
 	componentDidMount(){
-		if(Zotero.currentUser){
+		if(currentUser){
 			ajax({url:'/groups/newgroupdiscussions'}).then((resp)=>{
 				resp.text().then((data) => {
 					this.setState({partial:data});
@@ -24,7 +27,7 @@ class NewGroupDiscussions extends React.Component{
 		}
 	}
 	render() {
-		if(!Zotero.currentUser){
+		if(!currentUser){
 			return null;
 		}
 		let partialHtml = {__html: this.state.partial};

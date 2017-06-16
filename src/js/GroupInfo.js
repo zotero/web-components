@@ -8,11 +8,13 @@ import {ajax, postFormData} from './ajax.js';
 //import {LoadingSpinner} from './LoadingSpinner.js';
 import {buildUrl} from './wwwroutes.js';
 import {apiRequestString} from './ApiRouter.js';
-import {jsError, jsSuccess} from './Utils.js';
+import {jsError, jsSuccess, getCurrentUser} from './Utils.js';
 import classnames from 'classnames';
 import striptags from 'striptags';
 
 let React = require('react');
+
+const currentUser = getCurrentUser();
 
 let allGroupMembers = function(group) {
 	let members = group.data.hasOwnProperty('members') ? group.data.members : [];
@@ -161,15 +163,15 @@ class GroupMembershipActions extends React.Component{
 		});
 	}
 	render(){
-		if(!Zotero.currentUser){
+		if(!currentUser){
 			return null;
 		}
 		let group = this.props.group;
-		let member = allGroupMembers(group).includes(Zotero.currentUser.userID);
+		let member = allGroupMembers(group).includes(currentUser.userID);
 		//log.debug(`member is ${member} in GroupMembershipActions render`);
 
 		let controls = null;
-		if(group.data.owner == Zotero.currentUser.userID){
+		if(group.data.owner == currentUser.userID){
 			controls = null;
 		} else if(this.state.ownershipInvitation){
 			controls = (
@@ -269,11 +271,11 @@ class GroupInfo extends React.Component{
 		}
 
 		let libraryAccess;
-		if(!Zotero.currentUser){
+		if(!currentUser){
 			libraryAccess = 'None';
-		} else if(groupIsWritable(group, Zotero.currentUser.userID)){
+		} else if(groupIsWritable(group, currentUser.userID)){
 			libraryAccess = 'You can view and edit';
-		} else if(groupIsReadable(group, Zotero.currentUser.userID)){
+		} else if(groupIsReadable(group, currentUser.userID)){
 			libraryAccess = 'You can only view';
 		} else {
 			libraryAccess = 'None';

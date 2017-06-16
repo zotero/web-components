@@ -4,6 +4,9 @@ import {log as logger} from './Log.js';
 let log = logger.Logger('GroupInvitations');
 
 import {ajax, postFormData} from './ajax.js';
+import {getCurrentUser} from './Utils.js';
+
+const currentUser = getCurrentUser();
 
 let React = require('react');
 
@@ -84,7 +87,7 @@ class GroupInvitations extends React.Component{
 		this.loadInvitations();
 	}
 	loadInvitations() {
-		if(Zotero.currentUser){
+		if(currentUser){
 			ajax({url:'/groups/invitations'}).then((resp)=>{
 				resp.json().then((data) => {
 					let invitationGroups = {};

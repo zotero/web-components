@@ -336,4 +336,12 @@ let trimString = function(s, trimLength=35){
 	}
 };
 
-export {slugify, parseQuery, buildQuery, querystring, parseSearchString, readCookie, loadInitialState, pageReady, jsError, jsSuccess, Delay, formatItemField};
+let getCurrentUser = function(){
+	if(window.zoteroData && window.zoteroData.currentUser) {
+		return window.zoteroData.currentUser;
+	} else if(window.Zotero && window.Zotero.currentUser) {
+		return window.Zotero.currentUser;
+	}
+};
+
+export {slugify, parseQuery, buildQuery, querystring, parseSearchString, readCookie, loadInitialState, pageReady, jsError, jsSuccess, Delay, formatItemField, getCurrentUser};

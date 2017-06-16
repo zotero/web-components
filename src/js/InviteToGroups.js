@@ -8,7 +8,9 @@ import {apiRequestString} from './ApiRouter.js';
 import {LoadingSpinner} from './LoadingSpinner.js';
 import {buildUrl} from './wwwroutes.js';
 import {VerticalExpandable} from './VerticalExpandable.js';
-import {jsError} from './Utils.js';
+import {jsError, getCurrentUser} from './Utils.js';
+
+const currentUser = getCurrentUser();
 
 let React = require('react');
 
@@ -35,8 +37,8 @@ class InviteToGroups extends React.Component{
 		let inviteeUserID = this.props.invitee.userID;
 		if(this.props.userID){
 			userID = this.props.userID;
-		} else if(Zotero.currentUser){
-			userID = Zotero.currentUser.userID;
+		} else if(currentUser){
+			userID = currentUser.userID;
 		}
 
 		if(!userID || !inviteeUserID){

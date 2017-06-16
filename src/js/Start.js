@@ -17,11 +17,13 @@ const arrowDownGrayImagePath = imagePath + '/start/arrow-down-gray.svg';
 const arrowDownWhiteImagePath = imagePath + '/start/arrow-down-white.svg';
 
 import {ajax, postFormData} from './ajax.js';
-import {slugify} from './Utils.js';
+import {slugify, getCurrentUser} from './Utils.js';
 import {buildUrl} from './wwwroutes.js';
 import {Notifier} from './Notifier.js';
 import {VerticalExpandable} from './VerticalExpandable.js';
 import {InstallConnectorPrompt} from './InstallConnector.js';
+
+const currentUser = getCurrentUser();
 
 class ArrowDownGray extends Component{
 	render(){
@@ -178,7 +180,6 @@ class RegisterForm extends Component{
 		let profileUrl = buildUrl('profileUrl', {slug});
 		let previewClass = 'profile-preview ' + this.state.usernameValidity;
 		
-		let currentUser = window.Zotero.currentUser;
 		if(currentUser) {
 			return (
 				<div id='register-section'>

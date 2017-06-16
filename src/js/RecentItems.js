@@ -6,11 +6,13 @@
 import {ItemMaps} from './ItemMaps.js';
 import {ajax} from './ajax.js';
 import {apiRequestString} from './ApiRouter.js';
-import {formatItemField} from './Utils.js';
+import {formatItemField, getCurrentUser} from './Utils.js';
 import {buildUrl} from './wwwroutes.js';
 import {LoadingSpinner} from './LoadingSpinner.js';
 import {groupIsReadable} from './GroupInfo.js';
 import {jsError} from './Utils.js';
+
+const currentUser = getCurrentUser();
 
 let React = require('react');
 
@@ -77,8 +79,8 @@ class RecentItems extends React.Component{
 		let group = this.props.group;
 		//load items iff we have access
 		let userID = null;
-		if(Zotero.currentUser){
-			userID = Zotero.currentUser.userID;
+		if(currentUser){
+			userID = currentUser.userID;
 		}
 
 		if(groupIsReadable(group, userID) && this.state.items.length == 0){

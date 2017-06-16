@@ -7,6 +7,9 @@ import {ajax} from './ajax.js';
 import {apiRequestString} from './ApiRouter.js';
 import {LoadingSpinner} from './LoadingSpinner.js';
 import {buildUrl} from './wwwroutes.js';
+import {getCurrentUser} from './Utils.js';
+
+const currentUser = getCurrentUser();
 
 let React = require('react');
 const {Component} = React;
@@ -182,7 +185,7 @@ GroupNugget.propTypes = {
 class GroupsExplainer extends Component{
 	render(){
 		let nonUserLink = null;
-		if(!Zotero.currentUser){
+		if(!currentUser){
 			nonUserLink =  (
 				<div className="login-links">
 					<a href="/user/register"><b>Sign up now</b></a> or <a href="/user/login">log in</a>
@@ -225,8 +228,8 @@ class UserGroups extends Component{
 		let userID = false;
 		if(this.props.userID){
 			userID = this.props.userID;
-		} else if(Zotero.currentUser){
-			userID = Zotero.currentUser.userID;
+		} else if(currentUser){
+			userID = currentUser.userID;
 		} else {
 			this.setState({
 				groupsLoaded:true

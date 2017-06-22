@@ -58,8 +58,10 @@
 
 		h1 {
 			font-size: 30px;
+			margin-top: 180px;
 			margin-bottom: 8px;
 			letter-spacing: -1px;
+			white-space: nowrap;
 
 			@media (min-width: 1040px) {
 				font-size: 36px;
@@ -86,6 +88,7 @@
 		background-color: $gray-lightest;
 		background-image: linear-gradient($white 0%, $gray-lightest 33%);
 		padding: 0 20px 57px; // 64px
+		position: relative;
 
 		@media (min-width: $screen-sm-min) {
 			padding: 0 20px 89px; // 96px
@@ -94,14 +97,12 @@
 	}
 
 	.download-image {
-		display: block;
-		margin: 0 auto;
+		position: absolute;
 	}
 
 	.version-note {
 		font-size: 12px;
 		line-height: 1.42857143; // Reset
-		color: $slate;
 		margin: 12px 0 -36px 0;
 
 		@media (min-width: $screen-sm-min) {
@@ -111,15 +112,10 @@
 
 	.standalone {
 		.download-image {
-			margin-bottom: 14px; // 32px
-
-			@media (min-width: 1040px) {
-				margin-bottom: 29px; // 48px
-			}
+			left: calc(50% - 74px);
 		}
 
 		.other-versions {
-			color: $slate;
 			margin: 37px 0 0 0;
 		}
 
@@ -147,17 +143,13 @@
 		}
 
 		.download-image {
-			margin-bottom: 24px;
-
-			@media (min-width: 1040px) {
-				margin-bottom: 39px; // align h1
-			}
+			left: calc(50% - 64px);
+			top: 18px;
 		}
 
 		.description {
-			font-size: 14px;
-			margin: 14px auto 0;
-			color: $slate;
+			font-size: 13px;
+			margin: 37px auto 0;
 
 			@media (min-width: $screen-sm-min) {
 				max-width: 370px;

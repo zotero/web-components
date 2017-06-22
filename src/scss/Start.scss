@@ -117,16 +117,12 @@ div#post-register-guide {
 	padding-bottom:20px;
 }
 
-div#register-quick-links {
+ul#register-quick-links {
 	font-size: 1.3em;
-	text-align:center;
 
-	a {
-		text-decoration: none;
-	}
-
-	p {
-		margin:2px;
+	li {
+		list-style: none;
+		margin: 10px;
 	}
 }
 

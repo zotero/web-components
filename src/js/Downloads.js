@@ -25,6 +25,7 @@ const pluginsIconImagePath = imagePath + '/downloads/plugins-icon.svg';
 import {buildUrl} from './wwwroutes.js';
 
 import {BrowserDetect} from './browserdetect.js';
+import {BrowserIcon} from './Icons.js';
 
 class DownloadStandaloneButton extends Component {
 	render(){
@@ -45,8 +46,8 @@ class OtherDownloadLinkListItem extends Component {
 class DownloadStandalone extends Component {
 	render(){
 		let standaloneDownloadUrls = {
+			'macOS': macDownload,
 			'Windows': windowsDownload,
-			'Mac OS X': macDownload,
 			'Linux i686': linux32Download,
 			'Linux x86_64': linux64Download
 		};
@@ -58,10 +59,10 @@ class DownloadStandalone extends Component {
 
 		let featuredButton;
 		let otherVersions = [
+			'macOS',
 			'Windows',
-			'Mac OS X',
-			'Linux i686',
-			'Linux x86_64'
+			'Linux 32-bit',
+			'Linux 64-bit'
 		];
 		let OSLabel = featuredOS;
 		let versionNote = null;
@@ -69,30 +70,27 @@ class DownloadStandalone extends Component {
 		switch(featuredOS) {
 			case 'Windows':
 				featuredButton = <DownloadStandaloneButton href={standaloneDownloadUrls['Windows']} />;
-				otherVersions.splice(0, 1);
+				otherVersions.splice(1, 1);
 				break;
 			case 'Mac':
 				featuredButton = <DownloadStandaloneButton href={standaloneDownloadUrls['Mac']} />;
-				otherVersions.splice(1, 1);
+				otherVersions.splice(0, 1);
 				if(this.props.oldMac){
 					versionNote = (
 						<p className='version-note'>
-							Please note: The latest
-							version of Zotero will not run on macOS 10.6, which is no longer supported by any major
-							browser maker and no longer receives security updates from Apple. To install an outdated
-							version of Zotero, click the link above, or upgrade to macOS 10.11 (El Capitan) or later to
-							install the latest version. You can also use Zotero for Firefox with
-							{' '}
-							<a href="https://www.mozilla.org/en-US/firefox/organizations/">Firefox 45 ESR</a>
-							{' '}
-							until June 2017.
+							Please note: The latest version of Zotero will not run on macOS 10.6–10.8,
+							which are no longer supported by any major browser maker and no longer
+							receive security updates from Apple. To install an outdated version of
+							Zotero, click the link above, or upgrade to macOS 10.11 (El Capitan) or
+							later to install the latest version. All Macs running 10.8 can be upgraded
+							to at least 10.11.
 						</p>
 					);
 				}
 				break;
 			case 'Linux':
 				if(this.props.arch == 'x86_64'){
-					OSLabel = 'Linux 64-bit';
+					//OSLabel = 'Linux 64-bit';
 					featuredButton = <DownloadStandaloneButton href={standaloneDownloadUrls['Linux x86_64']} />;
 					otherVersions.splice(3, 1);
 				} else {
@@ -112,18 +110,20 @@ class DownloadStandalone extends Component {
 			<section className='standalone'>
 				<ZoteroIcon
 					context='downloads'
-					alt='Zotero Extension'
+					alt='Zotero'
 					className='download-image'
 					width='147'
 					height='160'
 				/>
-				<h1>Zotero 5.0 for {OSLabel}</h1>
+				<h1>Zotero for {OSLabel}</h1>
 				<p className='lead'>Your personal research assistant</p>
 				{featuredButton}
+				
 				<p className='other-versions'>Other versions</p>
 				<ul className='os-list'>
 					{otherNodes}
 				</ul>
+				<p><a href="/support/4.0">Looking for Zotero 4.0?</a></p>
 				{versionNote}
 			</section>
 		);
@@ -134,11 +134,17 @@ class DownloadConnector extends Component {
 	render(){
 		return (
 			<section className='connector'>
-				<img className='download-image' width='162' height='150' src={browserExtensionImagePath} srcSet={`${browserExtensionImagePath2x} 2x`} />
-				<h1>Browser Extension</h1>
-				<p className='lead'>Get Zotero connectors for your browser</p>
-				<div className='downloadButton'><a href={buildUrl('extensions')} className='btn'>Download</a></div>
-				<p className='description'>The Zotero Connector automatically senses content as you browse the web and allows you to save it to Zotero with a single click.</p>
+				<BrowserIcon
+					className='download-image'
+					alt={this.props.featuredBrowser + ' Icon'}
+					browser={this.props.featuredBrowser}
+					size="large"
+				/>
+				<h1>Zotero Connector</h1>
+				<p className='lead'>Save to Zotero from your browser</p>
+				<div className='downloadButton'><a href={buildUrl('extensions')} className='btn'>Install {this.props.featuredBrowser} Extension</a></div>
+				<p className='description'>Zotero Connectors automatically sense content as you browse the web and allow you to save it to Zotero with a single click.</p>
+				<p className='other-versions'><a href={buildUrl('extensions')}>Zotero Connectors for other browsers</a></p>
 			</section>
 		);
 	}

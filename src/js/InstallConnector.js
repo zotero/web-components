@@ -232,15 +232,15 @@ class InstallConnectorPrompt extends Component{
 		let versionNote = null;
 		switch(this.state.browser){
 			case 'Chrome':
-				connectorText = 'Chrome Extension';
+				connectorText = 'Zotero Connector for Chrome';
 				connectorImage = <BrowserExtensionIcon browser='chrome' />;
 				break;
 			case 'Firefox':
-				connectorText = 'Firefox Extension';
+				connectorText = 'Zotero Connector for Firefox';
 				connectorImage = <BrowserExtensionIcon browser='firefox' />;
 				break;
 			case 'Safari':
-				connectorText = 'Safari Extension';
+				connectorText = 'Zotero Connector for Safari';
 				connectorImage = <BrowserExtensionIcon browser='safari' />;
 				if(this.state.oldSafari){
 					versionNote = (
@@ -254,7 +254,7 @@ class InstallConnectorPrompt extends Component{
 				}
 				break;
 			case 'Opera':
-				connectorText = 'Opera Extension';
+				connectorText = 'Zotero Connector for Opera';
 				connectorImage = <BrowserExtensionIcon browser='opera' />;
 				break;
 		}
@@ -291,9 +291,9 @@ class InstallConnectorPrompt extends Component{
 						height="35"
 						alt=""/>
 					<br />
-					<a href={buildUrl('download')}>Get Zotero Standalone</a>
+					<a href={buildUrl('download')}>Get Zotero</a>
 					<br/>
-					for Mac, Windows, and Linux
+					For Mac, Windows, and Linux
 				</p>
 			);
 		}
@@ -312,6 +312,7 @@ class InstallConnectorPrompt extends Component{
 							<h1>{headerText}</h1>
 							<p className="lead">
 								<span className="line">Zotero Connectors allow you to save to Zotero</span>
+								{' '}
 								<span className="line">directly from your web browser.</span></p>
 							{installButton}
 							{versionNote}

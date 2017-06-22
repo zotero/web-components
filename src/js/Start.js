@@ -186,10 +186,10 @@ class RegisterForm extends Component{
 						<ArrowDownWhite />
 						<h1>2. Start syncing to take full advantage of Zotero</h1>
 						<div>
-							<p>It looks like you've already created an account. Now that you've installed Zotero, you can use it to&nbsp;
+							<p>It looks like you’ve already created an account. Now that you’ve installed Zotero, you can use it to{' '}
 								<a href="https://www.zotero.org/support/sync">sync and access your library from anywhere</a>.
-								It also lets you join <a href="https://www.zotero.org/support/groups">groups</a> and&nbsp;
-								<a href="https://www.zotero.org/support/sync#file_syncing">back up your all your attached files</a>.</p>
+								It also lets you join <a href="https://www.zotero.org/support/groups">groups</a> and{' '}
+								<a href="https://www.zotero.org/support/sync#file_syncing">back up all your attached files</a>.</p>
 						</div>
 					</div>
 				</div>
@@ -220,7 +220,7 @@ class RegisterForm extends Component{
 
 		let notifier = null;
 		if(this.state.registrationSuccessful){
-			let message = 'Thanks for registering. We\'ve sent an email to activate your account.';
+			let message = 'Thanks for registering. We’ve sent an email to activate your account.';
 			notifier = <Notifier type='success' message={message} />;
 		} else if(this.state.formError){
 			notifier = <Notifier type='error' message={this.state.formError} />;
@@ -231,10 +231,10 @@ class RegisterForm extends Component{
 				<div className='content'>
 					<ArrowDownWhite />
 					<h1>2. Register to take full advantage of Zotero</h1>
-					<p>If you haven't already created a Zotero account, please take a few moments to register now.
-					It's a <b>free</b> way to <a href="https://www.zotero.org/support/sync">sync and access your library from anywhere</a>,
-					and it lets you join <a href="https://www.zotero.org/support/groups">groups</a> and 
-					<a href="https://www.zotero.org/support/sync#file_syncing">back up your all your attached files</a>.
+					<p>If you haven’t already created a Zotero account, please take a few moments to register now.
+					It’s a <b>free</b> way to <a href="https://www.zotero.org/support/sync">sync and access your library from anywhere</a>,
+					and it lets you join <a href="https://www.zotero.org/support/groups">groups</a> and{' '}
+					<a href="https://www.zotero.org/support/sync#file_syncing">back up all your attached files</a>.
 					</p>
 					{registerForm}
 					{notifier}
@@ -252,16 +252,16 @@ class PostRegisterGuide extends Component{
 				<ArrowDownGray />
 				<img src={connectorButtonImagePath} />
 				<h1>3. Start building your library</h1>
-				<p>New to Zotero? Read the <a href={quickStartGuideUrl}>Quick Start Guide</a> and learn about all Zotero has to offer.</p>
-				<div id='register-quick-links'>
-					<p><a href="https://www.zotero.org/support/quick_start_guide">Read the Quick Start Guide</a></p>
-					<p><a href="https://www.zotero.org/support/getting_stuff_into_your_library">Add an item</a></p>
-					<p><a href="https://www.zotero.org/support/archive_the_web">Archive a webpage</a></p>
-					<p><a href="https://www.zotero.org/support/screencast_tutorials/manually_creating_items">Manually enter an item</a></p>
-					<p><a href="https://www.zotero.org/support/collections">Create a collection</a></p>
-					<p><a href="https://www.zotero.org/support/creating_bibliographies">Create a bibliography</a></p>
-					<p><a href="https://www.zotero.org/support/word_processor_plugin_usage">Use the Word or OpenOffice plugin</a></p>
-				</div>
+				<p>New to Zotero? Explore the documentation and try out some things you can do with Zotero:</p>
+				<ul id='register-quick-links'>
+					<li><a href="https://www.zotero.org/support/quick_start_guide">Read the Quick Start Guide</a></li>
+					<li><a href="https://www.zotero.org/support/getting_stuff_into_your_library">Add an item</a></li>
+					<li><a href="https://www.zotero.org/support/archive_the_web">Archive a webpage</a></li>
+					<li><a href="https://www.zotero.org/support/screencast_tutorials/manually_creating_items">Manually enter an item</a></li>
+					<li><a href="https://www.zotero.org/support/collections">Create a collection</a></li>
+					<li><a href="https://www.zotero.org/support/creating_bibliographies">Create a bibliography</a></li>
+					<li><a href="https://www.zotero.org/support/word_processor_plugin_usage">Use the Word or LibreOffice plugin</a></li>
+				</ul>
 			</div>
 		);
 	}

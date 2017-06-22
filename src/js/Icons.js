@@ -48,7 +48,7 @@ class BrowserIcon extends Component {
 		let browserImagePath2x = browserImagePath + '@2x.png';
 		browserImagePath += '.png';
 
-		let p = {...this.props, src:browserImagePath, srcSet:`${browserImagePath2x} 2x`, className:'browser-icon'};
+		let p = {...this.props, src:browserImagePath, srcSet:`${browserImagePath2x} 2x`, className:classnames('browser-icon', this.props.className)};
 		delete p.browser;
 		return (<img {...p} />);
 	}

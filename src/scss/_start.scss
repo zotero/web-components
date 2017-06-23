@@ -2,35 +2,18 @@
 	margin: 0 -40px;
 	text-align: center;
 
-	* {
-		box-sizing: border-box;
-	}
-
 	.container {
 		padding: 0 15px;
 	}
 
-	.btn {
-		color: $white;
-		background: $link-color;
-		text-decoration: none;
-		border-radius: 3px;
-		padding: 5px 15px;
-
-		&:hover {
-			background: darken($link-color, 5%);
-		}
+	h1 {
+		font-size: 30px;
+		line-height: 1.1;
+		margin: 0 0 16px;
 	}
 
-	h1 {
-		font-size: 24px;
-		margin: 19px auto 16px; // 32px
-
-		@media (min-width: $screen-sm-min) {
-			font-size: 36px;
-			margin-top: 27px; // 48px
-			letter-spacing: -1px;
-		}
+	img {
+		vertical-align: middle;
 	}
 
 	.install-success {
@@ -48,6 +31,17 @@
 		margin: 10px 0 48px; // 60px
 	}
 
+	.btn {
+		color: $white;
+		background: $link-color;
+		text-decoration: none;
+		border-radius: 3px;
+		padding: 5px 15px;
+
+		&:hover {
+			background: darken($link-color, 5%);
+		}
+	}
 
 	// Extensions picker on start page
 
@@ -69,6 +63,17 @@
 		.jumbotron {
 			padding: 0;
 
+			h1 {
+				font-size: 24px;
+				margin: 19px auto 16px; // 32px
+
+				@media (min-width: $screen-sm-min) {
+					font-size: 30px;
+					margin-top: 29px; // 48px
+					letter-spacing: -1px;
+				}
+			}
+
 			.show-extensions {
 				position: static;
 				text-align: center;
@@ -77,16 +82,130 @@
 		}
 	}
 
-
 	.register-section {
-		background: $gray-lightest;
+		background: url("../assets/images/start/arrow-down-white.svg") no-repeat center top $gray-lightest;
+		padding: 68px 0 65px; // 80px
 	}
-	
-	ul#register-quick-links {
-		li {
-			font-size: 1.3em;
-			list-style: none;
-			margin: 10px;
+
+	.post-register-guide {
+		background: url("../assets/images/start/arrow-down-gray.svg") no-repeat center top;
+		padding: 80px 0 72px; // 80px
+	}
+
+	.connector-button {
+		margin-bottom: 36px; // 48px
+	}
+
+	.register-quick-links {
+		list-style: none;
+		padding: 0;
+		margin: 43px 0 0; // 60px;
+		font-size: 16px;
+		line-height: 1.5;
+
+		@media (min-width: $screen-sm-min) {
+			font-size: 20px;
+		}
+
+		li + li {
+			margin-top: 5px;
+		}
+	}
+
+	#register-form {
+		margin-top: 54px; // 60px
+
+		.form-control,
+		.btn {
+			display: block;
+			margin: auto;
+			height: 48px;
+			font: {
+				family: inherit;
+				size: 20px;
+			}
+
+			@media (min-width: $screen-sm-min) {
+				max-width: 302px; // Adjust to captcha width
+			}
+		}
+
+		.form-control {
+			height: 48px;
+			padding: 13px 12px;
+			color: #222;
+			box-shadow: none;
+
+			&:focus {
+				border-color: mix($white, $link-color, 40%);
+				box-shadow: 0 0 0 2px mix($white, $link-color, 40%);
+			}
+		}
+
+		::-webkit-input-placeholder {
+			color: $slate;
+		}
+
+		::-moz-input-placeholder {
+			color: $slate;
+		}
+
+		::-ms-input-placeholder {
+			color: $slate;
+		}
+
+		.g-recaptcha {
+			width: 302px;
+			margin: auto;
+
+			@media (max-width: $screen-xs-max) {
+				transform-origin: left top;
+				transform: scale(0.96);
+			}
+		}
+
+		.btn {
+			width: 100%;
+
+			&:hover {
+				border-color: transparent;
+			}
+		}
+
+		p {
+			margin: 5px auto;
+
+			&:empty {
+				display: none;
+			}
+		}
+
+		.profile-preview {
+			color: #19a15f;
+
+			&.undecided {
+				color: inherit;
+			}
+
+			&.invalid {
+				color: #c00;
+			}
+		}
+
+		.username-message {
+			color: $slate;
+
+			@media (min-width: $screen-sm-min) {
+				width: 450px;
+				margin: {
+					left: auto;
+					right: auto;
+				}
+			}
+		}
+
+		.form-field-error {
+			color: #c00;
 		}
 	}
 }

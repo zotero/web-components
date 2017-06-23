@@ -182,7 +182,7 @@ class RegisterForm extends Component{
 		
 		if(currentUser) {
 			return (
-				<div id='register-section'>
+				<section className='register-section'>
 					<div className='content'>
 						<ArrowDownWhite />
 						<h1>2. Start syncing to take full advantage of Zotero</h1>
@@ -193,7 +193,7 @@ class RegisterForm extends Component{
 								<a href="https://www.zotero.org/support/sync#file_syncing">back up all your attached files</a>.</p>
 						</div>
 					</div>
-				</div>
+				</section>
 			);
 		}
 
@@ -228,7 +228,7 @@ class RegisterForm extends Component{
 		}
 
 		return (
-			<div id='register-section'>
+			<section className='register-section'>
 				<div className='content'>
 					<ArrowDownWhite />
 					<h1>2. Register to take full advantage of Zotero</h1>
@@ -240,7 +240,7 @@ class RegisterForm extends Component{
 					{registerForm}
 					{notifier}
 				</div>
-			</div>
+			</section>
 		);
 	}
 }
@@ -249,7 +249,7 @@ class PostRegisterGuide extends Component{
 	render(){
 		let quickStartGuideUrl = buildUrl('quickstartGuide');
 		return (
-			<div id='post-register-guide' className='content'>
+			<section id='post-register-guide' className='content'>
 				<ArrowDownGray />
 				<img src={connectorButtonImagePath} />
 				<h1>3. Start building your library</h1>
@@ -263,7 +263,7 @@ class PostRegisterGuide extends Component{
 					<li><a href="https://www.zotero.org/support/creating_bibliographies">Create a bibliography</a></li>
 					<li><a href="https://www.zotero.org/support/word_processor_plugin_usage">Use the Word or LibreOffice plugin</a></li>
 				</ul>
-			</div>
+			</section>
 		);
 	}
 }
@@ -274,13 +274,13 @@ class Start extends Component{
 	}
 	render(){
 		return (
-			<div id='start-container' className='extensions react'>
-				<div className='install-success-div'>
-					<h1>Success! You installed Zotero!</h1>
-				</div>
+			<div className='start react'>
+				<section>
+				<p className="install-success">Success! You installed Zotero!</p>
 				<div className='extensions-picker'>
 					<InstallConnectorPrompt ref='installConnectorPrompt' numbered={true} />
 				</div>
+				</section>
 				<RegisterForm ref='registerForm' />
 				<PostRegisterGuide ref='postRegisterGuide' />
 			</div>

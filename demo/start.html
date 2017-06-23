@@ -1,21 +1,21 @@
 <!DOCTYPE html>
-<html lang="en" class="no-js"> 
-    <head> 
+<html lang="en" class="no-js">
+    <head>
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="keywords" content="Zotero, research, tool, firefox, extension"/>
-        <meta name="description" content="Zotero is a powerful, easy-to-use research tool that 
-                                          helps you gather, organize, and analyze sources and then 
+        <meta name="description" content="Zotero is a powerful, easy-to-use research tool that
+                                          helps you gather, organize, and analyze sources and then
                                           share the results of your research."/>
-                
+
         <title>Zotero | </title>
         <link rel="shortcut icon" type="image/ico" href="/favicon.ico" />
-        
+
         <!-- css -->
-        <link rel="stylesheet" href="../assets/style.css" 
+        <link rel="stylesheet" href="../assets/style.css"
             type="text/css" media="screen" charset="utf-8"/>
-        <link rel="stylesheet" href="../assets/zotero_icons_sprite.css" 
+        <link rel="stylesheet" href="../assets/zotero_icons_sprite.css"
             type="text/css" media="screen" charset="utf-8"/>
         <link rel="stylesheet" href="../build/web-components.css" type="text/css" media="screen" charset="utf-8"/>
         <!-- set jsConfig on window.zoteroConfig -->
@@ -28,18 +28,18 @@
         <!-- Header -->
         <header role="banner" class="container">
             <div class="center container">
-                                                
+
                 <h1 id="logohead">
                     <a href="/"><img src="../assets/images/theme/zotero.png" alt="Zotero"></a>
                 </h1>
-            
+
             <div id="login-links">
                     <a href="https://www.zotero.org/user/login/" title="Log In">Log In</a>
                     <a href="https://www.zotero.org/user/register/" title="Register">Register</a>
             </div>
-            
+
             <a href="/settings/storage?ref=usb" class="button" id="purchase-storage-link"><img src="../assets/images/theme/archive.png" /> Upgrade Storage</a>
-            
+
             <div id="navbar" class="container">
                 <nav id="sitenav">
                     <ul>
@@ -65,9 +65,12 @@
         <div id="content">
             <div class="center container">
             <!-- Output the breadcrumb if it's set -->
-                        
+            <div id="breadcrumbs">
+              <a href="/">Home</a> &gt; Start
+            </div>
+
             <!-- Output any stored messages -->
-                                                                                                            
+
             <!-- hidden area for possible JS messages -->
             <div id="js-message">
                 <ul id="js-message-list">
@@ -229,7 +232,7 @@
         <footer>
             <div class="center container">
                     <img id="chnm-logo" src="../assets/images/theme/rrchnmlogo-gray.png" alt="Zotero">
-                <nav role="secondary">                 
+                <nav role="secondary">
                     <ul>
                         <!-- <li><a href="#">Give Us Feedback</a></li> -->
                         <li><a href="/blog/">Blog</a></li>
@@ -254,7 +257,7 @@
 
             </div>
         </footer>
-        
+
         <script type="text/javascript" charset="utf-8">
             if(typeof zoteroData == 'undefined'){
                 var zoteroData = {};

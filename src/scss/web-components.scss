@@ -1,18 +1,28 @@
 //
 // Zotero web components
-// ---------------------
+// --------------------------------------------------
 
 @import 'themes/light';
 
 @import 'common';
 
-@import '_spinner';
+@import 'spinner';
+
+
+// Scaffolding
+// --------------------------------------------------
+
+@import 'type';
+
+
+// Components
+// --------------------------------------------------
 
 @import 'Storage';
 @import 'GroupInvitations';
 @import 'InviteToGroup';
 @import 'UserGroups';
-@import 'Start';
+@import 'start';
 @import 'extensions';
 @import 'extensions-picker';
 @import 'downloads';

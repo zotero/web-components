@@ -155,7 +155,6 @@ class RegisterForm extends Component{
 		}
 		let profileUrl = buildUrl('profileUrl', {slug});
 		let previewClass = 'profile-preview ' + this.state.usernameValidity;
-		
 		if(currentUser) {
 			return (
 				<section className='register-section'>

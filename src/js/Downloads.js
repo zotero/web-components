@@ -1,7 +1,7 @@
 'use strict';
 
-//import {log as logger} from './Log.js';
-//let log = logger.Logger('Downloads');
+import {log as logger} from './Log.js';
+let log = logger.Logger('Downloads');
 
 const React = require('react');
 const {Component} = React;
@@ -9,23 +9,79 @@ const flexibility = require('flexibility');
 
 import {ZoteroIcon} from './Icons.js';
 import classnames from 'classnames';
+import {AllExtensionsSection} from './InstallConnector.js';
+import {VerticalExpandable} from './VerticalExpandable.js';
+import {ajax} from './ajax.js';
 
 const config = window.zoteroConfig;
 const installData = config.installData;
 
-const {windowsDownload, macDownload, linux32Download, linux64Download} = installData;
-
 const imagePath = config.imagePath;
-
-const browserExtensionImagePath = imagePath + '/downloads/browser-extension.png';
-const browserExtensionImagePath2x = imagePath + '/downloads/browser-extension@2x.png';
-
 const pluginsIconImagePath = imagePath + '/downloads/plugins-icon.svg';
 
 import {buildUrl} from './wwwroutes.js';
 
 import {BrowserDetect} from './browserdetect.js';
 import {BrowserIcon} from './Icons.js';
+
+let platforms = [
+	'mac',
+	'win32',
+	'linux-i686',
+	'linux-x86_64'
+];
+
+let platformMap = {
+	'macOS': 'mac',
+	'Windows': 'win32',
+	'Linux 32-bit': 'linux-i686',
+	'Linux 64-bit': 'linux-x86_64'
+};
+
+let genericClientDownloadUrl = function(platform='win32'){
+	//valid platforms are mac, win32, linux-i686, and linux-x86_64
+	return `https://www.zotero.org/download/standalone/dl?channel=release&platform=${platform}`;
+};
+
+let specificClientDownloadUrl = function(platform, version){
+	switch(platform){
+		case 'win32':
+			return `https://download.zotero.org/standalone/${version}/Zotero-${version}_setup.exe`;
+		case 'mac':
+			return `https://download.zotero.org/standalone/${version}/Zotero-${version}.dmg`;
+		case 'linux-i686':
+			return `https://download.zotero.org/standalone/${version}/Zotero-${version}_linux-i686.tar.bz2`;
+		case 'linux-x86_64':
+			return `https://download.zotero.org/standalone/${version}/Zotero-${version}_linux-x86_64.tar.bz2`;
+		default:
+			log.error('Invalid platform for downloadUrl');
+	}
+};
+
+let getManifest = function(platform){
+	let url = `https://www.zotero.org/download/standalone/manifests/release/updates-${platform}.json`;
+	return ajax(url).then((resp)=>{
+		resp.json().then((manifest)=>{
+			return manifest;
+		});
+	});
+};
+
+let getAllManifests = function(){
+	let promises = platforms.map((platform)=>{
+		return getManifest(platform);
+	});
+	return Promise.all(promises).then((manifests)=>{
+		return {
+			'mac':manifests[0],
+			'win32':manifests[1],
+			'linux-i686': manifests[2],
+			'linux-x86_64': manifests[3]
+		};
+	}).catch(()=>{
+		throw 'Error retrieving manifests';
+	});
+};
 
 class DownloadStandaloneButton extends Component {
 	render(){
@@ -44,14 +100,38 @@ class OtherDownloadLinkListItem extends Component {
 }
 
 class DownloadStandalone extends Component {
-	render(){
-		let standaloneDownloadUrls = {
-			'macOS': macDownload,
-			'Windows': windowsDownload,
-			'Linux i686': linux32Download,
-			'Linux x86_64': linux64Download
+	constructor(props){
+		super(props);
+		
+		let downloadUrls = {};
+		platforms.forEach((platform)=>{
+			downloadUrls[platform] = genericClientDownloadUrl(platform);
+		});
+		this.state = {
+			showOldVersions:false,
+			downloadUrls:downloadUrls,
+			versionSpecificUrls:false
 		};
-
+		this.showOldVersions = this.showOldVersions.bind(this);
+	}
+	componentDidMount(){
+		getAllManifests().then((manifests)=>{
+			let downloadUrls = {};
+			platforms.forEach((platform)=>{
+				let manifest = manifests[platform];
+				let version = manifest['version'];
+				downloadUrls[platform] = specificClientDownloadUrl(platform, version);
+			});
+			this.setState({downloadUrls:downloadUrls});
+		}).catch(()=>{
+			log.error('Error getting manifest files');
+		});
+	}
+	showOldVersions(evt){
+		this.setState({showOldVersions:true});
+		evt.preventDefault();
+	}
+	render(){
 		let featuredOS = this.props.featuredOS;
 		if(!['Windows', 'Mac', 'Linux'].includes(featuredOS)){
 			featuredOS = 'Windows';
@@ -68,12 +148,15 @@ class DownloadStandalone extends Component {
 		let versionNote = null;
 
 		switch(featuredOS) {
-			case 'Windows':
-				featuredButton = <DownloadStandaloneButton href={standaloneDownloadUrls['Windows']} />;
+			case 'Windows':{
+				let url = this.state.downloadUrls['win32'];
+				featuredButton = <DownloadStandaloneButton href={url} />;
 				otherVersions.splice(1, 1);
 				break;
-			case 'Mac':
-				featuredButton = <DownloadStandaloneButton href={standaloneDownloadUrls['Mac']} />;
+			}
+			case 'Mac':{
+				let url = this.state.downloadUrls['mac'];
+				featuredButton = <DownloadStandaloneButton href={url} />;
 				otherVersions.splice(0, 1);
 				if(this.props.oldMac){
 					versionNote = (
@@ -88,21 +171,24 @@ class DownloadStandalone extends Component {
 					);
 				}
 				break;
-			case 'Linux':
+			}
+			case 'Linux':{
 				if(this.props.arch == 'x86_64'){
-					//OSLabel = 'Linux 64-bit';
-					featuredButton = <DownloadStandaloneButton href={standaloneDownloadUrls['Linux x86_64']} />;
+					let url = this.state.downloadUrls['linux-x86_64'];
+					featuredButton = <DownloadStandaloneButton href={url} />;
 					otherVersions.splice(3, 1);
 				} else {
+					let url = this.state.downloadUrls['linux-i686'];
 					OSLabel = 'Linux 32-bit';
-					featuredButton = <DownloadStandaloneButton href={standaloneDownloadUrls['Linux i686']} />;
+					featuredButton = <DownloadStandaloneButton href={url} />;
 					otherVersions.splice(2, 1);
 				}
 				break;
+			}
 		}
 
 		let otherNodes = otherVersions.map((os)=>{
-			let downloadUrl = standaloneDownloadUrls[os];
+			let downloadUrl = this.state.downloadUrls[platformMap[os]];
 			return <OtherDownloadLinkListItem key={os} OS={os} href={downloadUrl} />;
 		});
 
@@ -123,14 +209,30 @@ class DownloadStandalone extends Component {
 				<ul className='os-list'>
 					{otherNodes}
 				</ul>
-				<p><a href="/support/4.0">Looking for Zotero 4.0?</a></p>
+				<p><a href="#" onClick={this.showOldVersions}>Looking for Zotero 4.0?</a></p>
 				{versionNote}
+				<VerticalExpandable expand={this.state.showOldVersions}>
+					<div>
+						Old Versions
+					</div>
+				</VerticalExpandable>
 			</section>
 		);
 	}
 }
 
 class DownloadConnector extends Component {
+	constructor(props){
+		super(props);
+		this.state = {
+			showAllExtensions:false
+		};
+		this.showAllExtensions = this.showAllExtensions.bind(this);
+	}
+	showAllExtensions(evt){
+		this.setState({showAllExtensions:true});
+		evt.preventDefault();
+	}
 	render(){
 		return (
 			<section className='connector'>
@@ -144,7 +246,10 @@ class DownloadConnector extends Component {
 				<p className='lead'>Save to Zotero from your browser</p>
 				<div className='downloadButton'><a href={buildUrl('extensions')} className='btn'>Install {this.props.featuredBrowser} Extension</a></div>
 				<p className='description'>Zotero Connectors automatically sense content as you browse the web and allow you to save it to Zotero with a single click.</p>
-				<p className='other-versions'><a href={buildUrl('extensions')}>Zotero Connectors for other browsers</a></p>
+				<p className='other-versions'><a href='#' onClick={this.showAllExtensions}>Zotero Connectors for other browsers</a></p>
+				<VerticalExpandable expand={this.state.showAllExtensions}>
+					<AllExtensionsSection except={this.props.featuredBrowser} type='full' />
+				</VerticalExpandable>
 			</section>
 		);
 	}
@@ -179,8 +284,10 @@ class Downloads extends Component{
 		};
 	}
 	componentDidMount(){
-		flexibility(document.documentElement);
-		document.documentElement.className += ' react-mounted';
+		if(typeof document != 'undefined'){
+			flexibility(document.documentElement);
+			document.documentElement.className += ' react-mounted';
+		}
 	}
 	render(){
 		let {featuredOS, featuredBrowser, arch, oldMac} = this.state;

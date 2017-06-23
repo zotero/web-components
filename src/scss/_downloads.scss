@@ -156,6 +156,30 @@
 				padding: 0 20px;
 			}
 		}
+
+		.all-extensions {
+			section.connector {
+				margin:0;
+				padding:0;
+			}
+			ul {
+				padding:0;
+			}
+			li {
+				list-style:none;
+				display:inline-block;
+				margin:8px;
+			}
+			.btn {
+				font-size:14px;
+				padding: 5px 15px;
+				min-width:35px;
+			}
+			h3 {
+				padding:0;
+				margin:0;
+			}
+		}
 	}
 
 	.plugins {

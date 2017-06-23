@@ -156,7 +156,6 @@ class RegisterForm extends Component{
 		let profileUrl = buildUrl('profileUrl', {slug});
 		let previewClass = 'profile-preview ' + this.state.usernameValidity;
 
-		let currentUser = window.Zotero.currentUser;
 		if(currentUser) {
 			return (
 				<section className='register-section'>

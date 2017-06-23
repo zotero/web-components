@@ -88,122 +88,139 @@
                         document.getElementById('react-start')
                     );
 
-                    let testStates = {
-                        test1: {
-                            formData:{
-                                username:'zotero@zotero.org',
-                                email:'',
-                                email2:'',
-                                password:'',
-                                password2:''
-                            },
-                            usernameValidity:'invalid',
-                            usernameMessage: 'Your email address can be used to log in to your Zotero account, but not as your username.',
-                            registrationSuccessful:false
+                    let tests = {
+                        test1: function(){
+							window.startElement.refs.registerForm.setState({
+                                formData:{
+                                    username:'zotero@zotero.org',
+                                    email:'',
+                                    email2:'',
+                                    password:'',
+                                    password2:''
+                                },
+                                usernameValidity:'invalid',
+                                usernameMessage: 'Your email address can be used to log in to your Zotero account, but not as your username.',
+                                registrationSuccessful:false
+                            });
                         },
-                        test2: {
-                            formData:{
-                                username:'valid-username',
-                                email:'',
-                                email2:'',
-                                password:'',
-                                password2:''
-                            },
-                            usernameValidity:'valid',
-                            usernameMessage: '',
-                            registrationSuccessful:false
+                        test2: function(){
+							window.startElement.refs.registerForm.setState({
+                                formData:{
+                                    username:'valid-username',
+                                    email:'',
+                                    email2:'',
+                                    password:'',
+                                    password2:''
+                                },
+                                usernameValidity:'valid',
+                                usernameMessage: '',
+                                registrationSuccessful:false
+                            });
                         },
-                        test3: {
-                            formData:{
-                                username:'fcheslack',
-                                email:'',
-                                email2:'',
-                                password:'',
-                                password2:''
-                            },
-                            usernameValidity:'invalid',
-                            usernameMessage: 'Username is not available',
-                            registrationSuccessful:false
+                        test3: function(){
+							window.startElement.refs.registerForm.setState({
+                                formData:{
+                                    username:'fcheslack',
+                                    email:'',
+                                    email2:'',
+                                    password:'',
+                                    password2:''
+                                },
+                                usernameValidity:'invalid',
+                                usernameMessage: 'Username is not available',
+                                registrationSuccessful:false
+                            });
                         },
-                        test4: {
-                            formData:{
-                                username:'fcheslack',
-                                email:'email@email.com',
-                                email2:'email2@email.com',
-                                password:'',
-                                password2:''
-                            },
-                            usernameValidity:'invalid',
-                            usernameMessage: 'Username is not available',
-                            registrationSuccessful:false
+                        test4: function(){
+							window.startElement.refs.registerForm.setState({
+                                formData:{
+                                    username:'fcheslack',
+                                    email:'email@email.com',
+                                    email2:'email2@email.com',
+                                    password:'',
+                                    password2:''
+                                },
+                                usernameValidity:'invalid',
+                                usernameMessage: 'Username is not available',
+                                registrationSuccessful:false
+                            });
                         },
-                        test5: {
-                            formData:{
-                                username:'valid',
-                                email:'email@email.com',
-                                email2:'email2@email.com',
-                                password:'',
-                                password2:''
-                            },
-                            formErrors:{
-                                email:['emails must match']
-                            },
-                            usernameValidity:'valid',
-                            usernameMessage: '',
-                            registrationSuccessful:false
+                        test5: function(){
+							window.startElement.refs.registerForm.setState({
+                                formData:{
+                                    username:'valid',
+                                    email:'email@email.com',
+                                    email2:'email2@email.com',
+                                    password:'',
+                                    password2:''
+                                },
+                                formErrors:{
+                                    email:['emails must match']
+                                },
+                                usernameValidity:'valid',
+                                usernameMessage: '',
+                                registrationSuccessful:false
+                            });
                         },
-                        test6: {
-                            formData:{
-                                username:'valid',
-                                email:'email@email.com',
-                                email2:'email@email.com',
-                                password:'',
-                                password2:''
-                            },
-                            usernameValidity:'valid',
-                            usernameMessage: '',
-                            registrationSuccessful:true
+                        test6: function(){
+							window.startElement.refs.registerForm.setState({
+                                formData:{
+                                    username:'valid',
+                                    email:'email@email.com',
+                                    email2:'email@email.com',
+                                    password:'',
+                                    password2:''
+                                },
+                                usernameValidity:'valid',
+                                usernameMessage: '',
+                                registrationSuccessful:true
+                            });
                         },
-                        test7: {
-                            formData:{
-                                username:'valid',
-                                email:'email@email.com',
-                                email2:'email2@email.com',
-                                password:'',
-                                password2:''
-                            },
-                            formErrors:{},
-                            formError:'Error processing registration',
-                            usernameValidity:'valid',
-                            usernameMessage: '',
-                            registrationSuccessful:false
+                        test7: function(){
+							window.startElement.refs.registerForm.setState({
+                                formData:{
+                                    username:'valid',
+                                    email:'email@email.com',
+                                    email2:'email2@email.com',
+                                    password:'',
+                                    password2:''
+                                },
+                                formErrors:{},
+                                formError:'Error processing registration',
+                                usernameValidity:'valid',
+                                usernameMessage: '',
+                                registrationSuccessful:false
+                            });
                         },
-                        test8: {
-                            formData:{
-                                username:'valid',
-                                email:'email@email.com',
-                                email2:'email2@email.com',
-                                password:'',
-                                password2:''
-                            },
-                            formErrors:{},
-                            formError:'',
-                            usernameValidity:'valid',
-                            usernameMessage: '',
-                            registrationSuccessful:false,
+                        test8: function(){
+							window.startElement.refs.registerForm.setState({
+                                formData:{
+                                    username:'valid',
+                                    email:'email@email.com',
+                                    email2:'email2@email.com',
+                                    password:'',
+                                    password2:''
+                                },
+                                formErrors:{},
+                                formError:'',
+                                usernameValidity:'valid',
+                                usernameMessage: '',
+                                registrationSuccessful:false,
+                            });
+                        },
+                        test9: function(){
+							window.startElement.refs.installConnectorPrompt.setState({browser:'Safari', oldSafari:true});
                         }
                     };
 
-                    let testCase = testStates['test1'];
+                    let testCase = tests['test1'];
                     if(window.location.hash.length > 0){
                         let testLabel = window.location.hash.substr(1);
-                        testCase = testStates[testLabel];
+                        testCase = tests[testLabel];
                     }
-                    let registerForm = window.startElement.refs.registerForm;
-                    registerForm.setState(Object.assign({}, registerForm.state, testCase));
+                    testCase();
 
-                    ZoteroWebComponents.cycleTestCases(registerForm, testStates);
-                    
+                    ZoteroWebComponents.cycleTestFuncs(tests);
                 });
             </script>
 

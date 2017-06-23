@@ -39,7 +39,7 @@ class ZoteroIcon extends Component {
 class BrowserIcon extends Component {
 	render() {
 		let browserImagePath = imagePath + '/extensions/';
-		browserImagePath += this.props.browser + '-icon';
+		browserImagePath += this.props.browser.toLowerCase() + '-icon';
 		if(this.props.size == 'small'){
 			browserImagePath += '-small';
 		} else if(this.props.size == 'large'){

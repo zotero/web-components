@@ -22,10 +22,9 @@
 		box-sizing: border-box;
 	}
 
-	.line {
-		@media (min-width: $screen-sm-min) {
-			display: block;
-		}
+	.jumbotron {
+		background: $gray-lightest; // IE9 fallback
+		background: linear-gradient($white, $gray-lightest);
 	}
 
 
@@ -36,6 +35,19 @@
 
 		@media (min-width: $screen-sm-min) {
 			padding: 0 80px;
+		}
+	}
+
+
+  // Extensions picker on extensions page
+
+	.extensions-picker {
+		.inner-extensions {
+			display: block;
+		}
+
+		.inner-start {
+			display: none;
 		}
 	}
 

@@ -1,7 +1,7 @@
 'use strict';
 
-import {log as logger} from './Log.js';
-let log = logger.Logger('InstallConnector');
+//import {log as logger} from './Log.js';
+//let log = logger.Logger('InstallConnector');
 
 const React = require('react');
 const {Component} = React;
@@ -182,14 +182,14 @@ class BrowserExtensionIcon extends Component{
 class AllExtensionsSection extends Component{
 	render(){
 		let otherBrowsers = ['chrome', 'firefox', 'safari', 'opera'].filter((browser)=>{
-			return browser != this.props.except;
+			return browser != this.props.except.toLowerCase();
 		});
 
 		let installButtons = {
-			'chrome': <li key='chrome'><InstallChromeButton type='full' /></li>,
-			'firefox': <li key='firefox'><InstallFirefoxButton type='full' /></li>,
-			'safari': <li key='safari'><InstallSafariButton type='full' /></li>,
-			'opera': <li key='opera'><InstallOperaButton type='full' /></li>
+			'chrome': <li key='chrome'><InstallChromeButton type={this.props.type} /></li>,
+			'firefox': <li key='firefox'><InstallFirefoxButton type={this.props.type} /></li>,
+			'safari': <li key='safari'><InstallSafariButton type={this.props.type} /></li>,
+			'opera': <li key='opera'><InstallOperaButton type={this.props.type} /></li>
 		};
 		let installNodes = otherBrowsers.map((browser)=>{
 			return installButtons[browser];
@@ -204,6 +204,9 @@ class AllExtensionsSection extends Component{
 		);
 	}
 }
+AllExtensionsSection.defaultProps = {
+	type:'full'
+};
 
 class InstallConnectorPrompt extends Component{
 	constructor(props){
@@ -332,4 +335,4 @@ InstallConnectorPrompt.defaultProps = {
 	showStandalone:false
 };
 
-export {InstallConnectorPrompt};
+export {InstallConnectorPrompt, AllExtensionsSection};

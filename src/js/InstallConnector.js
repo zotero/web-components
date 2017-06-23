@@ -16,13 +16,18 @@ import {Delay} from './Utils.js';
 const config = window.zoteroConfig;
 const installData = config.installData;
 
-const {firefoxHash, firefoxDownload, chromeDownload, safariDownload, operaDownload} = installData;
+const {firefoxHash} = installData;
+const chromeDownload = 'https://chrome.google.com/webstore/detail/ekhagklcjbdpajgpjgmbionohlpdbjgc';
+const firefoxDownload = 'https://www.zotero.org/download/connector/dl?browser=firefox';
+const safariDownload = 'https://www.zotero.org/download/connector/dl?browser=safari';
+const operaDownload = 'https://addons.opera.com/en/extensions/details/zotero-connector/?display=en';
 
 class InstallFirefoxButton extends Component{
-	installFirefox(){
+	installFirefox(evt){
 		if (typeof InstallTrigger == 'undefined') {
 			return true;
 		}
+		evt.preventDefault();
 		let params = {
 			'Zotero': {
 				URL: firefoxDownload,
@@ -36,7 +41,7 @@ class InstallFirefoxButton extends Component{
 	render(){
 		if(this.props.type == 'button'){
 			return (
-				<a href={firefoxDownload} className='btn' onClick={this.installFirefox}>Install</a>
+				<a href={firefoxDownload} className='btn' onClick={this.installFirefox}>{this.props.label}</a>
 			);
 		} else if(this.props.type == 'image') {
 			return (
@@ -47,13 +52,16 @@ class InstallFirefoxButton extends Component{
 				<div className='download-full'>
 					<div className='browser-image'><BrowserIcon browser='firefox' /></div>
 					<h3>Firefox extension</h3>
-					<div><a href={firefoxDownload} className='btn' onClick={this.installFirefox}>Install</a></div>
+					<div><a href={firefoxDownload} className='btn' onClick={this.installFirefox}>{this.props.label}</a></div>
 				</div>
 			);
 		}
 	}
 }
-InstallFirefoxButton.defaultProps = {type:'button'};
+InstallFirefoxButton.defaultProps = {
+	type:'button',
+	label:'Install'
+};
 
 class InstallChromeButton extends Component{
 	installChrome(evt){
@@ -68,7 +76,7 @@ class InstallChromeButton extends Component{
 	}
 	render(){
 		if(this.props.type == 'button') {
-			return <a href={chromeDownload} onClick={this.installChrome} id="chrome-connector-download-button" className="btn download-link">Install</a>;
+			return <a href={chromeDownload} onClick={this.installChrome} id="chrome-connector-download-button" className="btn download-link">{this.props.label}</a>;
 		} else if(this.props.type == 'image') {
 			return (
 				<a href={chromeDownload} onClick={this.installChrome}><BrowserIcon browser="chrome" /></a>
@@ -78,13 +86,16 @@ class InstallChromeButton extends Component{
 				<div className='download-full'>
 					<div className='browser-image'><BrowserIcon browser="chrome" /></div>
 					<h3>Chrome extension</h3>
-					<div className='install-button'><a href={chromeDownload} id="chrome-connector-download-button" className="btn download-link">Install</a></div>
+					<div className='install-button'><a href={chromeDownload} id="chrome-connector-download-button" className="btn download-link">{this.props.label}</a></div>
 				</div>
 			);
 		}
 	}
 }
-InstallChromeButton.defaultProps = {type:'button'};
+InstallChromeButton.defaultProps = {
+	type:'button',
+	label:'Install'
+};
 
 class InstallSafariButton extends Component{
 	installSafari(){
@@ -92,7 +103,7 @@ class InstallSafariButton extends Component{
 	render(){
 		if(this.props.type == 'button') {
 			return (
-				<a href={safariDownload} id="safari-connector-download-button" className="btn download-link">Install</a>
+				<a href={safariDownload} id="safari-connector-download-button" className="btn download-link">{this.props.label}</a>
 			);
 		} else if(this.props.type == 'image'){
 			return (
@@ -103,13 +114,16 @@ class InstallSafariButton extends Component{
 				<div className='download-full'>
 					<div className='browser-image'><BrowserIcon browser='safari' /></div>
 					<h3>Safari extension</h3>
-					<a href={safariDownload} id="safari-connector-download-button" className="btn download-link">Install</a>
+					<a href={safariDownload} id="safari-connector-download-button" className="btn download-link">{this.props.label}</a>
 				</div>
 			);
 		}
 	}
 }
-InstallSafariButton.defaultProps = {type:'button'};
+InstallSafariButton.defaultProps = {
+	type:'button',
+	label:'Install'
+};
 
 class InstallOperaButton extends Component{
 	installOpera(){
@@ -117,7 +131,7 @@ class InstallOperaButton extends Component{
 	render(){
 		if(this.props.type == 'button') {
 			return (
-				<a href={operaDownload} id="opera-connector-download-button" className="btn download-link">Install</a>
+				<a href={operaDownload} id="opera-connector-download-button" className="btn download-link">{this.props.label}</a>
 			);
 		} else if(this.props.type == 'image') {
 			return (
@@ -128,13 +142,16 @@ class InstallOperaButton extends Component{
 				<div className='download-full'>
 					<div className='browser-image'><BrowserIcon browser='opera' /></div>
 					<h3>Opera extension</h3>
-					<a href={operaDownload} id="opera-connector-download-button" className="btn download-link">Install</a>
+					<a href={operaDownload} id="opera-connector-download-button" className="btn download-link">{this.props.label}</a>
 				</div>
 			);
 		}
 	}
 }
-InstallOperaButton.defaultProps = {type:'button'};
+InstallOperaButton.defaultProps = {
+	type:'button',
+	label:'Install'
+};
 
 class InstallButton extends Component{
 	render(){
@@ -142,19 +159,22 @@ class InstallButton extends Component{
 
 		switch(browserName.toLowerCase()){
 			case 'firefox':
-				return <InstallFirefoxButton />;
+				return <InstallFirefoxButton label={this.props.label} />;
 			case 'chrome':
-				return <InstallChromeButton />;
+				return <InstallChromeButton label={this.props.label} />;
 			case 'safari':
-				return <InstallSafariButton />;
+				return <InstallSafariButton label={this.props.label} />;
 			case 'opera':
-				return <InstallOperaButton />;
+				return <InstallOperaButton label={this.props.label} />;
 			default:
 				//TODO: unknown browser download?
 				return null;
 		}
 	}
 }
+InstallButton.defaultProps = {
+	label:'Install'
+};
 
 class BrowserExtensionIcon extends Component{
 	render(){
@@ -335,4 +355,4 @@ InstallConnectorPrompt.defaultProps = {
 	showStandalone:false
 };
 
-export {InstallConnectorPrompt, AllExtensionsSection};
+export {InstallConnectorPrompt, AllExtensionsSection, InstallButton};

@@ -11,6 +11,7 @@ import {ZoteroIcon} from './Icons.js';
 import classnames from 'classnames';
 import {AllExtensionsSection} from './InstallConnector.js';
 import {VerticalExpandable} from './VerticalExpandable.js';
+import {InstallButton} from './InstallConnector.js';
 import {ajax} from './ajax.js';
 
 const config = window.zoteroConfig;
@@ -244,7 +245,7 @@ class DownloadConnector extends Component {
 				/>
 				<h1>Zotero Connector</h1>
 				<p className='lead'>Save to Zotero from your browser</p>
-				<div className='downloadButton'><a href={buildUrl('extensions')} className='btn'>Install {this.props.featuredBrowser} Extension</a></div>
+				<InstallButton browser={this.props.featuredBrowser} label={`Install ${this.props.featuredBrowser} Extension`} />
 				<p className='description'>Zotero Connectors automatically sense content as you browse the web and allow you to save it to Zotero with a single click.</p>
 				<p className='other-versions'><a href='#' onClick={this.showAllExtensions}>Zotero Connectors for other browsers</a></p>
 				<VerticalExpandable expand={this.state.showAllExtensions}>

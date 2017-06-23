@@ -21,6 +21,8 @@ import {Notifier} from './Notifier.js';
 import {VerticalExpandable} from './VerticalExpandable.js';
 import {InstallConnectorPrompt} from './InstallConnector.js';
 
+const currentUser = getCurrentUser();
+
 let validateRegisterForm = function(data) {
 	if(data.email != data.email2){
 		return {

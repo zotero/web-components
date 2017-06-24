@@ -75,7 +75,7 @@
 
 			@media (min-width: 1040px) {
 				font-size: 16px;
-				margin-bottom: 34px; // 40px
+				margin-bottom: 28px; // 40px
 			}
 		}
 	}
@@ -103,11 +103,7 @@
 	.version-note {
 		font-size: 12px;
 		line-height: 1.42857143; // Reset
-		margin: 12px 0 -36px 0;
-
-		@media (min-width: $screen-sm-min) {
-			margin-bottom: -68px;
-		}
+		margin: 21px 0 -21px 0;
 	}
 
 	.standalone {
@@ -121,8 +117,8 @@
 
 		.os-list {
 			list-style-type: none;
-			padding: 0;
 			margin: 0;
+			padding: 0;
 
 			li {
 				display: inline;
@@ -131,6 +127,25 @@
 					content: "·";
 					margin: 0 8px;
 				}
+			}
+		}
+
+		.old-versions {
+			width: 260px;
+			margin: 0 auto;
+			
+			> li {
+				list-style: none;
+			}
+			
+			h3, li {
+				text-align: left;
+			}
+			
+			li li {
+				list-style: disc;
+				margin: 0;
+				padding: 0;
 			}
 		}
 	}

@@ -157,6 +157,9 @@ class DownloadStandalone extends Component {
 			}
 			case 'Mac':{
 				let url = this.state.downloadUrls['mac'];
+				if(this.props.oldMac){
+					url = specificClientDownloadUrl('mac', '4.0.29.11');
+				}
 				featuredButton = <DownloadStandaloneButton href={url} />;
 				otherVersions.splice(0, 1);
 				if(this.props.oldMac){
@@ -206,16 +209,38 @@ class DownloadStandalone extends Component {
 				<p className='lead'>Your personal research assistant</p>
 				{featuredButton}
 				
-				<p className='other-versions'>Other versions</p>
+				{versionNote}
+				
+				<p className='other-versions'>Other platforms</p>
 				<ul className='os-list'>
 					{otherNodes}
 				</ul>
-				<p><a href="#" onClick={this.showOldVersions}>Looking for Zotero 4.0?</a></p>
-				{versionNote}
+				
+				{!this.state.showOldVersions
+					? <p><a href="#" onClick={this.showOldVersions}>Looking for Zotero 4.0?</a></p>
+					: ''
+				}
 				<VerticalExpandable expand={this.state.showOldVersions}>
-					<div>
-						Old Versions
-					</div>
+					<ul className='old-versions'>
+						<li>
+							<h3>Zotero 4.0 for Firefox</h3>
+							<ul>
+								<li><a href="https://download.zotero.org/extension/zotero-4.0.29.21.xpi">Zotero for Firefox</a></li>
+								<li><a href="/support/word_processor_plugin_installation">Word processor plugins</a></li>
+							</ul>
+						</li>
+						<li>
+							<h3>Zotero Standalone 4.0</h3>
+							<ul>
+								{this.props.oldMac
+									? <li><a href={specificClientDownloadUrl('mac', '4.0.29.11')}>Mac (10.6–10.8)</a></li>
+									: <li><a href={specificClientDownloadUrl('mac', '4.0.29.15')}>Mac</a></li>}
+								<li><a href={specificClientDownloadUrl('win32', '4.0.29.17')}>Windows</a></li>
+								<li><a href={specificClientDownloadUrl('linux-i686', '4.0.29.10')}>Linux 32-bit</a></li>
+								<li><a href={specificClientDownloadUrl('linux-x86_64', '4.0.29.10')}>Linux 64-bit</a></li>
+							</ul>
+						</li>
+					</ul>
 				</VerticalExpandable>
 			</section>
 		);
@@ -247,9 +272,13 @@ class DownloadConnector extends Component {
 				<p className='lead'>Save to Zotero from your browser</p>
 				<InstallButton browser={this.props.featuredBrowser} label={`Install ${this.props.featuredBrowser} Extension`} />
 				<p className='description'>Zotero Connectors automatically sense content as you browse the web and allow you to save it to Zotero with a single click.</p>
-				<p className='other-versions'><a href='#' onClick={this.showAllExtensions}>Zotero Connectors for other browsers</a></p>
+				{!this.state.showAllExtensions
+					? <p className='other-versions'><a href='#' onClick={this.showAllExtensions}>Zotero Connectors for other browsers</a></p>
+					: ''}
 				<VerticalExpandable expand={this.state.showAllExtensions}>
 					<AllExtensionsSection except={this.props.featuredBrowser} type='full' />
+					<p>A <a href="/downloadbookmarklet">bookmarklet</a> that works
+					in any browser, including those on smartphones and tablets, is also available.</p>
 				</VerticalExpandable>
 			</section>
 		);

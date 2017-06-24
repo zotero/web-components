@@ -1,7 +1,7 @@
 'use strict';
 
-import {log as logger} from './Log.js';
-let log = logger.Logger('ExtensionsPicker');
+//import {log as logger} from './Log.js';
+//let log = logger.Logger('ExtensionsPicker');
 
 const React = require('react');
 const {Component} = React;

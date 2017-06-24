@@ -251,7 +251,7 @@ class InstallConnectorPrompt extends Component{
 	render(){
 		let connectorText = '';
 		let connectorImage = null;
-		let installButton = <InstallButton browser='chrome' />;
+		let installButton = <InstallButton browser={this.state.browser.toLowerCase()} />;
 		let versionNote = null;
 		switch(this.state.browser){
 			case 'Chrome':

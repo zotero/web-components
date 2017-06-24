@@ -313,7 +313,9 @@ class Storage extends Component {
 		}
 		this.getSubscription();
 		this.getUserCustomer();
-		flexibility(document.documentElement);
+		if(typeof document != 'undefined'){
+			flexibility(document.documentElement);
+		}
 	}
 	getSubscription() {
 		log.debug('getSubscription');

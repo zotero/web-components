@@ -12,7 +12,6 @@ import classnames from 'classnames';
 import {AllExtensionsSection} from './InstallConnector.js';
 import {VerticalExpandable} from './VerticalExpandable.js';
 import {InstallButton} from './InstallConnector.js';
-import {ajax} from './ajax.js';
 
 const config = window.zoteroConfig;
 const installData = config.installData;
@@ -59,31 +58,6 @@ let specificClientDownloadUrl = function(platform, version){
 	}
 };
 
-let getManifest = function(platform){
-	let url = `https://www.zotero.org/download/standalone/manifests/release/updates-${platform}.json`;
-	return ajax(url).then((resp)=>{
-		resp.json().then((manifest)=>{
-			return manifest;
-		});
-	});
-};
-
-let getAllManifests = function(){
-	let promises = platforms.map((platform)=>{
-		return getManifest(platform);
-	});
-	return Promise.all(promises).then((manifests)=>{
-		return {
-			'mac':manifests[0],
-			'win32':manifests[1],
-			'linux-i686': manifests[2],
-			'linux-x86_64': manifests[3]
-		};
-	}).catch(()=>{
-		throw 'Error retrieving manifests';
-	});
-};
-
 class DownloadStandaloneButton extends Component {
 	render(){
 		return (<div className='downloadButton'><a className='btn' href={this.props.href}>Download</a></div>);
@@ -103,10 +77,13 @@ class OtherDownloadLinkListItem extends Component {
 class DownloadStandalone extends Component {
 	constructor(props){
 		super(props);
-		
+
 		let downloadUrls = {};
 		platforms.forEach((platform)=>{
 			downloadUrls[platform] = genericClientDownloadUrl(platform);
+			if(props.standaloneVersions && props.standaloneVersions[platform]){
+				downloadUrls[platform] = specificClientDownloadUrl(platform, props.standaloneVersions[platform]);
+			}
 		});
 		this.state = {
 			showOldVersions:false,
@@ -114,19 +91,6 @@ class DownloadStandalone extends Component {
 			versionSpecificUrls:false
 		};
 		this.showOldVersions = this.showOldVersions.bind(this);
-	}
-	componentDidMount(){
-		getAllManifests().then((manifests)=>{
-			let downloadUrls = {};
-			platforms.forEach((platform)=>{
-				let manifest = manifests[platform];
-				let version = manifest['version'];
-				downloadUrls[platform] = specificClientDownloadUrl(platform, version);
-			});
-			this.setState({downloadUrls:downloadUrls});
-		}).catch(()=>{
-			log.error('Error getting manifest files');
-		});
 	}
 	showOldVersions(evt){
 		this.setState({showOldVersions:true});
@@ -326,7 +290,7 @@ class Downloads extends Component{
 			<div className={classnames('downloads', this.state.mobile?'mobile':'')}>
 				<div className="container">
 					<div className='row loose jumbotron'>
-						<DownloadStandalone featuredOS={featuredOS} arch={arch} ref='downloadStandalone' oldMac={oldMac} />
+						<DownloadStandalone featuredOS={featuredOS} arch={arch} ref='downloadStandalone' oldMac={oldMac} standaloneVersions={this.props.standaloneVersions} />
 						<DownloadConnector featuredBrowser={featuredBrowser} ref='downloadConnector' />
 					</div>
 					<DownloadPlugins />

@@ -247,7 +247,6 @@ class RegisterForm extends Component{
 
 class PostRegisterGuide extends Component{
 	render(){
-		let quickStartGuideUrl = buildUrl('quickstartGuide');
 		return (
 			<div id='post-register-guide' className='content'>
 				<ArrowDownGray />

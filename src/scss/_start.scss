@@ -4,6 +4,10 @@
 
 	.container {
 		padding: 0 15px;
+
+		@media (min-width: $screen-sm-min) {
+			padding: 0 80px;
+		}
 	}
 
 	h1 {
@@ -115,7 +119,7 @@
 		.btn {
 			display: block;
 			margin: auto;
-			height: 32px;
+			height: 42px; // Thumb size
 			font: {
 				family: inherit;
 				size: 16px;

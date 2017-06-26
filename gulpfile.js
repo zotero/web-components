@@ -40,7 +40,7 @@ function getBrowserify(dev) {
 	if(!bundle) {
 		bundle = browserify({
 			debug: !dev,
-			entries: './src/js/web-components.js',
+			entries: 'src/js/web-components.js',
 			cache: {},
 			packageCache: {}
 		})
@@ -72,7 +72,7 @@ function getJS(dev) {
 }
 
 function getSass(dev) {
-	return gulp.src('./src/scss/web-components.scss')
+	return gulp.src('src/scss/web-components.scss')
 		.pipe(plumber({errorHandler: onError}))
 		.pipe(gulpif(dev, sourcemaps.init({loadMaps: true})))
 		.pipe(sass())
@@ -103,7 +103,7 @@ gulp.task('js', () => {
 });
 
 gulp.task('dev', ['clean:build'], () => {
-	gulp.watch('./src/scss/*.scss', ['sass']);
+	gulp.watch('src/scss/*.scss', ['sass']);
 	return merge(getSass(true), getJS(true));
 });
 
@@ -113,13 +113,13 @@ gulp.task('build', ['clean:build'], () => {
 
 gulp.task('prepublish:js', () => {
 	process.env.NODE_ENV='production';
-	return gulp.src('./src/js/*.js')
+	return gulp.src('src/js/*.js')
 			.pipe(babel(babelifyOpts))
 			.pipe(gulp.dest('./lib/'));
 });
 
 gulp.task('prepublish:sass', () => {
-	return gulp.src('./src/scss/*.scss')
+	return gulp.src('src/scss/*.scss')
 		.pipe(gulp.dest('./sass/'));
 });
 

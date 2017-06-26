@@ -7,9 +7,14 @@
 	}
 
 	h1 {
-		font-size: 30px;
+		font-size: 20px;
 		line-height: 1.1;
 		margin: 0 0 16px;
+
+		@media (min-width: $screen-sm-min) {
+			font-size: 30px;
+			letter-spacing: -0.5px;
+		}
 	}
 
 	img {
@@ -28,7 +33,11 @@
 		border: 3px solid currentColor;
 		border-radius: 6px;
 		padding: 16px 24px;
-		margin: 10px 0 48px; // 60px
+		margin: 20px 0 37px; // top/bottom: 40px
+
+		@media (min-width: $screen-sm-min) {
+			margin: 10px 0 48px; // 60px
+		}
 	}
 
 	.btn {
@@ -43,10 +52,15 @@
 		}
 	}
 
+
 	// Extensions picker on start page
 
 	.extensions-picker {
-		padding-bottom: 80px;
+		padding-bottom: 48px;
+
+		@media (min-width: $screen-sm-min) {
+			padding-bottom: 80px;
+		}
 
 		.all-extensions ul {
 			margin-top: 26px; // 60px
@@ -64,13 +78,10 @@
 			padding: 0;
 
 			h1 {
-				font-size: 24px;
-				margin: 19px auto 16px; // 32px
+				margin: 21px auto 16px; // 32px
 
 				@media (min-width: $screen-sm-min) {
-					font-size: 30px;
 					margin-top: 29px; // 48px
-					letter-spacing: -1px;
 				}
 			}
 
@@ -84,54 +95,40 @@
 
 	.register-section {
 		background: url("../assets/images/start/arrow-down-white.svg") no-repeat center top $gray-lightest;
-		padding: 68px 0 65px; // 80px
-	}
-
-	.post-register-guide {
-		background: url("../assets/images/start/arrow-down-gray.svg") no-repeat center top;
-		padding: 80px 0 72px; // 80px
-	}
-
-	.connector-button {
-		margin-bottom: 36px; // 48px
-	}
-
-	.register-quick-links {
-		list-style: none;
-		padding: 0;
-		margin: 43px 0 0; // 60px;
-		font-size: 16px;
-		line-height: 1.5;
+		background-size: 51px auto;
+		padding: 46px 0 38px; // 2/3
 
 		@media (min-width: $screen-sm-min) {
-			font-size: 20px;
-		}
-
-		li + li {
-			margin-top: 5px;
+			background-size: 76px auto;
+			padding: 68px 0 65px; // 80px
 		}
 	}
 
 	#register-form {
-		margin-top: 54px; // 60px
+		margin: 34px 0 0; // 40px
+
+		@media (min-width: $screen-sm-min) {
+			margin: 54px 0 0; // 60px
+		}
 
 		.form-control,
 		.btn {
 			display: block;
 			margin: auto;
-			height: 48px;
+			height: 32px;
 			font: {
 				family: inherit;
-				size: 20px;
+				size: 16px;
 			}
 
 			@media (min-width: $screen-sm-min) {
 				max-width: 302px; // Adjust to captcha width
+				height: 48px;
+				font-size: 20px;
 			}
 		}
 
 		.form-control {
-			height: 48px;
 			padding: 13px 12px;
 			color: #222;
 			box-shadow: none;
@@ -206,6 +203,42 @@
 
 		.form-field-error {
 			color: #c00;
+		}
+	}
+
+	.post-register-guide {
+		background: url("../assets/images/start/arrow-down-gray.svg") no-repeat center top;
+		background-size: 51px;
+		padding: 53px 0 47px; // 2/3
+
+		@media (min-width: $screen-sm-min) {
+			background-size: 76px auto;
+			padding: 80px 0 72px; // 80px
+		}
+	}
+
+	.connector-button {
+		margin-bottom: 25px; // 2/3
+
+		@media (min-width: $screen-sm-min) {
+			margin-bottom: 36px; // 48px
+		}
+	}
+
+	.register-quick-links {
+		list-style: none;
+		padding: 0;
+		font-size: 16px;
+		line-height: 1.5;
+		margin: 25px 0 0; // 2/3
+
+		@media (min-width: $screen-sm-min) {
+			font-size: 20px;
+			margin: 43px 0 0; // 60px;
+		}
+
+		li + li {
+			margin-top: 5px;
 		}
 	}
 }

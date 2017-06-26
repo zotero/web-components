@@ -174,7 +174,7 @@ class RegisterForm extends Component{
 		}
 
 		let registerForm = (
-			<div id='register-form'>
+			<form id='register-form'>
 				<VerticalExpandable expand={!this.state.registrationSuccessful}>
 					<div className='form-group'>
 						<input className='form-control' type='text' name='username' placeholder='Username' onChange={this.handleChange} onBlur={this.checkUsername} value={formData.username}></input>
@@ -206,7 +206,7 @@ class RegisterForm extends Component{
 						<button type='button' className='btn' onClick={this.register}>Register</button>
 					</div>
 				</VerticalExpandable>
-			</div>
+			</form>
 		);
 
 		let notifier = null;

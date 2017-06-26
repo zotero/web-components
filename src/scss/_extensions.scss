@@ -18,14 +18,9 @@
 	margin: 0 -40px;
 	animation: slide-in 0.8s ease;
 
-	* {
-		box-sizing: border-box;
-	}
-
-	.line {
-		@media (min-width: $screen-sm-min) {
-			display: block;
-		}
+	.jumbotron {
+		background: $gray-lightest; // IE9 fallback
+		background: linear-gradient($white, $gray-lightest);
 	}
 
 
@@ -36,6 +31,19 @@
 
 		@media (min-width: $screen-sm-min) {
 			padding: 0 80px;
+		}
+	}
+
+
+  // Extensions picker on extensions page
+
+	.extensions-picker {
+		.inner-extensions {
+			display: block;
+		}
+
+		.inner-start {
+			display: none;
 		}
 	}
 
@@ -81,17 +89,6 @@
 			font-size: 24px;
 			margin-top: 31px;
 			letter-spacing: -0.3px;
-		}
-	}
-
-	.lead {
-		font-size: 16px;
-		line-height: 1.5;
-		text-align: center;
-		margin: 0 auto;
-
-		@media (min-width: $screen-sm-min) {
-			width: 80%;
 		}
 	}
 

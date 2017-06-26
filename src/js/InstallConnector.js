@@ -289,9 +289,14 @@ class InstallConnectorPrompt extends Component{
 
 		let showExtensionsLink = (
 			<p className={classnames('show-extensions', {'fade-out':this.state.showingAllExtensions})}>
-				{otherBrowserImages}<br />
-				Not using {this.state.browser}?<br />
-				<a href='#' onClick={this.showAllExtensions}>Show all extensions</a>
+				<span className="inner-extensions">
+					{otherBrowserImages}<br />
+					Not using {this.state.browser}?<br />
+					<a href='#' onClick={this.showAllExtensions}>Show all extensions</a>
+				</span>
+				<span className="inner-start">
+				  <a href='#' onClick={this.showAllExtensions}>Not using {this.state.browser}? Show all extensions</a>
+				</span>
 			</p>
 		);
 

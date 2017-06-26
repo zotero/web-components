@@ -86,14 +86,6 @@ a {
 	cursor: pointer;
 }
 
-// Style email inputs the same as text/password
-input[type="email"] {
-	display: block;
-	padding: 4px;
-	border-radius: 4px;
-	border: 1px solid rgba(0,0,0,.2);
-}
-
 
 // Grid
 // --------------------------------------------------
@@ -147,5 +139,51 @@ input[type="email"] {
 		@media (min-width: $screen-sm-min) {
 			padding: 0 ($grid-gutter-loose / 2);
 		}
+	}
+}
+
+
+// Commnon styles
+// --------------------------------------------------
+
+// Scope styles to new pages
+.extensions,
+.downloads,
+.start {
+
+	* {
+		box-sizing: border-box;
+	}
+
+	a {
+		text-decoration: none;
+
+		&:hover {
+			text-decoration: underline;
+			color: $link-color;
+		}
+	}
+
+	.btn {
+		&:hover,
+		&:focus {
+			text-decoration: none;
+			color: $white;
+		}
+	}
+
+	.lead {
+		font-size: 16px;
+		line-height: 1.5;
+		text-align: center;
+		margin: 0 auto;
+
+		@media (min-width: $screen-sm-min) {
+			width: 80%;
+		}
+	}
+
+	.form-group {
+		margin-bottom: 15px;
 	}
 }

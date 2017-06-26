@@ -6,11 +6,9 @@
 
 	// Jumbotron
 	.jumbotron {
-		background: $gray-lightest; // IE9 fallback
-		background: linear-gradient($white, $gray-lightest);
-		padding: 28px 0 48px;
 		text-align: center;
 		position: relative;
+		padding: 28px 0 48px; // top: 53px (2/3) to breadcrumbs baseline
 
 		@media (min-width: $screen-sm-min) {
 			padding: 20px 0 80px;
@@ -21,6 +19,12 @@
 
 			@media (min-width: $screen-sm-min) {
 				margin-bottom: 34px; // 40px
+			}
+		}
+
+		.line {
+			@media (min-width: $screen-sm-min) {
+				display: block;
 			}
 		}
 
@@ -131,6 +135,8 @@
 
 	// Other browsers
 	.all-extensions {
+		overflow: hidden; // Fix jump in animation caused by negative margin-bottom
+
 		h3 {
 			font-size: 16px;
 			margin: 3px 0 13px 0;

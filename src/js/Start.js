@@ -13,8 +13,6 @@ const recaptchaSitekey = config.recaptchaSitekey;
 const imagePath = config.imagePath;
 
 const connectorButtonImagePath = imagePath + '/start/zotero-button.svg';
-const arrowDownGrayImagePath = imagePath + '/start/arrow-down-gray.svg';
-const arrowDownWhiteImagePath = imagePath + '/start/arrow-down-white.svg';
 
 import {ajax, postFormData} from './ajax.js';
 import {slugify, getCurrentUser} from './Utils.js';
@@ -24,26 +22,6 @@ import {VerticalExpandable} from './VerticalExpandable.js';
 import {InstallConnectorPrompt} from './InstallConnector.js';
 
 const currentUser = getCurrentUser();
-
-class ArrowDownGray extends Component{
-	render(){
-		return (
-			<div className='arrow-down'>
-				<img src={arrowDownGrayImagePath} />
-			</div>
-		);
-	}
-}
-
-class ArrowDownWhite extends Component{
-	render(){
-		return (
-			<div className='arrow-down'>
-				<img src={arrowDownWhiteImagePath} />
-			</div>
-		);
-	}
-}
 
 let validateRegisterForm = function(data) {
 	if(data.email != data.email2){
@@ -179,44 +157,56 @@ class RegisterForm extends Component{
 		}
 		let profileUrl = buildUrl('profileUrl', {slug});
 		let previewClass = 'profile-preview ' + this.state.usernameValidity;
-		
 		if(currentUser) {
 			return (
-				<div id='register-section'>
+				<section className='register-section'>
 					<div className='content'>
-						<ArrowDownWhite />
 						<h1>2. Start syncing to take full advantage of Zotero</h1>
 						<div>
-							<p>It looks like you’ve already created an account. Now that you’ve installed Zotero, you can use it to{' '}
+							<p className='lead'>It looks like you’ve already created an account. Now that you’ve installed Zotero, you can use it to{' '}
 								<a href="https://www.zotero.org/support/sync">sync and access your library from anywhere</a>.
 								It also lets you join <a href="https://www.zotero.org/support/groups">groups</a> and{' '}
 								<a href="https://www.zotero.org/support/sync#file_syncing">back up all your attached files</a>.</p>
 						</div>
 					</div>
-				</div>
+				</section>
 			);
 		}
 
 		let registerForm = (
-			<div id='register-form'>
+			<form id='register-form'>
 				<VerticalExpandable expand={!this.state.registrationSuccessful}>
-					<input type='text' name='username' placeholder='Username' onChange={this.handleChange} onBlur={this.checkUsername} value={formData.username}></input>
-					<p className={previewClass}>{profileUrl}</p>
-					<p className='usernameMessage'>{this.state.usernameMessage}</p>
-					<FormFieldErrorMessage message={this.state.formErrors['username']} />
-					<input type='email' name='email' placeholder='Email' onChange={this.handleChange} value={formData.email}></input>
-					<FormFieldErrorMessage message={this.state.formErrors['email']} />
-					<input type='email' name='email2' placeholder='Confirm Email' onChange={this.handleChange} value={formData.email2}></input>
-					<FormFieldErrorMessage message={this.state.formErrors['email2']} />
-					<input type='password' name='password' placeholder='Password' onChange={this.handleChange} value={formData.password}></input>
-					<FormFieldErrorMessage message={this.state.formErrors['password']} />
-					<input type='password' name='password2' placeholder='Verify Password' onChange={this.handleChange} value={formData.password2}></input>
-					<FormFieldErrorMessage message={this.state.formErrors['password2']} />
-					<div className="g-recaptcha" data-sitekey={recaptchaSitekey}></div>
-					<FormFieldErrorMessage message={this.state.formErrors['recaptcha']} />
-					<button type='button' className='btn' onClick={this.register}>Register</button>
+					<div className='form-group'>
+						<input className='form-control' type='text' name='username' placeholder='Username' onChange={this.handleChange} onBlur={this.checkUsername} value={formData.username}></input>
+						<p className={previewClass}>{profileUrl}</p>
+						<p className='username-message'>{this.state.usernameMessage}</p>
+						<FormFieldErrorMessage message={this.state.formErrors['username']} />
+					</div>
+					<div className='form-group'>
+						<input className='form-control' type='email' name='email' placeholder='Email' onChange={this.handleChange} value={formData.email}></input>
+						<FormFieldErrorMessage message={this.state.formErrors['email']} />
+					</div>
+					<div className='form-group'>
+						<input className='form-control' type='email' name='email2' placeholder='Confirm Email' onChange={this.handleChange} value={formData.email2}></input>
+						<FormFieldErrorMessage message={this.state.formErrors['email2']} />
+					</div>
+					<div className='form-group'>
+						<input className='form-control' type='password' name='password' placeholder='Password' onChange={this.handleChange} value={formData.password}></input>
+						<FormFieldErrorMessage message={this.state.formErrors['password']} />
+					</div>
+					<div className='form-group'>
+						<input className='form-control' type='password' name='password2' placeholder='Verify Password' onChange={this.handleChange} value={formData.password2}></input>
+						<FormFieldErrorMessage message={this.state.formErrors['password2']} />
+					</div>
+					<div className='form-group'>
+						<div className="g-recaptcha" data-sitekey={recaptchaSitekey}></div>
+						<FormFieldErrorMessage message={this.state.formErrors['recaptcha']} />
+					</div>
+					<div className='form-group'>
+						<button type='button' className='btn' onClick={this.register}>Register</button>
+					</div>
 				</VerticalExpandable>
-			</div>
+			</form>
 		);
 
 		let notifier = null;
@@ -228,11 +218,10 @@ class RegisterForm extends Component{
 		}
 
 		return (
-			<div id='register-section'>
-				<div className='content'>
-					<ArrowDownWhite />
+			<section className='register-section'>
+				<div className='container'>
 					<h1>2. Register to take full advantage of Zotero</h1>
-					<p>If you haven’t already created a Zotero account, please take a few moments to register now.
+					<p className='lead'>If you haven’t already created a Zotero account, please take a few moments to register now.
 					It’s a <b>free</b> way to <a href="https://www.zotero.org/support/sync">sync and access your library from anywhere</a>,
 					and it lets you join <a href="https://www.zotero.org/support/groups">groups</a> and{' '}
 					<a href="https://www.zotero.org/support/sync#file_syncing">back up all your attached files</a>.
@@ -240,7 +229,7 @@ class RegisterForm extends Component{
 					{registerForm}
 					{notifier}
 				</div>
-			</div>
+			</section>
 		);
 	}
 }
@@ -248,21 +237,22 @@ class RegisterForm extends Component{
 class PostRegisterGuide extends Component{
 	render(){
 		return (
-			<div id='post-register-guide' className='content'>
-				<ArrowDownGray />
-				<img src={connectorButtonImagePath} />
-				<h1>3. Start building your library</h1>
-				<p>New to Zotero? Explore the documentation and try out some things you can do with Zotero:</p>
-				<ul id='register-quick-links'>
-					<li><a href="https://www.zotero.org/support/quick_start_guide">Read the Quick Start Guide</a></li>
-					<li><a href="https://www.zotero.org/support/getting_stuff_into_your_library">Add an item</a></li>
-					<li><a href="https://www.zotero.org/support/archive_the_web">Archive a webpage</a></li>
-					<li><a href="https://www.zotero.org/support/screencast_tutorials/manually_creating_items">Manually enter an item</a></li>
-					<li><a href="https://www.zotero.org/support/collections">Create a collection</a></li>
-					<li><a href="https://www.zotero.org/support/creating_bibliographies">Create a bibliography</a></li>
-					<li><a href="https://www.zotero.org/support/word_processor_plugin_usage">Use the Word or LibreOffice plugin</a></li>
-				</ul>
-			</div>
+			<section className='post-register-guide'>
+				<div className='container'>
+					<img src={connectorButtonImagePath} className='connector-button' width='160' height='160' />
+					<h1>3. Start building your library</h1>
+					<p className='lead'>New to Zotero? Explore the documentation and try out some things you can do with Zotero:</p>
+					<ul className='register-quick-links'>
+						<li><a href="https://www.zotero.org/support/quick_start_guide">Read the Quick Start Guide</a></li>
+						<li><a href="https://www.zotero.org/support/getting_stuff_into_your_library">Add an item</a></li>
+						<li><a href="https://www.zotero.org/support/archive_the_web">Archive a webpage</a></li>
+						<li><a href="https://www.zotero.org/support/screencast_tutorials/manually_creating_items">Manually enter an item</a></li>
+						<li><a href="https://www.zotero.org/support/collections">Create a collection</a></li>
+						<li><a href="https://www.zotero.org/support/creating_bibliographies">Create a bibliography</a></li>
+						<li><a href="https://www.zotero.org/support/word_processor_plugin_usage">Use the Word or LibreOffice plugin</a></li>
+					</ul>
+				</div>
+			</section>
 		);
 	}
 }
@@ -273,13 +263,15 @@ class Start extends Component{
 	}
 	render(){
 		return (
-			<div id='start-container' className='extensions react'>
-				<div className='install-success-div'>
-					<h1>Success! You installed Zotero!</h1>
-				</div>
+			<div className='start react'>
+				<section>
+					<div className='container'>
+						<p className="install-success">Success! You installed Zotero!</p>
+					</div>
 				<div className='extensions-picker'>
 					<InstallConnectorPrompt ref='installConnectorPrompt' numbered={true} />
 				</div>
+				</section>
 				<RegisterForm ref='registerForm' />
 				<PostRegisterGuide ref='postRegisterGuide' />
 			</div>

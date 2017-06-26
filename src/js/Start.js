@@ -149,7 +149,7 @@ class RegisterForm extends Component{
 		});
 	}
 	render(){
-		log.debug('RegisterForm render');
+		//log.debug('RegisterForm render');
 		let formData = this.state.formData;
 		let slug = '<username>';
 		if(this.state.formData.username) {
@@ -158,10 +158,14 @@ class RegisterForm extends Component{
 		let profileUrl = buildUrl('profileUrl', {slug});
 		let previewClass = 'profile-preview ' + this.state.usernameValidity;
 		if(currentUser) {
+			let heading = <h1>2. Start syncing to take full advantage of Zotero</h1>;
+			if(!this.props.numbered) {
+				heading = null;
+			}
 			return (
 				<section className='register-section'>
 					<div className='content'>
-						<h1>2. Start syncing to take full advantage of Zotero</h1>
+						{heading}
 						<div>
 							<p className='lead'>It looks like you’ve already created an account. Now that you’ve installed Zotero, you can use it to{' '}
 								<a href="https://www.zotero.org/support/sync">sync and access your library from anywhere</a>.
@@ -217,10 +221,15 @@ class RegisterForm extends Component{
 			notifier = <Notifier type='error' message={this.state.formError} />;
 		}
 
+		let heading = <h1>2. Register to take full advantage of Zotero</h1>;
+		if(!this.props.numbered){
+			heading = null;
+		}
+
 		return (
 			<section className='register-section'>
 				<div className='container'>
-					<h1>2. Register to take full advantage of Zotero</h1>
+					{heading}
 					<p className='lead'>If you haven’t already created a Zotero account, please take a few moments to register now.
 					It’s a <b>free</b> way to <a href="https://www.zotero.org/support/sync">sync and access your library from anywhere</a>,
 					and it lets you join <a href="https://www.zotero.org/support/groups">groups</a> and{' '}
@@ -233,6 +242,9 @@ class RegisterForm extends Component{
 		);
 	}
 }
+RegisterForm.defaultProps = {
+	numbered:true
+};
 
 class PostRegisterGuide extends Component{
 	render(){
@@ -279,4 +291,4 @@ class Start extends Component{
 	}
 }
 
-export {Start, InstallConnectorPrompt};
+export {Start, InstallConnectorPrompt, RegisterForm};

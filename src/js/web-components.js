@@ -23,7 +23,7 @@ import {UserGroups} from './UserGroups.js';
 import {GroupInvitations} from './GroupInvitations.js';
 import {NewGroupDiscussions} from './NewGroupDiscussions.js';
 import {InviteToGroups} from './InviteToGroups.js';
-import {Start} from './Start.js';
+import {Start, RegisterForm} from './Start.js';
 import {Downloads} from './Downloads.js';
 import {ExtensionsPicker} from './ExtensionsPicker.js';
 import {CreateGroup} from './CreateGroup.js';
@@ -42,6 +42,7 @@ let ZoteroWebComponents = {
 	NewGroupDiscussions,
 	InviteToGroups,
 	Start,
+	RegisterForm,
 	Downloads,
 	ExtensionsPicker,
 	CreateGroup,

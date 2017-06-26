@@ -163,7 +163,7 @@ class RegisterForm extends Component{
 					<div className='content'>
 						<h1>2. Start syncing to take full advantage of Zotero</h1>
 						<div>
-							<p>It looks like you’ve already created an account. Now that you’ve installed Zotero, you can use it to{' '}
+							<p className='lead'>It looks like you’ve already created an account. Now that you’ve installed Zotero, you can use it to{' '}
 								<a href="https://www.zotero.org/support/sync">sync and access your library from anywhere</a>.
 								It also lets you join <a href="https://www.zotero.org/support/groups">groups</a> and{' '}
 								<a href="https://www.zotero.org/support/sync#file_syncing">back up all your attached files</a>.</p>

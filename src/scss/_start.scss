@@ -98,7 +98,7 @@
 	}
 
 	.register-section {
-		background: url("../assets/images/start/arrow-down-white.svg") no-repeat center top $gray-lightest;
+		background: url($staticPath + "/images/start/arrow-down-white.svg") no-repeat center top $gray-lightest;
 		background-size: 51px auto;
 		padding: 46px 0 38px; // 2/3
 
@@ -211,7 +211,7 @@
 	}
 
 	.post-register-guide {
-		background: url("../assets/images/start/arrow-down-gray.svg") no-repeat center top;
+		background: url($staticPath + "/images/start/arrow-down-gray.svg") no-repeat center top;
 		background-size: 51px;
 		padding: 53px 0 47px; // 2/3
 

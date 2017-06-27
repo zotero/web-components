@@ -69,7 +69,7 @@ let buildUrl = function(name, params){
 		case 'extensions':
 			return '/extensions';
 		case 'download':
-			return '/downloads';
+			return '/download';
 	}
 	throw new Error('Unknown route in buildUrl');
 };

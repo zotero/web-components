@@ -40,11 +40,11 @@ let platformMap = {
 
 let genericClientDownloadUrl = function(platform='win32'){
 	//valid platforms are mac, win32, linux-i686, and linux-x86_64
-	return `https://www.zotero.org/download/standalone/dl?channel=release&platform=${platform}`;
+	return `https://www.zotero.org/download/client/dl?channel=release&platform=${platform}`;
 };
 
 let specificClientDownloadUrl = function(platform, version){
-	return `https://www.zotero.org/download/standalone/dl?channel=release&platform=${platform}&version=${version}`;
+	return `https://www.zotero.org/download/client/dl?channel=release&platform=${platform}&version=${version}`;
 };
 
 class DownloadStandaloneButton extends Component {

@@ -16,9 +16,9 @@ import {Delay} from './Utils.js';
 const config = window.zoteroConfig;
 const installData = config.installData;
 
-const {firefoxHash} = installData;
+const {firefoxHash, firefoxVersion} = installData;
 const chromeDownload = 'https://chrome.google.com/webstore/detail/ekhagklcjbdpajgpjgmbionohlpdbjgc';
-const firefoxDownload = 'https://www.zotero.org/download/connector/dl?browser=firefox';
+const firefoxDownload = `https://www.zotero.org/download/connector/dl?browser=firefox&version=${firefoxVersion}`;
 const safariDownload = 'https://www.zotero.org/download/connector/dl?browser=safari';
 const operaDownload = 'https://addons.opera.com/en/extensions/details/zotero-connector/?display=en';
 

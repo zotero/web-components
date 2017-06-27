@@ -1,7 +1,7 @@
 'use strict';
 
-import {log as logger} from './Log.js';
-let log = logger.Logger('Downloads');
+//import {log as logger} from './Log.js';
+//let log = logger.Logger('Downloads');
 
 const React = require('react');
 const {Component} = React;
@@ -44,18 +44,7 @@ let genericClientDownloadUrl = function(platform='win32'){
 };
 
 let specificClientDownloadUrl = function(platform, version){
-	switch(platform){
-		case 'win32':
-			return `https://download.zotero.org/standalone/${version}/Zotero-${version}_setup.exe`;
-		case 'mac':
-			return `https://download.zotero.org/standalone/${version}/Zotero-${version}.dmg`;
-		case 'linux-i686':
-			return `https://download.zotero.org/standalone/${version}/Zotero-${version}_linux-i686.tar.bz2`;
-		case 'linux-x86_64':
-			return `https://download.zotero.org/standalone/${version}/Zotero-${version}_linux-x86_64.tar.bz2`;
-		default:
-			log.error('Invalid platform for downloadUrl');
-	}
+	return `https://www.zotero.org/download/standalone/dl?channel=release&platform=${platform}&version=${version}`;
 };
 
 class DownloadStandaloneButton extends Component {

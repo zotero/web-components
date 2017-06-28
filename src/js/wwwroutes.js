@@ -66,8 +66,8 @@ let buildUrl = function(name, params){
 			return '/support/quickstartguide';
 		case 'pluginSupport':
 			return '/support/plugins';
-		case 'extensions':
-			return '/extensions';
+		case 'connectors':
+			return '/download/connectors';
 		case 'download':
 			return '/download';
 	}

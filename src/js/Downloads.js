@@ -223,7 +223,7 @@ class DownloadConnector extends Component {
 				/>
 				<h1>Zotero Connector</h1>
 				<p className='lead'>Save to Zotero from your browser</p>
-				<InstallButton browser={this.props.featuredBrowser} label={`Install ${this.props.featuredBrowser} Extension`} />
+				<InstallButton browser={this.props.featuredBrowser} label={`Install ${this.props.featuredBrowser} Connector`} />
 				<p className='description'>Zotero Connectors automatically sense content as you browse the web and allow you to save it to Zotero with a single click.</p>
 				{!this.state.showAllExtensions
 					? <p className='other-versions'><a href='#' onClick={this.showAllExtensions}>Zotero Connectors for other browsers</a></p>

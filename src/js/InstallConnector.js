@@ -51,7 +51,7 @@ class InstallFirefoxButton extends Component{
 			return (
 				<div className='download-full'>
 					<div className='browser-image'><BrowserIcon browser='firefox' /></div>
-					<h3>Firefox extension</h3>
+					<h3>Firefox connector</h3>
 					<div><a href={firefoxDownload} className='btn' onClick={this.installFirefox}>{this.props.label}</a></div>
 				</div>
 			);
@@ -85,7 +85,7 @@ class InstallChromeButton extends Component{
 			return (
 				<div className='download-full'>
 					<div className='browser-image'><BrowserIcon browser="chrome" /></div>
-					<h3>Chrome extension</h3>
+					<h3>Chrome connector</h3>
 					<div className='install-button'><a href={chromeDownload} id="chrome-connector-download-button" className="btn download-link">{this.props.label}</a></div>
 				</div>
 			);
@@ -113,7 +113,7 @@ class InstallSafariButton extends Component{
 			return (
 				<div className='download-full'>
 					<div className='browser-image'><BrowserIcon browser='safari' /></div>
-					<h3>Safari extension</h3>
+					<h3>Safari connector</h3>
 					<a href={safariDownload} id="safari-connector-download-button" className="btn download-link">{this.props.label}</a>
 				</div>
 			);
@@ -141,7 +141,7 @@ class InstallOperaButton extends Component{
 			return (
 				<div className='download-full'>
 					<div className='browser-image'><BrowserIcon browser='opera' /></div>
-					<h3>Opera extension</h3>
+					<h3>Opera connector</h3>
 					<a href={operaDownload} id="opera-connector-download-button" className="btn download-link">{this.props.label}</a>
 				</div>
 			);
@@ -216,7 +216,7 @@ class AllExtensionsSection extends Component{
 		});
 		return (
 			<section className='all-extensions'>
-				<h2 className="visually-hidden">All extensions</h2>
+				<h2 className="visually-hidden">All connectors</h2>
 				<ul>
 					{installNodes}
 				</ul>
@@ -268,10 +268,10 @@ class InstallConnectorPrompt extends Component{
 				if(this.state.oldSafari){
 					versionNote = (
 						<p className='version-note'>
-							Please note: The link above is for an outdated version of the Safari extension,
+							Please note: The link above is for an outdated version of the Safari connector,
 							as the latest version is not compatible with your version of macOS.
 							For the best experience, please upgrade to macOS 10.11 or later and reinstall
-							the Safari extension from this page.
+							the Safari connector from this page.
 						</p>
 					);
 				}
@@ -292,10 +292,10 @@ class InstallConnectorPrompt extends Component{
 				<span className="inner-extensions">
 					{otherBrowserImages}<br />
 					Not using {this.state.browser}?<br />
-					<a href='#' onClick={this.showAllExtensions}>Show all extensions</a>
+					<a href='#' onClick={this.showAllExtensions}>Show all connectors</a>
 				</span>
 				<span className="inner-start">
-				  <a href='#' onClick={this.showAllExtensions}>Not using {this.state.browser}? Show all extensions</a>
+					<a href='#' onClick={this.showAllExtensions}>Not using {this.state.browser}? Show all connectors</a>
 				</span>
 			</p>
 		);

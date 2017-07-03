@@ -220,6 +220,8 @@ class AllExtensionsSection extends Component{
 				<ul>
 					{installNodes}
 				</ul>
+				<p className='bookmarklet'>A <a href="/downloadbookmarklet">bookmarklet</a> that works
+				in any browser, including those on smartphones and tablets, is also available.</p>
 			</section>
 		);
 	}

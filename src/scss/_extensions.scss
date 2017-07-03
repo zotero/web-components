@@ -110,6 +110,17 @@
 		}
 	}
 
+	.all-extensions {
+		ul {
+			margin-top: 40px;
+		}
+
+		.bookmarklet {
+			margin-bottom: 25px;
+			padding: 0 ($grid-gutter-width / 2);
+		}
+	}
+
 	// Features
 	.features {
 		padding-bottom: 21px;

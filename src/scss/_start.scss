@@ -91,6 +91,12 @@
 				margin-bottom: 0;
 			}
 		}
+
+		.all-extensions {
+			.bookmarklet {
+				padding: 0 ($grid-gutter-width / 2);
+			}
+		}
 	}
 
 	.register-section {

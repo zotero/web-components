@@ -230,8 +230,6 @@ class DownloadConnector extends Component {
 					: ''}
 				<VerticalExpandable expand={this.state.showAllExtensions}>
 					<AllExtensionsSection except={this.props.featuredBrowser} type='full' />
-					<p className='bookmarklet'>A <a href="/downloadbookmarklet">bookmarklet</a> that works
-					in any browser, including those on smartphones and tablets, is also available.</p>
 				</VerticalExpandable>
 			</section>
 		);

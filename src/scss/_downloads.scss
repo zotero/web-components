@@ -14,22 +14,17 @@
 		line-height: 1.1;
 	}
 
-	.btn {
-		color: $white;
-		background: $link-color;
-		text-decoration: none;
+	.downloadButton .btn,
+	.lead + .btn {
 		font-size: 16px;
 		min-width: 160px;
+		text-decoration: none;
+		font-size: 16px;
 		padding: 9px 23px;
 		border-radius: 4px;
 
-		@media (min-width: 1040px) {
+		@media (min-width: 1041px) {
 			font-size: 20px;
-		}
-
-		&:hover {
-			background: darken($link-color, 5%);
-			text-decoration: none;
 		}
 	}
 
@@ -50,7 +45,7 @@
 			letter-spacing: -1px;
 			white-space: nowrap;
 
-			@media (min-width: 1040px) {
+			@media (min-width: 1041px) {
 				font-size: 36px;
 			}
 		}
@@ -59,8 +54,9 @@
 			font-size: 14px;
 			line-height: 24px;
 			margin: 0 auto 20px; // 27px
+			width: auto;
 
-			@media (min-width: 1040px) {
+			@media (min-width: 1041px) {
 				font-size: 16px;
 				margin-bottom: 28px; // 40px
 			}
@@ -81,6 +77,10 @@
 			padding: 0 20px 89px; // 96px
 			margin: 0 20px;
 		}
+
+		p {
+			margin-bottom: 0;
+		}
 	}
 
 	.download-image {
@@ -99,17 +99,23 @@
 		}
 
 		.other-versions {
-			margin: 37px 0 0 0;
+			color: $slate;
+			margin: 38px 0 0 0;
 		}
 
-		.os-list {
-			list-style-type: none;
+		ul {
 			margin: 0;
 			padding: 0;
 
 			li {
+				list-style-type: none;
 				display: inline;
+			}
+		}
 
+		.os-list,
+		.old-versions ul {
+			li {
 				& + li:before {
 					content: "·";
 					margin: 0 8px;
@@ -118,21 +124,26 @@
 		}
 
 		.old-versions {
-			width: 260px;
-			margin: 0 auto;
-			
-			> li {
-				list-style: none;
+			@media (max-width: 1040px) {
+				li {
+					display: block;
+					margin-top: 5px;
+
+				}
+
+				ul li {
+					& + li:before {
+						content: none;
+					}
+				}
 			}
-			
-			h3, li {
-				text-align: left;
-			}
-			
-			li li {
-				list-style: disc;
-				margin: 0;
-				padding: 0;
+
+			h3 {
+				font-size: 16px;
+				line-height: inherit;
+				color: #444;
+				font-weight: 700;
+				margin: 14px 0 0;
 			}
 		}
 	}
@@ -150,8 +161,9 @@
 		}
 
 		.description {
-			font-size: 13px;
-			margin: 37px auto 0;
+			font-size: 14px;
+			color: $slate;
+			margin: 14px auto 0;
 
 			@media (min-width: $screen-sm-min) {
 				max-width: 370px;
@@ -160,28 +172,19 @@
 		}
 
 		.all-extensions {
-			section.connector {
-				margin:0;
-				padding:0;
-			}
 			ul {
-				padding:0;
-			}
-			li {
-				list-style:none;
-				display:inline-block;
-				margin:8px;
-			}
-			.btn {
-				font-size:14px;
-				padding: 5px 15px;
-				min-width:35px;
-			}
-			h3 {
-				padding:0;
-				margin:0;
+				margin-bottom: 0;
+
+				li {
+					padding: 0 ($grid-gutter-width / 2);
+				}
 			}
 		}
+	}
+
+	.bookmarklet {
+		margin: 0;
+		color: #777;
 	}
 
 	.plugins {

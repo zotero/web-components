@@ -161,14 +161,14 @@ class DownloadStandalone extends Component {
 				<h1>Zotero for {OSLabel}</h1>
 				<p className='lead'>Your personal research assistant</p>
 				{featuredButton}
-				
+
 				{versionNote}
-				
+
 				<p className='other-versions'>Other platforms</p>
 				<ul className='os-list'>
 					{otherNodes}
 				</ul>
-				
+
 				{!this.state.showOldVersions
 					? <p><a href="#" onClick={this.showOldVersions}>Looking for Zotero 4.0?</a></p>
 					: ''
@@ -230,7 +230,7 @@ class DownloadConnector extends Component {
 					: ''}
 				<VerticalExpandable expand={this.state.showAllExtensions}>
 					<AllExtensionsSection except={this.props.featuredBrowser} type='full' />
-					<p>A <a href="/downloadbookmarklet">bookmarklet</a> that works
+					<p className='bookmarklet'>A <a href="/downloadbookmarklet">bookmarklet</a> that works
 					in any browser, including those on smartphones and tablets, is also available.</p>
 				</VerticalExpandable>
 			</section>

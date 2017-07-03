@@ -164,11 +164,19 @@ a {
 		}
 	}
 
+	img {
+		vertical-align: middle;
+	}
+
 	.btn {
+		color: $white;
+		background: $link-color;
+
 		&:hover,
 		&:focus {
 			text-decoration: none;
 			color: $white;
+			background: darken($link-color, 5%);
 		}
 	}
 

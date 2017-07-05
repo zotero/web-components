@@ -7,7 +7,7 @@ const React = require('react');
 const {Component} = React;
 const flexibility = require('flexibility');
 
-import {ZoteroIcon} from './Icons.js';
+import {ZoteroIcon, PluginsIcon} from './Icons.js';
 import classnames from 'classnames';
 import {AllExtensionsSection} from './InstallConnector.js';
 import {VerticalExpandable} from './VerticalExpandable.js';
@@ -16,13 +16,10 @@ import {InstallButton} from './InstallConnector.js';
 const config = window.zoteroConfig;
 const installData = config.installData;
 
-const imagePath = config.imagePath;
-const pluginsIconImagePath = imagePath + '/downloads/plugins-icon.svg';
-
 import {buildUrl} from './wwwroutes.js';
 
 import {BrowserDetect} from './browserdetect.js';
-import {BrowserIcon} from './Icons.js';
+import {BrowserExtensionIcon} from './Icons.js';
 
 let platforms = [
 	'mac',
@@ -152,7 +149,6 @@ class DownloadStandalone extends Component {
 		return (
 			<section className='standalone'>
 				<ZoteroIcon
-					context='downloads'
 					alt='Zotero'
 					className='download-image'
 					width='147'
@@ -215,11 +211,13 @@ class DownloadConnector extends Component {
 	render(){
 		return (
 			<section className='connector'>
-				<BrowserIcon
+				<BrowserExtensionIcon
 					className='download-image'
 					alt={this.props.featuredBrowser + ' Icon'}
 					browser={this.props.featuredBrowser}
-					size="large"
+					browserIconSize='112'
+					zoteroIconWidth='112'
+					zoteroIconHeight='122'
 				/>
 				<h1>Zotero Connector</h1>
 				<p className='lead'>Save to Zotero from your browser</p>
@@ -241,7 +239,7 @@ class DownloadPlugins extends Component {
 		return (
 			<section className='plugins'>
 				<div className='plugins-container clearfix'>
-					<img className='plugins-icon' width='116' height='120' src={pluginsIconImagePath} />
+					<PluginsIcon width='116' height='120' />
 					<h1>Plugins</h1>
 					<p>
 						Install one of the many third-party plugins and become even more productive.<br />

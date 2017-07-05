@@ -9,7 +9,7 @@ const {Component} = React;
 import {buildUrl} from './wwwroutes.js';
 import {BrowserDetect} from './browserdetect.js';
 import {VerticalExpandable} from './VerticalExpandable.js';
-import {ZoteroIcon, BrowserIcon} from './Icons.js';
+import {ZoteroIcon, BrowserIcon, BrowserExtensionIcon} from './Icons.js';
 import classnames from 'classnames';
 import {Delay} from './Utils.js';
 
@@ -176,29 +176,6 @@ InstallButton.defaultProps = {
 	label:'Install'
 };
 
-class BrowserExtensionIcon extends Component{
-	render(){
-		return (
-			<figure className="browser-plus-extension">
-				<BrowserIcon
-					browser={this.props.browser}
-					size="large"
-					width="128"
-					height="128" />
-				<span className="icon-plus"></span>
-				<ZoteroIcon
-					context='extensions'
-					size="large"
-					alt="Zotero Extension"
-					width="128"
-					height="140"
-					className="zotero-icon"
-				/>
-			</figure>
-		);
-	}
-}
-
 class AllExtensionsSection extends Component{
 	render(){
 		let otherBrowsers = ['chrome', 'firefox', 'safari', 'opera'].filter((browser)=>{
@@ -286,7 +263,7 @@ class InstallConnectorPrompt extends Component{
 
 		let otherBrowsers = ['chrome', 'firefox', 'safari', 'opera'].filter((browser)=>{return browser.toLowerCase() != this.state.browser.toLowerCase();});
 		let otherBrowserImages = otherBrowsers.map((browser)=>{
-			return <BrowserIcon key={browser} browser={browser} size="small" width="32" height="32" />;
+			return <BrowserIcon key={browser} browser={browser} size="32" />;
 		});
 
 		let showExtensionsLink = (
@@ -315,8 +292,6 @@ class InstallConnectorPrompt extends Component{
 			getStandaloneSection = (
 				<p className='get-zotero-standalone'>
 					<ZoteroIcon
-						context='extensions'
-						size="small"
 						width="32"
 						height="35"
 						alt=""/>

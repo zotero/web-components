@@ -178,6 +178,7 @@ class GroupMembershipActions extends React.Component{
 				<div className='join-group'>
 					<p>You have been offered ownership of this group.</p>
 					<button className={classnames('btn')} onClick={this.acceptOwnership}>Accept</button>
+					<button className={classnames('btn', {'visually-hidden':!member})} onClick={this.leaveGroup}>Leave</button>
 				</div>
 			);
 		} else if(this.state.membershipInvitation){

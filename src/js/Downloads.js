@@ -96,6 +96,7 @@ class DownloadStandalone extends Component {
 			'Linux 64-bit'
 		];
 		let OSLabel = featuredOS;
+		let wrapHeader = false;
 		let versionNote = null;
 
 		switch(featuredOS) {
@@ -134,6 +135,7 @@ class DownloadStandalone extends Component {
 				} else {
 					let url = this.state.downloadUrls['linux-i686'];
 					OSLabel = 'Linux 32-bit';
+					wrapHeader = true;
 					featuredButton = <DownloadStandaloneButton href={url} />;
 					otherVersions.splice(2, 1);
 				}
@@ -154,7 +156,7 @@ class DownloadStandalone extends Component {
 					width='147'
 					height='160'
 				/>
-				<h1>Zotero for {OSLabel}</h1>
+				<h1 className={wrapHeader ? 'wrap' : null}>Zotero 5.0 for {OSLabel}</h1>
 				<p className='lead'>Your personal research assistant</p>
 				{featuredButton}
 

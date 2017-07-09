@@ -43,12 +43,15 @@
 			margin-top: 180px;
 			margin-bottom: 8px;
 			letter-spacing: -1px;
-			white-space: nowrap;
 
 			@media (min-width: 1041px) {
 				font-size: 36px;
 			}
 		}
+		h1:not(.wrap) {
+			white-space: nowrap;
+		}
+		
 		.connector h1 {
 			margin-top:60px;
 		}

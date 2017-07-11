@@ -19,7 +19,7 @@ $spinner-color: $slate;
 		87.5%:    (0.25, 0.25, 0.25, 0.4, 0.55, 0.7, 0.85, 1)
 	);
 
-	@keyframes loading {
+	@keyframes spinner-loading {
 		@each $keyframe, $opacity in $spinner-opacities {
 			@at-root {
 				#{$keyframe} {
@@ -45,7 +45,7 @@ $spinner-color: $slate;
 		height: 1em;
 		margin: 2em auto;
 		border-radius: 50%;
-		animation: loading 0.75s linear infinite;
+		animation: spinner-loading 0.75s linear infinite;
 		transform: rotate(-9deg);
 	}
 }

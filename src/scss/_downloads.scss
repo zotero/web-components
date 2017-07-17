@@ -164,9 +164,11 @@
 			padding-top: 0;
 		}
 
-		.download-image {
-			left: calc(50% - 64px);
-			top: 18px;
+		.icon-plus {
+			width: 42px;
+			height: 42px;
+			background: url($staticPath + "/images/downloads/icon-plus.svg") no-repeat 0 0;
+			margin: 0 13px 0 14px;
 		}
 
 		.description {

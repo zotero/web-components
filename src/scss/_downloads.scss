@@ -40,7 +40,6 @@
 
 		h1 {
 			font-size: 30px;
-			margin-top: 180px;
 			margin-bottom: 8px;
 			letter-spacing: -1px;
 
@@ -50,10 +49,6 @@
 		}
 		h1:not(.wrap) {
 			white-space: nowrap;
-		}
-
-		.connector h1 {
-			margin-top:60px;
 		}
 
 		.lead {
@@ -90,7 +85,15 @@
 	}
 
 	.download-image {
-		position: absolute;
+		width: 118px;
+		height: 128px;
+		margin-bottom: 14px;
+
+		@media (min-width: 1041px) {
+			width: 147px;
+			height: 160px;
+			margin-bottom: 28px; // 48px
+		}
 	}
 
 	.version-note {
@@ -103,10 +106,6 @@
 	}
 
 	.standalone {
-		.download-image {
-			left: calc(50% - 74px);
-		}
-
 		.other-versions {
 			color: $slate;
 			margin: 38px 0 0 0;
@@ -164,11 +163,62 @@
 			padding-top: 0;
 		}
 
+		.browser-plus-extension {
+			margin-bottom: 14px;
+
+			@media (min-width: $screen-sm-min) {
+				margin: {
+					top: 10px;
+					bottom: 27px; // align h1
+				}
+			}
+
+			@media (min-width: 1041px) {
+				margin: {
+					top: 16px;
+					bottom: 51px;
+				}
+			}
+
+			.browser-icon {
+				@media (min-width: $screen-sm-min) {
+					width: 96px;
+					height: 96px;
+				}
+
+				@media (min-width: 1041px) {
+					width: 112px;
+					height: 112px;
+				}
+			}
+
+			.zotero-icon {
+				@media (min-width: $screen-sm-min) {
+					width: 96px;
+					height: 105px;
+				}
+
+				@media (min-width: 1041px) {
+					width: 112px;
+					height: 122px;
+				}
+			}
+		}
+
 		.icon-plus {
-			width: 42px;
-			height: 42px;
-			background: url($staticPath + "/images/downloads/icon-plus.svg") no-repeat 0 0;
-			margin: 0 13px 0 14px;
+			@media (min-width: $screen-sm-min) {
+				width: 36px;
+				height: 36px;
+				background: url($staticPath + "/images/downloads/icon-plus.svg") no-repeat 0 0;
+				background-size: 100%;
+				margin: 0 10px 0 11px;
+			}
+
+			@media (min-width: 1041px) {
+				width: 42px;
+				height: 42px;
+				margin: 0 13px 0 14px;
+			}
 		}
 
 		.description {

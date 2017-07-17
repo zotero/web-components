@@ -99,12 +99,8 @@
 	}
 }
 
-.extensions-picker,.downloads .browser-plus-extension {
+.browser-plus-extension {
 	margin: 0;
-
-	img {
-		vertical-align: middle;
-	}
 
 	.icon-plus {
 		display: inline-block;
@@ -113,6 +109,7 @@
 		background: url($staticPath + "/images/extensions/icon-plus.svg") no-repeat 0 0;
 		vertical-align: middle;
 		margin: 0 15px 0 16px;
+		background-size: 100%;
 	}
 
 	@media (max-width: $screen-xs-max) {

@@ -94,8 +94,11 @@
 	}
 
 	.version-note {
-		font-size: 12px;
 		line-height: 1.42857143; // Reset
+		font-size: 12px;
+	}
+
+	.version-note, .installation-help {
 		margin: 21px 0 -21px 0;
 	}
 

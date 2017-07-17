@@ -139,6 +139,11 @@ class DownloadStandalone extends Component {
 					featuredButton = <DownloadStandaloneButton href={url} />;
 					otherVersions.splice(2, 1);
 				}
+				versionNote = (
+					<p className='installation-help'>
+						<a href="/support/installation">Installation Help</a>
+					</p>
+				);
 				break;
 			}
 		}

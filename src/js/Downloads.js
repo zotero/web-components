@@ -207,7 +207,8 @@ class DownloadConnector extends Component {
 	constructor(props){
 		super(props);
 		this.state = {
-			showAllExtensions:false
+			showAllExtensions:false,
+			oldSafari: installData.oldSafari,
 		};
 		this.showAllExtensions = this.showAllExtensions.bind(this);
 	}
@@ -216,6 +217,17 @@ class DownloadConnector extends Component {
 		evt.preventDefault();
 	}
 	render(){
+		let versionNote = null;
+		if(this.props.featuredBrowser == 'Safari' && this.state.oldSafari){
+			versionNote = (
+				<p className='version-note'>
+					Please note: The link above is for an outdated version of the Safari connector,
+					as the latest version is not compatible with your version of macOS.
+					For the best experience, please upgrade to macOS 10.11 or later and reinstall
+					the Safari connector from this page.
+				</p>
+			);
+		}
 		return (
 			<section className='connector'>
 				<BrowserExtensionIcon
@@ -230,6 +242,7 @@ class DownloadConnector extends Component {
 				<p className='lead'>Save to Zotero from your browser</p>
 				<InstallButton browser={this.props.featuredBrowser} label={`Install ${this.props.featuredBrowser} Connector`} />
 				<p className='description'>Zotero Connectors automatically sense content as you browse the web and allow you to save it to Zotero with a single click.</p>
+				{versionNote}
 				{!this.state.showAllExtensions
 					? <p className='other-versions'><a href='#' onClick={this.showAllExtensions}>Zotero Connectors for other browsers</a></p>
 					: ''}

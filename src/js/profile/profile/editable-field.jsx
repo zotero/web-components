@@ -1,0 +1,136 @@
+'use strict';
+
+import EditableBase from '../abstract/editable-base.jsx';
+import profileEventSystem from '../profile-event-system.js';
+
+export default class EditableField extends EditableBase {
+	constructor(props) {
+		super(props);
+		this.state = {
+			value: this.props.value,
+			editing: false,
+			processing: false
+		}
+	}
+
+	focus() {
+		this.edit();
+	}
+
+	edit() {
+		this.setState({
+			editing: true
+		}, () => {
+			this.input.focus();
+		});
+	}
+
+	save() {
+		var previous = this.state.value,	
+			promise = this.updateFieldOnServer(this.props.field, this.input.value);
+
+		this.cancelPending();
+
+		this.setState({
+			processing: true,
+			editing: true,
+			value: ''
+		});
+
+		promise.done(response => {
+			this.setState({
+				processing: false,
+				editing: false,
+				value: response.data[this.props.field]
+			});			
+		});
+
+		promise.fail(error => {
+			profileEventSystem.trigger('alert', {
+				level: 'danger',
+				message: error.responseJSON.message
+			});
+			this.setState({
+				processing: false,
+				editing: false,
+				value: previous
+			});
+		});
+	}
+
+	cancel() {
+		this.cancelPending();
+		this.setState({
+			editing: false
+		});
+	}
+
+	cancelPending() {
+		clearTimeout(this.pending);
+	}
+
+	cancelHandler(ev) {
+		ev.preventDefault();
+		return this.cancel();
+	}
+
+	saveHandler(ev) {
+		ev && ev.preventDefault();
+		return this.save();
+	}
+
+	keyboardHandler(ev) {
+		if(ev.keyCode == 27) {
+			this.cancelPending();
+			ev.preventDefault();
+			this.cancel();
+		}
+	}
+
+	blurHandler() {
+		this.pending = setTimeout(this.save.bind(this), 100);
+	}
+
+	render() {
+		var actions,
+			cssClasses = 'profile-editable-field ' + (this.state.value ? 'profile-editable-value' : 'profile-editable-emptytext');
+
+		if(this.state.editing) {
+			if(this.state.processing) {
+				actions = <div className="profile-editable-spinner"></div>;
+			} else {
+				actions = <div className="profile-editable-actions">
+					<a className="profile-editable-action" onClick={ev => this.saveHandler(ev) }>
+						<span className="glyphicon glyphicon-ok"></span>
+					</a>
+					<a className="profile-editable-action" onClick={ev => this.cancelHandler(ev) }>
+						<span className="glyphicon glyphicon-remove"></span>
+					</a>
+				</div>;
+			}
+			return <form className="profile-editable-field profile-editable-editing form-inline" onSubmit={ev => { this.saveHandler(ev) }}>
+				<input 
+					disabled={this.state.processing ? 'disabled' : null }
+					className="form-control" ref={(c) => this.input = c}
+					defaultValue={this.state.value}
+					onKeyUp={ ev => this.keyboardHandler(ev) }
+					onBlur={ ev => this.blurHandler(ev) } />
+				{actions}
+			</form>;
+		} else {
+			return <div className={cssClasses}>
+				<span>{this.state.value || this.props.emptytext}</span>
+				<a className="profile-editable-action" onClick={ () => { this.edit() }}>
+					<span className="glyphicon glyphicon-pencil"></span>
+				</a>
+			</div>;
+		}	
+	}
+}
+
+
+EditableField.propTypes = {
+	value: React.PropTypes.string,
+	field: React.PropTypes.string,
+	emptytext: React.PropTypes.string
+}

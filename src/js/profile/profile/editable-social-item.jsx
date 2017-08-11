@@ -1,5 +1,8 @@
 'use strict';
 
+import React from 'react';
+import PropTypes from 'prop-types';
+
 import EditableField from './editable-field.jsx';
 
 export default class EditableSocialItem extends EditableField {
@@ -8,7 +11,7 @@ export default class EditableSocialItem extends EditableField {
 		this.state = {
 			name: this.props.value.name,
 			value: this.props.value.value
-		}
+		};
 	}
 
 	focus() {
@@ -20,7 +23,7 @@ export default class EditableSocialItem extends EditableField {
 			name: this.nameInput.value,
 			value: this.valueInput.value,
 			id: this.props.value.id
-		}
+		};
 	
 		this.setState(updatedItem, () => {
 			this.props.onUpdate(updatedItem);
@@ -51,7 +54,7 @@ export default class EditableSocialItem extends EditableField {
 			if(this.state.value) {
 				entry = <a href={this.constructor.NETWORKS[this.props.value.name].getUrl(this.props.value.value)}>
 					<span className={this.constructor.NETWORKS[this.props.value.name]['iconClass']}></span>
-				</a>
+				</a>;
 			} else {
 				entry = this.props.emptytext;
 			}
@@ -94,9 +97,9 @@ export default class EditableSocialItem extends EditableField {
 
 
 EditableSocialItem.propTypes = {
-	value: React.PropTypes.object,
-	editing: React.PropTypes.bool,
-	emptytext: React.PropTypes.string,
-	onUpdate: React.PropTypes.func,
-	onDelete: React.PropTypes.func
-}
+	value: PropTypes.object,
+	editing: PropTypes.bool,
+	emptytext: PropTypes.string,
+	onUpdate: PropTypes.func,
+	onDelete: PropTypes.func
+};

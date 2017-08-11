@@ -1,7 +1,10 @@
 'use strict';
 
+import React from 'react';
+import PropTypes from 'prop-types';
+
 import profileEventSystem from '../profile-event-system.js';
-import ProfileDataSource from '../profile-data-source.js'
+import ProfileDataSource from '../profile-data-source.js';
 
 export default class RelatedPeopleDetailed extends React.Component {
 	constructor(props) {
@@ -10,7 +13,7 @@ export default class RelatedPeopleDetailed extends React.Component {
 			loading: false,
 			all: !this.props.more,
 			people: this.props.people
-		}
+		};
 	}
 
 	showAllHandler() {
@@ -34,7 +37,7 @@ export default class RelatedPeopleDetailed extends React.Component {
 			});
 			this.setState({
 				loading: false
-			})
+			});
 		});
 	}
 
@@ -100,8 +103,8 @@ export default class RelatedPeopleDetailed extends React.Component {
 }
 
 RelatedPeopleDetailed.propTypes = {
-	people: React.PropTypes.array.isRequired,
-	more: React.PropTypes.bool,
-	title: React.PropTypes.string.isRequired,
-	dataSource: React.PropTypes.instanceOf(ProfileDataSource).isRequired
-}
+	people: PropTypes.array.isRequired,
+	more: PropTypes.bool,
+	title: PropTypes.string.isRequired,
+	dataSource: PropTypes.instanceOf(ProfileDataSource).isRequired
+};

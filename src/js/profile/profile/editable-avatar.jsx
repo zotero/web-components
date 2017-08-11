@@ -1,5 +1,8 @@
 'use strict';
 
+import React from 'react';
+import PropTypes from 'prop-types';
+
 import EditableBase from '../abstract/editable-base.jsx';
 import profileEventSystem from '../profile-event-system.js';
 
@@ -10,7 +13,7 @@ export default class EditableAvatar extends EditableBase {
 			value: this.props.value,
 			editing: false,
 			processing: false
-		}
+		};
 	}
 
 	edit() {
@@ -135,5 +138,5 @@ export default class EditableAvatar extends EditableBase {
 
 
 EditableAvatar.propTypes = {
-	value: React.PropTypes.string
-}
+	value: PropTypes.string
+};

@@ -1,5 +1,8 @@
 'use strict';
 
+import React from 'react';
+import PropTypes from 'prop-types';
+
 export default class RelatedPeople extends React.Component {
 	viewMoreHandler(ev) {
 		ev.preventDefault();
@@ -13,7 +16,7 @@ export default class RelatedPeople extends React.Component {
 		}
 
 		if(this.props.more) {
-			viewAllButton = <span className="profile-side-panel-header-link"><a onClick={this.viewMore} href="">View All</a></span>
+			viewAllButton = <span className="profile-side-panel-header-link"><a onClick={this.viewMore} href="">View All</a></span>;
 		}
 		return <div className="profile-side-panel">
 			<h3>{this.props.title}</h3>
@@ -29,13 +32,13 @@ export default class RelatedPeople extends React.Component {
 					</div>
 				</li>)}
 			</ul>
-		</div>
+		</div>;
 	}
 }
 
 RelatedPeople.propTypes = {
-	people: React.PropTypes.array.isRequired,
-	more: React.PropTypes.bool,
-	title: React.PropTypes.string.isRequired,
-	onViewMore: React.PropTypes.func.isRequired
-}
+	people: PropTypes.array.isRequired,
+	more: PropTypes.bool,
+	title: PropTypes.string.isRequired,
+	onViewMore: PropTypes.func.isRequired
+};

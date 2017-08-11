@@ -1,5 +1,7 @@
 'use strict';
 
+import React from 'react';
+
 export default class EditableBase extends React.Component {
 	updateFieldOnServer(field, value) {
 		var data = {};

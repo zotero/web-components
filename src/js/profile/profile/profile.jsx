@@ -1,5 +1,8 @@
 'use strict';
 
+import React from 'react';
+import PropTypes from 'prop-types';
+
 import EditableAvatar from './profile/editable-avatar.jsx';
 import EditableEducationItem from './profile/editable-education-item.jsx';
 import EditableExperienceItem from './profile/editable-experience-item.jsx';
@@ -59,7 +62,7 @@ export default class Profile extends React.Component {
 			this.alertTimeout = setTimeout(() => {
 				this.setState({
 					alert: {}
-				})
+				});
 			}, this.constructor.ALERT_AUTO_HIDE_TIME);
 		});
 	}
@@ -158,7 +161,7 @@ export default class Profile extends React.Component {
 }
 
 Profile.propTypes = {
-	profile: React.PropTypes.object.isRequired,
-	userslug: React.PropTypes.string.isRequired,
-	userid: React.PropTypes.number.isRequired
-}
+	profile: PropTypes.object.isRequired,
+	userslug: PropTypes.string.isRequired,
+	userid: PropTypes.number.isRequired
+};

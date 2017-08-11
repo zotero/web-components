@@ -1,5 +1,8 @@
 'use strict';
 
+import React from 'react';
+import PropTypes from 'prop-types';
+
 import EditableBase from '../abstract/editable-base.jsx';
 import profileEventSystem from '../profile-event-system.js';
 
@@ -11,7 +14,7 @@ export default class EditableItems extends EditableBase {
 			value: props.value && JSON.parse(props.value) || [],
 			editing: false,
 			processing: false
-		}
+		};
 	}
 
 	componentWillMount() {
@@ -136,19 +139,19 @@ export default class EditableItems extends EditableBase {
 				<a className="profile-editable-action" onClick={ () => this.save() } >
 					<span className="glyphicon glyphicon-ok"></span>
 				</a>
-			</div>
+			</div>;
 		}
 
 		if(this.props.uniform && !this.state.editing) {
 			edit = <a className="profile-editable-action" onClick={ () => this.edit() }>
 				<span className="glyphicon glyphicon-pencil"></span>
-			</a>
+			</a>;
 		}
 
 		if(!this.props.uniform) {
 			add = <a className="profile-editable-action" onClick={ () => this.add() }>
 				<span className="glyphicon glyphicon-plus"></span>
-			</a>
+			</a>;
 		}
 
 		return <div className={cssClasses}>
@@ -161,7 +164,7 @@ export default class EditableItems extends EditableBase {
 						editing: this.state.editing,
 						onUpdate: this.update.bind(this),
 						onDelete: this.delete.bind(this),
-						ref: ref => { this.editableItems[item.id] = ref }
+						ref: ref => { this.editableItems[item.id] = ref; }
 					});
 				})}
 				{edit}
@@ -171,8 +174,8 @@ export default class EditableItems extends EditableBase {
 }
 
 EditableItems.propTypes = {
-	title: React.PropTypes.string,
-	field: React.PropTypes.string,
-	emptytext: React.PropTypes.string,
-	value: React.PropTypes.string
-}
+	title: PropTypes.string,
+	field: PropTypes.string,
+	emptytext: PropTypes.string,
+	value: PropTypes.string
+};

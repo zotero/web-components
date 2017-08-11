@@ -1,5 +1,8 @@
 'use strict';
 
+import React from 'react';
+import PropTypes from 'prop-types';
+
 import EditableField from './editable-field.jsx';
 
 export default class EditableInterestItem extends EditableField {
@@ -8,14 +11,14 @@ export default class EditableInterestItem extends EditableField {
 		this.state = {
 			interest: props.value.interest,
 			editing: false
-		}
+		};
 	}
 
 	save() {
 		var updatedItem = {
 			interest: this.input.value,
 			id: this.props.value.id
-		}
+		};
 
 		this.cancelPending();
 	
@@ -70,8 +73,8 @@ export default class EditableInterestItem extends EditableField {
 
 
 EditableInterestItem.propTypes = {
-	value: React.PropTypes.object,
-	onUpdate: React.PropTypes.func,
-	onDelete: React.PropTypes.func,
-	emptytext: React.PropTypes.string
-}
+	value: PropTypes.object,
+	onUpdate: PropTypes.func,
+	onDelete: PropTypes.func,
+	emptytext: PropTypes.string
+};

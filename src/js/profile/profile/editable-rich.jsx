@@ -1,6 +1,9 @@
 /* global CKEDITOR:false */
 'use strict';
 
+import React from 'react';
+import PropTypes from 'prop-types';
+
 import EditableBase from '../abstract/editable-base.jsx';
 import profileEventSystem from '../profile-event-system.js';
 
@@ -11,7 +14,7 @@ export default class EditableRich extends EditableBase {
 			value: props.value,
 			editing: false,
 			processing: false
-		}
+		};
 	}
 
 	edit() {
@@ -66,7 +69,7 @@ export default class EditableRich extends EditableBase {
 	getMarkup() {
 		return {
 			__html: this.state.value || this.props.emptytext
-		}
+		};
 	}
 
 	saveHandler(ev) {
@@ -134,14 +137,14 @@ export default class EditableRich extends EditableBase {
 					items: [ 'Maximize', '-', 'Source' ]
 				}
 			]
-		}
+		};
 	}
 }
 
 
 EditableRich.propTypes = {
-	title: React.PropTypes.string,
-	field: React.PropTypes.string,
-	emptytext: React.PropTypes.string,
-	value: React.PropTypes.string
-}
+	title: PropTypes.string,
+	field: PropTypes.string,
+	emptytext: PropTypes.string,
+	value: PropTypes.string
+};

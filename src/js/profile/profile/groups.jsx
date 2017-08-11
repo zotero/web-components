@@ -1,8 +1,12 @@
 /* global Zotero:false */
 'use strict';
 
+import React from 'react';
+import PropTypes from 'prop-types';
+
 import GroupsBase from '../abstract/groups-base.jsx';
 import profileEventSystem from '../profile-event-system.js';
+import {buildUrl} from '../../wwwroutes.js';
 
 export default class Groups extends GroupsBase {
 	constructor(props) {
@@ -44,12 +48,12 @@ export default class Groups extends GroupsBase {
 		}
 
 		if(this.state.more) {
-			viewAllButton = <span className="profile-side-panel-header-link">
+			viewAllButton = (<span className="profile-side-panel-header-link">
 				<a onClick={ ev => this.viewMore(ev) } href="">View All</a>
-			</span>
+			</span>);
 		}
 
-		return <div className="profile-side-panel">
+		return (<div className="profile-side-panel">
 			<h3>Groups</h3>
 			{ viewAllButton }
 			<ul>
@@ -59,11 +63,11 @@ export default class Groups extends GroupsBase {
 							{ group.get('name') }
 						</div>
 						<div>
-							<a href={ Zotero.url.groupViewUrl(group) }>Join</a>
+							<a href={ buildUrl('groupView', {group:group.apiObj}) }>Join</a>
 						</div>
 					</li>)}
 			</ul>
-		</div>
+		</div>);
 	}
 
 	static get defaultProps() {
@@ -74,7 +78,7 @@ export default class Groups extends GroupsBase {
 }
 
 Groups.propTypes = {
-	userid: React.PropTypes.number.isRequired,
-	count: React.PropTypes.number,
-	onViewMore: React.PropTypes.func.isRequired
-}
+	userid: PropTypes.number.isRequired,
+	count: PropTypes.number,
+	onViewMore: PropTypes.func.isRequired
+};

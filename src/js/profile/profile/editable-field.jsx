@@ -1,5 +1,8 @@
 'use strict';
 
+import React from 'react';
+import PropTypes from 'prop-types';
+
 import EditableBase from '../abstract/editable-base.jsx';
 import profileEventSystem from '../profile-event-system.js';
 
@@ -10,7 +13,7 @@ export default class EditableField extends EditableBase {
 			value: this.props.value,
 			editing: false,
 			processing: false
-		}
+		};
 	}
 
 	focus() {
@@ -108,7 +111,7 @@ export default class EditableField extends EditableBase {
 					</a>
 				</div>;
 			}
-			return <form className="profile-editable-field profile-editable-editing form-inline" onSubmit={ev => { this.saveHandler(ev) }}>
+			return <form className="profile-editable-field profile-editable-editing form-inline" onSubmit={ev => { this.saveHandler(ev); }}>
 				<input 
 					disabled={this.state.processing ? 'disabled' : null }
 					className="form-control" ref={(c) => this.input = c}
@@ -120,7 +123,7 @@ export default class EditableField extends EditableBase {
 		} else {
 			return <div className={cssClasses}>
 				<span>{this.state.value || this.props.emptytext}</span>
-				<a className="profile-editable-action" onClick={ () => { this.edit() }}>
+				<a className="profile-editable-action" onClick={ () => { this.edit(); }}>
 					<span className="glyphicon glyphicon-pencil"></span>
 				</a>
 			</div>;
@@ -130,7 +133,7 @@ export default class EditableField extends EditableBase {
 
 
 EditableField.propTypes = {
-	value: React.PropTypes.string,
-	field: React.PropTypes.string,
-	emptytext: React.PropTypes.string
-}
+	value: PropTypes.string,
+	field: PropTypes.string,
+	emptytext: PropTypes.string
+};

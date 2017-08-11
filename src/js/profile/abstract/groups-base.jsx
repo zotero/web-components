@@ -1,6 +1,9 @@
 /* global Zotero:false */
 'use strict';
 
+import React from 'react';
+import PropTypes from 'prop-types';
+
 var cache = {};
 
 export default class GroupsBase extends React.Component {
@@ -19,5 +22,5 @@ export default class GroupsBase extends React.Component {
 }
 
 GroupsBase.propTypes = {
-	userid: React.PropTypes.number.isRequired
-}
+	userid: PropTypes.number.isRequired
+};

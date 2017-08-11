@@ -1,5 +1,8 @@
 'use strict';
 
+import React from 'react';
+import PropTypes from 'prop-types';
+
 export default class Tab extends React.Component {
 	render() {
 		var classes = 'profile-tab-content tab-pane';
@@ -14,6 +17,6 @@ export default class Tab extends React.Component {
 }
 
 Tab.propTypes = {
-	active: React.PropTypes.bool,
-	children: React.PropTypes.node
-}
+	active: PropTypes.bool,
+	children: PropTypes.node
+};

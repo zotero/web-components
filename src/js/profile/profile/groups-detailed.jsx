@@ -1,8 +1,12 @@
 /* global Zotero:false */
 'use strict';
 
+import React from 'react';
+import PropTypes from 'prop-types';
+
 import GroupsBase from '../abstract/groups-base.jsx';
 import profileEventSystem from '../profile-event-system.js';
+import {buildUrl} from '../../wwwroutes.js';
 
 export default class GroupsDetailed extends GroupsBase {
 	constructor(props) {
@@ -39,7 +43,7 @@ export default class GroupsDetailed extends GroupsBase {
 								<span>
 									{ group.get('name') }
 								</span>
-								<a href={ Zotero.url.groupViewUrl(group) } className="profile-groups-detailed-details-join">
+								<a href={ buildUrl('groupView', {group:group.apiObj}) } className="profile-groups-detailed-details-join">
 									Join
 								</a>
 							</div>
@@ -64,7 +68,7 @@ export default class GroupsDetailed extends GroupsBase {
 }
 
 GroupsDetailed.propTypes = {
-	userid: React.PropTypes.number.isRequired,
-	count: React.PropTypes.number,
-	onViewMore: React.PropTypes.func.isRequired
-}
+	userid: PropTypes.number.isRequired,
+	count: PropTypes.number,
+	onViewMore: PropTypes.func.isRequired
+};

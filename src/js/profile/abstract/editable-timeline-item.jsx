@@ -1,5 +1,8 @@
 'use strict';
 
+import React from 'react';
+import PropTypes from 'prop-types';
+
 export default class EditableTimelineItem extends React.Component {
 	constructor(props) {
 		super(props);
@@ -110,7 +113,7 @@ export default class EditableTimelineItem extends React.Component {
 }
 
 EditableTimelineItem.propTypes = {
-	value: React.PropTypes.object,
-	onUpdate: React.PropTypes.func,
-	onDelete: React.PropTypes.func
-}
+	value: PropTypes.object,
+	onUpdate: PropTypes.func,
+	onDelete: PropTypes.func
+};

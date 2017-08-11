@@ -1,5 +1,8 @@
 'use strict';
 
+import React from 'react';
+import PropTypes from 'prop-types';
+
 export default class Tabs extends React.Component {
 	render() {
 		if(this.props.extended) {
@@ -22,7 +25,7 @@ export default class Tabs extends React.Component {
 }
 
 Tabs.propTypes = {
-	active: React.PropTypes.bool,
-	extended: React.PropTypes.bool,
-	children: React.PropTypes.node
-}
+	active: PropTypes.bool,
+	extended: PropTypes.bool,
+	children: PropTypes.node
+};

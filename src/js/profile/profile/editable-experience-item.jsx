@@ -1,4 +1,6 @@
  'use strict';
+ 
+ import React from 'react';
 
  import EditableTimelineItem from '../abstract/editable-timeline-item.jsx';
 
@@ -89,6 +91,6 @@
 			end_year: '',
 			institution: '',
 			present: false
-		}
+		};
 	}
  }

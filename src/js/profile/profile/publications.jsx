@@ -1,5 +1,8 @@
 'use strict';
 
+import React from 'react';
+import PropTypes from 'prop-types';
+
 import ZoteroPublications from 'zotero-publications';
 
 export default class Publications extends React.Component {
@@ -8,7 +11,7 @@ export default class Publications extends React.Component {
 		this.state = {
 			hidden: true,
 			loading: true
-		}
+		};
 	}
 
 	componentWillMount() {
@@ -40,7 +43,7 @@ export default class Publications extends React.Component {
 					this.setState({
 						loading: false,
 						hidden: true
-					})
+					});
 				}
 			})
 			.catch(() => {
@@ -48,7 +51,7 @@ export default class Publications extends React.Component {
 				this.setState({
 					hidden: true,
 					loading: false
-				})
+				});
 			});
 	}
 
@@ -61,13 +64,13 @@ export default class Publications extends React.Component {
 			return <div>
 				<h2>Publications</h2>
 				<div className="profile-editable-spinner"></div>
-			</div>
+			</div>;
 		}
 
 		return <div>
 			<h2>Publications</h2>
 			<div ref={ ref => this.publicationsContainer = ref}></div>
-		</div>
+		</div>;
 	}
 
 	static get SHOW_SPINNER_DELAY() {
@@ -76,5 +79,5 @@ export default class Publications extends React.Component {
 }
 
 Publications.propTypes = {
-	userid: React.PropTypes.number
-}
+	userid: PropTypes.number
+};

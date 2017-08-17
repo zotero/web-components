@@ -13,9 +13,11 @@ if(typeof window === 'undefined') {
 }
 
 const React = require('react');
+let Zotero = require('libzotero');
 
 globalScope.ReactDOM = require('react-dom');
 globalScope.React = React;
+globalScope.Zotero = Zotero;
 
 import {Storage} from './Storage.js';
 import {MakeEditable} from './MakeEditable.js';
@@ -34,6 +36,7 @@ import {pageReady, jsError} from './Utils.js';
 import {cycleTestCases, cycleTestFuncs} from './TestUtils.js';
 import {Combined} from './GlobalSearch/Combined.js';
 import Profile from './profile/profile.jsx';
+import Layout from './Layout/layout.js';
 
 let ZoteroWebComponents = {
 	Storage,
@@ -55,7 +58,8 @@ let ZoteroWebComponents = {
 	cycleTestCases,
 	cycleTestFuncs,
 	Combined,
-	Profile
+	Profile,
+	Layout
 };
 
 globalScope.ZoteroWebComponents = ZoteroWebComponents;

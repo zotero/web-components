@@ -14,6 +14,9 @@ import {buildUrl} from './wwwroutes.js';
 
 let phpgroupToGroup = function(phpgroup){
 	log.debug('phpgroupToGroup');
+	if(phpgroup.hasOwnProperty('wwwData')){
+		return phpgroup.apiObj;
+	}
 	let group = {
 		id: phpgroup.id,
 		data: {

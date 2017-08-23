@@ -14,10 +14,15 @@ if(typeof window === 'undefined') {
 
 const React = require('react');
 let Zotero = require('libzotero');
+let jQuery = require('jquery');
 
 globalScope.ReactDOM = require('react-dom');
 globalScope.React = React;
 globalScope.Zotero = Zotero;
+globalScope.jQuery = jQuery;
+globalScope.$ = jQuery;
+globalScope.Popper = require('popper.js');
+require('bootstrap');
 
 import {Storage} from './Storage.js';
 import {MakeEditable} from './MakeEditable.js';

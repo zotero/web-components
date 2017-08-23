@@ -1,0 +1,11 @@
+.major-col {
+	@include make-col(8);
+}
+
+.minor-col {
+	@include make-col(4);
+}
+
+.single-col {
+	@include make-col(12);
+}

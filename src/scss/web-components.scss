@@ -1,6 +1,23 @@
 //
 // Zotero web components
 // --------------------------------------------------
+/*
+$theme-colors: (
+	primary: #5c93e5,
+	secondary: gray,
+	success: green,
+	info: cyan,
+	warning: yellow,
+	danger: red,
+	light: lightgray,
+	dark: gray
+);
+*/
+@import 'themestyle';
+@import 'main';
+
+@import '../../node_modules/bootstrap/scss/bootstrap';
+@import 'layout';
 
 @import 'themes/light';
 

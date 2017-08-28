@@ -34,6 +34,7 @@ import {pageReady, jsError} from './Utils.js';
 import {cycleTestCases, cycleTestFuncs} from './TestUtils.js';
 import {Combined} from './GlobalSearch/Combined.js';
 import Profile from './profile/profile.jsx';
+import {ChangeUsername} from './ChangeUsername.js';
 
 let ZoteroWebComponents = {
 	Storage,
@@ -55,7 +56,8 @@ let ZoteroWebComponents = {
 	cycleTestCases,
 	cycleTestFuncs,
 	Combined,
-	Profile
+	Profile,
+	ChangeUsername
 };
 
 globalScope.ZoteroWebComponents = ZoteroWebComponents;

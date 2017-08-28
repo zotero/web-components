@@ -50,6 +50,8 @@ let buildUrl = function(name, params){
 			return `/groups/checkname?input=${params.name}`;
 		case 'checkUsername':
 			return `/user/checkusername?username=${encodeURIComponent(params.username)}`;
+		case 'changeUsername':
+			return `/settings/changeusername`;
 		case 'itemUrl':
 			if(params.item.library.type == 'group'){
 				return `/groups/${params.item.library.id}/${slugify(params.item.library.name)}/items/itemKey/${params.item.key}`;

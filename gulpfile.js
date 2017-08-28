@@ -103,7 +103,7 @@ gulp.task('js', () => {
 });
 
 gulp.task('dev', ['clean:build'], () => {
-	gulp.watch('src/scss/*.scss', ['sass']);
+	gulp.watch('src/scss/**/*.scss', ['sass']);
 	return merge(getSass(true), getJS(true));
 });
 

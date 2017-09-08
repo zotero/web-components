@@ -1,0 +1,21 @@
+div.CVEditor {
+	
+	button,.btn {
+		color: #333;
+		background: #f0f0f0;
+		border: 1px solid #b1b1b1;
+		text-decoration: none;
+		border-radius: 3px;
+		padding: 5px 15px;
+		text-shadow:initial;
+
+		&:hover {
+			background: darken(#f0f0f0, 5%);
+		}
+	}
+	
+	input, select {
+		min-width:350px;
+		margin:3px 0;
+	}
+}

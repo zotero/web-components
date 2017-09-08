@@ -35,6 +35,7 @@ import {cycleTestCases, cycleTestFuncs} from './TestUtils.js';
 import {Combined} from './GlobalSearch/Combined.js';
 import Profile from './profile/profile.jsx';
 import {ChangeUsername} from './ChangeUsername.js';
+import {CVEditor} from './CV/cv.js';
 
 let ZoteroWebComponents = {
 	Storage,
@@ -57,7 +58,8 @@ let ZoteroWebComponents = {
 	cycleTestFuncs,
 	Combined,
 	Profile,
-	ChangeUsername
+	ChangeUsername,
+	CVEditor
 };
 
 globalScope.ZoteroWebComponents = ZoteroWebComponents;

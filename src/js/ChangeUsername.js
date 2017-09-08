@@ -1,7 +1,7 @@
 'use strict';
 
-import {log as logger} from './Log.js';
-let log = logger.Logger('ChangeUsernameComponent');
+//import {log as logger} from './Log.js';
+//let log = logger.Logger('ChangeUsernameComponent');
 
 const React = require('react');
 const {Component} = React;

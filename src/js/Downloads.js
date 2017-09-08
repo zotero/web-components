@@ -209,6 +209,7 @@ class DownloadConnector extends Component {
 		this.state = {
 			showAllExtensions:false,
 			oldSafari: installData.oldSafari,
+			firefox45: navigator.userAgent.includes('Firefox/45')
 		};
 		this.showAllExtensions = this.showAllExtensions.bind(this);
 	}
@@ -228,6 +229,10 @@ class DownloadConnector extends Component {
 				</p>
 			);
 		}
+		let installButton = <InstallButton browser={this.props.featuredBrowser} label={`Install ${this.props.featuredBrowser} Connector`} />;
+		if(this.state.firefox45){
+			installButton = <p className='danger'>It looks like you're using Firefox 45. A newer version of Firefox is required to use the Zotero connector.</p>;
+		}
 		return (
 			<section className='connector'>
 				<BrowserExtensionIcon
@@ -240,7 +245,7 @@ class DownloadConnector extends Component {
 				/>
 				<h1>Zotero Connector</h1>
 				<p className='lead'>Save to Zotero from your browser</p>
-				<InstallButton browser={this.props.featuredBrowser} label={`Install ${this.props.featuredBrowser} Connector`} />
+				{installButton}
 				<p className='description'>Zotero Connectors automatically sense content as you browse the web and allow you to save it to Zotero with a single click.</p>
 				{versionNote}
 				{!this.state.showAllExtensions

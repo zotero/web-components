@@ -167,6 +167,18 @@
 								oldSafari:true
 							});
 						},
+						test12: function(){
+							window.downloadElement.setState({
+								featuredOS:'Mac',
+								featuredBrowser:'Firefox',
+								arch:'x86_64'
+							});
+							window.downloadElement.refs.downloadConnector.setState({
+								featuredBrowser:'Firefox',
+								oldSafari:false,
+								firefox45:true
+							});
+						},
 					};
 
 					let testCase = tests['test1'];

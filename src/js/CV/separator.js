@@ -48,19 +48,8 @@ class Separator extends Component {
 		const { connectDropTarget, isOver, canDrop } = this.props;
 
 		return connectDropTarget(
-			<div style={{
-				position: 'relative',
-				width: '100%',
-				height: '20px'
-			}}>
-				{isOver && canDrop && <div style={{
-					width: '100%',
-					height: '100%',
-					backgroundColor: 'blue',
-					opacity: '0.2'
-				}}>
-				</div>
-				}
+			<div className={`separator ${this.props.region}`}>
+				{isOver && canDrop && <div className='separator-highlight'></div>}
 			</div>
 		);
 	}

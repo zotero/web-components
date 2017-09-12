@@ -18,4 +18,25 @@ div.CVEditor {
 		min-width:350px;
 		margin:3px 0;
 	}
+
+	.separator {
+		position: relative;
+		width:100%;
+		height:30px;
+		opacity: 0.2;
+	}
+	.separator.top {
+		top:-30px;
+	}
+	.separator-highlight {
+		width: 100%;
+		height: 100%;
+		background-color: blue;
+		opacity: 0.5;
+	}
+	.cv_section {
+		margin-top:-20px;
+		border: 1px dashed rgba(0,0,0,.2);
+		padding:15px;
+	}
 }

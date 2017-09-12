@@ -76,9 +76,9 @@ class Section extends Component {
 		}
 		return connectDragSource(
 			<div className='cv_section'>
-				<button className='btn' onClick={this.moveUp}>▲</button>
-				<button className='btn' onClick={this.moveDown}>▼</button>
-				<button className='btn' onClick={this.remove}>x</button>
+				<button className='btn' onClick={this.moveUp} title='Move Up'>▲</button>
+				<button className='btn' onClick={this.moveDown} title='Move Down'>▼</button>
+				<button className='btn' onClick={this.remove} title='Remove Section'>x</button>
 				<input type='text' className='cv-heading form-control' name='' defaultValue={this.props.section.heading} onChange={this.headingChange} placeholder='Section Title' /> 
 				{typedSection}
 			</div>

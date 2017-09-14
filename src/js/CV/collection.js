@@ -43,16 +43,26 @@ class Collection extends Component {
 			);
 		});
 
-		let def = this.props.section.value;
+		let collectionKey = this.props.section.value;
 		
-		return (
-			<div className='cv-collection'>
-				<select className='form-control' defaultValue={def}>
-					{options}
-				</select>
-				<p className='hint'>Collection from your library that will be formatted as a bibliography</p>
-			</div>
-		);
+		if(this.props.editing){
+			return (
+				<div className='cv-collection'>
+					<select className='form-control' defaultValue={collectionKey} onChange={this.collectionChange}>
+						{options}
+					</select>
+					<p className='hint'>Collection from your library that will be formatted as a bibliography</p>
+					{(this.props.section.collectionPreview !== undefined) && true }
+					<div dangerouslySetInnerHTML={{__html:this.props.collectionPreviews[collectionKey]}}></div>
+				</div>
+			);
+		} else {
+			return (
+				<div className="profile_cvText">
+					<div dangerouslySetInnerHTML={{__html:this.props.collectionPreviews[collectionKey]}}></div>
+				</div>
+			);
+		}
 	}
 }
 

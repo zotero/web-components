@@ -33,15 +33,22 @@ class RTE extends Component {
 		this.props.updateEntry(this.props.section.tracking, 'value', content);
 	}
 	render() {
-		return (
-			<div className='cv_rte'>
-				<TinyEditorComponent 
-					id={this.props.id}
-					content={this.props.section.value}
-					onEditorChange={this.editorChange}
-				/>
-			</div>
-		);
+		if(!this.props.editing){
+			return(
+				<div className="profile_cvText" dangerouslySetInnerHTML={{__html:this.props.section.value}}>
+				</div>
+			);
+		} else {
+			return (
+				<div className='cv_rte'>
+					<TinyEditorComponent 
+						id={this.props.id}
+						content={this.props.section.value}
+						onEditorChange={this.editorChange}
+					/>
+				</div>
+			);
+		}
 	}
 }
 

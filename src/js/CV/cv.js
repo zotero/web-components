@@ -1,5 +1,9 @@
 'use strict';
 
+//TODO: make click to edit/blur to save
+//add handle for dragging
+//actually save the CV (currently not submitting form)
+
 import {log as logger} from '../Log.js';
 let log = logger.Logger('CVEditor');
 
@@ -14,7 +18,6 @@ import {randomString} from '../Utils.js';
 
 import {StyleChooser} from './styleChooser.js';
 import Section from './section.js';
-import Separator from './separator.js';
 import {jsError, getCurrentUser} from '../Utils.js';
 import {apiRequestString} from '../ApiRouter.js';
 
@@ -61,6 +64,7 @@ class CVEditor extends Component{
 		CVEntryMap = entryMap;
 		this.state = {
 			collections:[],
+			collectionPreviews:{},
 			entryMap:entryMap,
 			entryOrder:entryOrder,
 			style:this.props.style
@@ -72,11 +76,13 @@ class CVEditor extends Component{
 		this.updateEntry = this.updateEntry.bind(this);
 		this.save = this.save.bind(this);
 		this.loadCollections = this.loadCollections.bind(this);
+		this.edit = this.edit.bind(this);
 	}
 	componentDidMount(){
 		document.documentElement.className += ' react-mounted';
 		this.activateEditors();
 		this.loadCollections();
+		this.initializePreviews();
 	}
 	async loadCollections() {
 		let userID = false;
@@ -113,6 +119,49 @@ class CVEditor extends Component{
 			return nested;
 		} catch(err) {
 			jsError('Error loading collections');
+		}
+	}
+	async initializePreviews(){
+		try{
+			let collectionPreviews = {};
+			for(let i = 0; i < this.state.entryOrder.length; i++){
+				let tracking = this.state.entryOrder[i];
+				let section = CVEntryMap[tracking];
+				if(section.type == 'collection'){
+					let preview = await this.previewCollection(section.value);
+					collectionPreviews[section.value] = preview;
+				}
+			}
+			this.setState({collectionPreviews});
+		} catch(err) {
+			jsError('Error initializing previews');
+		}
+	}
+	//load the collection styled with the current style
+	async previewCollection(collectionKey){
+		log.debug('previewCollection');
+		try{
+			let userID = false;
+			if(this.props.userID){
+				userID = this.props.userID;
+			} else if(currentUser){
+				userID = currentUser.userID;
+			}
+
+			let collectionsUrl = apiRequestString({
+				'format':'bib',
+				'style':this.state.style,
+				'linkwrap':1,
+				'target':'items',
+				'collectionKey':collectionKey,
+				'libraryType':'user',
+				'libraryID': userID
+			});
+			let resp = await ajax({url: collectionsUrl, credentials:'omit'});
+			let preview = await resp.text();
+			return preview;
+		} catch(err) {
+			jsError('Error loading collection preview');
 		}
 	}
 	appendSection(type){
@@ -155,8 +204,17 @@ class CVEditor extends Component{
 			statusbar:true
 		});
 	}
-	updateEntry(tracking, field, value){
+	async updateEntry(tracking, field, value){
+		log.debug('updateEntry');
 		CVEntryMap[tracking][field] = value;
+		if(CVEntryMap[tracking]['type'] == 'collection'){
+			let preview = await this.previewCollection(CVEntryMap[tracking]['value']);
+			CVEntryMap[tracking]['collectionPreview'] = preview;
+			this.setState({preview:preview});
+		}
+	}
+	edit(index){
+		this.setState({editing:index}, this.activateEditors);
 	}
 	save(){
 		let cventries = [];
@@ -171,13 +229,11 @@ class CVEditor extends Component{
 			CVEntryMap[tracking]['value'] = updatedContent;
 			cventries.push(CVEntryMap[tracking]);
 		});
-		//log.debug(CVEntryMap);
 		let cleancventries = cventries.map((entry)=>{
 			entry = Object.assign({}, entry);
 			delete entry.tracking;
 			return entry;
 		});
-		//log.debug(cleancventries);
 		let saveObj = {
 			style:this.state.style,
 			entries:cleancventries
@@ -187,6 +243,7 @@ class CVEditor extends Component{
 	render(){
 		let sections = this.state.entryOrder.map((tracking, index)=>{
 			let section = CVEntryMap[tracking];
+			let editing = (this.state.editing == index);
 			return <Section
 				ref={tracking}
 				section={section}
@@ -194,20 +251,17 @@ class CVEditor extends Component{
 				key={tracking}
 				id={`cv_${tracking}`}
 				collections={this.state.collections}
+				collectionPreviews={this.state.collectionPreviews}
 				moveEntry={this.moveEntry}
 				updateEntry={this.updateEntry}
+				editing={editing}
+				edit={this.edit}
 			/>;
-		});
-		let separated = [];
-		sections.forEach((el, ind)=>{
-			separated.push(<Separator index={ind} region='top' key={`top_${ind}`} moveEntry={this.moveEntry} />);
-			separated.push(el);
-			separated.push(<Separator index={ind} region='bottom' key={`bottom_${ind}`} moveEntry={this.moveEntry} />);
 		});
 		return (
 			<div className='CVEditor'>
 				<StyleChooser style={this.state.style} changeStyle={(style)=>{this.setState({style});}}/>
-				{separated}
+				{sections}
 				<a href='#' onClick={this.insertTextSection}>Insert a new text section</a>
 				{' | '}
 				<a href='#' onClick={this.insertCollection}>Insert a new collection from library</a>

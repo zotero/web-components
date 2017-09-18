@@ -77,9 +77,18 @@ class UsernameForm extends Component{
 					});
 				}
 			});
-		}).catch(()=>{
-			let formErrors = {username: 'Error changing username'};
-			this.setState({formErrors});
+		}).catch((response)=>{
+			if(response.status == 429){
+				this.setState({
+					changeSuccessful:false,
+					formError:'Username has been changed too recently'
+				});
+			} else {
+				this.setState({
+					changeSuccessful:false,
+					formError:'There was an error changing your username'
+				});
+			}
 		});
 	}
 	handleChange(ev){

@@ -295,8 +295,19 @@ class Downloads extends Component{
 			<div className={classnames('downloads', this.state.mobile?'mobile':'')}>
 				<div className="container">
 					{featuredBrowser == 'Firefox'
-						? <p style={{ fontSize: '16px', fontWeight: 'bold', textAlign: 'center' }}>
-							Looking for Zotero 5.0 for Firefox? We’ve made some{' '}
+						? <p style={{
+								width: '90%',
+								marginLeft: 'auto',
+								marginRight: 'auto',
+								fontSize: '16px',
+								fontWeight: 'bold',
+								textAlign: 'center',
+								backgroundColor: '#fff9b7',
+								paddingTop: '9px',
+								paddingBottom: '9px',
+								borderRadius: '4px'
+						}}>
+							Using Zotero with Firefox? We’ve made some{' '}
 							<a href="/blog/a-unified-zotero-experience/">important changes</a> to the way
 							Zotero works.
 						</p>

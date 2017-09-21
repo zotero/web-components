@@ -3,6 +3,8 @@
 //TODO: make click to edit/blur to save
 //add handle for dragging
 //actually save the CV (currently not submitting form)
+//fix collection preview behaviour
+//decide what to do with editable select
 
 import {log as logger} from '../Log.js';
 let log = logger.Logger('CVEditor');
@@ -208,9 +210,11 @@ class CVEditor extends Component{
 		log.debug('updateEntry');
 		CVEntryMap[tracking][field] = value;
 		if(CVEntryMap[tracking]['type'] == 'collection'){
+			let collectionPreviews = this.state.collectionPreviews;
 			let preview = await this.previewCollection(CVEntryMap[tracking]['value']);
 			CVEntryMap[tracking]['collectionPreview'] = preview;
-			this.setState({preview:preview});
+			collectionPreviews[CVEntryMap[tracking]['value']] = preview;
+			this.setState({collectionPreviews});
 		}
 	}
 	edit(index){

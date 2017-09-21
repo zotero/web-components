@@ -5,24 +5,7 @@
 
 const React = require('react');
 const {Component} = React;
-
-
-class TinyEditorComponent extends Component {
-	constructor(props) {
-		super(props);
-		this.state = { editor: null };
-	}
-	render() {
-		return (
-			<textarea
-				id={this.props.id}
-				defaultValue={this.props.content}
-				className='rte'
-			/>
-		);
-	}
-}
-
+import {EditableRichText} from './editableTextInput.js';
 
 class RTE extends Component {
 	constructor(props) {
@@ -33,22 +16,7 @@ class RTE extends Component {
 		this.props.updateEntry(this.props.section.tracking, 'value', content);
 	}
 	render() {
-		if(!this.props.editing){
-			return(
-				<div className="profile_cvText" dangerouslySetInnerHTML={{__html:this.props.section.value}}>
-				</div>
-			);
-		} else {
-			return (
-				<div className='cv_rte'>
-					<TinyEditorComponent 
-						id={this.props.id}
-						content={this.props.section.value}
-						onEditorChange={this.editorChange}
-					/>
-				</div>
-			);
-		}
+		return <EditableRichText id={this.props.id} value={this.props.section.value} save={this.editorChange} />;
 	}
 }
 

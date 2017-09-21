@@ -10,6 +10,7 @@ import { DragSource, DropTarget } from 'react-dnd';
 
 import {RTE} from './text.js';
 import {Collection} from './collection.js';
+import {EditableTextInput, EditableRichText} from './editableTextInput.js';
 
 // Drag sources and drop targets only interact
 // if they have the same string type.
@@ -90,6 +91,7 @@ function dragcollect(connect, monitor) {
 		// Call this function inside render()
 		// to let React DnD handle the drag events:
 		connectDragSource: connect.dragSource(),
+		connectDragPreview: connect.dragPreview(),
 		// You can ask the monitor about the current drag state:
 		isDragging: monitor.isDragging()
 	};
@@ -111,9 +113,13 @@ class Section extends Component {
 		this.headingChange = this.headingChange.bind(this);
 		this.edit = this.edit.bind(this);
 		this.save = this.save.bind(this);
+		this.updateHeading = this.updateHeading.bind(this);
 	}
 	headingChange(evt){
 		this.props.updateEntry(this.props.section.tracking, 'heading', evt.target.value);
+	}
+	updateHeading(newval){
+		this.props.updateEntry(this.props.section.tracking, 'heading', newval);
 	}
 	moveUp(){
 		this.props.moveEntry(this.props.index, this.props.index-1);
@@ -134,7 +140,7 @@ class Section extends Component {
 		const {type} = this.props.section;
 		// These two props are injected by React DnD,
 		// as defined by your `collect` function above:
-		const { isDragging, connectDragSource, connectDropTarget, isOver, canDrop } = this.props;
+		const { isDragging, connectDragPreview, connectDragSource, connectDropTarget, isOver, canDrop } = this.props;
 
 		let typedSection = null;
 		if(type == 'text'){
@@ -142,30 +148,21 @@ class Section extends Component {
 		} else if(type == 'collection'){
 			typedSection = <Collection {...this.props} />;
 		}
-		if(this.props.editing){
-			return connectDropTarget(connectDragSource(
-				<div className='cv_section'>
-					<button className='btn' onClick={this.moveUp} title='Move Up'>▲</button>
-					<button className='btn' onClick={this.moveDown} title='Move Down'>▼</button>
-					<button className='btn' onClick={this.remove} title='Remove Section'>x</button>
-					<button className='btn' onClick={this.save} title='Save Section'>Save</button>
-					<input type='text' className='cv-heading form-control' name='' defaultValue={this.props.section.heading} onChange={this.headingChange} placeholder='Section Title' /> 
-					{typedSection}
-				</div>
-			));
-		} else {
-			return connectDropTarget(connectDragSource(
-				<div className='cv_section'>
-					<button className='btn' onClick={this.moveUp} title='Move Up'>▲</button>
-					<button className='btn' onClick={this.moveDown} title='Move Down'>▼</button>
-					<button className='btn' onClick={this.remove} title='Remove Section'>x</button>
-					<button className='btn' onClick={this.edit} title='Edit Section'>Edit</button>
-					<h2 className="profile_cvHead">{this.props.section.heading}</h2>
-					{typedSection}
-				</div>
-			));
-		}
+		return connectDropTarget(connectDragPreview(
+			<div className='cv_section'>
+				{connectDragSource(<div className='drag_handle'></div>)}
+				<button className='btn' onClick={this.moveUp} title='Move Up'>▲</button>
+				<button className='btn' onClick={this.moveDown} title='Move Down'>▼</button>
+				<button className='btn' onClick={this.remove} title='Remove Section'>x</button>
+				<button className='btn' onClick={this.edit} title='Edit Section'>Edit</button>
+				<h2 className="profile_cvHead">
+					<EditableTextInput value={this.props.section.heading} save={this.updateHeading} />
+				</h2>
+				{typedSection}
+			</div>
+		));
 	}
 }
 
 export default DropTarget(Types.CVSECTION, sectionTarget, dropcollect)(DragSource(Types.CVSECTION, sectionSource, dragcollect)(Section));
+//export default Section;

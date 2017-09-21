@@ -36,4 +36,24 @@ div.CVEditor {
 		border: 1px dashed rgba(0,0,0,.2);
 		padding:15px;
 	}
+
+	h2.profile_cvHead {
+		display:flex;
+	}
+	span.editable, input.editable, div.editable {
+		border-radius:3px;
+		padding:3px;
+		flex:1 1 auto;
+
+		&:hover {
+			background:rgba(0,0,255,.3);
+		}
+	}
+	
+	div.drag_handle {
+		background-color:rgba(0,0,0,.1);
+		cursor: move;
+		min-height:20px;
+		margin-bottom:8px;
+	}
 }

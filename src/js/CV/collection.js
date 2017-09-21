@@ -45,24 +45,16 @@ class Collection extends Component {
 
 		let collectionKey = this.props.section.value;
 		
-		if(this.props.editing){
-			return (
-				<div className='cv-collection'>
-					<select className='form-control' defaultValue={collectionKey} onChange={this.collectionChange}>
-						{options}
-					</select>
-					<p className='hint'>Collection from your library that will be formatted as a bibliography</p>
-					{(this.props.section.collectionPreview !== undefined) && true }
-					<div dangerouslySetInnerHTML={{__html:this.props.collectionPreviews[collectionKey]}}></div>
-				</div>
-			);
-		} else {
-			return (
-				<div className="profile_cvText">
-					<div dangerouslySetInnerHTML={{__html:this.props.collectionPreviews[collectionKey]}}></div>
-				</div>
-			);
-		}
+		return (
+			<div className='cv-collection'>
+				<select className='form-control' defaultValue={collectionKey} onChange={this.collectionChange}>
+					{options}
+				</select>
+				<p className='hint'>Collection from your library that will be formatted as a bibliography</p>
+				{(this.props.section.collectionPreview !== undefined) && true }
+				<div dangerouslySetInnerHTML={{__html:this.props.collectionPreviews[collectionKey]}}></div>
+			</div>
+		);
 	}
 }
 

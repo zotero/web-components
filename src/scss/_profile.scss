@@ -1,0 +1,402 @@
+$color-profile-base: #000;
+$color-profile-accent: #337ab7;
+$color-profile-tint: rgba(255, 255, 255, .75);
+
+.profile-avatar {
+	border: 1px solid $color-profile-base;
+	height: 200px;
+	position: relative;
+	width: 200px;
+
+	.profile-editable-actions {
+		background-color: $color-profile-tint;
+		padding: .25em;
+		position: absolute;
+		right: .5em;
+		top: .5em;
+
+		> a {
+			margin: 0 .1em;
+		}
+	}
+
+	.profile-editable-spinner {
+		position: absolute;
+		right: 10px;
+		top: 5px;
+	}
+
+	img {
+		height: 100%;
+		width: 100%;
+	}
+
+	[type=file] {
+		display: none;
+	}
+}
+
+.profile-editable-interest {
+	align-items: center;
+	border: 1px solid $color-profile-accent;
+	display: inline-flex;
+	justify-content: center;
+	min-height: 50px;
+	padding: .5em;
+	vertical-align: top;
+
+	/*@include upto(vga) {
+		display: block;
+
+		.profile-editable-actions {
+			margin-top: .5em;
+			text-align: right;
+			width: 100%;
+		}
+
+		+ .profile-editable-interest {
+			margin-top: 1em;
+		}
+	}
+
+	@include from(vga) {
+		margin-bottom: .5em;
+		margin-right: 1em;
+	}*/
+}
+
+.editable-text {
+	border-bottom: 0;
+	cursor: pointer;
+	line-height: 1.2em;
+	vertical-align: middle;
+}
+
+.user-profile-personal-details {
+	ul {
+		list-style: none;
+	}
+
+	li {
+		margin-top: .25em;
+	}
+
+	.profile-editable-field {
+		/*@include upto(xga) {
+			.form-control {
+				display: inline-block;
+				width: calc(100% - 48px);
+			}
+
+			.profile-editable-actions {
+				width: 48px;
+			}
+		}*/
+	}
+}
+
+.profile-editable-action {
+	margin-left: .5em;
+}
+
+.profile-editable-rich,
+.profile-editable-items,
+.profile-editable-field {
+	display: block;
+	width: 100%;
+
+	h2 {
+		display: inline-block;
+		max-width: calc(100% - 30px);
+	}
+}
+
+.profile-editable-rich,
+.profile-editable-items {
+	min-height: 50px;
+
+	.profile-editable-spinner {
+		display: block;
+	}
+}
+
+.profile-timeline-wrapper {
+	display: flex;
+	min-height: 3em;
+
+	> div {
+		flex: 1 0 33%;
+		padding-top: 1em;
+	}
+
+	&:last-child {
+		.profile-timeline::after {
+			display: none;
+		}
+	}
+}
+
+.profile-editable-social {
+	display: inline-block;
+	opacity: .7;
+
+	/*@include upto(xga) {
+		> input {
+			margin-top: .5em;
+		}
+
+		.profile-editable-actions {
+			margin-top: .5em;
+			text-align: right;
+			width: 100%;
+		}
+	}
+
+	@include from(xga) {
+		.form-control + .form-control {
+			margin-left: .5em;
+		}
+	}*/
+
+	&:hover {
+		opacity: 1;
+	}
+
+	&:not(.profile-editable-editing) + .profile-editable-social {
+		margin-left: .5em;
+	}
+}
+
+.profile-timeline {
+	padding-left: 2.5em;
+	position: relative;
+
+	&::after {
+		background: $color-profile-accent;
+		content: '';
+		height: calc(100% - 20px);
+		left: 8px;
+		position: absolute;
+		top: calc(1em + 20px);
+		width: 4px;
+	}
+}
+
+.profile-timeline-point {
+	border-color: $color-profile-accent;
+	border-radius: 10px;
+	border-style: solid;
+	border-width: 3px;
+	height: 20px;
+	left: 0;
+	position: absolute;
+	top: 1em;
+	width: 20px;
+}
+
+.profile-timeline-form-wrapper {
+	border: 3px solid $color-profile-accent;
+	margin-top: 1em;
+	padding: 1em;
+
+	.form-group {
+		display: flex;
+		flex-wrap: wrap;
+		margin-top: 1em;
+
+		> div {
+			flex: 1 0 33%;
+
+			/*@include upto(xga-portrait) {
+				flex: 1 0 50%;
+			}
+
+			@include upto(xga) {
+				flex: 1 0 100%;
+				margin-top: .5em;
+			}*/
+		}
+	}
+
+	+ .profile-timeline-wrapper {
+		.profile-timeline {
+			&::before {
+				background: $color-profile-accent;
+				content: '';
+				height: 1em;
+				left: 8px;
+				position: absolute;
+				top: 0;
+				width: 4px;
+			}
+		}
+	}
+}
+
+.profile-editable-spinner {
+	display: inline-block;
+	margin-left: .5em;
+	text-align: center;
+	vertical-align: top;
+
+	@at-root {
+		@keyframes loading {
+			to {
+				transform: rotate(360deg);
+			}
+		}
+	}
+
+	&::after {
+		animation: loading .75s steps(8, end) infinite;
+		background: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbDpzcGFjZT0icHJlc2VydmUiIHZlcnNpb249IjEuMSIgeT0iMHB4IiB4PSIwcHgiIHhtbG5zOmNjPSJodHRwOi8vY3JlYXRpdmVjb21tb25zLm9yZy9ucyMiIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgdmlld0JveD0iMCAwIDUwIDUwIj48cGF0aCBkPSJtMzUuODMgMy43NTljNC4zNzcgMi4yMjUgOC4wODYgNS44NiAxMC4yOSAxMC41M2wtMTAuMjEgNC42NDljLTAuODkwMi0yLjEyNy0yLjg0NC0zLjk1Ni01LjE2OC01LjExOWw1LjA5LTEwLjA2eiIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9Ii4zNTYxIiBjbGFzcz0ic3QxIi8+PGcgc3Ryb2tlPSIjZTdlN2U3IiBzdHJva2Utd2lkdGg9Ii4zNTYxIiBmaWxsPSIjZTdlN2U3Ij48cGF0aCBkPSJtNDcuNjcgMTcuNjNjMS41MzMgNC42NzMgMS41ODMgOS44NDEtMC4xNzMxIDE0LjcxbC0xMC41MS0zLjkwN2MwLjg2NTUtMi4xMjcgMC43NjY1LTQuNzk3LTAuMDQ5NDUtNy4yN2wxMC43My0zLjUzNnoiIGNsYXNzPSJzdDAiLz48cGF0aCBkPSJtNDYuMjQgMzUuODNjLTIuMjI1IDQuMzc3LTUuODYgOC4wODYtMTAuNTMgMTAuMjlsLTQuNjQ5LTEwLjE5YzIuMTI3LTAuODkwMiAzLjk1Ni0yLjg0NCA1LjExOS01LjE2OGwxMC4wNiA1LjA2OXoiIGNsYXNzPSJzdDAiLz48cGF0aCBkPSJtMzIuMzcgNDcuNjdjLTQuNjczIDEuNTMzLTkuODQxIDEuNTgzLTE0LjcxLTAuMTczMWwzLjkwNy0xMC41MWMyLjEyNyAwLjg2NTQgNC43OTcgMC43NjY1IDcuMjctMC4wNDk1bDMuNTM2IDEwLjczeiIgY2xhc3M9InN0MCIvPjxwYXRoIGQ9Im0xNC4xNyA0Ni4yNGMtNC4zNzctMi4yMi04LjA4Ni01Ljg2LTEwLjI5LTEwLjUzbDEwLjE5LTQuNjQ5YzAuODkwMiAyLjEyNyAyLjg0NCAzLjk1NiA1LjE2OCA1LjExOWwtNS4wNjkgMTAuMDZ6IiBjbGFzcz0ic3QwIi8+PHBhdGggZD0ibTIuMzI1IDMyLjM3Yy0xLjUzMy00LjY3My0xLjU4My05Ljg0MSAwLjE3MzEtMTQuNzFsMTAuNTEgMy45MDdjLTAuODY1NSAyLjEyNy0wLjc2NjUgNC43OTcgMC4wNDk0NSA3LjI3bC0xMC43MyAzLjUzNnoiIGNsYXNzPSJzdDAiLz48cGF0aCBkPSJtMy43NTkgMTQuMTdjMi4yMjYtNC4zNzcgNS44NjEtOC4wODYgMTAuNTMtMTAuMjlsNC42NDkgMTAuMTljLTIuMTI3IDAuODkwMi0zLjk1NiAyLjg0NC01LjExOSA1LjE2OGwtMTAuMDYtNS4wN3oiIGNsYXNzPSJzdDAiLz48cGF0aCBkPSJtMTcuNjMgMi4zMjVjNC42NzMtMS41MzMgOS44NDEtMS41ODMgMTQuNzEgMC4xNzMxbC0zLjkgMTAuNTFjLTIuMTI3LTAuODY1NC00Ljc5Ny0wLjc2NjUtNy4yNyAwLjA0OTVsLTMuNTQtMTAuNzR6IiBjbGFzcz0ic3QwIi8+PC9nPjwvc3ZnPgo=') 0 0 no-repeat;
+		content: '';
+		display: inline-block;
+		height: 25px;
+		position: relative;
+		top: 5px;
+		vertical-align: top;
+		width: 25px;
+	}
+}
+
+.profile-tabs {
+	margin-top: 1.5em;
+}
+
+.profile-side-panel {
+	border: 1px solid $color-profile-base;
+	margin: .75em 0;
+	padding: 1em .75em;
+
+	h3 {
+		display: inline-block;
+		margin: 0 0 .5em;
+	}
+
+	ul {
+		list-style-type: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	li {
+		display: flex;
+
+		> div {
+			flex: 1 0 50%;
+			text-align: left;
+
+			&:nth-child(2) {
+				text-align: right;
+			}
+		}
+	}
+}
+
+.profile-side-panel-header-link {
+	display: inline-block;
+	margin-left: .75em;
+
+	> a {
+		margin-left: .75em;
+	}
+
+	&::before {
+		content: '\2022';
+	}
+}
+
+.profile-related-people-detailed,
+.profile-groups-detailed {
+	margin: 1em 0;
+
+	ul {
+		display: flex;
+		flex-wrap: wrap;
+		list-style-type: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	li {
+		border: 1px solid $color-profile-base;
+		box-sizing: border-box;
+		display: flex;
+		flex: 0 0 calc(33% - 1em);
+		height: 80px;
+		margin: .5em;
+		overflow: hidden;
+		padding: .5em 1em;
+
+		/*@include upto(xga-portrait) {
+			flex: 0 0 calc(50% - 1em);
+		}
+
+		@include upto(xga) {
+			flex: 1 0 calc(100% - 1em);
+		}*/
+	}
+}
+
+.profile-related-people-detailed-academic,
+.profile-related-people-detailed-affiliation {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.profile-related-people-detailed-avatar {
+	flex: 0 0 80px;
+	text-align: center;
+
+	img {
+		max-height: 64px;
+		max-width: 80px;
+	}
+}
+
+.profile-related-people-detailed-details,
+.profile-groups-detailed-details {
+	flex: 1 0 auto;
+	max-width: calc(100% - 80px);
+}
+
+.profile-related-people-detailed-details-username,
+.profile-groups-detailed-details-groupname {
+	display: flex;
+	text-decoration: underline;
+}
+
+.profile-related-people-detailed-details-follow,
+.profile-groups-detailed-details-join {
+	display: inline-block;
+	flex: 1 0 auto;
+	text-align: right;
+}
+
+.profile-timeline-form-actions,
+.profile-social-form-actions {
+	text-align: right;
+	width: 100%;
+}
+
+.profile-editable-action,
+.profile-editable-actions,
+.profile-editable-emptytext,
+.profile-editable-items-empty {
+	display: none;
+}
+
+[data-editable=true] {
+	.profile-editable-action,
+	.profile-editable-actions,
+	.profile-editable-emptytext,
+	.profile-editable-items-empty {
+		display: inline-block;
+	}
+}
+
+.profile-related-people-detailed-action {
+	text-align: center;
+}

@@ -70,7 +70,8 @@ class InstallChromeButton extends Component{
 			window.chrome.webstore.install(undefined, ()=>{
 				//success
 			}, ()=>{
-				//failure
+				//failure: forward to chrome webstore
+				window.location = chromeDownload;
 			});
 		}
 	}

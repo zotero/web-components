@@ -13,9 +13,17 @@ if(typeof window === 'undefined') {
 }
 
 const React = require('react');
+const ReactDOM = require('react-dom');
 
-globalScope.ReactDOM = require('react-dom');
+let jQuery = require('jquery');
+
+globalScope.ReactDOM = ReactDOM;
 globalScope.React = React;
+globalScope.jQuery = jQuery;
+globalScope.$ = jQuery;
+globalScope.Popper = require('popper.js');
+require('bootstrap');
+
 
 import {Storage} from './Storage.js';
 import {MakeEditable} from './MakeEditable.js';

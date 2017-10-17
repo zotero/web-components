@@ -8,7 +8,9 @@
 
 @import 'spinner';
 
-
+//@import 'react-select';
+//@import '../../node_modules/react-tabs/style/react-tabs.scss';
+@import 'components/react-tabs';
 // Components
 // --------------------------------------------------
 
@@ -26,5 +28,9 @@
 @import 'ApiKeyEditor';
 @import 'Notifier';
 @import 'components/changeusername';
+//@import 'components/cv-editor';
+@import 'components/usernameautocomplete';
+@import 'email-prompt';
+@import 'components/institution-checkout';
 
 @import 'GlobalSearch';

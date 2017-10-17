@@ -22,7 +22,7 @@ const sass = require('gulp-sass');
 const babelify = require('babelify');
 
 const babelifyOpts = {
-	presets: ['es2015', 'react'],
+	presets: ['env', 'react'],
 	plugins: ['transform-flow-strip-types']
 };
 

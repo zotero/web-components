@@ -2,29 +2,6 @@
 // Zotero web components
 // --------------------------------------------------
 
-@import 'themes/light';
+@import '../../node_modules/bootstrap/scss/bootstrap.scss';
 
 @import 'common';
-
-@import 'spinner';
-
-
-// Components
-// --------------------------------------------------
-
-@import 'Storage';
-@import 'GroupInvitations';
-@import 'InviteToGroup';
-@import 'UserGroups';
-@import 'register-form';
-@import 'start';
-@import 'extensions';
-@import 'extensions-picker';
-@import 'all-extensions';
-@import 'downloads';
-@import 'group-information';
-@import 'ApiKeyEditor';
-@import 'Notifier';
-@import 'components/changeusername';
-
-@import 'GlobalSearch';

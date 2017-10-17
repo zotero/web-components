@@ -52,6 +52,14 @@ let buildUrl = function(name, params){
 			return `/user/checkusername?username=${encodeURIComponent(params.username)}`;
 		case 'changeUsername':
 			return `/settings/changeusername`;
+		case 'completeUsername':
+			return `/users/completeusername`;
+		case 'updateEmail':
+			return `/settings/updateemail`;
+		case 'manageInstitution':
+			return `/settings/storage/institution/${params.institutionID}`;
+		case 'institutionemaillist':
+			return `/settings/storage/institution/${params.institutionID}/emaillist`;
 		case 'itemUrl':
 			if(params.item.library.type == 'group'){
 				return `/groups/${params.item.library.id}/${slugify(params.item.library.name)}/items/itemKey/${params.item.key}`;

@@ -57,6 +57,7 @@ import {cycleTestCases, cycleTestFuncs} from './TestUtils.js';
 import {Combined} from './GlobalSearch/Combined.js';
 import Profile from './profile/profile.jsx';
 import {ChangeUsername} from './ChangeUsername.js';
+import * as Institutional from './Institutional/Institutional.js';
 import {collect} from './animations/collect.js';
 import {organize} from './animations/organize.js';
 let animations = {
@@ -86,7 +87,8 @@ let ZoteroWebComponents = {
 	Combined,
 	Profile,
 	ChangeUsername,
-	animations
+	animations,
+	Institutional
 };
 
 globalScope.ZoteroWebComponents = ZoteroWebComponents;

@@ -4,4 +4,9 @@
 
 @import '../../node_modules/bootstrap/scss/bootstrap.scss';
 
-@import 'common';
+@import "mixins";
+@import "functions";
+
+@import "header";
+@import "footer";
+@import "home";

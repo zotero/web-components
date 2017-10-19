@@ -74,6 +74,7 @@ $grays: (
 ) !default;
 
 $blue:    #2983cc;
+$blue-dark: #3f4654;
 $indigo:  #6610f2 !default;
 $purple:  #6f42c1 !default;
 $pink:    #e83e8c !default;
@@ -86,6 +87,7 @@ $cyan:    #17a2b8 !default;
 
 $colors: (
   blue: $blue,
+  blue-dark: $blue-dark,
   indigo: $indigo,
   purple: $purple,
   pink: $pink,
@@ -254,7 +256,7 @@ $font-weight-bold: bold !default;
 $font-weight-base: $font-weight-normal !default;
 $line-height-base: 1.5 !default;
 
-$h1-font-size: 2.5rem !default;
+$h1-font-size: 3.75rem; // 60px
 $h2-font-size: 2rem !default;
 $h3-font-size: 1.75rem !default;
 $h4-font-size: 1.5rem !default;
@@ -616,7 +618,7 @@ $pagination-disabled-border-color:     #ddd !default;
 // Jumbotron
 
 $jumbotron-padding:              2rem !default;
-$jumbotron-bg:                   $gray-200 !default;
+$jumbotron-bg:                   $blue-dark;
 
 
 // Cards

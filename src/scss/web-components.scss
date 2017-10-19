@@ -1,15 +1,36 @@
 //
-// Zotero web components
-// --------------------------------------------------
+// Zotero
+//
+
+
+// Custom variables
 
 @import "../../node_modules/bootstrap/scss/functions";
 @import "variables";
 
+
+// Bootstrap
+
 @import "../../node_modules/bootstrap/scss/bootstrap.scss";
 
-@import "mixins";
+
+// Functions
+
 @import "functions";
 
+
+// Mixins
+
+@import "mixins";
+
+
+// Partials
+
 @import "header";
+@import "jumbotron";
 @import "footer";
+
+
+// Pages
+
 @import "home";

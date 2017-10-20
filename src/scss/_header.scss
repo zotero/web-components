@@ -1,0 +1,35 @@
+//
+// Header
+//
+
+.main-header {
+	height: $main-header-height;
+	display: flex;
+
+	.container {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.main-nav {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+	}
+
+	.nav-item {
+		&.active {
+			// todo
+		}
+	}
+
+	.nav-link {
+		color: $body-color;
+
+		&:hover {
+			// todo
+		}
+	}
+}

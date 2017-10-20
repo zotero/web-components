@@ -7,4 +7,11 @@
 		padding-top: 55.5%;
 		background: $gray-200;
 	}
+
+	.features {
+		p {
+			font-size: $font-size-lg;
+			line-height: $line-height-lg;
+		}
+	}
 }

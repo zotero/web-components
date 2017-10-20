@@ -1,6 +1,9 @@
 [*.{js,jsx}]
 indent_style = tab
 
+[*.html]
+indent_style = tab
+
 [*.scss]
 indent_style = tab
 

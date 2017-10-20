@@ -1,0 +1,17 @@
+//
+// Sections
+//
+
+.section-sm {
+	padding: $space-xxl;
+}
+
+.section-md {
+	padding: ($space-max - $space-md) 0;
+}
+
+section {
+	&.separated {
+		border-top: 1px solid #e6e6e6;
+	}
+}

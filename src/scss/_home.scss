@@ -9,9 +9,21 @@
 	}
 
 	.features {
-		p {
-			font-size: $font-size-lg;
-			line-height: $line-height-lg;
+		@include media-breakpoint-up("xl") {
+			.feature-col {
+				&:first-child {
+					padding-right: $spacer-7 - $spacer-2;
+				}
+
+				&:last-child {
+					padding-left: $spacer-7 - $spacer-2;
+				}
+			}
+
+			p {
+				font-size: $font-size-lg;
+				line-height: $line-height-lg;
+			}
 		}
 	}
 

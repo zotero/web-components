@@ -78,7 +78,7 @@ $blue-dark: #3f4654;
 $indigo:  #6610f2 !default;
 $purple:  #6f42c1 !default;
 $pink:    #e83e8c !default;
-$red:     #dc3545 !default;
+$red:     #cc2929;
 $orange:  #fd7e14 !default;
 $yellow:  #ffc107 !default;
 $green:   #28a745 !default;
@@ -103,8 +103,8 @@ $colors: (
 ) !default;
 
 $theme-colors: (
-  primary: $blue,
-  secondary: $gray-600,
+  primary: $red,
+  secondary: $blue,
   success: $green,
   info: $cyan,
   warning: $yellow,
@@ -165,7 +165,7 @@ $body-color:    $gray-900 !default;
 //
 // Style anchor elements.
 
-$link-color:            theme-color("primary") !default;
+$link-color:            theme-color("secondary");
 $link-decoration:       none !default;
 $link-hover-color:      darken($link-color, 15%) !default;
 $link-hover-decoration: underline !default;

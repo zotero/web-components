@@ -136,15 +136,32 @@ $enable-print-styles:       true !default;
 // variables. Mostly focused on spacing.
 // You can add more entries to the $spacers map, should you need more variation.
 
+
 $spacer: 1rem !default;
+
+$spacer-0: 0;
+$spacer-1: ($spacer * 0.25); // 4px
+$spacer-2: ($spacer * 0.5);  // 8px
+$spacer-3: ($spacer * 0.75); // 12px
+$spacer-4: $spacer;          // 16px
+$spacer-5: ($spacer * 1.5);  // 24px
+$spacer-6: ($spacer * 2);    // 32px
+$spacer-7: ($spacer * 3);    // 48px
+$spacer-8: ($spacer * 4);    // 64px
+$spacer-9: ($spacer * 6);    // 96px
+
 $spacers: (
   0: 0,
   1: ($spacer * .25),
   2: ($spacer * .5),
-  3: $spacer,
-  4: ($spacer * 1.5),
-  5: ($spacer * 3)
-) !default;
+  3: ($spacer * 0.75),
+  4: $spacer,
+  5: ($spacer * 1.5),
+  6: ($spacer * 2),
+  7: ($spacer * 3),
+  8: ($spacer * 4),
+  9: ($spacer * 6)
+);
 
 // This variable affects the `.h-*` and `.w-*` classes.
 $sizes: (
@@ -856,21 +873,7 @@ $pre-scrollable-max-height:   340px !default;
 // Zotero styles
 //
 
-// Space sizes
-
-$space-min:  4px;
-$space-xs:   8px;
-$space-sm:   12px;
-$space-md:   16px;
-$space-lg:   24px;
-$space-xl:   32px;
-$space-xxl:  48px;
-$space-xxxl: 64px;
-$space-max:  96px;
-
-$space-thumb: 42px;
-
 
 // Main header
 
-$main-header-height: $space-max;
+$main-header-height: $spacer-9;

@@ -3,9 +3,31 @@
 //
 
 .home {
+	.jumbotron {
+		text-align: center;
+		color: $white;
+		padding-top: 105px; // 128px
+		padding-bottom: 283px; // 192px + 96px
+		margin-bottom: 0;
+
+		.display-1 {
+			margin-bottom: 23px; // 48px
+		}
+
+		.lead {
+			margin-bottom: 39px; // 48px
+		}
+
+		.platforms {
+			font-size: $font-size-sm;
+			margin-bottom: 0;
+		}
+	}
+
 	.screenshot {
 		padding-top: 55.5%;
 		background: $gray-200;
+		margin-top: -12rem; // -192px
 	}
 
 	.features {

@@ -34,7 +34,28 @@
 		}
 	}
 
+	.log-in {
+		color: $link-color;
+
+		&:hover {
+			// todo
+		}
+	}
+
 	.upgrade-storage {
 		margin-left: $spacer;
+	}
+
+	.nav-toggle {
+		border: none;
+		background: transparent;
+		padding: $spacer-3 ($grid-gutter-width / 2);
+		line-height: 1;
+		color: inherit;
+		margin-right: -$grid-gutter-width / 2;
+
+		svg {
+			vertical-align: top;
+		}
 	}
 }

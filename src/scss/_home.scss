@@ -9,6 +9,18 @@
 	}
 
 	.features {
+		@include media-breakpoint-up("lg") {
+			.feature-col {
+				&:first-child {
+					padding-right: 25px;
+				}
+
+				&:last-child {
+					padding-left: 25px;
+				}
+			}
+		}
+
 		@include media-breakpoint-up("xl") {
 			.feature-col {
 				&:first-child {
@@ -19,11 +31,11 @@
 					padding-left: $spacer-7 - $spacer-2;
 				}
 			}
+		}
 
-			p {
-				font-size: $font-size-lg;
-				line-height: $line-height-lg;
-			}
+		p {
+			font-size: $font-size-lg;
+			line-height: $line-height-lg;
 		}
 	}
 

@@ -54,6 +54,19 @@
 		color: inherit;
 		margin-right: -$grid-gutter-width / 2;
 
+		@each $bp in sm, md {
+			@include media-breakpoint-only($bp) {
+				position: absolute;
+				right: calc((100% - #{map-get($container-max-widths, $bp)
+					- $grid-gutter-width}) / 2);
+				transition: right $mobile-nav-transition;
+
+				.nav-opened & {
+					right: 15px;
+				}
+			}
+		}
+
 		svg {
 			vertical-align: top;
 		}

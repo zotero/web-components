@@ -1,0 +1,19 @@
+//
+// Reboot
+//
+
+body {
+	&.nav-opened {
+		overflow: hidden;
+	}
+}
+
+.site-wrapper {
+	background: $white;
+	position: relative;
+	transition: transform $mobile-nav-transition;
+
+	.nav-opened & {
+		transform: translate3d(calc(-100% + 54px), 0, 0); // Nav-toggle width
+	}
+}

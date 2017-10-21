@@ -175,8 +175,8 @@ $sizes: (
 //
 // Settings for the `<body>` element.
 
-$body-bg:       $white !default;
-$body-color:    $gray-900 !default;
+$body-bg:       $gray-900;
+$body-color:    $gray-900;
 
 // Links
 //
@@ -344,7 +344,7 @@ $table-inverse-bg:              $gray-900 !default;
 $table-inverse-accent-bg:       rgba($white, .05) !default;
 $table-inverse-hover-bg:        rgba($white, .075) !default;
 $table-inverse-border-color:    lighten($gray-900, 7.5%) !default;
-$table-inverse-color:           $body-bg !default;
+$table-inverse-color:           #222;
 
 
 // Buttons
@@ -877,3 +877,7 @@ $pre-scrollable-max-height:   340px !default;
 // Main header
 
 $main-header-height: $spacer-9;
+
+
+// Transitions
+$mobile-nav-transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1);

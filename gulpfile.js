@@ -22,8 +22,12 @@ const sass = require('gulp-sass');
 const babelify = require('babelify');
 
 const babelifyOpts = {
+	extensions: ['.js', '.jsx'],
 	presets: ['env', 'react'],
-	plugins: ['transform-flow-strip-types']
+	plugins: [
+		'transform-flow-strip-types',
+		'transform-es2015-modules-commonjs'
+	]
 };
 
 var bundle;
@@ -116,8 +120,8 @@ gulp.task('build', ['clean:build'], () => {
 
 gulp.task('prepublish:js', () => {
 	process.env.NODE_ENV='production';
-	return gulp.src('src/js/*.js')
-			.pipe(babel(babelifyOpts))
+	return gulp.src('src/js/**/*.js')
+			.pipe(babel())
 			.pipe(gulp.dest('./lib/'));
 });
 

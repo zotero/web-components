@@ -3,6 +3,7 @@
 const watchify = require('watchify');
 const browserify = require('browserify');
 const gulp = require('gulp');
+const debug = require('gulp-debug');
 const source = require('vinyl-source-stream');
 const buffer = require('vinyl-buffer');
 const gutil = require('gulp-util');
@@ -63,6 +64,7 @@ function getJS(dev) {
 	return getBrowserify(dev).bundle()
 		.on('error', onError)
 		.pipe(source('web-components.js'))
+		.pipe(debug({title: 'web-components JS:'}))
 		.pipe(buffer())
 		.pipe(plumber({errorHandler: onError}))
 		.pipe(gulpif(dev, sourcemaps.init({loadMaps: true})))
@@ -75,6 +77,7 @@ function getJS(dev) {
 
 function getSass(dev) {
 	return gulp.src(['src/scss/web-components.scss', 'src/scss/fonts-mac.scss', 'src/scss/fonts-win.scss'])
+		.pipe(debug({title: 'web-components scss:'}))
 		.pipe(plumber({errorHandler: onError}))
 		.pipe(gulpif(dev, sourcemaps.init({loadMaps: true})))
 		.pipe(sass())

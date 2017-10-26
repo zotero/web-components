@@ -19,7 +19,9 @@ let ajax = function(config){
 		let sessionCookie = readCookie(zoteroConfig.sessionCookieName);
 		headersInit.Authorization = sessionCookie;
 	} else if(apiKey != ''){
-		headersInit['Zotero-Api-Key'] = apiKey;
+		if(!zoteroConfig.sessionAuth) {
+			headersInit['Zotero-Api-Key'] = apiKey;
+		}
 	}
 	let headers = new Headers(headersInit);
 

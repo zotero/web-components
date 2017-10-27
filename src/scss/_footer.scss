@@ -2,6 +2,65 @@
 // Footer
 //
 
-footer {
+.main-footer {
 	background: $blue-dark;
+	color: $white;
+	padding: 28px 0;
+
+	.test {
+		color: red;
+
+		@include media-breakpoint-only("xl") {
+		 display: flex;
+		 justify-content: space-between;
+		}
+	}
+
+	.footer-nav,
+	.social-nav {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.footer-nav {
+		display: flex;
+		flex-wrap: wrap;
+	}
+
+	.social-nav {
+		display: flex;
+		align-items: center;
+	}
+
+	.follow-us {
+		opacity: 0.5;
+	}
+
+	.twitter {
+		margin-left: 12px;
+	}
+
+	.fb {
+		margin-left: $spacer-1 + $spacer-1 / 2;
+	}
+
+	.rss {
+		margin-left: $spacer-2;
+	}
+
+	a {
+		&,
+		&:hover {
+			color: $white;
+		}
+
+		& {
+			opacity: 0.5;
+		}
+
+		&:hover {
+			opacity: 1;
+		}
+	}
 }

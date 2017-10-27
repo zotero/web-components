@@ -7,6 +7,7 @@
     "build": "./node_modules/.bin/gulp build",
     "start": "./node_modules/.bin/gulp",
     "test": "./node_modules/.bin/mocha --compilers js:babel-core/register ./test/tests",
+    "lint": "./node_modules/.bin/stylelint --syntax scss \"src/scss/**/*.scss\"",
     "prepublish": "./node_modules/.bin/gulp prepublish",
     "postpublish": "./node_modules/.bin/gulp postpublish"
   },

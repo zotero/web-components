@@ -3,67 +3,67 @@
 //
 
 .home {
-	.jumbotron {
-		text-align: center;
-		color: $white;
-		padding-top: 105px; // 128px
-		padding-bottom: 283px; // 192px + 96px
-		margin-bottom: 0;
+  .jumbotron {
+    text-align: center;
+    color: $white;
+    padding-top: 105px; // 128px
+    padding-bottom: 283px; // 192px + 96px
+    margin-bottom: 0;
 
-		.display-1 {
-			margin-bottom: 23px; // 48px
-		}
+    .display-1 {
+      margin-bottom: 23px; // 48px
+    }
 
-		.lead {
-			margin-bottom: 39px; // 48px
-		}
+    .lead {
+      margin-bottom: 39px; // 48px
+    }
 
-		.platforms {
-			font-size: $font-size-sm;
-			margin-bottom: 0;
-		}
-	}
+    .platforms {
+      font-size: $font-size-sm;
+      margin-bottom: 0;
+    }
+  }
 
-	.screenshot {
-		padding-top: 55.5%;
-		background: $gray-200;
-		margin-top: -12rem; // -192px
-	}
+  .screenshot {
+    padding-top: 55.5%;
+    background: $gray-200;
+    margin-top: -12rem; // -192px
+  }
 
-	.features {
-		@include media-breakpoint-up("lg") {
-			.feature-col {
-				&:first-child {
-					padding-right: 25px;
-				}
+  .features {
+    @include media-breakpoint-up("lg") {
+      .feature-col {
+        &:first-child {
+          padding-right: 25px;
+        }
 
-				&:last-child {
-					padding-left: 25px;
-				}
-			}
-		}
+        &:last-child {
+          padding-left: 25px;
+        }
+      }
+    }
 
-		@include media-breakpoint-up("xl") {
-			.feature-col {
-				&:first-child {
-					padding-right: $spacer-7 - $spacer-2;
-				}
+    @include media-breakpoint-up("xl") {
+      .feature-col {
+        &:first-child {
+          padding-right: $spacer-7 - $spacer-2;
+        }
 
-				&:last-child {
-					padding-left: $spacer-7 - $spacer-2;
-				}
-			}
-		}
+        &:last-child {
+          padding-left: $spacer-7 - $spacer-2;
+        }
+      }
+    }
 
-		p {
-			font-size: $font-size-lg;
-			line-height: $line-height-lg;
-		}
-	}
+    p {
+      font-size: $font-size-lg;
+      line-height: $line-height-lg;
+    }
+  }
 
-	.call-to-action {
-		a {
-			margin-left: $spacer-6;
-		}
-	}
+  .call-to-action {
+    a {
+      margin-left: $spacer-6;
+    }
+  }
 }

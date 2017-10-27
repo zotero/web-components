@@ -3,15 +3,15 @@
 //
 
 .section-sm {
-	padding: $spacer-7;
+  padding: $spacer-7;
 }
 
 .section-md {
-	padding: ($spacer-9 - $spacer) 0;
+  padding: ($spacer-9 - $spacer) 0;
 }
 
 section {
-	&.separated {
-		border-top: 1px solid #e6e6e6;
-	}
+  &.separated {
+    border-top: 1px solid #e6e6e6;
+  }
 }

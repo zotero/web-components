@@ -40,6 +40,10 @@
     "react-radio-group": "^3.0.1",
     "react-tabs": "^0.8.2",
     "run-sequence": "^1.2.1",
+    "stylelint": "^8.2.0",
+    "stylelint-config-recommended-scss": "^2.0.0",
+    "stylelint-config-standard": "^17.0.0",
+    "stylelint-scss": "^2.1.0",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.7.0"

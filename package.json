@@ -46,7 +46,7 @@
   },
   "dependencies": {
     "babel-polyfill": "^6.26.0",
-    "bootstrap": "^4.0.0-beta",
+    "bootstrap": "^4.0.0-beta.2",
     "classnames": "^2.2.5",
     "flexibility": "^2.0.1",
     "jquery": "^3.2.1",

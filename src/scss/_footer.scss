@@ -5,7 +5,7 @@
 .main-footer {
   background: $blue-dark;
   color: $white;
-  padding: 28px 0;
+  padding: $spacer-5 0;
 
   nav {
     display: flex;
@@ -35,7 +35,6 @@
   .social-nav {
     display: flex;
     align-items: center;
-    padding-top: 14px;
 
     @include media-breakpoint-only("xl") {
       padding-top: 0;

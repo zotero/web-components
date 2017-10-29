@@ -7,15 +7,20 @@
   color: $white;
   padding: 28px 0;
 
-  .test {
+  nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
     @include media-breakpoint-only("xl") {
-      display: flex;
+      flex-direction: row;
       justify-content: space-between;
     }
   }
 
   .footer-nav,
   .social-nav {
+    flex: 0 0 auto;
     list-style: none;
     margin: 0;
     padding: 0;
@@ -24,15 +29,32 @@
   .footer-nav {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
   }
 
   .social-nav {
     display: flex;
     align-items: center;
+    padding-top: 14px;
+
+    @include media-breakpoint-only("xl") {
+      padding-top: 0;
+    }
+
+    .nav-link {
+      padding: {
+        left: 0;
+        right: 0;
+      }
+
+      img {
+        display: block;
+      }
+    }
   }
 
   .follow-us {
-    opacity: 0.5;
+    opacity: 0.25;
   }
 
   .twitter {

@@ -124,6 +124,14 @@
     text-align: center;
     margin: $spacer-6 0 0;
 
+    @include media-breakpoint-between("md", "lg") {
+      width: 80%;
+      margin: {
+        left: auto;
+        right: auto;
+      }
+    }
+
     @include media-breakpoint-up("xl") {
       margin: (-$spacer) 0;
       text-align: right;

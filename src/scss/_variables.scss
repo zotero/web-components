@@ -177,7 +177,7 @@ $sizes: (
 //
 // Settings for the `<body>` element.
 
-$body-bg:       $gray-900;
+$body-bg:       $white;
 $body-color:    $gray-900;
 
 // Links
@@ -203,10 +203,10 @@ $paragraph-margin-bottom: 1rem;
 
 $grid-breakpoints: (
   xs: 0,
-  sm: 576px,
-  md: 768px,
-  lg: 992px,
-  xl: 1230px
+  sm: 578px,
+  md: 770px,
+  lg: 994px,
+  xl: 1232px
 );
 
 @include _assert-ascending($grid-breakpoints, "$grid-breakpoints");
@@ -218,10 +218,10 @@ $grid-breakpoints: (
 // Define the maximum width of `.container` for different screen sizes.
 
 $container-max-widths: (
-  sm: 540px,
-  md: 720px,
-  lg: 970px,
-  xl: 1200px
+  sm: 542px,
+  md: 722px,
+  lg: 972px,
+  xl: 1202px
 );
 
 @include _assert-ascending($container-max-widths, "$container-max-widths");
@@ -232,7 +232,7 @@ $container-max-widths: (
 // Set the number of columns and specify the width of the gutters.
 
 $grid-columns: 12 !default;
-$grid-gutter-width: 30px !default;
+$grid-gutter-width: 32px;
 
 // Components
 //
@@ -881,6 +881,7 @@ $pre-scrollable-max-height:   340px !default;
 // Main header
 
 $main-header-height: $spacer-9;
+$nav-toggle-width: $spacer-5 + $spacer-6;
 
 
 // Transitions

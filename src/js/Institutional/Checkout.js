@@ -8,14 +8,8 @@ const {Component} = React;
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import {LabCheckout} from './LabCheckout.js';
 import {Notifier} from '../Notifier.js';
-import PropTypes from 'prop-types';
-//import classnames from 'classnames';
 
 import {postFormData} from '../ajax.js';
-import {getCurrentUser} from '../Utils.js';
-import {buildUrl} from '../wwwroutes.js';
-
-const currentUser = getCurrentUser();
 
 let institutionPrice = function(fte){
 	return (200000 + ((Math.max(500, fte) - 500) * 40));
@@ -58,11 +52,43 @@ class InstitutionCheckout extends Component{
 		
 		this.requestInvoice = this.requestInvoice.bind(this);
 	}
-	requestInvoice(){
-		//TODO
+	async requestInvoice(){
+		let resp;
+		let {fte, contact, domain} = this.state;
+		try{
+			resp = await postFormData('/storage/requestinstitutionalinvoice', {
+				subscriptionType:'lab',
+				fte:fte,
+				institutionName:name,
+				institutionDomain:domain,
+				contactEmail: contact
+			});
+
+			log.debug(resp);
+			if(!resp.ok){
+				throw 'Error requesting invoice';
+			}
+			let respData = await resp.json();
+			log.debug(respData);
+			this.setState({
+				notification: {
+					type: 'success',
+					message: (<p>We'll contact you shortly about your Zotero Institution subscription</p>)
+				}
+			});
+
+		} catch(e) {
+			log.debug(resp);
+			this.setState({
+				notification: {
+					type: 'error',
+					message: 'There was an error requesting an invoice. If you continue to experience problems, email storage@zotero.org for assistance.'
+				}
+			});
+		}
 	}
 	render(){
-		const {fte, contact, domain} = this.state;
+		const {fte, contact, domain, notification} = this.state;
 		
 		return (
 			<div id='institutional-checkout'>
@@ -96,8 +122,9 @@ class InstitutionCheckout extends Component{
 				</div>
 				
 				<div className='form-line purchase-line'>
-					<button className='btn'>Request Invoice</button>
+					<button className='btn' onClick={this.requestInvoice}>Request Invoice</button>
 				</div>
+				<Notifier {...notification} />
 			</div>
 		);
 	}
@@ -108,24 +135,4 @@ InstitutionCheckout.defaultProps = {
 	domain:''
 };
 
-
-/*
-Checkout.propTypes = {
-	userValidated:PropTypes.bool,
-	emails:PropTypes.arrayOf(PropTypes.shape({
-		email:PropTypes.string.isRequired,
-		validated:PropTypes.string.isRequired,
-		emailID:PropTypes.string.isRequired
-	}))
-};
-*/
-
-/*
-let accessShape = PropTypes.shape({
-	library: PropTypes.bool,
-	notes: PropTypes.bool,
-	write: PropTypes.bool,
-	groups: PropTypes.object
-}).isRequired;
-*/
 export {Checkout};

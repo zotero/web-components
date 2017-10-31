@@ -35,7 +35,7 @@ let plans = [
 		description: 'Unlimited',
 		price: '$120',
 		discountedPrice: '$96'
-	}	
+	}
 ];
 
 var calculateRemainingValue = function(expiration=Date.now(), storageLevel=2) {
@@ -128,8 +128,12 @@ StoragePlanRow.propTypes = {
 class InstitutionProvides extends Component {
 	render(){
 		let institution = this.props.institution;
+		let quotaDescription = `${institution.storageQuota} MB of storage`;
+		if(institution.storageQuota == 1000000){
+			quotaDescription = 'unlimited storage';
+		}
 		return (
-			<p>{institution.name} provides {institution.storageQuota} MB for {institution.email}</p>
+			<p>{institution.name} provides {quotaDescription} for {institution.email}</p>
 		);
 	}
 }

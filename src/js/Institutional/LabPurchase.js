@@ -37,13 +37,16 @@ class LabPurchase extends Component{
 			log.debug(`charging stripe lab. FTE:${fte} - token.id:${token.id}`);
 			let resp;
 			try{
-				resp = await postFormData('/storage/stripechargelabajax', {
+				let args = {
 					subscriptionType:'lab',
 					stripeToken:token.id,
 					userCount:fte,
-					institutionName:name,
-					institutionID:institutionID
-				});
+					institutionName:name
+				};
+				if(institutionID){
+					args['institutionID'] = institutionID;
+				}
+				resp = await postFormData('/storage/stripechargelabajax', args);
 
 				log.debug(resp);
 				if(!resp.ok){

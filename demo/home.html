@@ -15,10 +15,10 @@
 		<script type="text/javascript" charset="utf-8" src="../build/web-components.js"></script>
 	</head>
 	<body class="home">
-		<header class="mobile-header">
+		<header class="mobile-header d-lg-none d-xl-none">
 			<nav>
 				<ul class="mobile-nav">
-					<li><a href="/">Zotero</a></li>
+					<li class="active"><a href="/">Zotero</a></li>
 					<li><a href="https://www.zotero.org/groups/">Groups</a></li>
 					<li><a href="https://www.zotero.org/support/">Documentation</a></li>
 					<li><a href="https://forums.zotero.org/discussions">Forums</a></li>
@@ -28,6 +28,7 @@
 				</ul>
 			</nav>
 		</header>
+		<div class="nav-cover"></div>
 		<div class="site-wrapper">
 			<header class="main-header">
 				<div class="container">
@@ -161,11 +162,16 @@
 		</div>
 		<!-- Nav toggle dummy script -->
 		<script>
-			var navToggle = document.querySelector('.nav-toggle');
-			var body = document.querySelector('body');
+			var navToggle = document.querySelector('.nav-toggle'),
+			    navCover = document.querySelector('.nav-cover'),
+			    body = document.querySelector('body');
 
 			navToggle.addEventListener('click', function() {
-        body.classList.toggle('nav-opened');
+        body.classList.add('nav-opened');
+			});
+
+			navCover.addEventListener('click', function() {
+        body.classList.remove('nav-opened');
 			});
 		</script>
 	</body>

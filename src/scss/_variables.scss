@@ -152,6 +152,8 @@ $spacer-7: ($spacer * 3);    // 48px
 $spacer-8: ($spacer * 4);    // 64px
 $spacer-9: ($spacer * 6);    // 96px
 
+$spacer-thumb: ($spacer * 2.625); // 42px
+
 $spacers: (
   0: 0,
   1: ($spacer * 0.25),
@@ -885,4 +887,5 @@ $nav-toggle-width: $spacer-5 + $spacer-6;
 
 
 // Transitions
-$mobile-nav-transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+$mobile-nav-transition-duration: 0.6s;
+$mobile-nav-transition: $mobile-nav-transition-duration cubic-bezier(0.23, 1, 0.32, 1);

@@ -476,6 +476,17 @@ class Storage extends Component {
 						message: 'Error updating subscription. Please try again in a few minutes.'
 					}
 				});
+				resp.json().then((data)=>{
+					if(data.stripeMessage){
+						this.setState({
+							operationPending:false,
+							notification: {
+								type: 'error',
+								message: `There was an error processing your payment: ${data.stripeMessage}`
+							}
+						});
+					}
+				});
 			}).then(()=>{
 				this.getSubscription();
 				this.getUserCustomer();

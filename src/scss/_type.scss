@@ -10,13 +10,9 @@
 .display-1,
 .display-2 {
   font-family: "AvenirLTPro-Light", $font-family-sans-serif;
-}
-
-.display-1 {
-  //letter-spacing: todo
+  letter-spacing: -0.025em;
 }
 
 .display-2 {
   margin-bottom: 1.75rem; // 28px
-  //letter-spacing: todo
 }

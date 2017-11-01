@@ -13,7 +13,8 @@
   -webkit-overflow-scrolling: touch;
   opacity: 0;
   transform: translate3d(25%, 0, 0);
-  transition: transform $mobile-nav-transition,
+  transition:
+    transform $mobile-nav-transition,
     opacity 0s linear $mobile-nav-transition-duration;
 
   .nav-opened & {

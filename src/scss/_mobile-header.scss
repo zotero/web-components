@@ -27,7 +27,6 @@
     list-style: none;
     margin: 46px 0 48px; // 64px
     padding: 0;
-    line-height: $spacer-thumb;
 
     li {
       &.active {
@@ -35,9 +34,12 @@
       }
     }
 
-    a {
+    .nav-link {
       display: block;
-      padding: 0 $spacer-6;
+      padding: {
+        left: $spacer-6;
+        right: $spacer-6;
+      }
       color: $white;
 
       &:hover {

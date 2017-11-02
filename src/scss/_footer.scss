@@ -91,10 +91,10 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 46px; // 64px
+    margin-top: 45px; // 64px
 
     @include media-breakpoint-up("md") {
-      margin-top: 78px; // 96px
+      margin-top: 77px; // 96px
     }
 
     @include media-breakpoint-only("xl") {

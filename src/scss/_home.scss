@@ -6,16 +6,40 @@
   .jumbotron {
     text-align: center;
     color: $white;
-    padding-top: 105px; // 128px
-    padding-bottom: 283px; // 192px + 96px
+    padding-top: 48px; // 64px
+    padding-bottom: 26px; // 32px
     margin-bottom: 0;
 
+    @include media-breakpoint-up("md") {
+      padding-top: 105px; // 128px
+      padding-bottom: 282px; // 192px + 96px
+    }
+
     .display-1 {
-      margin-bottom: 23px; // 48px
+      margin-bottom: 11px; // 32px
+
+      @include media-breakpoint-up("md") {
+        margin-bottom: 21px; // 48px
+      }
+
+      .kern {
+        letter-spacing: -0.15em;
+        padding-right: calc(7em / 60);
+      }
     }
 
     .lead {
-      margin-bottom: 39px; // 48px
+      margin: 0 auto 24px; // 32px
+      max-width: 380px;
+
+      @include media-breakpoint-up("md") {
+        margin-bottom: 38px; // 48px
+        max-width: none;
+      }
+    }
+
+    .download {
+      margin-bottom: 20px; // 14px blank line in draft
     }
 
     .platforms {
@@ -24,10 +48,25 @@
     }
   }
 
+  .section-screenshot {
+    background: $jumbotron-bg;
+    padding-bottom: $spacer-8;
+
+    @include media-breakpoint-up("md") {
+      margin-top: -12rem; // -192px
+      background: none;
+      padding-bottom: 0;
+    }
+  }
+
   .screenshot {
     padding-top: 55.5%;
     background: $gray-200;
-    margin-top: -12rem; // -192px
+    margin: 0;
+  }
+
+  .page-header {
+    margin: 135px 0 67px; // 160px
   }
 
   .features {
@@ -56,7 +95,7 @@
     }
 
     p {
-      font-size: $font-size-lg;
+      font-size: 1.125rem;
       line-height: $line-height-lg;
     }
   }

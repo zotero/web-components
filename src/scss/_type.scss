@@ -13,6 +13,34 @@
   letter-spacing: -0.025em;
 }
 
+.display-1 {
+  @include media-breakpoint-down("sm") {
+    font-size: $display1-size-mobile;
+  }
+}
+
 .display-2 {
   margin-bottom: 1.75rem; // 28px
+
+  @include media-breakpoint-down("sm") {
+    font-size: $display2-size-mobile;
+  }
+}
+
+
+// Page header
+
+.page-header {
+  margin: ($spacer-8 + $spacer-9) 0;
+}
+
+
+// Lead
+
+.lead {
+  font-family: "AvenirLTPro-Light", $font-family-sans-serif;
+
+  @include media-breakpoint-down("sm") {
+    font-size: 1.25rem; // 20px
+  }
 }

@@ -3,13 +3,26 @@
 //
 
 .main-header {
-  height: $main-header-height;
   display: flex;
+  height: $spacer-8;
+
+  @include media-breakpoint-up("lg") {
+    height: $main-header-height;
+  }
 
   .container {
     display: flex;
     justify-content: space-between;
     align-items: center;
+  }
+
+  .brand {
+    img {
+      @include media-breakpoint-down("sm") {
+        width: auto;
+        height: 28px;
+      }
+    }
   }
 
   .main-nav {

@@ -362,9 +362,9 @@ $input-btn-padding-y:       0.5rem !default;
 $input-btn-padding-x:       0.75rem !default;
 $input-btn-line-height:     1.25 !default;
 
-$input-btn-padding-y-sm:    0.25rem !default;
-$input-btn-padding-x-sm:    0.5rem !default;
-$input-btn-line-height-sm:  1.5 !default;
+$input-btn-padding-y-sm:    rem(5.5);
+$input-btn-padding-x-sm:    rem(11);
+$input-btn-line-height-sm:  1;
 
 $input-btn-padding-y-lg:    0.6875rem;
 $input-btn-padding-x-lg:    1.4375rem;
@@ -384,7 +384,7 @@ $btn-border-radius:              $border-radius !default;
 $btn-border-radius-lg:           $border-radius-sm;
 $btn-border-radius-sm:           $border-radius-sm !default;
 
-$btn-transition:                 background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !default;
+$btn-transition:                 background-color 0s ease-in-out, border-color 0s ease-in-out, box-shadow 0.15s ease-in-out;
 
 
 // Forms

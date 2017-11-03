@@ -5,23 +5,20 @@
 //
 
 
+// Functions
 
+@import "../../node_modules/bootstrap/scss/functions";
+@import "functions";
 
 
 // Custom variables
 
-@import "../../node_modules/bootstrap/scss/functions";
 @import "variables";
 
 
 // Bootstrap
 
 @import "../../node_modules/bootstrap/scss/bootstrap.scss";
-
-
-// Functions
-
-@import "functions";
 
 
 // Mixins

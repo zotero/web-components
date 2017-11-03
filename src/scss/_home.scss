@@ -50,7 +50,7 @@
 
   .section-screenshot {
     background: $jumbotron-bg;
-    padding-bottom: $spacer-8;
+    padding-bottom: $spacer-xxxl;
 
     @include media-breakpoint-up("md") {
       margin-top: -12rem; // -192px
@@ -83,11 +83,11 @@
     @include media-breakpoint-up("xl") {
       .feature-col {
         &:first-child {
-          padding-right: $spacer-7 - $spacer-2;
+          padding-right: $spacer-xxl - $spacer-xs;
         }
 
         &:last-child {
-          padding-left: $spacer-7 - $spacer-2;
+          padding-left: $spacer-xxl - $spacer-xs;
         }
       }
     }
@@ -100,7 +100,7 @@
 
   .call-to-action {
     a {
-      margin-left: $spacer-6;
+      margin-left: $spacer-xl;
     }
   }
 }

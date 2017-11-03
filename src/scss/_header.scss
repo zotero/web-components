@@ -4,7 +4,7 @@
 
 .main-header {
   display: flex;
-  height: $spacer-8;
+  height: $spacer-xxxl;
 
   @include media-breakpoint-up("lg") {
     height: $main-header-height;
@@ -62,7 +62,7 @@
   .nav-toggle {
     border: none;
     background: transparent;
-    padding: $spacer-3 ($grid-gutter-width / 2);
+    padding: $spacer-sm ($grid-gutter-width / 2);
     line-height: 1;
     color: inherit;
     margin-right: -$grid-gutter-width / 2;

@@ -141,28 +141,28 @@ $enable-print-styles:       true !default;
 
 $spacer: 1rem !default;
 
-$spacer-0: 0;
-$spacer-1: ($spacer * 0.25); // 4px
-$spacer-2: ($spacer * 0.5);  // 8px
-$spacer-3: ($spacer * 0.75); // 12px
-$spacer-4: $spacer;          // 16px
-$spacer-5: ($spacer * 1.5);  // 24px
-$spacer-6: ($spacer * 2);    // 32px
-$spacer-7: ($spacer * 3);    // 48px
-$spacer-8: ($spacer * 4);    // 64px
-$spacer-9: ($spacer * 6);    // 96px
+$spacer-0:    0;
+$spacer-min:  ($spacer * 0.25); // 4px
+$spacer-xs:   ($spacer * 0.5);  // 8px
+$spacer-sm:   ($spacer * 0.75); // 12px
+$spacer-md:   $spacer;          // 16px
+$spacer-lg:   ($spacer * 1.5);  // 24px
+$spacer-xl:   ($spacer * 2);    // 32px
+$spacer-xxl:  ($spacer * 3);    // 48px
+$spacer-xxxl: ($spacer * 4);    // 64px
+$spacer-max:  ($spacer * 6);    // 96px
 
 $spacers: (
   0: 0,
-  1: ($spacer * 0.25),
-  2: ($spacer * 0.5),
-  3: ($spacer * 0.75),
-  4: $spacer,
-  5: ($spacer * 1.5),
-  6: ($spacer * 2),
-  7: ($spacer * 3),
-  8: ($spacer * 4),
-  9: ($spacer * 6)
+  1: $spacer-min,
+  2: $spacer-xs,
+  3: $spacer-sm,
+  4: $spacer-md,
+  5: $spacer-lg,
+  6: $spacer-xl,
+  7: $spacer-xxl,
+  8: $spacer-xxxl,
+  9: $spacer-max
 );
 
 // This variable affects the `.h-*` and `.w-*` classes.
@@ -246,7 +246,7 @@ $border-color: $gray-200 !default;
 
 $border-radius:          0.25rem !default;
 $border-radius-lg:       0.3rem !default;
-$border-radius-sm:       0.1875rem; // 3px
+$border-radius-sm:       rem(3);
 
 $component-active-color: $white !default;
 $component-active-bg:    theme-color("primary") !default;
@@ -267,8 +267,8 @@ $font-family-monospace:  "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation 
 $font-family-base:       $font-family-sans-serif !default;
 
 $font-size-base: 1rem !default; // Assumes the browser default, typically `16px`
-$font-size-lg:   1.5rem; // 24px
-$font-size-sm:   0.875rem; // 14px
+$font-size-lg:   rem(24);
+$font-size-sm:   rem(14);
 
 $font-weight-light: 300 !default;
 $font-weight-normal: normal !default;
@@ -277,7 +277,7 @@ $font-weight-bold: bold !default;
 $font-weight-base: $font-weight-normal !default;
 $line-height-base: 1.5;
 
-$h1-font-size: 3.75rem; // 60px
+$h1-font-size: rem(60);
 $h2-font-size: 2rem !default;
 $h3-font-size: 1.75rem !default;
 $h4-font-size: 1.5rem !default;
@@ -290,13 +290,13 @@ $headings-font-weight:   500 !default;
 $headings-line-height:   1.1;
 $headings-color:         inherit !default;
 
-$display1-size: 3.75rem; // 60px
-$display2-size: 2.5rem; // 40px
+$display1-size: rem(60);
+$display2-size: rem(40);
 $display3-size: 4.5rem !default;
 $display4-size: 3.5rem !default;
 
-$display1-size-mobile: 2.5rem; // 40px
-$display2-size-mobile: 2rem; // 32px
+$display1-size-mobile: rem(40);
+$display2-size-mobile: rem(32);
 
 $display1-weight:     300;
 $display2-weight:     300;
@@ -883,8 +883,8 @@ $pre-scrollable-max-height:   340px !default;
 
 // Main header
 
-$main-header-height: $spacer-9;
-$nav-toggle-width: $spacer-5 + $spacer-6;
+$main-header-height: $spacer-max;
+$nav-toggle-width: $spacer-lg + $spacer-xl;
 
 
 // Transitions

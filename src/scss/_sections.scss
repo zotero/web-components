@@ -3,11 +3,11 @@
 //
 
 .section-sm {
-  padding: $spacer-7;
+  padding: $spacer-xxl;
 }
 
 .section-md {
-  padding: ($spacer-9 - $spacer) 0;
+  padding: ($spacer-max - $spacer) 0;
 }
 
 section {

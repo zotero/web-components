@@ -68,25 +68,23 @@
   }
 
   .features {
-    @include media-breakpoint-up("lg") {
-      .feature-col {
-        &:first-child {
+    .feature-col {
+      &.left {
+        @include media-breakpoint-up("lg") {
           padding-right: 25px;
         }
 
-        &:last-child {
-          padding-left: 25px;
-        }
-      }
-    }
-
-    @include media-breakpoint-up("xl") {
-      .feature-col {
-        &:first-child {
+        @include media-breakpoint-up("xl") {
           padding-right: $spacer-xxl - $spacer-xs;
         }
+      }
 
-        &:last-child {
+      &.right {
+        @include media-breakpoint-up("lg") {
+          padding-left: 25px;
+        }
+
+        @include media-breakpoint-up("xl") {
           padding-left: $spacer-xxl - $spacer-xs;
         }
       }

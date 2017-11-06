@@ -63,8 +63,22 @@
     margin: 0;
   }
 
+  .section-md {
+    @include media-breakpoint-down("sm") {
+      padding-bottom: rem(25);
+    }
+
+    &.last {
+      @include media-breakpoint-down("sm") {
+        padding-bottom: rem(57);
+      }
+    }
+  }
+
   .page-header {
-    margin: 135px 0 67px; // 160px
+    @include media-breakpoint-up("md") {
+      margin: 135px 0 67px; // 160px
+    }
   }
 
   .features {
@@ -90,9 +104,21 @@
       }
     }
 
+    img {
+      @include media-breakpoint-only("xs") {
+        max-width: rem(200);
+      }
+
+      @include media-breakpoint-down("sm") {
+        margin-bottom: rem(35);
+      }
+    }
+
     p {
-      font-size: 1.125rem;
-      line-height: $line-height-lg;
+      @include media-breakpoint-up("md") {
+        font-size: 1.125rem;
+        line-height: $line-height-lg;
+      }
     }
   }
 

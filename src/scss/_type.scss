@@ -20,10 +20,11 @@
 }
 
 .display-2 {
-  margin-bottom: 1.75rem; // 28px
+  margin-bottom: rem(28);
 
   @include media-breakpoint-down("sm") {
     font-size: $display2-size-mobile;
+    margin-bottom: rem(12);
   }
 }
 
@@ -31,7 +32,11 @@
 // Page header
 
 .page-header {
-  margin: ($spacer-xxxl + $spacer-max) 0;
+  margin: rem(48) 0 rem(23);
+
+  @include media-breakpoint-up("md") {
+    margin: ($spacer-xxxl + $spacer-max) 0 ($spacer-max - $spacer);
+  }
 }
 
 
@@ -41,6 +46,13 @@
   font-family: "AvenirLTPro-Light", $font-family-sans-serif;
 
   @include media-breakpoint-down("sm") {
-    font-size: 1.25rem; // 20px
+    font-size: rem(20);
   }
+}
+
+
+// Paragraph
+
+p:last-child {
+  margin-bottom: 0;
 }

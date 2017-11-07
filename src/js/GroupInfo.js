@@ -273,7 +273,11 @@ class GroupInfo extends React.Component{
 
 		let libraryAccess;
 		if(!currentUser){
-			libraryAccess = 'None';
+			if(groupIsReadable(group, 0)){
+				libraryAccess = 'You can only view';
+			} else {
+				libraryAccess = 'None';
+			}
 		} else if(groupIsWritable(group, currentUser.userID)){
 			libraryAccess = 'You can view and edit';
 		} else if(groupIsReadable(group, currentUser.userID)){

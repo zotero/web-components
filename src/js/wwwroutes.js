@@ -80,6 +80,10 @@ let buildUrl = function(name, params){
 			return '/download/connectors';
 		case 'download':
 			return '/download';
+		case 'login':
+			return '/user/login';
+		case 'register':
+			return '/user/register';
 	}
 	throw new Error('Unknown route in buildUrl');
 };

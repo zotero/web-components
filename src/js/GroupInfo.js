@@ -164,7 +164,7 @@ class GroupMembershipActions extends React.Component{
 	}
 	render(){
 		if(!currentUser){
-			return null;
+			return <p><a href={buildUrl('login')}>Log in</a> or <a href={buildUrl('register')}>Register</a> to join groups</p>;
 		}
 		let group = this.props.group;
 		let member = allGroupMembers(group).includes(currentUser.userID);

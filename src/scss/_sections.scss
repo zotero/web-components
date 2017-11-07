@@ -3,7 +3,11 @@
 //
 
 .section-sm {
-  padding: $spacer-xxl;
+  padding: $spacer-xl 0;
+
+  @include media-breakpoint-up("md") {
+    padding: $spacer-xxl 0;
+  }
 }
 
 .section-md {

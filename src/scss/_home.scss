@@ -105,7 +105,7 @@
     }
 
     img {
-      @include media-breakpoint-only("xs") {
+      @include media-breakpoint-between("xs", "sm") {
         max-width: rem(200);
       }
 
@@ -123,8 +123,16 @@
   }
 
   .call-to-action {
-    a {
-      margin-left: $spacer-xl;
+    @include media-breakpoint-down("sm") {
+      padding-top: rem(19);
+    }
+
+    .display-2 {
+      margin-bottom: rem(21);
+
+      @include media-breakpoint-up(md) {
+        margin: 0;
+      }
     }
   }
 }

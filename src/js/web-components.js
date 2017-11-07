@@ -10,6 +10,14 @@ if(typeof window === 'undefined') {
 	globalScope = global;
 } else {
 	globalScope = window;
+	document.addEventListener('click', function(){
+		document.documentElement.classList.add('mouseuser');
+		document.documentElement.classList.remove('keyboarduser');
+	});
+	document.addEventListener('keydown', function(){
+		document.documentElement.classList.add('keyboarduser');
+		document.documentElement.classList.remove('mouseuser');
+	});
 }
 
 const React = require('react');

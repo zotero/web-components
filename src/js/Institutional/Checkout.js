@@ -15,6 +15,14 @@ let institutionPrice = function(fte){
 	return (200000 + ((Math.max(500, fte) - 500) * 40));
 };
 
+class FormFieldErrorMessage extends Component {
+	render() {
+		return (
+			<p className='form-field-error'>{this.props.message}</p>
+		);
+	}
+}
+
 //Checkout is a component that allows a user to enter a number of FTE for their institution and preview
 //the price for an institutional plan with that many users, then make the purchase or request an invoice
 class Checkout extends Component{
@@ -47,14 +55,57 @@ class InstitutionCheckout extends Component{
 		this.state = {
 			fte:this.props.fte,
 			contact:this.props.contact,
-			domain:this.props.domain
+			domain:this.props.domain,
+			name:this.props.name,
+			formErrors:{}
 		};
 		
 		this.requestInvoice = this.requestInvoice.bind(this);
+		this.validateForm = this.validateForm.bind(this);
+	}
+	validateForm(state){
+		if(state.fte == ''){
+			return {
+				valid:false,
+				field:'fte',
+				reason:'Please specify a number of full time equivalents at your institution.'
+			};
+		}
+		if(state.contact == '') {
+			return {
+				valid:false,
+				field:'contact',
+				reason:'Please specify an email address to contact you with.'
+			};
+		}
+		if(state.name == '') {
+			return {
+				valid:false,
+				field:'name',
+				reason:'Please specify the name of your institution.'
+			};
+		}
+		if(state.domain == '') {
+			return {
+				valid:false,
+				field:'domain',
+				reason:'Please specify one or more domains that your institution uses for email addresses.'
+			};
+		}
+		return {valid:true};
 	}
 	async requestInvoice(){
 		let resp;
-		let {fte, contact, domain} = this.state;
+		let {fte, contact, domain, name} = this.state;
+		let validated = this.validateForm(this.state);
+		if(!validated.valid){
+			//show error
+			let formErrors = {};
+			formErrors[validated.field] = validated.reason;
+			this.setState({formErrors});
+			return;
+		}
+
 		try{
 			resp = await postFormData('/storage/requestinstitutionalinvoice', {
 				subscriptionType:'lab',
@@ -88,7 +139,7 @@ class InstitutionCheckout extends Component{
 		}
 	}
 	render(){
-		const {fte, contact, domain, notification} = this.state;
+		const {fte, contact, domain, name, notification, formErrors} = this.state;
 		
 		return (
 			<div id='institutional-checkout'>
@@ -101,6 +152,7 @@ class InstitutionCheckout extends Component{
 				<div className='form-line'>
 					<label htmlFor='institution_fte'>FTE:</label>
 					<input type='text' className='institution_fte form-control' value={fte} onChange={(evt)=>{this.setState({fte:evt.target.value});}} />
+					<FormFieldErrorMessage message={formErrors['fte']} />
 				</div>
 				<div className='form-line'>
 					<label>Price</label>
@@ -109,16 +161,19 @@ class InstitutionCheckout extends Component{
 				<div className='form-line'>
 					<label>Contact Email:</label>
 					<input type='text' className='institution_contact_email form-control' value={contact} onChange={(evt)=>{this.setState({contact:evt.target.value});}} />
+					<FormFieldErrorMessage message={formErrors['contact']} />
 				</div>
 				<div className='form-line'>
 					<label htmlFor='institution_name'>Institution Name:</label>
 					<input type='text' name='institution_name' className='institution_name form-control' value={name} onChange={(evt)=>{this.setState({name:evt.target.value});}} />
 					<p className='hint'>This name will appear as the provider of storage for your users.</p>
+					<FormFieldErrorMessage message={formErrors['name']} />
 				</div>
 				<div className='form-line'>
 					<label htmlFor='institution_domain'>Domain:</label>
 					<input type='text' name='institution_domain' className='form-control' value={domain} onChange={(evt)=>{this.setState({domain:evt.target.value});}} placeholder='@my-institution.edu' />
-					<p className='hint'>The domain you use for your institution's email addresses. This is how we'll identify your users.</p>
+					<p className='hint'>The domain(s) you use for your institution's email addresses. This is how we'll identify your users.</p>
+					<FormFieldErrorMessage message={formErrors['domain']} />
 				</div>
 				
 				<div className='form-line purchase-line'>
@@ -132,7 +187,8 @@ class InstitutionCheckout extends Component{
 InstitutionCheckout.defaultProps = {
 	fte:500,
 	name:'',
-	domain:''
+	domain:'',
+	contact:''
 };
 
 export {Checkout};

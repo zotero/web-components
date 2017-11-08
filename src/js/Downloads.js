@@ -180,7 +180,7 @@ class DownloadStandalone extends Component {
 						<li>
 							<h3>Zotero 4.0 for Firefox</h3>
 							<ul>
-								<li><a href="https://download.zotero.org/extension/zotero-4.0.29.23.xpi">Zotero for Firefox</a></li>
+								<li><a href="https://download.zotero.org/extension/zotero-4.0.29.25.xpi">Zotero for Firefox</a></li>
 								<li><a href="/support/word_processor_plugin_installation">Word processor plugins</a></li>
 							</ul>
 						</li>

@@ -29,6 +29,7 @@ class LabRenew extends Component{
 		if(!(fteNum > 14)){
 			fteNum = 14;
 		}
+		//log.debug(`LabRenew fte:${fte} fteNum:${fteNum}`);
 		return (
 			<div>
 				<a href='#' onClick={(evt)=>{evt.preventDefault(); this.setState({showRenew:true});}}>Renew</a>
@@ -41,7 +42,7 @@ class LabRenew extends Component{
 						<label>Price</label>
 						{new Intl.NumberFormat('en-US', {style:'currency', currency:'USD'}).format(labPrice(fteNum)/100)}
 					</div>
-					<LabPurchase {...{fteNum, name, institutionID}} />
+					<LabPurchase fte={fteNum} name={name} institutionID={institutionID} />
 				</VerticalExpandable>
 			</div>
 		);
@@ -92,7 +93,7 @@ class InstitutionData extends Component{
 		}
 	}
 	render(){
-		const {fte, userEmails, expirationDate} = this.props;
+		const {fte, userEmails, expirationDate, institutionID} = this.props;
 		const {name} = this.state;
 		let expdate = new Date(expirationDate*1000);
 		//let expdate = new Date();
@@ -113,9 +114,9 @@ class InstitutionData extends Component{
 					{`${expdate.getFullYear()}-${expdate.getMonth()+1}-${expdate.getDate()}`}
 				</div>
 				<LabRenew
-					fte={this.props.fte}
-					institutionID={this.props.institutionID}
-					name={this.props.name}
+					fte={fte}
+					institutionID={institutionID}
+					name={name}
 				/>
 			</div>
 		);

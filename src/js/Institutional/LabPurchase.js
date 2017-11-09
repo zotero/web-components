@@ -30,6 +30,9 @@ class LabPurchase extends Component{
 		
 		let description = `Zotero Lab subscription. ${fte} users. 1 year.`;
 		let priceCents = labPrice(fte);
+		// log.debug(this.props);
+		// log.debug(description);
+		// log.debug(priceCents);
 		
 		let tokenHandler = async (token) => {
 			// You can access the token ID with `token.id`.

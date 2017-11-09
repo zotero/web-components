@@ -122,8 +122,8 @@
       <rect x="140" y="32" width="6" height="6" fill="#e6e6e6" style="mix-blend-mode: multiply"/>
       <rect x="154" y="32" width="6" height="6" fill="#e6e6e6" style="mix-blend-mode: multiply"/>
       <g>
-        <rect x="85" y="76" width="274" height="176" opacity="0.04"/>
-        <rect x="87" y="74" width="270" height="178" fill="#fff"/>
+        <rect x="85" y="76" width="274" height="174" opacity="0.04"/>
+        <rect x="87" y="74" width="270" height="176" fill="#fff"/>
         <rect x="119" y="114" width="104" height="6" fill="#e6e6e6"/>
         <rect x="119" y="132" width="206" height="4" fill="#ccc"/>
         <rect x="119" y="144" width="206" height="4" fill="#e6e6e6"/>

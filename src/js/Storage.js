@@ -419,7 +419,7 @@ class Storage extends Component {
 		}
 		this.setState({operationPending:true});
 
-		postFormData('/storage/updatesubscription', {storageLevel:storageLevel}).then((resp) => {
+		postFormData('/storage/updatesubscription', {storageLevel:storageLevel}, {withSession:true}).then((resp) => {
 			log.debug(resp);
 			//re-fetch full subscription info now that it's been updated
 			this.getSubscription();

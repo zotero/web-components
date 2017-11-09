@@ -43,6 +43,14 @@ class UsernameForm extends Component{
 			});
 			return;
 		}
+		if(username.trim().indexOf(' ') != -1){
+			this.setState({
+				usernameValidity:'invalid',
+				usernameMessage: 'Your username can\'t contain spaces'
+			});
+			return;
+		}
+
 		let checkUrl = buildUrl('checkUsername', {username});
 		ajax({url:checkUrl}).then((response)=>{
 			response.json().then((data)=>{

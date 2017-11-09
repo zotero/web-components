@@ -105,8 +105,12 @@
     }
 
     img {
-      @include media-breakpoint-between("xs", "sm") {
+      @include media-breakpoint-only("xs") {
         max-width: rem(200);
+      }
+
+      @include media-breakpoint-only("sm") {
+        max-width: rem(336);
       }
 
       @include media-breakpoint-down("sm") {

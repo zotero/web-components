@@ -203,7 +203,7 @@ $paragraph-margin-bottom: 1rem;
 
 $grid-breakpoints: (
   xs: 0,
-  sm: 576px,
+  sm: 568px, // Include iPhone 5 size
   md: 768px,
   lg: 994px,
   xl: 1234px
@@ -218,8 +218,8 @@ $grid-breakpoints: (
 // Define the maximum width of `.container` for different screen sizes.
 
 $container-max-widths: (
-  sm: 540px,
-  md: 736px,
+  sm: 536px, // 32px spacing left and right
+  md: 736px, // 32px spacing left and right
   lg: 972px,
   xl: 1202px
 );

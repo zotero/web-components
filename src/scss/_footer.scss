@@ -58,10 +58,16 @@
 
   .follow-us {
     opacity: 0.25;
+
+    @include media-breakpoint-down("lg") {
+      display: none;
+    }
   }
 
   .twitter {
-    margin-left: 12px;
+    @include media-breakpoint-only("xl") {
+      margin-left: 12px;
+    }
   }
 
   .fb {

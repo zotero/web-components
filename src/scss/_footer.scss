@@ -5,7 +5,7 @@
 .main-footer {
   background: $blue-dark;
   color: $white;
-  padding: $spacer-lg 0 40px;
+  padding: $spacer-lg 0 rem(40);
 
   nav {
     display: flex;
@@ -119,7 +119,6 @@
   }
 
   .about {
-    flex: 0 0 50%;
     font-size: $font-size-sm;
     text-align: center;
     margin: $spacer-xl 0 0;
@@ -133,6 +132,7 @@
     }
 
     @include media-breakpoint-up("xl") {
+      flex: 0 0 50%;
       margin: (-$spacer) 0;
       text-align: right;
       position: relative;

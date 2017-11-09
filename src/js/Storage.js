@@ -468,7 +468,7 @@ class Storage extends Component {
 					operationPending:false,
 					notification: {
 						type: 'success',
-						message: 'Success'
+						message: <span>Success. <a href='/settings/storage/invoice'>View Payment Receipt</a></span>
 					}
 				});
 			}).catch((resp) => {

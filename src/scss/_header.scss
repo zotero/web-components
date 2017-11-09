@@ -4,7 +4,7 @@
 
 .main-header {
   display: flex;
-  height: $spacer-xxxl;
+  height: $main-header-height-mobile;
 
   @include media-breakpoint-up("lg") {
     height: $main-header-height;
@@ -70,7 +70,7 @@
     @each $bp in sm, md {
       @include media-breakpoint-only($bp) {
         position: absolute;
-        top: ($main-header-height - $nav-toogle-height) / 2; // Fix position on iPad 3
+        top: ($main-header-height-mobile - $nav-toggle-height) / 2; // Fix position on iPad 3
         right: calc((100% - #{map-get($container-max-widths, $bp) - $grid-gutter-width}) / 2);
         transition: right $mobile-nav-transition;
 

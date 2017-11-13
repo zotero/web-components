@@ -72,7 +72,7 @@ function getJS(dev) {
 }
 
 function getSass(dev) {
-	return gulp.src('src/scss/web-components.scss')
+	return gulp.src(['src/scss/web-components.scss', 'src/scss/fonts-mac.scss'])
 		.pipe(plumber({errorHandler: onError}))
 		.pipe(gulpif(dev, sourcemaps.init({loadMaps: true})))
 		.pipe(sass())

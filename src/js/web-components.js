@@ -2,6 +2,8 @@
 
 import 'babel-polyfill';
 import 'whatwg-fetch';
+import 'picturefill';
+import 'picturefill/dist/plugins/mutation/pf.mutation.min';
 //import {log as logger} from './Log.js';
 //var log = logger.Logger('WebComponents');
 

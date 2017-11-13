@@ -126,6 +126,37 @@
     }
   }
 
+  .illu-sync {
+    img {
+      width: rem(336);
+      height: rem(315);
+    }
+
+    @include media-breakpoint-only("xs") {
+      img {
+        max-width: rem(240);
+      }
+    }
+
+    @include media-breakpoint-only("lg") {
+      margin: 0 rem(-20);
+
+      img {
+        width: rem(484);
+        height: rem(336);
+      }
+    }
+
+    @include media-breakpoint-only("xl") {
+      margin: 0 rem(-50);
+
+      img {
+        width: rem(544);
+        height: rem(336);
+      }
+    }
+  }
+
   .call-to-action {
     @include media-breakpoint-down("sm") {
       padding-top: rem(19);

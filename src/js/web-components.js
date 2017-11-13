@@ -4,6 +4,7 @@ import 'babel-polyfill';
 import 'whatwg-fetch';
 import 'picturefill';
 import 'picturefill/dist/plugins/mutation/pf.mutation.min';
+var WebFont = require('webfontloader');
 //import {log as logger} from './Log.js';
 //var log = logger.Logger('WebComponents');
 
@@ -32,6 +33,7 @@ globalScope.React = React;
 globalScope.jQuery = jQuery;
 globalScope.$ = jQuery;
 globalScope.Popper = require('popper.js');
+globalScope.WebFont = WebFont;
 require('bootstrap');
 
 

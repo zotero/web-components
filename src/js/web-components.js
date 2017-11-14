@@ -4,6 +4,7 @@ import 'babel-polyfill';
 import 'whatwg-fetch';
 import 'picturefill';
 import 'picturefill/dist/plugins/mutation/pf.mutation.min';
+import {init} from './Theme.js';
 var WebFont = require('webfontloader');
 //import {log as logger} from './Log.js';
 //var log = logger.Logger('WebComponents');
@@ -13,21 +14,7 @@ if(typeof window === 'undefined') {
 	globalScope = global;
 } else {
 	globalScope = window;
-	document.addEventListener('click', function(){
-		document.documentElement.classList.add('mouseuser');
-		document.documentElement.classList.remove('keyboarduser');
-		document.documentElement.classList.remove('touchuser');
-	});
-	document.addEventListener('keydown', function(){
-		document.documentElement.classList.add('keyboarduser');
-		document.documentElement.classList.remove('mouseuser');
-		document.documentElement.classList.remove('touchuser');
-	});
-	document.addEventListener('touchstart', function(){
-		document.documentElement.classList.add('touchuser');
-		document.documentElement.classList.remove('mouseuser');
-		document.documentElement.classList.remove('keyboarduser');
-	});
+	init();
 }
 
 const React = require('react');

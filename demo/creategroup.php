@@ -19,8 +19,13 @@
             type="text/css" media="screen" charset="utf-8"/>
         <link rel="stylesheet" href="../build/web-components.css" type="text/css" media="screen" charset="utf-8"/>
         <!-- set jsConfig on window.zoteroConfig -->
-        <script type="text/javascript" charset="utf-8">
-            window.zoteroConfig = {"librarySettings":{"allowEdit":1,"allowUpload":1,"libraryPathString":""},"baseApiUrl":"https://apidev.zotero.org","baseWebsiteUrl":"https://zotero.live","baseFeedUrl":"https://apidev.zotero.org","baseZoteroWebsiteUrl":"https://zotero.live","baseDownloadUrl":"/web-library/examples/library/download.php","debugLogEndpoint":"https://test.zotero.net/user/submitdebug","proxyDownloads":false,"staticPath":"/static","proxyPath":"","ignoreLoggedInStatus":false,"storePrefsRemote":false,"proxy":false,"sessionAuth":false,"sessionCookieName":"zotero_www_session_v2","breadcrumbsBase":[{"label":"username","path":"/"}],"apiKey":"","apiVersion":3,"useIndexedDB":true,"preferUrlItem":false,"CORSallowed":true,"locale":"en-US","cacheStoreType":"localStorage","preloadCachedLibrary":true,"rte":"ckeditor","sortOrdering":{"dateAdded":"desc","dateModified":"desc","date":"desc","year":"desc","accessDate":"desc","title":"asc","creator":"asc"},"defaultSortColumn":"title","defaultSortOrder":"asc","largeFields":{"title":1,"abstractNote":1,"extra":1},"richTextFields":{"note":1},"maxFieldSummaryLength":{"title":60},"exportFormats":["bibtex","bookmarks","mods","refer","rdf_bibliontology","rdf_dc","rdf_zotero","ris","wikipedia"],"exportFormatsMap":{"bibtex":"BibTeX","bookmarks":"Bookmarks","mods":"MODS","refer":"Refer/BibIX","rdf_bibliontology":"Bibliontology RDF","rdf_dc":"Unqualified Dublin Core RDF","rdf_zotero":"Zotero RDF","ris":"RIS","wikipedia":"Wikipedia Citation Templates"},"defaultApiArgs":{"order":"title","sort":"asc","limit":50,"start":0,"content":"json","format":"json"},"defaultPrefs":{"server_javascript_enabled":true,"debug_level":3},"imagePath":"../assets/images","installData":{"firefoxHash":"sha1:4d4c464d351a5c05d19746d271713670fe8939a8","firefoxDownload":"https://download.zotero.org/extension/zotero-4.0.29.11.xpi","safariDownloadUrl":"https://download.zotero.org/connector/safari/Zotero_Connector-4.0.28-1.safariextz","operaDownloadUrl":"","macDownloadUrl":"","windowsDownloadUrl":"","linuxDownloadUrl":""}};
+		<?php $jsConfig = include('./jsConfig.php');?>
+		<script type="text/javascript">
+			window.zoteroConfig = <?=json_encode($jsConfig);?>;
+
+			if(!window.Zotero){
+				window.Zotero = {};
+			}
         </script>
         <script type="text/javascript" charset="utf-8" src="../build/web-components.js"></script>
     </head>

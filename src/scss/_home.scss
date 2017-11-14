@@ -126,6 +126,16 @@
     }
   }
 
+  .illu-collect {
+    @include media-breakpoint-only("md") {
+      margin-top: rem(-44);
+    }
+
+    @include media-breakpoint-up("lg") {
+      margin-top: rem(-58);
+    }
+  }
+
   .illu-sync {
     img {
       width: rem(336);

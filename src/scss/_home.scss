@@ -129,12 +129,12 @@
   .illu-sync {
     img {
       width: rem(336);
-      height: rem(315);
+      height: auto;
     }
 
     @include media-breakpoint-only("xs") {
       img {
-        max-width: rem(240);
+        max-width: rem(220);
       }
     }
 

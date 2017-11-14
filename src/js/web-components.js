@@ -16,10 +16,17 @@ if(typeof window === 'undefined') {
 	document.addEventListener('click', function(){
 		document.documentElement.classList.add('mouseuser');
 		document.documentElement.classList.remove('keyboarduser');
+		document.documentElement.classList.remove('touchuser');
 	});
 	document.addEventListener('keydown', function(){
 		document.documentElement.classList.add('keyboarduser');
 		document.documentElement.classList.remove('mouseuser');
+		document.documentElement.classList.remove('touchuser');
+	});
+	document.addEventListener('touchstart', function(){
+		document.documentElement.classList.add('touchuser');
+		document.documentElement.classList.remove('mouseuser');
+		document.documentElement.classList.remove('keyboarduser');
 	});
 }
 

@@ -22,7 +22,10 @@
   &:focus,
   &.focus {
     outline: 0;
-    box-shadow: $input-btn-focus-box-shadow;
+
+    .keyboard-user & {
+      box-shadow: $input-btn-focus-box-shadow;
+    }
   }
 
   // Disabled comes first so active can properly restyle

@@ -25,11 +25,15 @@
 
   &:focus,
   &.focus {
+    box-shadow: none; // Box shadow for keyboard users only
+
     // Avoid using mixin so we can pass custom focus shadow properly
-    @if $enable-shadows {
-      box-shadow: $btn-box-shadow, 0 0 0 $input-btn-focus-width rgba($border, .5);
-    } @else {
-      box-shadow: 0 0 0 $input-btn-focus-width rgba($border, .5);
+    .keyboard-user & {
+      @if $enable-shadows {
+        box-shadow: $btn-box-shadow, 0 0 0 $input-btn-focus-width rgba($border, .5);
+      } @else {
+        box-shadow: 0 0 0 $input-btn-focus-width rgba($border, .5);
+      }
     }
   }
 
@@ -49,12 +53,15 @@
       background-image: none; // Remove the gradient for the pressed/active state
     }
     border-color: $active-border;
+    box-shadow: none; // Box shadow for keyboard users only
 
-    // Avoid using mixin so we can pass custom focus shadow properly
-    @if $enable-shadows {
-      box-shadow: $btn-active-box-shadow, 0 0 0 $input-btn-focus-width rgba($border, .5);
-    } @else {
-      box-shadow: 0 0 0 $input-btn-focus-width rgba($border, .5);
+    .keyboard-user & {
+      // Avoid using mixin so we can pass custom focus shadow properly
+      @if $enable-shadows {
+        box-shadow: $btn-active-box-shadow, 0 0 0 $input-btn-focus-width rgba($border, .5);
+      } @else {
+        box-shadow: 0 0 0 $input-btn-focus-width rgba($border, .5);
+      }
     }
   }
 }
@@ -73,7 +80,11 @@
 
   &:focus,
   &.focus {
-    box-shadow: 0 0 0 $input-btn-focus-width rgba($color, .5);
+    box-shadow: none; // Box shadow for keyboard users only
+
+    .keyboard-user & {
+      box-shadow: 0 0 0 $input-btn-focus-width rgba($color, .5);
+    }
   }
 
   &.disabled,
@@ -89,7 +100,11 @@
     background-color: $color;
     border-color: $color;
     // Avoid using mixin so we can pass custom focus shadow properly
-    box-shadow: 0 0 0 $input-btn-focus-width rgba($color, .5);
+    box-shadow: none; // Box shadow for keyboard users only
+
+    .keyboard-user & {
+      box-shadow: 0 0 0 $input-btn-focus-width rgba($color, .5);
+    }
   }
 }
 

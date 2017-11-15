@@ -10,19 +10,19 @@ let init = function(){
 		pageReady(function(){
 			//add type of user to html element on input events
 			document.addEventListener('click', function(){
-				document.documentElement.classList.add('mouseuser');
-				document.documentElement.classList.remove('keyboarduser');
-				document.documentElement.classList.remove('touchuser');
+				document.documentElement.classList.add('mouse-user');
+				document.documentElement.classList.remove('keyboard-user');
+				document.documentElement.classList.remove('touch-user');
 			});
 			document.addEventListener('keydown', function(){
-				document.documentElement.classList.add('keyboarduser');
-				document.documentElement.classList.remove('mouseuser');
-				document.documentElement.classList.remove('touchuser');
+				document.documentElement.classList.add('keyboard-user');
+				document.documentElement.classList.remove('mouse-user');
+				document.documentElement.classList.remove('touch-user');
 			});
 			document.addEventListener('touchstart', function(){
-				document.documentElement.classList.add('touchuser');
-				document.documentElement.classList.remove('mouseuser');
-				document.documentElement.classList.remove('keyboarduser');
+				document.documentElement.classList.add('touch-user');
+				document.documentElement.classList.remove('mouse-user');
+				document.documentElement.classList.remove('keyboard-user');
 			});
 
 			//set up nav classes

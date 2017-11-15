@@ -333,8 +333,8 @@ $input-btn-padding-y:         0.5rem;
 $input-btn-padding-x:         0.75rem !default;
 $input-btn-line-height:       $line-height-base !default;
 
-$input-btn-focus-width:       .2rem !default;
-$input-btn-focus-color:       rgba(theme-color("primary"), .25) !default;
+$input-btn-focus-width:       rem(3);
+$input-btn-focus-color:       rgba(theme-color("secondary"), 0.5);
 $input-btn-focus-box-shadow:  0 0 0 $input-btn-focus-width $input-btn-focus-color !default;
 
 $input-btn-padding-y-sm:      rem(5.5);
@@ -852,6 +852,13 @@ $pre-scrollable-max-height:         340px !default;
 //
 
 
+// Outline
+
+$outline-color: hsb(hue($secondary), 50%, 100%, 0.5);
+$outline-width: 3px;
+$outline-offset: 2px;
+
+
 // Main header
 
 $main-header-height: $spacer-max;
@@ -860,6 +867,7 @@ $nav-toggle-width: $spacer-lg + $spacer-xl;
 $nav-toggle-height: rem(42);
 
 
-// Transitions
+// Mobile nav
+
 $mobile-nav-transition-duration: 0.6s;
 $mobile-nav-transition: $mobile-nav-transition-duration cubic-bezier(0.23, 1, 0.32, 1);

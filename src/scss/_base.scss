@@ -17,3 +17,12 @@ body {
     transform: translate3d(calc(-100% + #{$nav-toggle-width}), 0, 0); // Nav-toggle width
   }
 }
+
+:focus {
+  outline: none;
+  outline-offset: $outline-offset;
+
+  .keyboard-user & {
+    outline: $outline-width solid $outline-color;
+  }
+}

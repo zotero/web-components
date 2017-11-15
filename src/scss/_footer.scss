@@ -4,8 +4,24 @@
 
 .main-footer {
   background: $blue-dark;
-  color: $white;
+  color: rgba($white, 0.5);
   padding: $spacer-lg 0 rem(40);
+
+  a {
+    color: rgba($white, 0.5);
+
+    &:hover {
+      color: $white;
+
+      img {
+        opacity: 1;
+      }
+    }
+
+    img {
+      opacity: 0.5;
+    }
+  }
 
   nav {
     display: flex;
@@ -34,21 +50,24 @@
     @include media-breakpoint-only("xl") {
       margin-left: -$nav-link-padding-x;
     }
+
+    .nav-link {
+      &:focus {
+        outline-offset: -$outline-width;
+      }
+    }
   }
 
   .social-nav {
     display: flex;
     align-items: center;
-
-    @include media-breakpoint-only("xl") {
-      padding-top: 0;
+    padding: {
+      top: $spacer-sm;
+      bottom: $spacer-sm;
     }
 
     .nav-link {
-      padding: {
-        left: 0;
-        right: 0;
-      }
+      padding: 0; // Set padding on social-nav for better-looking focus outline
 
       img {
         display: block;
@@ -57,7 +76,7 @@
   }
 
   .follow-us {
-    opacity: 0.25;
+    color: rgba($white, 0.25);
 
     @include media-breakpoint-down("lg") {
       display: none;
@@ -76,21 +95,6 @@
 
   .rss {
     margin-left: $spacer-xs;
-  }
-
-  a {
-    &,
-    &:hover {
-      color: $white;
-    }
-
-    & {
-      opacity: 0.5;
-    }
-
-    &:hover {
-      opacity: 1;
-    }
   }
 
   .credits {
@@ -113,14 +117,9 @@
   .chnm-link {
     flex: 0 0 auto;
     margin-right: -$spacer; // Optical center
-    opacity: 0.5;
 
     @include media-breakpoint-only("xl") {
-      margin-right: 0; // Rest
-    }
-
-    &:hover {
-      opacity: 1;
+      margin-right: 0; // Reset
     }
   }
 
@@ -145,17 +144,8 @@
       bottom: 2px;
     }
 
-    span,
-    a {
-      opacity: 0.5;
-    }
-
     a {
       text-decoration: underline;
-
-      &:hover {
-        opacity: 1;
-      }
     }
   }
 }

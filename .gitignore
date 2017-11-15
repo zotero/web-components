@@ -2,3 +2,4 @@ node_modules/
 lib/
 build/
 sass/
+phpd.log

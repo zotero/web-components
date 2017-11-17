@@ -50,12 +50,6 @@
     @include media-breakpoint-only("xl") {
       margin-left: -$nav-link-padding-x;
     }
-
-    .nav-link {
-      &:focus {
-        outline-offset: -$outline-width;
-      }
-    }
   }
 
   .social-nav {

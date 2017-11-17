@@ -60,12 +60,9 @@
       bottom: $spacer-sm;
     }
 
-    .nav-link {
-      padding: 0; // Set padding on social-nav for better-looking focus outline
-
-      img {
-        display: block;
-      }
+    a,
+    img {
+      display: block;
     }
   }
 

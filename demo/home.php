@@ -190,9 +190,9 @@
 						</ul>
 						<ul class="social-nav">
 							<li class="nav-item follow-us">Follow us</li>
-							<li class="nav-item twitter"><a href="https://twitter.com/zotero" class="nav-link"><img src="../assets/images/twitter-icon.svg"></a></li>
-							<li class="nav-item fb"><a href="https://www.facebook.com/zotero/" class="nav-link"><img src="../assets/images/fb-icon.svg"></a></li>
-							<li class="nav-item rss"><a href="https://www.zotero.org/blog/" class="nav-link"><img src="../assets/images/rss-icon.svg"></a></li>
+							<li class="nav-item twitter"><a href="https://twitter.com/zotero"><img src="../assets/images/twitter-icon.svg"></a></li>
+							<li class="nav-item fb"><a href="https://www.facebook.com/zotero/"><img src="../assets/images/fb-icon.svg"></a></li>
+							<li class="nav-item rss"><a href="https://www.zotero.org/blog/"><img src="../assets/images/rss-icon.svg"></a></li>
 						</ul>
 					</nav>
 					<div class="credits">

@@ -1,13 +1,16 @@
 'use strict';
 
-import {pageReady} from './Utils.js';
-
 //import {log as logger} from './Log.js';
-//let log = logger.Logger('ChangeUsernameComponent');
+//let log = logger.Logger('Theme');
+
+import {pageReady} from './Utils.js';
+const flexibility = require('flexibility');
 
 let init = function(){
 	if(document){
 		pageReady(function(){
+			flexibility(document.documentElement);
+
 			//add type of user to html element on input events
 			document.addEventListener('click', function(){
 				document.documentElement.classList.add('mouse-user');

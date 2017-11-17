@@ -1,0 +1,9 @@
+//
+// Nav
+//
+
+.nav-link {
+  &:focus {
+    outline-offset: -$outline-width;
+  }
+}

@@ -30,7 +30,9 @@
 
     li {
       &.active {
-        opacity: 0.5;
+        .nav-link {
+          color: rgba($white, 0.5);
+        }
       }
     }
 

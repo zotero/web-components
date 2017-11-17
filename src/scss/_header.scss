@@ -46,10 +46,6 @@
   .nav-link {
     color: $body-color;
 
-    &:focus {
-      outline-offset: -$outline-width;
-    }
-
     &:hover {
       // todo
     }

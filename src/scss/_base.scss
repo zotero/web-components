@@ -14,7 +14,7 @@ body {
   transition: transform $mobile-nav-transition;
 
   .nav-opened & {
-    transform: translate3d(calc(-100% + #{$nav-toggle-width}), 0, 0); // Nav-toggle width
+    transform: translate3d(-100%, 0, 0) translate3d(#{$nav-toggle-width}, 0, 0);
   }
 }
 

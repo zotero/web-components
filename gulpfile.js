@@ -20,7 +20,6 @@ const runSequence = require('run-sequence');
 const del = require('del');
 const sass = require('gulp-sass');
 const babelify = require('babelify');
-const postcss    = require('gulp-postcss');
 
 const babelifyOpts = {
 	extensions: ['.js', '.jsx'],
@@ -90,7 +89,6 @@ function getSass(dev) {
 		.pipe(autoprefixer({
 			browsers: ['last 2 versions', 'IE 10']
 		}))
-		.pipe(postcss([ require('postcss-flexibility') ]))
 		.pipe(gulpif(!dev, gulp.dest('./build')))
 		.pipe(gulpif(!dev, cssminify()))
 		.pipe(gulpif(!dev, rename({ extname: '.min.css' })))

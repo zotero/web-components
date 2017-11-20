@@ -46,6 +46,7 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    max-width: 100%; // IE10 fix
 
     @include media-breakpoint-only("xl") {
       margin-left: -$nav-link-padding-x;
@@ -118,6 +119,7 @@
     font-size: $font-size-sm;
     text-align: center;
     margin: $spacer-xl 0 0;
+    max-width: 100%; // IE10 fix
 
     @include media-breakpoint-between("md", "lg") {
       width: 80%;

@@ -4,22 +4,10 @@
 //let log = logger.Logger('Theme');
 
 import {pageReady} from './Utils.js';
-const flexibility = require('flexibility');
-
-let supportsFlexBox = function() {
-	var test = document.createElement('test');
-	test.style.display = 'flex';
-	return test.style.display === 'flex';
-};
 
 let init = function(){
 	if(document){
 		pageReady(function(){
-			if (supportsFlexBox()) {
-				// Modern Flexbox is supported
-			} else {
-				flexibility(document.documentElement);
-			}
 
 			//add type of user to html element on input events
 			document.addEventListener('click', function(){

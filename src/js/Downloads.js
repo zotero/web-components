@@ -5,7 +5,6 @@
 
 const React = require('react');
 const {Component} = React;
-const flexibility = require('flexibility');
 
 import {ZoteroIcon, PluginsIcon} from './Icons.js';
 import classnames from 'classnames';
@@ -289,7 +288,6 @@ class Downloads extends Component{
 	}
 	componentDidMount(){
 		if(typeof document != 'undefined'){
-			flexibility(document.documentElement);
 			document.documentElement.className += ' react-mounted';
 		}
 	}

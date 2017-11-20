@@ -48,7 +48,6 @@
   "dependencies": {
     "babel-polyfill": "^6.26.0",
     "classnames": "^2.2.5",
-    "flexibility": "^2.0.1",
     "picturefill": "^3.0.2",
     "prop-types": "^15.6.0",
     "react": "^16.0.0",

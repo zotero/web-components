@@ -5,7 +5,6 @@ var log = logger.Logger('StorageComponent');
 
 const React = require('react');
 const {Component} = React;
-const flexibility = require('flexibility');
 import PropTypes from 'prop-types';
 
 import {ajax, postFormData} from './ajax.js';
@@ -313,9 +312,6 @@ class Storage extends Component {
 		}
 		this.getSubscription();
 		this.getUserCustomer();
-		if(typeof document != 'undefined'){
-			flexibility(document.documentElement);
-		}
 	}
 	getSubscription() {
 		log.debug('getSubscription');

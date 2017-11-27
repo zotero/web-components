@@ -18,6 +18,17 @@
 			<link rel="stylesheet" href="../build/fonts-mac.css">
 		<?php endif;?>
 
+		<?php 
+		$testData = include('./testdata.php');
+		$user = null;
+		if($_GET['user']){
+			$username = $_GET['user'];
+			if(isset($testData[$username])){
+				$user = $testData[$username];
+			}
+		}
+		?>
+
 		<!-- set jsConfig on window.zoteroConfig -->
 		<?php $jsConfig = include('./jsConfig.php');?>
 		<script type="text/javascript">
@@ -46,7 +57,10 @@
 					<li><a class="nav-link" href="https://www.zotero.org/support/">Documentation</a></li>
 					<li><a class="nav-link" href="https://forums.zotero.org/discussions">Forums</a></li>
 					<li><a class="nav-link" href="https://www.zotero.org/getinvolved">Get Involved</a></li>
+					<? if(!$user):?>
 					<li><a class="nav-link" href="https://www.zotero.org/user/login/">Log In</a></li>
+					<? else:?>
+					<? endif;?>
 					<li><a class="nav-link" href="/settings/storage?ref=usb">Upgrade Storage</a></li>
 				</ul>
 			</nav>
@@ -64,7 +78,10 @@
 							<li class="nav-item"><a href="https://www.zotero.org/support/" class="nav-link">Documentation</a></li>
 							<li class="nav-item"><a href="https://forums.zotero.org/discussions" class="nav-link">Forums</a></li>
 							<li class="nav-item"><a href="https://www.zotero.org/getinvolved" class="nav-link">Get Involved</a></li>
+							<? if(!$user):?>
 							<li class="nav-item"><a href="https://www.zotero.org/user/login/" class="nav-link log-in">Log In</a></li>
+							<? else:?>
+							<? endif;?>
 							<li class="nav-item"><a href="/settings/storage?ref=usb" class="btn btn-secondary btn-sm upgrade-storage">Upgrade Storage</a></li>
 						</ul>
 					</nav>

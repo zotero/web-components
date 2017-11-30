@@ -18,7 +18,7 @@
 			<link rel="stylesheet" href="../build/fonts-mac.css">
 		<?php endif;?>
 
-		<?php 
+		<?php
 		$testData = include('./testdata.php');
 		$user = null;
 		if($_GET['user']){
@@ -123,7 +123,9 @@
 						<section class="section-md">
 							<div class="row align-items-center">
 								<div class="feature-col col-md-6 col-xl-5 text-center right">
-									<img class="img-fluid illu-collect" src="../assets/images/home/collect.svg" width="444" height="514">
+  								<div class="illu-collect">
+                    <?php include "collect-animation.php";?>
+                  </div>
 								</div>
 								<div class="feature-col col-md-6 order-md-first col-xl-5 offset-xl-1 left">
 									<h2 class="display-2">Collect with a click.</h2>
@@ -219,5 +221,15 @@
 				</div>
 			</footer>
 		</div>
+		<script>
+  		setInterval(function(){
+        document.body.classList.add('reset');
+        console.log('reset');
+
+        setTimeout(function() {
+          document.body.classList.remove('reset');
+        }, 15);
+  		}, 8500);
+    </script>
 	</body>
 </html>

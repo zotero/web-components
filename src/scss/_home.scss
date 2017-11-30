@@ -3,6 +3,12 @@
 //
 
 .home {
+  svg {
+    max-width: 100%;
+    height: auto;
+    vertical-align: middle;
+  }
+
   .jumbotron {
     text-align: center;
     color: $white;
@@ -105,7 +111,8 @@
       }
     }
 
-    img {
+    img,
+    svg {
       @include media-breakpoint-only("xs") {
         max-width: rem(200);
       }
@@ -129,11 +136,11 @@
 
   .illu-collect {
     @include media-breakpoint-only("md") {
-      margin-top: rem(-44);
+      margin-top: rem(-46);
     }
 
     @include media-breakpoint-up("lg") {
-      margin-top: rem(-58);
+      margin-top: rem(-61);
     }
   }
 

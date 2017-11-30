@@ -50,7 +50,20 @@ class UsernameForm extends Component{
 			});
 			return;
 		}
-
+		if(!(/^[a-z0-9._-]{3,}$/i.test(username))){
+			this.setState({
+				usernameValidity:'invalid',
+				usernameMessage: 'Username may only use upper and lower case letters, numbers, ., _, or -'
+			});
+			return;
+		}
+		if((/^[0-9]+$/i.test(username))){
+			this.setState({
+				usernameValidity:'invalid',
+				usernameMessage: 'Username can not use exclusively numerals'
+			});
+			return;
+		}
 		let checkUrl = buildUrl('checkUsername', {username});
 		ajax({url:checkUrl}).then((response)=>{
 			response.json().then((data)=>{

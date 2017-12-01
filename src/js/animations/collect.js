@@ -1,4 +1,6 @@
 
-let animations = {};
+let collect = function(){
+	console.log('collect animation');
+};
 
-export {animations};
+export {collect};

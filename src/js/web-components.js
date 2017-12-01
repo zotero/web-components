@@ -51,7 +51,12 @@ import {cycleTestCases, cycleTestFuncs} from './TestUtils.js';
 import {Combined} from './GlobalSearch/Combined.js';
 import Profile from './profile/profile.jsx';
 import {ChangeUsername} from './ChangeUsername.js';
-import {animations} from './animations/collect.js';
+import {collect} from './animations/collect.js';
+import {organize} from './animations/organize.js';
+let animations = {
+	collect,
+	organize
+};
 
 let ZoteroWebComponents = {
 	Storage,

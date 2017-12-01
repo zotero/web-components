@@ -222,6 +222,9 @@
 			</footer>
 		</div>
 		<script>
+			ZoteroWebComponents.pageReady(function() {
+				ZoteroWebComponents.animations.collect();
+			});
   		setInterval(function(){
         document.body.classList.add('reset');
         console.log('reset');

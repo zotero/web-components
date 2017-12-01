@@ -111,6 +111,7 @@
       }
     }
 
+    .illu-container,
     img,
     svg {
       @include media-breakpoint-only("xs") {
@@ -126,6 +127,11 @@
       }
     }
 
+    .illu-container {
+      margin-left: auto;
+      margin-right: auto;
+    }
+
     p {
       @include media-breakpoint-up("md") {
         font-size: 1.125rem;
@@ -135,12 +141,29 @@
   }
 
   .illu-collect {
+    @include media-breakpoint-down("md") {
+      position: relative;
+      padding-top: (100% * 441 / 444);
+
+      svg {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+      }
+    }
+
     @include media-breakpoint-only("md") {
       margin-top: rem(-46);
     }
 
     @include media-breakpoint-up("lg") {
       margin-top: rem(-61);
+
+      svg {
+        width: 444px;
+        height: 441px;
+      }
     }
   }
 

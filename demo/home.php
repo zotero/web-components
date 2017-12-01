@@ -123,7 +123,7 @@
 						<section class="section-md">
 							<div class="row align-items-center">
 								<div class="feature-col col-md-6 col-xl-5 text-center right">
-  								<div class="illu-collect">
+  								<div class="illu-collect illu-container">
                     <?php include "collect-animation.php";?>
                   </div>
 								</div>
@@ -225,14 +225,6 @@
 			ZoteroWebComponents.pageReady(function() {
 				ZoteroWebComponents.animations.collect();
 			});
-  		setInterval(function(){
-        document.body.classList.add('reset');
-        console.log('reset');
-
-        setTimeout(function() {
-          document.body.classList.remove('reset');
-        }, 15);
-  		}, 8500);
-    </script>
+		</script>
 	</body>
 </html>

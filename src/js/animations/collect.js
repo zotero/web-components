@@ -1,0 +1,4 @@
+
+let animations = {};
+
+export {animations};

@@ -30,6 +30,8 @@ globalScope.Popper = require('popper.js');
 globalScope.WebFont = WebFont;
 require('bootstrap');
 
+import {TweenMax} from 'gsap';
+globalScope.TweenMax = TweenMax;
 
 import {Storage} from './Storage.js';
 import {MakeEditable} from './MakeEditable.js';
@@ -49,6 +51,7 @@ import {cycleTestCases, cycleTestFuncs} from './TestUtils.js';
 import {Combined} from './GlobalSearch/Combined.js';
 import Profile from './profile/profile.jsx';
 import {ChangeUsername} from './ChangeUsername.js';
+import {animations} from './animations/collect.js';
 
 let ZoteroWebComponents = {
 	Storage,
@@ -71,7 +74,8 @@ let ZoteroWebComponents = {
 	cycleTestFuncs,
 	Combined,
 	Profile,
-	ChangeUsername
+	ChangeUsername,
+	animations
 };
 
 globalScope.ZoteroWebComponents = ZoteroWebComponents;

@@ -54,6 +54,7 @@
     "babel-polyfill": "^6.26.0",
     "bootstrap": "^4.0.0-beta.2",
     "classnames": "^2.2.5",
+    "gsap": "^1.20.3",
     "jquery": "^3.2.1",
     "picturefill": "^3.0.2",
     "popper.js": "^1.12.5",

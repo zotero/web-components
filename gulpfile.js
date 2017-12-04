@@ -52,6 +52,7 @@ function getBrowserify(dev) {
 				return getJS(dev);
 			});
 			bundle.on('log', onSuccess);
+			bundle.on('error', onError);
 		}
 	}
 
@@ -60,6 +61,7 @@ function getBrowserify(dev) {
 
 function getJS(dev) {
 	return getBrowserify(dev).bundle()
+		.on('error', onError)
 		.pipe(source('web-components.js'))
 		.pipe(buffer())
 		.pipe(plumber({errorHandler: onError}))

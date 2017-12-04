@@ -1,49 +1,115 @@
 
 let collect = function(){
+	let cursor = document.querySelector('#cursor');
+	let url = document.querySelector('#url');
+	let spinner = document.querySelector('#spinner');
+	let content = document.querySelector('#content');
+	let clipPath = document.querySelector('#clip-path circle');
 
-	var e = $('.illu-collect svg');
+	let easeInOut = BezierEasing(0.42, 0, 0.58, 1);
 
-	var cursor = e.find('#cursor');
-	var url = e.find('#url');
-	var spinner = e.find('#spinner');
-	var content = e.find('#content');
-	var journalIcon = e.find('#journal-icon');
-	var zIcon = e.find('#z-icon');
-	var clipPath = e.find('#clip-path circle');
-	var magnifier = e.find('#magnifier');
-
-	TweenLite.defaultEase = Linear.easeNone;
-	var tl = new TimelineLite();
-
-	tl.to(cursor, 0.35, {x: 7, y: -47, ease: Power1.easeInOut})
-
-	  .set(cursor, {scale: 0.8, transformOrigin: 'center'}, '+=0.125')
-
-	  .set(cursor, {scale: 1, transformOrigin: 'center'}, '+=0.05')
-
-	  .set(cursor, {scale: 1, opacity: 0}, '+=0.05')
-
-	  .set(url, {opacity: 1, attr: {width: 0}}, '+=0.125')
-
-	  .to(url, 0.5, {attr: {width: 128}, ease: SteppedEase.config(8)})
-
-	  .set(spinner, {opacity: 1})
-
-	  .to(spinner, 0.5, {rotation: 180, transformOrigin: 'center'})
-
-	  .set(spinner, {opacity: 0})
-	  .set(content, {opacity: 1})
-	  .set(journalIcon, {opacity: 1})
-	  .set(zIcon, {opacity: 0})
-
-	  .set(cursor, {opacity: 1}, '+=0.25')
-		.set(magnifier, {scale: 0.67, transformOrigin: 'center'})
-
-	  .to(cursor, 0.5, {x: 155, ease: Power1.easeInOut})
-
-	  .to(clipPath, 0.2, {attr: {r: 100}, ease: Power3.easeOut}, "-=0.25")
-		.to(magnifier, 0.2, {scale: 1, transformOrigin: 'center', ease: Power3.easeOut}, "-=0.2");
-
+	let stepEasing = function(k) {
+		return Math.floor(k * 8) / 8;
 	};
 
+	let animate = function(time) {
+		requestAnimationFrame(animate);
+		TWEEN.update(time);
+	};
+
+	requestAnimationFrame(animate);
+
+	let coords1 = { x: 0, y: 0 };
+	let duration1 = 350;
+	let delay1 = 0;
+	let tween1 = new TWEEN.Tween(coords1)
+		.to({ x: 7, y: -47 }, duration1)
+		.easing(easeInOut)
+		.onUpdate(function() {
+			cursor.style.setProperty('transform',
+				`translate(${coords1.x}px, ${coords1.y}px`);
+		})
+		.start();
+
+	let coords2 = { s: 1 };
+	let duration2 = 0;
+	let delay2 = delay1 + duration1 + 125;
+	let tween2 = new TWEEN.Tween(coords2)
+		.to({ s: 0.8 }, duration2)
+		.onUpdate(function() {
+			cursor.style.setProperty('transform-origin', '195px 156px');
+			cursor.style.setProperty('transform',
+				`translate(${coords1.x}px, ${coords1.y}px) scale(${coords2.s}`);
+		})
+		.delay(delay2)
+		.start();
+
+	let delay3 = delay2 + duration2 + 50;
+	setTimeout(function() {
+		cursor.style.setProperty('transform',
+			`translate(${coords1.x}px, ${coords1.y}px) scale(1)`);
+	}, delay3);
+
+	let delay4 = delay3 + 50;
+	setTimeout(function() {
+		cursor.style.setProperty('opacity', 0);
+	}, delay4);
+
+	let delay5 = delay4 + 62.5;
+	setTimeout(function(){
+		url.setAttribute('width', 0);
+		url.style.setProperty('opacity', 1);
+	}, delay5);
+
+	let coords6 = { w: 0 };
+	let duration6 = 500;
+	let delay6 = delay5;
+	let tween6 = new TWEEN.Tween(coords6)
+		.to({ w: 128 }, duration6)
+		.easing(stepEasing)
+		.onUpdate(function() {
+			url.setAttribute('width', coords6.w);
+		})
+		.delay(delay6)
+		.start();
+
+	let delay7 = delay6 + duration6 + 62.5;
+	setTimeout(function() {
+		spinner.style.setProperty('transform-origin', '71px 77px');
+		spinner.style.setProperty('opacity', 1);
+	}, delay7);
+
+	let coords8 = { r: 0 };
+	let duration8 = 500;
+	let delay8 = delay7;
+	let tween8 = new TWEEN.Tween(coords8)
+		.to({ r: 180 }, duration8)
+		.onUpdate(function() {
+			spinner.style.setProperty('transform', `rotate(${coords8.r}deg)`);
+		})
+		.delay(delay8)
+		.start()
+
+	let delay9 = delay8 + duration8;
+	setTimeout(function() {
+		spinner.style.setProperty('opacity', 0);
+		content.style.setProperty('opacity', 1);
+	}, delay9);
+
+	//let coords3 = { r: clipPath.getAttribute('r') };
+	//let delay3 = delay2 + 500;
+	//let tween3 = new TWEEN.Tween(coords3)
+	//  .to({ r: "+50"}, 500)
+	//  .easing(bezier1)
+	//  .onUpdate(function(coords3) {
+	// 		clipPath.setAttribute('r', coords3.r);
+	//  })
+	//  .delay(delay3)
+	//  .start();
+
+};
+
 export {collect};
+
+
+

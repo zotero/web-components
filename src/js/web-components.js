@@ -33,6 +33,12 @@ require('bootstrap');
 import {TweenMax} from 'gsap';
 globalScope.TweenMax = TweenMax;
 
+const TWEEN = require('@tweenjs/tween.js');
+globalScope.TWEEN = TWEEN;
+
+const BezierEasing = require('bezier-easing');
+globalScope.BezierEasing = BezierEasing;
+
 import {Storage} from './Storage.js';
 import {MakeEditable} from './MakeEditable.js';
 import {UserGroups} from './UserGroups.js';

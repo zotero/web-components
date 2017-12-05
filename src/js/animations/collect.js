@@ -4,109 +4,154 @@ let collect = function(){
 	let url = document.querySelector('#url');
 	let spinner = document.querySelector('#spinner');
 	let content = document.querySelector('#content');
+	let journalIcon = document.querySelector('#journal-icon');
+	let zIcon = document.querySelector('#z-icon');
 	let clipPath = document.querySelector('#clip-path circle');
+	let magnifier = document.querySelector('#magnifier');
 
 	let easeInOut = BezierEasing(0.42, 0, 0.58, 1);
+	let strongEaseOut = BezierEasing(0.23, 1, 0.32, 1);
 
 	let stepEasing = function(k) {
 		return Math.floor(k * 8) / 8;
 	};
 
+	let groupA = new TWEEN.Group();
+	let groupB = new TWEEN.Group();
+
 	let animate = function(time) {
 		requestAnimationFrame(animate);
-		TWEEN.update(time);
+		groupA.update(time);
+		groupB.update(time);
 	};
 
 	requestAnimationFrame(animate);
 
-	let coords1 = { x: 0, y: 0 };
-	let duration1 = 350;
-	let delay1 = 0;
-	let tween1 = new TWEEN.Tween(coords1)
-		.to({ x: 7, y: -47 }, duration1)
+	// Group A
+
+	let moveToAddressBarCoords = { x: 0, y: 0 };
+	let moveToAddressBarDuration = 350;
+	let moveToAddressBar = new TWEEN.Tween(moveToAddressBarCoords, groupA)
+		.to({ x: 7, y: -47 }, moveToAddressBarDuration)
 		.easing(easeInOut)
 		.onUpdate(function() {
 			cursor.style.setProperty('transform',
-				`translate(${coords1.x}px, ${coords1.y}px`);
+				`translate(${moveToAddressBarCoords.x}px, \n
+				${moveToAddressBarCoords.y}px`);
 		})
-		.start();
 
-	let coords2 = { s: 1 };
-	let duration2 = 0;
-	let delay2 = delay1 + duration1 + 125;
-	let tween2 = new TWEEN.Tween(coords2)
-		.to({ s: 0.8 }, duration2)
-		.onUpdate(function() {
+	let mouseDownCoords = { s: 1 };
+	let mouseDownDuration = 0;
+	let mouseDown = new TWEEN.Tween(mouseDownCoords, groupA)
+		.to({ s: 0.8 }, mouseDownDuration)
+		.onStart(function() {
 			cursor.style.setProperty('transform-origin', '195px 156px');
-			cursor.style.setProperty('transform',
-				`translate(${coords1.x}px, ${coords1.y}px) scale(${coords2.s}`);
 		})
-		.delay(delay2)
-		.start();
+		.onUpdate(function() {
+			cursor.style.setProperty('transform',
+				`translate(${moveToAddressBarCoords.x}px, \n
+				${moveToAddressBarCoords.y}px) scale(${mouseDownCoords.s}`);
+		})
+		.delay(125)
 
-	let delay3 = delay2 + duration2 + 50;
-	setTimeout(function() {
-		cursor.style.setProperty('transform',
-			`translate(${coords1.x}px, ${coords1.y}px) scale(1)`);
-	}, delay3);
+	let mouseUpCoords = { s: 0.8 };
+	let mouseUpDuration = 0;
+	let mouseUp = new TWEEN.Tween(mouseUpCoords, groupA)
+		.to({ s: 1 }, mouseUpDuration)
+		.onUpdate(function() {
+			cursor.style.setProperty('transform',
+				`translate(${moveToAddressBarCoords.x}px, \n
+				${moveToAddressBarCoords.y}px) scale(${mouseUpCoords.s}`);
+		})
+		.delay(50)
 
-	let delay4 = delay3 + 50;
-	setTimeout(function() {
-		cursor.style.setProperty('opacity', 0);
-	}, delay4);
+	let hideCursorCoords = { o: 1 };
+	let hideCursorDuration = 0;
+	let hideCursor = new TWEEN.Tween(hideCursorCoords, groupA)
+		.to({ o: 0 }, hideCursorDuration)
+		.onUpdate(function() {
+			cursor.style.setProperty('opacity', hideCursorCoords.o);
+		})
+		.delay(50)
 
-	let delay5 = delay4 + 62.5;
-	setTimeout(function(){
-		url.setAttribute('width', 0);
-		url.style.setProperty('opacity', 1);
-	}, delay5);
+	let showUrlCoords = { w: 128, o: 0};
+	let showUrlDuration = 0;
+	let showUrl = new TWEEN.Tween(showUrlCoords, groupA)
+		.to({ w: 0, o: 1}, showUrlDuration)
+		.onUpdate(function(){
+			url.setAttribute('width', showUrlCoords.w);
+			url.style.setProperty('opacity', showUrlCoords.o);
+		})
+		.delay(62.5)
 
-	let coords6 = { w: 0 };
-	let duration6 = 500;
-	let delay6 = delay5;
-	let tween6 = new TWEEN.Tween(coords6)
-		.to({ w: 128 }, duration6)
+	let typeUrlCoords = { w: 0 };
+	let typeUrlDuration = 500;
+	let typeUrl = new TWEEN.Tween(typeUrlCoords, groupA)
+		.to({ w: 128 }, typeUrlDuration)
 		.easing(stepEasing)
 		.onUpdate(function() {
-			url.setAttribute('width', coords6.w);
+			url.setAttribute('width', typeUrlCoords.w);
 		})
-		.delay(delay6)
-		.start();
 
-	let delay7 = delay6 + duration6 + 62.5;
-	setTimeout(function() {
-		spinner.style.setProperty('transform-origin', '71px 77px');
-		spinner.style.setProperty('opacity', 1);
-	}, delay7);
-
-	let coords8 = { r: 0 };
-	let duration8 = 500;
-	let delay8 = delay7;
-	let tween8 = new TWEEN.Tween(coords8)
-		.to({ r: 180 }, duration8)
+	let spinCoords = { r: 0 };
+	let spinDuration = 500;
+	let spin = new TWEEN.Tween(spinCoords, groupA)
+		.to({ r: 180 }, spinDuration)
+		.onStart(function() {
+			spinner.style.setProperty('transform-origin', '71px 77px');
+			spinner.setAttribute('opacity', 1);
+		})
 		.onUpdate(function() {
-			spinner.style.setProperty('transform', `rotate(${coords8.r}deg)`);
+			spinner.style.setProperty('transform', `rotate(${spinCoords.r}deg)`);
 		})
-		.delay(delay8)
-		.start()
+		.onComplete(function() {
+			spinner.setAttribute('opacity', 0);
+			content.setAttribute('opacity', 1);
+			journalIcon.setAttribute('opacity', 1);
+			zIcon.setAttribute('opacity', 0);
+			magnifierGrow.start();
+		})
+		.delay(62.5)
 
-	let delay9 = delay8 + duration8;
-	setTimeout(function() {
-		spinner.style.setProperty('opacity', 0);
-		content.style.setProperty('opacity', 1);
-	}, delay9);
+	let moveToConnectorCoords = { x: 7 }
+	let moveToConnectorDuration = 500;
+	let moveToConnector = new TWEEN.Tween(moveToConnectorCoords, groupA)
+		.to({ x: 155}, moveToConnectorDuration)
+		.easing(easeInOut)
+		.onStart(function() {
+			cursor.style.setProperty('opacity', 1);
+		})
+		.onUpdate(function() {
+			cursor.style.setProperty('transform',
+				`translate(${moveToConnectorCoords.x}px, -47px`);
+		})
+		.delay(250)
 
-	//let coords3 = { r: clipPath.getAttribute('r') };
-	//let delay3 = delay2 + 500;
-	//let tween3 = new TWEEN.Tween(coords3)
-	//  .to({ r: "+50"}, 500)
-	//  .easing(bezier1)
-	//  .onUpdate(function(coords3) {
-	// 		clipPath.setAttribute('r', coords3.r);
-	//  })
-	//  .delay(delay3)
-	//  .start();
+	moveToAddressBar.chain(mouseDown);
+	mouseDown.chain(mouseUp);
+	mouseUp.chain(hideCursor);
+	hideCursor.chain(showUrl);
+	showUrl.chain(typeUrl);
+	typeUrl.chain(spin);
+	spin.chain(moveToConnector);
 
+	moveToAddressBar.start();
+
+	// Group B
+
+	let magnifierCoords = { r: 0, s: 0.67 };
+	let magnifierDuration = 250;
+	let magnifierGrow = new TWEEN.Tween(magnifierCoords, groupB)
+	  .to({ r: 100, s: 1 }, magnifierDuration)
+	  .easing(strongEaseOut)
+		.onStart(function() {
+			magnifier.style.setProperty('transform-origin', '344px 100px')
+		})
+	  .onUpdate(function() {
+		  clipPath.setAttribute('r', magnifierCoords.r);
+		  magnifier.style.setProperty('transform', `scale(${magnifierCoords.s})`)
+	  })
+	  .delay(500)
 };
 
 export {collect};

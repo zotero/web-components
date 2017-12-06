@@ -40,30 +40,24 @@ let collect = function(){
 				${moveToAddressBarCoords.y}px`);
 		})
 
-	let mouseDownCoords = { s: 1 };
-	let mouseDownDuration = 0;
-	let mouseDown = new TWEEN.Tween(mouseDownCoords, groupA)
-		.to({ s: 0.8 }, mouseDownDuration)
+	let clickCoords = { s: 0.8 };
+	let clickDuration = 50;
+	let click = new TWEEN.Tween(clickCoords, groupA)
+		.to({ s: 0.8 }, clickDuration)
 		.onStart(function() {
 			cursor.style.setProperty('transform-origin', '195px 156px');
 		})
 		.onUpdate(function() {
 			cursor.style.setProperty('transform',
 				`translate(${moveToAddressBarCoords.x}px, \n
-				${moveToAddressBarCoords.y}px) scale(${mouseDownCoords.s}`);
+				${moveToAddressBarCoords.y}px) scale(${clickCoords.s})`);
 		})
-		.delay(125)
-
-	let mouseUpCoords = { s: 0.8 };
-	let mouseUpDuration = 0;
-	let mouseUp = new TWEEN.Tween(mouseUpCoords, groupA)
-		.to({ s: 1 }, mouseUpDuration)
-		.onUpdate(function() {
+		.onComplete(function() {
 			cursor.style.setProperty('transform',
 				`translate(${moveToAddressBarCoords.x}px, \n
-				${moveToAddressBarCoords.y}px) scale(${mouseUpCoords.s}`);
+				${moveToAddressBarCoords.y}px) scale(1)`);
 		})
-		.delay(50)
+		.delay(125)
 
 	let hideCursorCoords = { o: 1 };
 	let hideCursorDuration = 0;
@@ -127,9 +121,8 @@ let collect = function(){
 		})
 		.delay(250)
 
-	moveToAddressBar.chain(mouseDown);
-	mouseDown.chain(mouseUp);
-	mouseUp.chain(hideCursor);
+	moveToAddressBar.chain(click);
+	click.chain(hideCursor);
 	hideCursor.chain(showUrl);
 	showUrl.chain(typeUrl);
 	typeUrl.chain(spin);

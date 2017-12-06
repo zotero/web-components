@@ -8,6 +8,10 @@ let collect = function(){
 	let zIcon = document.querySelector('#z-icon');
 	let clipPath = document.querySelector('#clip-path circle');
 	let magnifier = document.querySelector('#magnifier');
+	let tooltip = document.querySelector('#tooltip');
+	let zoteroBack = document.querySelector('#zotero-back');
+	let zoteroFront = document.querySelector('#zotero-front');
+	let newItem = document.querySelector('#new-item');
 
 	let easeInOut = BezierEasing(0.42, 0, 0.58, 1);
 	let strongEaseOut = BezierEasing(0.23, 1, 0.32, 1);
@@ -19,20 +23,20 @@ let collect = function(){
 	let groupA = new TWEEN.Group();
 	let groupB = new TWEEN.Group();
 
-	let animate = function(time) {
-		requestAnimationFrame(animate);
-		groupA.update(time);
-		groupB.update(time);
+	let animate = function() {
+	 requestAnimationFrame(animate);
+	 groupA.update();
+	 groupB.update();
 	};
 
 	requestAnimationFrame(animate);
 
 	// Group A
 
-	let moveToAddressBarCoords = { x: 0, y: 0 };
+	let moveToAddressBarCoords = { x: 193, y: 156 };
 	let moveToAddressBarDuration = 350;
 	let moveToAddressBar = new TWEEN.Tween(moveToAddressBarCoords, groupA)
-		.to({ x: 7, y: -47 }, moveToAddressBarDuration)
+		.to({ x: 200, y: 109 }, moveToAddressBarDuration)
 		.easing(easeInOut)
 		.onUpdate(function() {
 			cursor.style.setProperty('transform',
@@ -40,17 +44,14 @@ let collect = function(){
 				${moveToAddressBarCoords.y}px`);
 		})
 
-	let clickCoords = { s: 0.8 };
-	let clickDuration = 50;
-	let click = new TWEEN.Tween(clickCoords, groupA)
-		.to({ s: 0.8 }, clickDuration)
-		.onStart(function() {
-			cursor.style.setProperty('transform-origin', '195px 156px');
-		})
+	let clickAddressBarCoords = { s: 0.8 };
+	let clickAddressBarDuration = 50;
+	let clickAddressBar = new TWEEN.Tween(clickAddressBarCoords, groupA)
+		.to({ s: 0.8 }, clickAddressBarDuration)
 		.onUpdate(function() {
 			cursor.style.setProperty('transform',
 				`translate(${moveToAddressBarCoords.x}px, \n
-				${moveToAddressBarCoords.y}px) scale(${clickCoords.s})`);
+				${moveToAddressBarCoords.y}px) scale(${clickAddressBarCoords.s})`);
 		})
 		.onComplete(function() {
 			cursor.style.setProperty('transform',
@@ -99,7 +100,7 @@ let collect = function(){
 			spinner.style.setProperty('transform', `rotate(${spinCoords.r}deg)`);
 		})
 		.onComplete(function() {
-			spinner.setAttribute('opacity', 0);
+			//spinner.setAttribute('opacity', 0);
 			content.setAttribute('opacity', 1);
 			journalIcon.setAttribute('opacity', 1);
 			zIcon.setAttribute('opacity', 0);
@@ -107,26 +108,97 @@ let collect = function(){
 		})
 		.delay(62.5)
 
-	let moveToConnectorCoords = { x: 7 }
+	let moveToConnectorCoords = { x: 200}
 	let moveToConnectorDuration = 500;
 	let moveToConnector = new TWEEN.Tween(moveToConnectorCoords, groupA)
-		.to({ x: 155}, moveToConnectorDuration)
+		.to({ x: 348 }, moveToConnectorDuration)
 		.easing(easeInOut)
 		.onStart(function() {
 			cursor.style.setProperty('opacity', 1);
 		})
 		.onUpdate(function() {
 			cursor.style.setProperty('transform',
-				`translate(${moveToConnectorCoords.x}px, -47px`);
+				`translate(${moveToConnectorCoords.x}px, ${moveToAddressBarCoords.y}px`);
+		})
+		.onComplete(function() {
+			tooltip.style.setProperty('opacity', 1)
 		})
 		.delay(250)
 
-	moveToAddressBar.chain(click);
-	click.chain(hideCursor);
+	let clickConnectorCoords = { s: 0.8 };
+	let clickConnectorDuration = 50;
+	let clickConnector = new TWEEN.Tween(clickConnectorCoords, groupA)
+		.to({ s: 0.8 }, clickConnectorDuration)
+		.onUpdate(function() {
+			cursor.style.setProperty('transform',
+			`translate(${moveToConnectorCoords.x}px, \n
+			${moveToAddressBarCoords.y}px) scale(${clickConnectorCoords.s})`);
+		})
+		.onComplete(function() {
+			cursor.style.setProperty('transform',
+				`translate(${moveToConnectorCoords.x}px, \n
+				${moveToAddressBarCoords.y}px) scale(1)`);
+		})
+		.delay(500)
+
+	let moveToZoteroCoords = { x: 348, y: 109 };
+	let moveToZoteroDuration = 500;
+	let moveToZotero = new TWEEN.Tween(moveToZoteroCoords, groupA)
+		.to({ x: 245, y: 384}, moveToZoteroDuration)
+		.easing(easeInOut)
+		.onUpdate(function() {
+			cursor.style.setProperty('transform',
+			`translate(${moveToZoteroCoords.x}px, ${moveToZoteroCoords.y}px)`)
+		})
+		.delay(500)
+
+	let clickZoteroCoords = { s: 1 };
+	let clickZoteroDuration = 50;
+	let clickZotero = new TWEEN.Tween(clickZoteroCoords, groupA)
+		.to({ s: 0.8}, clickZoteroDuration)
+		.onUpdate(function() {
+			cursor.style.setProperty('transform',
+			`translate(${moveToZoteroCoords.x}px, \n
+			${moveToZoteroCoords.y}px) scale(${clickConnectorCoords.s})`);
+		})
+		.onComplete(function() {
+			cursor.style.setProperty('transform',
+				`translate(${moveToZoteroCoords.x}px, \n
+				${moveToZoteroCoords.y}px) scale(1)`);
+		})
+		.delay(250)
+
+	let focusZoteroCoords = {};
+	let focusZotero = new TWEEN.Tween({}, groupA)
+		.to({}, 0)
+		.onUpdate(function(){
+			zoteroBack.setAttribute('opacity', 0);
+			zoteroFront.setAttribute('opacity', 1);
+		})
+
+	//let newItemCoords = { y: -18 };
+	//let newItemDuration = 150;
+	//let newItem = new TWEEN.Tween(newItemCoords, groupA)
+	//	.to({ y: 0 }, newItemDuration)
+	//	.onStart(function() {
+	//		zoteroBack.setAttribute('opacity', 0);
+	//		zoteroFront.setAttribute('opacity', 1);
+	//	})
+	//	.onUpdate(function() {
+	//		newitem.style.setProperty('transform', `translateY(${newItemCoords.y}px)`);
+	//	})
+
+
+	moveToAddressBar.chain(clickAddressBar);
+	clickAddressBar.chain(hideCursor);
 	hideCursor.chain(showUrl);
 	showUrl.chain(typeUrl);
 	typeUrl.chain(spin);
 	spin.chain(moveToConnector);
+	moveToConnector.chain(clickConnector);
+	clickConnector.chain(moveToZotero);
+	moveToZotero.chain(clickZotero);
+	clickZotero.chain(focusZotero);
 
 	moveToAddressBar.start();
 
@@ -135,16 +207,16 @@ let collect = function(){
 	let magnifierCoords = { r: 0, s: 0.67 };
 	let magnifierDuration = 250;
 	let magnifierGrow = new TWEEN.Tween(magnifierCoords, groupB)
-	  .to({ r: 100, s: 1 }, magnifierDuration)
-	  .easing(strongEaseOut)
+		.to({ r: 100, s: 1 }, magnifierDuration)
+		.easing(strongEaseOut)
 		.onStart(function() {
 			magnifier.style.setProperty('transform-origin', '344px 100px')
 		})
-	  .onUpdate(function() {
-		  clipPath.setAttribute('r', magnifierCoords.r);
-		  magnifier.style.setProperty('transform', `scale(${magnifierCoords.s})`)
-	  })
-	  .delay(500)
+		.onUpdate(function() {
+			clipPath.setAttribute('r', magnifierCoords.r);
+			magnifier.style.setProperty('transform', `scale(${magnifierCoords.s})`)
+		})
+		.delay(500)
 };
 
 export {collect};

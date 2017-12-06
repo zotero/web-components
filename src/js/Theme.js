@@ -31,13 +31,16 @@ let init = function(){
 			navCover = document.querySelector('.nav-cover'),
 			body = document.querySelector('body');
 
-			navToggle.addEventListener('click', function() {
-				body.classList.add('nav-opened');
-			});
-
-			navCover.addEventListener('click', function() {
-				body.classList.remove('nav-opened');
-			});
+			if(navToggle){
+				navToggle.addEventListener('click', function() {
+					body.classList.add('nav-opened');
+				});
+			}
+			if(navCover){
+				navCover.addEventListener('click', function() {
+					body.classList.remove('nav-opened');
+				});
+			}
 		});
 	}
 };

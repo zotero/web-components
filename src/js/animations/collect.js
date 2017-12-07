@@ -39,24 +39,25 @@ let collect = function(){
 		.to({ x: 200, y: 109 }, moveToAddressBarDuration)
 		.easing(easeInOut)
 		.onUpdate(function() {
-			cursor.style.setProperty('transform',
-				`translate(${moveToAddressBarCoords.x}px, \n
-				${moveToAddressBarCoords.y}px`);
+			cursor.setAttribute('transform',
+				`translate(${moveToAddressBarCoords.x}, \n
+				${moveToAddressBarCoords.y})`);
 		})
+		.delay(3000)
 
 	let clickAddressBarCoords = { s: 0.8 };
 	let clickAddressBarDuration = 50;
 	let clickAddressBar = new TWEEN.Tween(clickAddressBarCoords, groupA)
 		.to({ s: 0.8 }, clickAddressBarDuration)
 		.onUpdate(function() {
-			cursor.style.setProperty('transform',
-				`translate(${moveToAddressBarCoords.x}px, \n
-				${moveToAddressBarCoords.y}px) scale(${clickAddressBarCoords.s})`);
+			cursor.setAttribute('transform',
+				`translate(${moveToAddressBarCoords.x}, \n
+				${moveToAddressBarCoords.y}) scale(${clickAddressBarCoords.s})`);
 		})
 		.onComplete(function() {
-			cursor.style.setProperty('transform',
-				`translate(${moveToAddressBarCoords.x}px, \n
-				${moveToAddressBarCoords.y}px) scale(1)`);
+			cursor.setAttribute('transform',
+				`translate(${moveToAddressBarCoords.x}, \n
+				${moveToAddressBarCoords.y}) scale(1)`);
 		})
 		.delay(125)
 
@@ -65,7 +66,7 @@ let collect = function(){
 	let hideCursor = new TWEEN.Tween(hideCursorCoords, groupA)
 		.to({ o: 0 }, hideCursorDuration)
 		.onUpdate(function() {
-			cursor.style.setProperty('opacity', hideCursorCoords.o);
+			cursor.setAttribute('opacity', hideCursorCoords.o);
 		})
 		.delay(50)
 
@@ -75,7 +76,7 @@ let collect = function(){
 		.to({ w: 0, o: 1}, showUrlDuration)
 		.onUpdate(function(){
 			url.setAttribute('width', showUrlCoords.w);
-			url.style.setProperty('opacity', showUrlCoords.o);
+			url.setAttribute('opacity', showUrlCoords.o);
 		})
 		.delay(62.5)
 
@@ -93,14 +94,13 @@ let collect = function(){
 	let spin = new TWEEN.Tween(spinCoords, groupA)
 		.to({ r: 180 }, spinDuration)
 		.onStart(function() {
-			spinner.style.setProperty('transform-origin', '71px 77px');
 			spinner.setAttribute('opacity', 1);
 		})
 		.onUpdate(function() {
-			spinner.style.setProperty('transform', `rotate(${spinCoords.r}deg)`);
+			spinner.setAttribute('transform', `rotate(${spinCoords.r}, 71, 77)`);
 		})
 		.onComplete(function() {
-			//spinner.setAttribute('opacity', 0);
+			spinner.setAttribute('opacity', 0);
 			content.setAttribute('opacity', 1);
 			journalIcon.setAttribute('opacity', 1);
 			zIcon.setAttribute('opacity', 0);
@@ -114,14 +114,14 @@ let collect = function(){
 		.to({ x: 348 }, moveToConnectorDuration)
 		.easing(easeInOut)
 		.onStart(function() {
-			cursor.style.setProperty('opacity', 1);
+			cursor.setAttribute('opacity', 1);
 		})
 		.onUpdate(function() {
-			cursor.style.setProperty('transform',
-				`translate(${moveToConnectorCoords.x}px, ${moveToAddressBarCoords.y}px`);
+			cursor.setAttribute('transform',
+				`translate(${moveToConnectorCoords.x}, ${moveToAddressBarCoords.y})`);
 		})
 		.onComplete(function() {
-			tooltip.style.setProperty('opacity', 1)
+			tooltip.setAttribute('opacity', 1)
 		})
 		.delay(250)
 
@@ -130,14 +130,14 @@ let collect = function(){
 	let clickConnector = new TWEEN.Tween(clickConnectorCoords, groupA)
 		.to({ s: 0.8 }, clickConnectorDuration)
 		.onUpdate(function() {
-			cursor.style.setProperty('transform',
-			`translate(${moveToConnectorCoords.x}px, \n
-			${moveToAddressBarCoords.y}px) scale(${clickConnectorCoords.s})`);
+			cursor.setAttribute('transform',
+			`translate(${moveToConnectorCoords.x}, \n
+			${moveToAddressBarCoords.y}) scale(${clickConnectorCoords.s})`);
 		})
 		.onComplete(function() {
-			cursor.style.setProperty('transform',
-				`translate(${moveToConnectorCoords.x}px, \n
-				${moveToAddressBarCoords.y}px) scale(1)`);
+			cursor.setAttribute('transform',
+				`translate(${moveToConnectorCoords.x}, \n
+				${moveToAddressBarCoords.y}) scale(1)`);
 		})
 		.delay(500)
 
@@ -147,8 +147,8 @@ let collect = function(){
 		.to({ x: 245, y: 384}, moveToZoteroDuration)
 		.easing(easeInOut)
 		.onUpdate(function() {
-			cursor.style.setProperty('transform',
-			`translate(${moveToZoteroCoords.x}px, ${moveToZoteroCoords.y}px)`)
+			cursor.setAttribute('transform',
+			`translate(${moveToZoteroCoords.x}, ${moveToZoteroCoords.y})`)
 		})
 		.delay(500)
 
@@ -157,14 +157,14 @@ let collect = function(){
 	let clickZotero = new TWEEN.Tween(clickZoteroCoords, groupA)
 		.to({ s: 0.8}, clickZoteroDuration)
 		.onUpdate(function() {
-			cursor.style.setProperty('transform',
-			`translate(${moveToZoteroCoords.x}px, \n
-			${moveToZoteroCoords.y}px) scale(${clickConnectorCoords.s})`);
+			cursor.setAttribute('transform',
+			`translate(${moveToZoteroCoords.x}, \n
+			${moveToZoteroCoords.y}) scale(${clickConnectorCoords.s})`);
 		})
 		.onComplete(function() {
-			cursor.style.setProperty('transform',
-				`translate(${moveToZoteroCoords.x}px, \n
-				${moveToZoteroCoords.y}px) scale(1)`);
+			cursor.setAttribute('transform',
+				`translate(${moveToZoteroCoords.x}, \n
+				${moveToZoteroCoords.y}) scale(1)`);
 		})
 		.delay(250)
 

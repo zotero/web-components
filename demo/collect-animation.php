@@ -138,7 +138,7 @@
         <rect x="171" y="267" width="36.8" height="6" fill="#0069e0"/>
         <rect x="171" y="231" width="36.8" height="6" fill="#0069e0"/>
         <rect x="233" y="267" width="38" height="6" fill="#0069e0"/>
-        <g id="new-item">
+        <g id="new-item" opacity="0">
           <rect x="145" y="279" width="182" height="18" transform="translate(472 576) rotate(180)" fill="#0069e0"/>
           <g>
             <path d="M159.707,281H152v14h12v-9.707Zm2.586,4H160v-2.293Zm.707,9H153V282h6v4h4Z" fill="#fff" opacity="0.8"/>

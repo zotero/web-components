@@ -11,212 +11,311 @@ let collect = function(){
 	let tooltip = document.querySelector('#tooltip');
 	let zoteroBack = document.querySelector('#zotero-back');
 	let zoteroFront = document.querySelector('#zotero-front');
+	let zoteroToolbar = document.querySelector('#zotero-toolbar');
+	let chromeToolbar = document.querySelector('#chrome-toolbar');
 	let newItem = document.querySelector('#new-item');
+	let chromeMiddle = document.querySelector('#chrome-middle');
 
-	let easeInOut = BezierEasing(0.42, 0, 0.58, 1);
-	let strongEaseOut = BezierEasing(0.23, 1, 0.32, 1);
+	let loop = function() {
+		let easeInOut = BezierEasing(0.42, 0, 0.58, 1);
+		let strongEaseOut = BezierEasing(0.23, 1, 0.32, 1);
+		let stepEasing = function(k) {
+			return Math.floor(k * 8) / 8;
+		};
 
-	let stepEasing = function(k) {
-		return Math.floor(k * 8) / 8;
-	};
+		let groupA = new TWEEN.Group();
+		let groupB = new TWEEN.Group();
 
-	let groupA = new TWEEN.Group();
-	let groupB = new TWEEN.Group();
+		let animate = function() {
+		 requestAnimationFrame(animate);
+		 groupA.update();
+		 groupB.update();
+		};
 
-	let animate = function() {
-	 requestAnimationFrame(animate);
-	 groupA.update();
-	 groupB.update();
-	};
+		requestAnimationFrame(animate);
 
-	requestAnimationFrame(animate);
+		// Group B
 
-	// Group A
+		let magnifierGrowCoords = { r: 0, s: 0.67 };
+		let magnifierGrowDuration = 250;
+		let magnifierGrow = new TWEEN.Tween(magnifierGrowCoords, groupB)
+			.to({ r: 100, s: 1 }, magnifierGrowDuration)
+			.easing(strongEaseOut)
+			.onUpdate(function() {
+				clipPath.setAttribute('r', magnifierGrowCoords.r);
+				magnifier.setAttribute('transform',
+					`matrix(${magnifierGrowCoords.s}, 0 , 0, ${magnifierGrowCoords.s},
+					${344 - magnifierGrowCoords.s * 344},
+					${100 - magnifierGrowCoords.s * 100})`);
+			})
+			.delay(500)
 
-	let moveToAddressBarCoords = { x: 193, y: 156 };
-	let moveToAddressBarDuration = 350;
-	let moveToAddressBar = new TWEEN.Tween(moveToAddressBarCoords, groupA)
-		.to({ x: 200, y: 109 }, moveToAddressBarDuration)
-		.easing(easeInOut)
-		.onUpdate(function() {
-			cursor.setAttribute('transform',
-				`translate(${moveToAddressBarCoords.x}, \n
-				${moveToAddressBarCoords.y})`);
-		})
-		.delay(3000)
+		let magnifierShrinkCoords = { r: 100 };
+		let magnifierShrinkDuration = 250;
+		let magnifierShrink = new TWEEN.Tween(magnifierShrinkCoords, groupB)
+			.to({ r: 0 }, magnifierShrinkDuration)
+			.easing(TWEEN.Easing.Sinusoidal.Out)
+			.onUpdate(function() {
+				clipPath.setAttribute('r', magnifierShrinkCoords.r);
+			})
+			.delay(2400) // 250 after moveToZotero
 
-	let clickAddressBarCoords = { s: 0.8 };
-	let clickAddressBarDuration = 50;
-	let clickAddressBar = new TWEEN.Tween(clickAddressBarCoords, groupA)
-		.to({ s: 0.8 }, clickAddressBarDuration)
-		.onUpdate(function() {
-			cursor.setAttribute('transform',
-				`translate(${moveToAddressBarCoords.x}, \n
-				${moveToAddressBarCoords.y}) scale(${clickAddressBarCoords.s})`);
-		})
-		.onComplete(function() {
-			cursor.setAttribute('transform',
-				`translate(${moveToAddressBarCoords.x}, \n
-				${moveToAddressBarCoords.y}) scale(1)`);
-		})
-		.delay(125)
+		magnifierGrow.chain(magnifierShrink);
 
-	let hideCursorCoords = { o: 1 };
-	let hideCursorDuration = 0;
-	let hideCursor = new TWEEN.Tween(hideCursorCoords, groupA)
-		.to({ o: 0 }, hideCursorDuration)
-		.onUpdate(function() {
-			cursor.setAttribute('opacity', hideCursorCoords.o);
-		})
-		.delay(50)
+		// Group A
 
-	let showUrlCoords = { w: 128, o: 0};
-	let showUrlDuration = 0;
-	let showUrl = new TWEEN.Tween(showUrlCoords, groupA)
-		.to({ w: 0, o: 1}, showUrlDuration)
-		.onUpdate(function(){
-			url.setAttribute('width', showUrlCoords.w);
-			url.setAttribute('opacity', showUrlCoords.o);
-		})
-		.delay(62.5)
+		let moveToAddressBarCoords = { tx: 193, ty: 156 };
+		let moveToAddressBarDuration = 350;
+		let moveToAddressBar = new TWEEN.Tween(moveToAddressBarCoords, groupA)
+			.to({ tx: 200, ty: 109 }, moveToAddressBarDuration)
+			.easing(easeInOut)
+			.onUpdate(function() {
+				cursor.setAttribute('transform',
+					`translate(${moveToAddressBarCoords.tx},
+					${moveToAddressBarCoords.ty})`);
+			})
 
-	let typeUrlCoords = { w: 0 };
-	let typeUrlDuration = 500;
-	let typeUrl = new TWEEN.Tween(typeUrlCoords, groupA)
-		.to({ w: 128 }, typeUrlDuration)
-		.easing(stepEasing)
-		.onUpdate(function() {
-			url.setAttribute('width', typeUrlCoords.w);
-		})
+		let clickAddressBarCoords = { s: 0.8 };
+		let clickAddressBarDuration = 50;
+		let clickAddressBar = new TWEEN.Tween(clickAddressBarCoords, groupA)
+			.to({ s: 0.8 }, clickAddressBarDuration)
+			.onUpdate(function() {
+				cursor.setAttribute('transform',
+					`translate(${moveToAddressBarCoords.tx}, ${moveToAddressBarCoords.ty})
+					scale(${clickAddressBarCoords.s})`);
+			})
+			.onComplete(function() {
+				cursor.setAttribute('transform',
+					`translate(${moveToAddressBarCoords.tx}, ${moveToAddressBarCoords.ty})
+					scale(1)`);
+			})
+			.delay(125)
 
-	let spinCoords = { r: 0 };
-	let spinDuration = 500;
-	let spin = new TWEEN.Tween(spinCoords, groupA)
-		.to({ r: 180 }, spinDuration)
-		.onStart(function() {
-			spinner.setAttribute('opacity', 1);
-		})
-		.onUpdate(function() {
-			spinner.setAttribute('transform', `rotate(${spinCoords.r}, 71, 77)`);
-		})
-		.onComplete(function() {
-			spinner.setAttribute('opacity', 0);
-			content.setAttribute('opacity', 1);
-			journalIcon.setAttribute('opacity', 1);
-			zIcon.setAttribute('opacity', 0);
-			magnifierGrow.start();
-		})
-		.delay(62.5)
+		let hideCursorCoords = { o: 1 };
+		let hideCursorDuration = 0;
+		let hideCursor = new TWEEN.Tween(hideCursorCoords, groupA)
+			.to({ o: 0 }, hideCursorDuration)
+			.onUpdate(function() {
+				cursor.setAttribute('opacity', hideCursorCoords.o);
+			})
+			.delay(50)
 
-	let moveToConnectorCoords = { x: 200}
-	let moveToConnectorDuration = 500;
-	let moveToConnector = new TWEEN.Tween(moveToConnectorCoords, groupA)
-		.to({ x: 348 }, moveToConnectorDuration)
-		.easing(easeInOut)
-		.onStart(function() {
-			cursor.setAttribute('opacity', 1);
-		})
-		.onUpdate(function() {
-			cursor.setAttribute('transform',
-				`translate(${moveToConnectorCoords.x}, ${moveToAddressBarCoords.y})`);
-		})
-		.onComplete(function() {
-			tooltip.setAttribute('opacity', 1)
+		let typeUrlCoords = { w: 0 };
+		let typeUrlDuration = 500;
+		let typeUrl = new TWEEN.Tween(typeUrlCoords, groupA)
+			.to({ w: 128 }, typeUrlDuration)
+			.easing(stepEasing)
+			.onStart(function() {
+				url.setAttribute('width', 0);
+				url.setAttribute('opacity', 1);
+			})
+			.onUpdate(function() {
+				url.setAttribute('width', typeUrlCoords.w);
+			})
+			.delay(62.5)
+
+		let spinCoords = { r: 0 };
+		let spinDuration = 500;
+		let spin = new TWEEN.Tween(spinCoords, groupA)
+			.to({ r: 180 }, spinDuration)
+			.onStart(function() {
+				spinner.setAttribute('opacity', 1);
+			})
+			.onUpdate(function() {
+				spinner.setAttribute('transform', `rotate(${spinCoords.r}, 71, 77)`);
+			})
+			.onComplete(function() {
+				spinner.setAttribute('opacity', 0);
+				content.setAttribute('opacity', 1);
+				journalIcon.setAttribute('opacity', 1);
+				zIcon.setAttribute('opacity', 0);
+				magnifierGrow.start();
+			})
+			.delay(62.5)
+
+		let moveToConnectorCoords = { tx: 200}
+		let moveToConnectorDuration = 500;
+		let moveToConnector = new TWEEN.Tween(moveToConnectorCoords, groupA)
+			.to({ tx: 348 }, moveToConnectorDuration)
+			.easing(easeInOut)
+			.onStart(function() {
+				cursor.setAttribute('opacity', 1);
+			})
+			.onUpdate(function() {
+				cursor.setAttribute('transform',
+					`translate(${moveToConnectorCoords.tx}, ${moveToAddressBarCoords.ty})`);
+			})
+			.onComplete(function() {
+				tooltip.setAttribute('opacity', 1)
+			})
+			.delay(250)
+
+		let clickConnectorCoords = { s: 0.8 };
+		let clickConnectorDuration = 50;
+		let clickConnector = new TWEEN.Tween(clickConnectorCoords, groupA)
+			.to({ s: 0.8 }, clickConnectorDuration)
+			.onUpdate(function() {
+				cursor.setAttribute('transform',
+					`translate(${moveToConnectorCoords.tx},
+					${moveToAddressBarCoords.ty}) scale(${clickConnectorCoords.s})`);
+			})
+			.onComplete(function() {
+				cursor.setAttribute('transform',
+					`translate(${moveToConnectorCoords.tx},
+					${moveToAddressBarCoords.ty}) scale(1)`);
+			})
+			.delay(500)
+
+		let moveToZoteroCoords = { tx: 348, ty: 109 };
+		let moveToZoteroDuration = 500;
+		let moveToZotero = new TWEEN.Tween(moveToZoteroCoords, groupA)
+			.to({ tx: 245, ty: 384}, moveToZoteroDuration)
+			.easing(easeInOut)
+			.onUpdate(function() {
+				cursor.setAttribute('transform',
+					`translate(${moveToZoteroCoords.tx}, ${moveToZoteroCoords.ty})`);
+			})
+			.delay(500)
+
+		let clickZoteroCoords = { s: 1 };
+		let clickZoteroDuration = 50;
+		let clickZotero = new TWEEN.Tween(clickZoteroCoords, groupA)
+			.to({ s: 0.8}, clickZoteroDuration)
+			.onUpdate(function() {
+				cursor.setAttribute('transform',
+					`translate(${moveToZoteroCoords.tx},
+					${moveToZoteroCoords.ty}) scale(${clickConnectorCoords.s})`);
+			})
+			.onComplete(function() {
+				cursor.setAttribute('transform',
+					`translate(${moveToZoteroCoords.tx},
+					${moveToZoteroCoords.ty}) scale(1)`);
+			})
+			.delay(250)
+
+		let focusZoteroCoords = {};
+		let focusZotero = new TWEEN.Tween({}, groupA)
+			.to({}, 0)
+			.onUpdate(function(){
+				zoteroBack.setAttribute('opacity', 0);
+				zoteroFront.setAttribute('opacity', 1);
+				zoteroToolbar.setAttribute('fill', '#e6e6e6');
+				chromeToolbar.setAttribute('fill', '#f6f6f6');
+			})
+
+		let showItemCoords = { o: 0, tx: 0, ty: -18 };
+		let showItemDuration = 150;
+		let showItem = new TWEEN.Tween(showItemCoords, groupA)
+			.to({ o: 1, tx: 0, ty: 0 }, showItemDuration)
+			.easing(TWEEN.Easing.Back.Out)
+			.onUpdate(function() {
+				newItem.setAttribute('opacity', showItemCoords.o);
+				newItem.setAttribute('transform', `translate(${showItemCoords.tx},
+					${showItemCoords.ty})`);
+			})
+			.delay(500)
+
+		let moveToCloseButtonCoords = { tx: 245 , ty: 384 };
+		let moveToCloseButtonDuration = 750;
+		let moveToCloseButton = new TWEEN.Tween(moveToCloseButtonCoords, groupA)
+			.to({ tx: 17, ty: 83 }, moveToCloseButtonDuration)
+			.easing(easeInOut)
+			.onUpdate(function() {
+				cursor.setAttribute('transform',
+					`translate(${moveToCloseButtonCoords.tx},
+					${moveToCloseButtonCoords.ty})`);
+			})
+			.delay(500)
+
+		let clickCloseButtonCoords = { s: 0.8 };
+		let clickCloseButtonDuration = 50;
+		let clickCloseButton = new TWEEN.Tween(clickCloseButtonCoords, groupA)
+			.to({ s: 0.8 }, clickCloseButtonDuration)
+			.onUpdate(function() {
+				cursor.setAttribute('transform',
+					`translate(17, 83) scale(${clickCloseButtonCoords.s})`);
+			})
+			.onComplete(function() {
+				cursor.setAttribute('transform',
+					`translate(${moveToCloseButtonCoords.tx},
+					${moveToCloseButtonCoords.ty}) scale(1)`);
 		})
 		.delay(250)
 
-	let clickConnectorCoords = { s: 0.8 };
-	let clickConnectorDuration = 50;
-	let clickConnector = new TWEEN.Tween(clickConnectorCoords, groupA)
-		.to({ s: 0.8 }, clickConnectorDuration)
-		.onUpdate(function() {
-			cursor.setAttribute('transform',
-			`translate(${moveToConnectorCoords.x}, \n
-			${moveToAddressBarCoords.y}) scale(${clickConnectorCoords.s})`);
-		})
-		.onComplete(function() {
-			cursor.setAttribute('transform',
-				`translate(${moveToConnectorCoords.x}, \n
-				${moveToAddressBarCoords.y}) scale(1)`);
-		})
-		.delay(500)
+		let closeChromeCoords = { o: 1, s: 1, tx: 0, ty: 0 }
+		let closeChromeDuration = 250;
+		let closeChrome = new TWEEN.Tween(closeChromeCoords, groupA)
+			.to({ o: 0, s: 0.5, tx: 0, ty: 48 }, closeChromeDuration)
+			.easing(strongEaseOut)
+			.onUpdate(function() {
+				chromeMiddle.setAttribute('opacity', closeChromeCoords.o);
+				chromeMiddle.setAttribute('transform',
+					`matrix(${closeChromeCoords.s}, 0, 0, ${closeChromeCoords.s}
+					${188 - closeChromeCoords.s * 188},
+					${376 - closeChromeCoords.s * 376 + closeChromeCoords.ty})`);
+			})
+			.onComplete(function() {
+				content.setAttribute('opacity', 0);
+				url.setAttribute('opacity', 0);
+				zoteroBack.setAttribute('opacity', 1);
+				zoteroFront.setAttribute('opacity', 0);
+			})
 
-	let moveToZoteroCoords = { x: 348, y: 109 };
-	let moveToZoteroDuration = 500;
-	let moveToZotero = new TWEEN.Tween(moveToZoteroCoords, groupA)
-		.to({ x: 245, y: 384}, moveToZoteroDuration)
-		.easing(easeInOut)
-		.onUpdate(function() {
-			cursor.setAttribute('transform',
-			`translate(${moveToZoteroCoords.x}, ${moveToZoteroCoords.y})`)
-		})
-		.delay(500)
+		let moveToStartCoords = { tx: 17, ty: 83 };
+		let moveToStartDuration = 500;
+		let moveToStart = new TWEEN.Tween(moveToStartCoords, groupA)
+			.to({ tx: 193, ty: 156 }, moveToStartDuration)
+			.easing(easeInOut)
+			.onUpdate(function() {
+				cursor.setAttribute('transform',
+					`translate(${moveToStartCoords.tx}, ${moveToStartCoords.ty})`);
+			})
+			.delay(250)
 
-	let clickZoteroCoords = { s: 1 };
-	let clickZoteroDuration = 50;
-	let clickZotero = new TWEEN.Tween(clickZoteroCoords, groupA)
-		.to({ s: 0.8}, clickZoteroDuration)
-		.onUpdate(function() {
-			cursor.setAttribute('transform',
-			`translate(${moveToZoteroCoords.x}, \n
-			${moveToZoteroCoords.y}) scale(${clickConnectorCoords.s})`);
-		})
-		.onComplete(function() {
-			cursor.setAttribute('transform',
-				`translate(${moveToZoteroCoords.x}, \n
-				${moveToZoteroCoords.y}) scale(1)`);
-		})
-		.delay(250)
+		let openChromeCoords = { o: 0, s: 0.5};
+		let openChromeDuration = 250;
+		let openChrome = new TWEEN.Tween(openChromeCoords, groupA)
+			.to({ o: 1, s: 1 }, openChromeDuration)
+			.easing(TWEEN.Easing.Back.Out)
+			.onStart(function() {
+				chromeToolbar.setAttribute('fill', '#e6e6e6');
+				zoteroToolbar.setAttribute('fill', '#f6f6f6');
+			})
+			.onUpdate(function() {
+				chromeMiddle.setAttribute('opacity', openChromeCoords.o);
+				chromeMiddle.setAttribute('transform',
+					`matrix(${openChromeCoords.s}, 0, 0, ${openChromeCoords.s}
+					${188 - openChromeCoords.s * 188},
+					${376 - openChromeCoords.s * 376})`);
+			})
+			.onComplete(function() {
+				newItem.setAttribute('opacity', 0);
 
-	let focusZoteroCoords = {};
-	let focusZotero = new TWEEN.Tween({}, groupA)
-		.to({}, 0)
-		.onUpdate(function(){
-			zoteroBack.setAttribute('opacity', 0);
-			zoteroFront.setAttribute('opacity', 1);
-		})
+				setTimeout(function() {
+					loop();
+				}, 500)
+			})
 
-	//let newItemCoords = { y: -18 };
-	//let newItemDuration = 150;
-	//let newItem = new TWEEN.Tween(newItemCoords, groupA)
-	//	.to({ y: 0 }, newItemDuration)
-	//	.onStart(function() {
-	//		zoteroBack.setAttribute('opacity', 0);
-	//		zoteroFront.setAttribute('opacity', 1);
-	//	})
-	//	.onUpdate(function() {
-	//		newitem.style.setProperty('transform', `translateY(${newItemCoords.y}px)`);
-	//	})
+		moveToAddressBar.chain(clickAddressBar);
+		clickAddressBar.chain(hideCursor);
+		hideCursor.chain(typeUrl);
+		typeUrl.chain(spin);
+		spin.chain(moveToConnector);
+		moveToConnector.chain(clickConnector);
+		clickConnector.chain(moveToZotero);
+		moveToZotero.chain(clickZotero);
+		clickZotero.chain(focusZotero);
+		focusZotero.chain(showItem);
+		showItem.chain(moveToCloseButton);
+		moveToCloseButton.chain(clickCloseButton);
+		clickCloseButton.chain(closeChrome);
+		closeChrome.chain(moveToStart);
+		moveToStart.chain(openChrome);
 
+		moveToAddressBar.start();
+	}
 
-	moveToAddressBar.chain(clickAddressBar);
-	clickAddressBar.chain(hideCursor);
-	hideCursor.chain(showUrl);
-	showUrl.chain(typeUrl);
-	typeUrl.chain(spin);
-	spin.chain(moveToConnector);
-	moveToConnector.chain(clickConnector);
-	clickConnector.chain(moveToZotero);
-	moveToZotero.chain(clickZotero);
-	clickZotero.chain(focusZotero);
-
-	moveToAddressBar.start();
-
-	// Group B
-
-	let magnifierCoords = { r: 0, s: 0.67 };
-	let magnifierDuration = 250;
-	let magnifierGrow = new TWEEN.Tween(magnifierCoords, groupB)
-		.to({ r: 100, s: 1 }, magnifierDuration)
-		.easing(strongEaseOut)
-		.onStart(function() {
-			magnifier.style.setProperty('transform-origin', '344px 100px')
-		})
-		.onUpdate(function() {
-			clipPath.setAttribute('r', magnifierCoords.r);
-			magnifier.style.setProperty('transform', `scale(${magnifierCoords.s})`)
-		})
-		.delay(500)
+	loop();
 };
 
 export {collect};

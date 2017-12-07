@@ -81,6 +81,17 @@
 							<? if(!$user):?>
 							<li class="nav-item"><a href="https://www.zotero.org/user/login/" class="nav-link log-in">Log In</a></li>
 							<? else:?>
+							<div class="btn-group">
+								<button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									<?=$user->displayName?>
+								</button>
+								<div class="dropdown-menu">
+								<a class="dropdown-item" href="/mylibrary">My Library</a>
+								<a class="dropdown-item" href="<?="/{$user->slug}"?>">My Profile</a>
+								<a class="dropdown-item" href="/settings">Settings</a>
+								<a class="dropdown-item" href="https://forums.zotero.org/messages/inbox">Inbox<?=$user->unreadMessages > 0 ? " ({$user->unreadMessages})" : "";?></a>
+								</div>
+							</div>
 							<? endif;?>
 							<li class="nav-item"><a href="/settings/storage?ref=usb" class="btn btn-secondary btn-sm upgrade-storage">Upgrade Storage</a></li>
 						</ul>

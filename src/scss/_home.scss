@@ -141,6 +141,10 @@
   }
 
   .illu-collect {
+    svg {
+      overflow: visible;
+    }
+
     @include media-breakpoint-down("md") {
       position: relative;
       padding-top: (100% * 441 / 444);

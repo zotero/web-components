@@ -253,7 +253,7 @@
         <circle cx="344" cy="100" r="100" fill="#0069e0" opacity="0.08"/>
       </g>
     </g>
-  <g id="cursor">
+  <g id="cursor" transform="translate(193, 156)">
     <g>
       <g>
         <polygon points="10.455 4.035 -5 -11.457 -5 9.897 -0.701 5.721 2.306 12.842 7.113 10.796 4.312 4.035 10.455 4.035" fill="#fff"/>

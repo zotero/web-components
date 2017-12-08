@@ -8,6 +8,8 @@ let collect = function(){
 	let zIcon = document.querySelector('#z-icon');
 	let clipPath = document.querySelector('#clip-path circle');
 	let magnifier = document.querySelector('#magnifier');
+	let connectorButtonLg = document.querySelector('#connector-button-lg');
+	let journalIconLg = document.querySelector('#journal-icon-lg');
 	let tooltip = document.querySelector('#tooltip');
 	let zoteroBack = document.querySelector('#zotero-back');
 	let zoteroFront = document.querySelector('#zotero-front');
@@ -25,11 +27,13 @@ let collect = function(){
 
 		let groupA = new TWEEN.Group();
 		let groupB = new TWEEN.Group();
+		let groupC = new TWEEN.Group();
 
 		let animate = function() {
 		 requestAnimationFrame(animate);
 		 groupA.update();
 		 groupB.update();
+		 groupC.update();
 		};
 
 		requestAnimationFrame(animate);
@@ -50,17 +54,57 @@ let collect = function(){
 			})
 			.delay(500)
 
-		let magnifierShrinkCoords = { r: 100 };
+		let magnifierShrinkCoords = { r: 100, s: 1 };
 		let magnifierShrinkDuration = 250;
 		let magnifierShrink = new TWEEN.Tween(magnifierShrinkCoords, groupB)
-			.to({ r: 0 }, magnifierShrinkDuration)
+			.to({ r: 0, s: 0.67 }, magnifierShrinkDuration)
 			.easing(TWEEN.Easing.Sinusoidal.Out)
 			.onUpdate(function() {
 				clipPath.setAttribute('r', magnifierShrinkCoords.r);
+				magnifier.setAttribute('transform',
+					`matrix(${magnifierShrinkCoords.s}, 0 , 0, ${magnifierShrinkCoords.s},
+					${344 - magnifierShrinkCoords.s * 344},
+					${100 - magnifierShrinkCoords.s * 100})`);
 			})
-			.delay(2400) // 250 after moveToZotero
+			.delay(1300) // 250 after moveToZotero
 
 		magnifierGrow.chain(magnifierShrink);
+
+		// Group C
+
+		let connectorButtonLgMouseInCoords = { o: 0, r: 0, g: 105, b: 224 };
+		let connectorButtonLgMouseInDuration = 150;
+		let connectorButtonLgMouseIn = new TWEEN.Tween(connectorButtonLgMouseInCoords, groupC)
+			.to({ o: 1, r: 255, g: 255, b: 255 }, connectorButtonLgMouseInDuration)
+			.easing(easeInOut)
+			.onUpdate(function() {
+				connectorButtonLg.setAttribute('opacity', connectorButtonLgMouseInCoords.o);
+				journalIconLg.setAttribute('fill',
+					`rgb(
+						${Math.floor(connectorButtonLgMouseInCoords.r)},
+						${Math.floor(connectorButtonLgMouseInCoords.g)},
+						${Math.floor(connectorButtonLgMouseInCoords.b)})
+					`);
+			})
+			.delay(645)
+
+		let connectorButtonLgMouseOutCoords = { o: 1, r: 255, g: 255, b: 255 };
+		let connectorButtonLgMouseOutDuration = 150;
+		let connectorButtonLgMouseOut = new TWEEN.Tween(connectorButtonLgMouseOutCoords, groupC)
+			.to({ o: 0, r: 0, g: 105, b: 224 }, connectorButtonLgMouseOutDuration)
+			.easing(easeInOut)
+			.onUpdate(function() {
+				connectorButtonLg.setAttribute('opacity', connectorButtonLgMouseOutCoords.o);
+				journalIconLg.setAttribute('fill',
+					`rgb(
+						${Math.floor(connectorButtonLgMouseOutCoords.r)},
+						${Math.floor(connectorButtonLgMouseOutCoords.g)},
+						${Math.floor(connectorButtonLgMouseOutCoords.b)})
+					`);
+			})
+			.delay(1085)
+
+		connectorButtonLgMouseIn.chain(connectorButtonLgMouseOut);
 
 		// Group A
 
@@ -130,6 +174,7 @@ let collect = function(){
 				journalIcon.setAttribute('opacity', 1);
 				zIcon.setAttribute('opacity', 0);
 				magnifierGrow.start();
+				connectorButtonLgMouseIn.start();
 			})
 			.delay(62.5)
 
@@ -154,12 +199,16 @@ let collect = function(){
 		let clickConnectorDuration = 50;
 		let clickConnector = new TWEEN.Tween(clickConnectorCoords, groupA)
 			.to({ s: 0.8 }, clickConnectorDuration)
+			.onStart(function() {
+				connectorButtonLg.setAttribute('fill', '#002bc5');
+			})
 			.onUpdate(function() {
 				cursor.setAttribute('transform',
 					`translate(${moveToConnectorCoords.tx},
 					${moveToAddressBarCoords.ty}) scale(${clickConnectorCoords.s})`);
 			})
 			.onComplete(function() {
+				connectorButtonLg.setAttribute('fill', '#0069e0');
 				cursor.setAttribute('transform',
 					`translate(${moveToConnectorCoords.tx},
 					${moveToAddressBarCoords.ty}) scale(1)`);
@@ -257,6 +306,8 @@ let collect = function(){
 			.onComplete(function() {
 				content.setAttribute('opacity', 0);
 				url.setAttribute('opacity', 0);
+				journalIcon.setAttribute('opacity', 0);
+				zIcon.setAttribute('opacity', 1);
 				zoteroBack.setAttribute('opacity', 1);
 				zoteroFront.setAttribute('opacity', 0);
 			})

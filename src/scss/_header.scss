@@ -59,6 +59,28 @@
     }
   }
 
+  .user-dropdown-toggle {
+    cursor: pointer;
+    border: 0;
+    color: $link-color;
+
+    &:hover {
+      text-decoration: none;
+    }
+
+    &:focus {
+      outline: none;
+
+      .keyboard-user & {
+        outline: $outline-width solid $outline-color;
+      }
+    }
+
+    &::after {
+      content: none;
+    }
+  }
+
   .upgrade-storage {
     margin-left: $spacer;
   }

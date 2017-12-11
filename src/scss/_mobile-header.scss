@@ -47,6 +47,10 @@
       &:hover {
         text-decoration: none;
       }
+
+      &.separated {
+        border-top: 1px solid $gray-800;
+      }
     }
   }
 }

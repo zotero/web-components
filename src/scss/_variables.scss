@@ -19,7 +19,7 @@ $gray-400: #ced4da !default;
 $gray-500: #adb5bd !default;
 $gray-600: #868e96 !default;
 $gray-700: #495057 !default;
-$gray-800: #343a40 !default;
+$gray-800: #444;
 $gray-900: #222;
 $black:    #000 !default;
 
@@ -329,8 +329,8 @@ $table-dark-color:            $body-bg !default;
 //
 // For each of Bootstrap's buttons, define text, background and border color.
 
-$input-btn-padding-y:         0.5rem;
-$input-btn-padding-x:         0.75rem !default;
+$input-btn-padding-y:         rem(11);
+$input-btn-padding-x:         rem(15);
 $input-btn-line-height:       $line-height-base !default;
 
 $input-btn-focus-width:       rem(3);
@@ -354,7 +354,7 @@ $btn-link-disabled-color:     $gray-600 !default;
 $btn-block-spacing-y:         0.5rem !default;
 
 // Allows for customizing button radius independently from global border radius
-$btn-border-radius:              $border-radius !default;
+$btn-border-radius:              $border-radius-sm;
 $btn-border-radius-lg:           $border-radius-sm;
 $btn-border-radius-sm:           $border-radius-sm !default;
 

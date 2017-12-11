@@ -57,6 +57,7 @@ function getBrowserify(dev) {
 				return getJS(dev);
 			});
 			bundle.on('log', onSuccess);
+			bundle.on('error', onError);
 		}
 	}
 
@@ -65,6 +66,7 @@ function getBrowserify(dev) {
 
 function getJS(dev) {
 	return getBrowserify(dev).bundle()
+		.on('error', onError)
 		.pipe(source('web-components.js'))
 		.pipe(debug({title: 'web-components JS:'}))
 		.pipe(buffer())
@@ -79,6 +81,7 @@ function getJS(dev) {
 
 function getSass(dev) {
 	return gulp.src('src/scss/web-components.scss')
+		.on('error', onError)
 		.pipe(debug({title: 'web-components scss:'}))
 		.pipe(plumber({errorHandler: onError}))
 		.pipe(gulpif(dev, sourcemaps.init({loadMaps: true})))

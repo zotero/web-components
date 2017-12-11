@@ -136,10 +136,14 @@ let loadInitialState = function(defaultState = {}) {
 };
 
 let pageReady = function(fn) {
-	if (document.readyState != 'loading'){
+	if(document.readyState === 'interactive' || document.readyState === 'complete'){
 		fn();
 	} else {
-		document.addEventListener('DOMContentLoaded', fn);
+		document.onreadystatechange = function () {
+			if (document.readyState === 'interactive' || document.readyState === 'complete') {
+				fn();
+			}
+		};
 	}
 };
 

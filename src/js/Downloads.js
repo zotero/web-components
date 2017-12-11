@@ -278,9 +278,13 @@ class DownloadPlugins extends Component {
 class Downloads extends Component{
 	constructor(props){
 		super(props);
+		let featuredBrowser = BrowserDetect.browser;
+		if(['chrome', 'firefox', 'safari'].indexOf(featuredBrowser.toLowerCase()) == -1){
+			featuredBrowser = 'Chrome';
+		}
 		this.state = {
 			featuredOS:BrowserDetect.OS,
-			featuredBrowser:BrowserDetect.browser,
+			featuredBrowser:featuredBrowser,
 			arch:((navigator.userAgent.indexOf('x86_64') != -1) ? 'x86_64' : 'x86'),
 			oldMac: installData.oldMac,
 			mobile: navigator.userAgent.includes('mobile')

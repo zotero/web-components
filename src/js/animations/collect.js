@@ -18,6 +18,13 @@ let collect = function(){
 	let newItem = document.querySelector('#new-item');
 	let chromeMiddle = document.querySelector('#chrome-middle');
 
+	let elements = [ spinner, magnifier, chromeMiddle ];
+
+	for (let i of elements) {
+		i.originX = i.getBBox().x + i.getBBox().width / 2;
+		i.originY = i.getBBox().y + i.getBBox().height / 2;
+	}
+
 	let loop = function() {
 		let easeInOut = BezierEasing(0.42, 0, 0.58, 1);
 		let strongEaseOut = BezierEasing(0.23, 1, 0.32, 1);
@@ -30,10 +37,10 @@ let collect = function(){
 		let groupC = new TWEEN.Group();
 
 		let animate = function() {
-		 requestAnimationFrame(animate);
-		 groupA.update();
-		 groupB.update();
-		 groupC.update();
+			requestAnimationFrame(animate);
+			groupA.update();
+			groupB.update();
+			groupC.update();
 		};
 
 		requestAnimationFrame(animate);
@@ -49,8 +56,8 @@ let collect = function(){
 				clipPath.setAttribute('r', magnifierGrowCoords.r);
 				magnifier.setAttribute('transform',
 					`matrix(${magnifierGrowCoords.s}, 0 , 0, ${magnifierGrowCoords.s},
-					${344 - magnifierGrowCoords.s * 344},
-					${100 - magnifierGrowCoords.s * 100})`);
+					${magnifier.originX - magnifierGrowCoords.s * magnifier.originX},
+					${magnifier.originY - magnifierGrowCoords.s * magnifier.originY})`);
 			})
 			.delay(500)
 
@@ -63,8 +70,8 @@ let collect = function(){
 				clipPath.setAttribute('r', magnifierShrinkCoords.r);
 				magnifier.setAttribute('transform',
 					`matrix(${magnifierShrinkCoords.s}, 0 , 0, ${magnifierShrinkCoords.s},
-					${344 - magnifierShrinkCoords.s * 344},
-					${100 - magnifierShrinkCoords.s * 100})`);
+					${magnifier.originX - magnifierShrinkCoords.s * magnifier.originX},
+					${magnifier.originY - magnifierShrinkCoords.s * magnifier.originY})`);
 			})
 			.delay(1300) // 250 after moveToZotero
 
@@ -74,11 +81,13 @@ let collect = function(){
 
 		let connectorButtonLgMouseInCoords = { o: 0, r: 0, g: 105, b: 224 };
 		let connectorButtonLgMouseInDuration = 150;
-		let connectorButtonLgMouseIn = new TWEEN.Tween(connectorButtonLgMouseInCoords, groupC)
+		let connectorButtonLgMouseIn =
+			new TWEEN.Tween(connectorButtonLgMouseInCoords, groupC)
 			.to({ o: 1, r: 255, g: 255, b: 255 }, connectorButtonLgMouseInDuration)
 			.easing(easeInOut)
 			.onUpdate(function() {
-				connectorButtonLg.setAttribute('opacity', connectorButtonLgMouseInCoords.o);
+				connectorButtonLg.setAttribute('opacity',
+					connectorButtonLgMouseInCoords.o);
 				journalIconLg.setAttribute('fill',
 					`rgb(
 						${Math.floor(connectorButtonLgMouseInCoords.r)},
@@ -90,11 +99,13 @@ let collect = function(){
 
 		let connectorButtonLgMouseOutCoords = { o: 1, r: 255, g: 255, b: 255 };
 		let connectorButtonLgMouseOutDuration = 150;
-		let connectorButtonLgMouseOut = new TWEEN.Tween(connectorButtonLgMouseOutCoords, groupC)
+		let connectorButtonLgMouseOut =
+			new TWEEN.Tween(connectorButtonLgMouseOutCoords, groupC)
 			.to({ o: 0, r: 0, g: 105, b: 224 }, connectorButtonLgMouseOutDuration)
 			.easing(easeInOut)
 			.onUpdate(function() {
-				connectorButtonLg.setAttribute('opacity', connectorButtonLgMouseOutCoords.o);
+				connectorButtonLg.setAttribute('opacity',
+					connectorButtonLgMouseOutCoords.o);
 				journalIconLg.setAttribute('fill',
 					`rgb(
 						${Math.floor(connectorButtonLgMouseOutCoords.r)},
@@ -166,7 +177,8 @@ let collect = function(){
 				spinner.setAttribute('opacity', 1);
 			})
 			.onUpdate(function() {
-				spinner.setAttribute('transform', `rotate(${spinCoords.r}, 71, 77)`);
+				spinner.setAttribute('transform', `rotate(${spinCoords.r},
+					${spinner.originX}, ${spinner.originY})`);
 			})
 			.onComplete(function() {
 				spinner.setAttribute('opacity', 0);
@@ -188,7 +200,8 @@ let collect = function(){
 			})
 			.onUpdate(function() {
 				cursor.setAttribute('transform',
-					`translate(${moveToConnectorCoords.tx}, ${moveToAddressBarCoords.ty})`);
+					`translate(${moveToConnectorCoords.tx},
+					${moveToAddressBarCoords.ty})`);
 			})
 			.onComplete(function() {
 				tooltip.setAttribute('opacity', 1)
@@ -301,7 +314,8 @@ let collect = function(){
 				chromeMiddle.setAttribute('transform',
 					`matrix(${closeChromeCoords.s}, 0, 0, ${closeChromeCoords.s}
 					${188 - closeChromeCoords.s * 188},
-					${376 - closeChromeCoords.s * 376 + closeChromeCoords.ty})`);
+					${chromeMiddle.originX - closeChromeCoords.s * chromeMiddle.originX
+					+ closeChromeCoords.ty})`);
 			})
 			.onComplete(function() {
 				content.setAttribute('opacity', 0);
@@ -337,7 +351,8 @@ let collect = function(){
 				chromeMiddle.setAttribute('transform',
 					`matrix(${openChromeCoords.s}, 0, 0, ${openChromeCoords.s}
 					${188 - openChromeCoords.s * 188},
-					${376 - openChromeCoords.s * 376})`);
+					${chromeMiddle.originX - openChromeCoords.s
+					* chromeMiddle.originX})`);
 			})
 			.onComplete(function() {
 				newItem.setAttribute('opacity', 0);
@@ -370,6 +385,3 @@ let collect = function(){
 };
 
 export {collect};
-
-
-

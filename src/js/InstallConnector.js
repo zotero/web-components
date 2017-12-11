@@ -224,6 +224,9 @@ class InstallConnectorPrompt extends Component{
 					);
 				}
 				break;
+			default:
+				connectorText = 'Zotero Connector for Chrome';
+				connectorImage = <BrowserExtensionIcon browser='chrome' />;
 		}
 
 		let otherBrowsers = ['chrome', 'firefox', 'safari'].filter((browser)=>{return browser.toLowerCase() != this.state.browser.toLowerCase();});
@@ -235,11 +238,11 @@ class InstallConnectorPrompt extends Component{
 			<p className={classnames('show-extensions', {'fade-out':this.state.showingAllExtensions})}>
 				<span className="inner-extensions">
 					{otherBrowserImages}<br />
-					Not using {this.state.browser}?<br />
+					Not the browser you're looking for?<br />
 					<a href='#' onClick={this.showAllExtensions}>Show all connectors</a>
 				</span>
 				<span className="inner-start">
-					<a href='#' onClick={this.showAllExtensions}>Not using {this.state.browser}? Show all connectors</a>
+					<a href='#' onClick={this.showAllExtensions}>Not the browser you're looking for? Show all connectors</a>
 				</span>
 			</p>
 		);

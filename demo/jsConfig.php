@@ -16,7 +16,7 @@ return [
 	//"directDownloads" => false,
 	"proxyDownloads" => false,
 	
-	"staticPath" => '/static',
+	"staticPath" => '/assets',
 	"proxyPath" => '',
 	"ignoreLoggedInStatus" => false,
 	"storePrefsRemote" => false,
@@ -88,7 +88,7 @@ return [
 		"debug_level" => 3,
 	],
 	"recaptchaSitekey" => 'recaptchapublickey',
-	"imagePath" => "/static/images",
+	"imagePath" => "/assets/images",
 	"installData" => [
 		"firefoxHash"=>"sha1:4d4c464d351a5c05d19746d271713670fe8939a8",
 		"firefoxDownload"=>"https://download.zotero.org/extension/zotero-4.0.29.11.xpi",

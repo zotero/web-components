@@ -38,7 +38,12 @@
 @import "jumbotron";
 @import "footer";
 
+// Component Sections
+
+@import "all-extensions";
+@import "extensions-picker";
 
 // Pages
 
 @import "home";
+@import "start";

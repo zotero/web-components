@@ -42,6 +42,9 @@
 			<nav>
 				<ul class="mobile-nav">
 					<li class="active"><a class="nav-link" href="/">Zotero</a></li>
+					<? if($user):?>
+					<li><a class="nav-link" href="https://www.zotero.org/mylibrary">My Library</a></li>
+					<? endif;?>
 					<li><a class="nav-link" href="https://www.zotero.org/groups/">Groups</a></li>
 					<li><a class="nav-link" href="https://www.zotero.org/support/">Documentation</a></li>
 					<li><a class="nav-link" href="https://forums.zotero.org/discussions">Forums</a></li>
@@ -49,9 +52,8 @@
 					<? if(!$user):?>
 					<li><a class="nav-link separated" href="https://www.zotero.org/user/login/">Log In</a></li>
 					<? else:?>
-					<li><a class="nav-link separated" href="/mylibrary">My Library</a></li>
-					<li><a class="nav-link" href="<?="/{$user->slug}"?>">My Profile</a></li>
-					<li><a class="nav-link separated" href="https://forums.zotero.org/messages/inbox">Inbox<?=$user->unreadMessages > 0 ? " ({$user->unreadMessages})" : "";?></a></li>
+					<li><a class="nav-link separated" href="<?="/{$user->slug}"?>">My Profile</a></li>
+					<li><a class="nav-link" href="https://forums.zotero.org/messages/inbox">Inbox<?=$user->unreadMessages > 0 ? " ({$user->unreadMessages})" : "";?></a></li>
 					<li><a class="nav-link separated" href="/settings">Settings</a></li>
 					<li><a class="nav-link" href="/user/logout">Log Out</a></li>
 					<? endif;?>
@@ -68,6 +70,9 @@
 					</a>
 					<nav>
 						<ul class="main-nav d-none d-lg-flex">
+							<? if($user):?>
+							<li><a class="nav-link" href="https://www.zotero.org/mylibrary">My Library</a></li>
+							<? endif;?>
 							<li class="nav-item active"><a href="https://www.zotero.org/groups/" class="nav-link">Groups</a></li>
 							<li class="nav-item"><a href="https://www.zotero.org/support/" class="nav-link">Documentation</a></li>
 							<li class="nav-item"><a href="https://forums.zotero.org/discussions" class="nav-link">Forums</a></li>
@@ -80,7 +85,6 @@
 									<?=$user->displayName?>
 								</button>
 								<div class="dropdown-menu">
-								<a class="dropdown-item" href="/mylibrary">My Library</a>
 								<a class="dropdown-item" href="<?="/{$user->slug}"?>">My Profile</a>
 								<div role="separator" class="dropdown-divider"></div>
 								<a class="dropdown-item" href="https://forums.zotero.org/messages/inbox">Inbox<?=$user->unreadMessages > 0 ? " ({$user->unreadMessages})" : "";?></a>

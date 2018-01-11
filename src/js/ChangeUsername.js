@@ -33,8 +33,12 @@ class UsernameForm extends Component{
 		this.checkUsername = this.checkUsername.bind(this);
 		this.saveUsername = this.saveUsername.bind(this);
 		this.handleChange = this.handleChange.bind(this);
+		this.handleBlur = this.handleBlur.bind(this);
 	}
-	checkUsername(){
+	handleBlur(){
+		this.checkUsername(false);
+	}
+	checkUsername(skipServer=false){
 		let username = this.state.formData.username;
 		if(username.indexOf('@') != -1){
 			this.setState({
@@ -64,22 +68,24 @@ class UsernameForm extends Component{
 			});
 			return;
 		}
-		let checkUrl = buildUrl('checkUsername', {username});
-		ajax({url:checkUrl}).then((response)=>{
-			response.json().then((data)=>{
-				if(data.valid){
-					this.setState({usernameValidity:'valid'});
-				} else {
-					this.setState({
-						usernameValidity:'invalid',
-						usernameMessage: 'Username is not available'
-					});
-				}
+		if(!skipServer){
+			let checkUrl = buildUrl('checkUsername', {username});
+			ajax({url:checkUrl}).then((response)=>{
+				response.json().then((data)=>{
+					if(data.valid){
+						this.setState({usernameValidity:'valid'});
+					} else {
+						this.setState({
+							usernameValidity:'invalid',
+							usernameMessage: 'Username is not available'
+						});
+					}
+				});
+			}).catch(()=>{
+				let formErrors = {username: 'Error checking username'};
+				this.setState({formErrors});
 			});
-		}).catch(()=>{
-			let formErrors = {username: 'Error checking username'};
-			this.setState({formErrors});
-		});
+		}
 	}
 	saveUsername(evt){
 		if(evt){
@@ -119,6 +125,7 @@ class UsernameForm extends Component{
 		this.setState({formData:formData});
 		if(ev.target.name == 'username'){
 			this.setState({usernameValidity:'undecided', usernameMessage:''});
+			this.checkUsername(true); //check username validity on every change, but only locally
 		}
 	}
 	render(){
@@ -133,7 +140,7 @@ class UsernameForm extends Component{
 		let usernameForm = (
 			<form id='username-form'>
 				<div className='form-group'>
-					<input className='form-control' type='text' name='username' placeholder='Username' onChange={this.handleChange} onBlur={this.checkUsername} value={formData.username}></input>
+					<input className='form-control' type='text' name='username' placeholder='Username' onChange={this.handleChange} onBlur={this.handleBlur} value={formData.username}></input>
 					<p className={previewClass}>{profileUrl}</p>
 					<p className='username-message'>{this.state.usernameMessage}</p>
 					<FormFieldErrorMessage message={this.state.formErrors['username']} />

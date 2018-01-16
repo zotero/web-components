@@ -7,10 +7,11 @@ const React = require('react');
 const {Component} = React;
 const Fragment = React.Fragment;
 
-import {ajax, postFormData} from './ajax.js';
+import {postFormData} from './ajax.js';
 import {slugify} from './Utils.js';
 import {buildUrl} from './wwwroutes.js';
 import {Notifier} from './Notifier.js';
+import {usernameValidation} from './Validate.js';
 
 class FormFieldErrorMessage extends Component {
 	render() {
@@ -41,7 +42,6 @@ class UsernameForm extends Component{
 		this.handleChange = this.handleChange.bind(this);
 		this.handleBlur = this.handleBlur.bind(this);
 		this.handleForumCheck = this.handleForumCheck.bind(this);
-		this.usernameValidation = this.usernameValidation.bind(this);
 	}
 	handleForumCheck(evt){
 		this.setState({
@@ -62,7 +62,7 @@ class UsernameForm extends Component{
 	async checkForumUsername(skipServer=false){
 		log.debug('checkForumUsername');
 		let username = this.state.formData.forumUsername;
-		let result = await this.usernameValidation(username, skipServer);
+		let result = await usernameValidation(username, skipServer);
 		log.debug(result);
 		let nstate = {
 			forumUsernameValidity: result.usernameValidity,
@@ -72,55 +72,9 @@ class UsernameForm extends Component{
 	}
 	async checkUsername(skipServer=false){
 		let username = this.state.formData.username;
-		let result = await this.usernameValidation(username, skipServer);
+		let result = await usernameValidation(username, skipServer);
 		log.debug(result);
 		this.setState(result);
-	}
-	async usernameValidation(username, skipServer=false){
-		if(username.indexOf('@') != -1){
-			return {
-				usernameValidity:'invalid',
-				usernameMessage: 'Your email address can be used to log in to your Zotero account, but not as your username.'
-			};
-		}
-		if(username.trim().indexOf(' ') != -1){
-			return {
-				usernameValidity:'invalid',
-				usernameMessage: 'Your username can\'t contain spaces'
-			};
-		}
-		if(!(/^[a-z0-9._-]{3,}$/i.test(username))){
-			return {
-				usernameValidity:'invalid',
-				usernameMessage: 'Username must be at least 3 characters and may only use upper and lower case letters, numbers, ., _, or -'
-			};
-		}
-		if((/^[0-9]+$/i.test(username))){
-			return {
-				usernameValidity:'invalid',
-				usernameMessage: 'Username can not use exclusively numerals'
-			};
-		}
-		if(!skipServer){
-			let checkUrl = buildUrl('checkUsername', {username});
-			try{
-				let response = await ajax({url:checkUrl});
-				let data = await response.json();
-				if(data.valid){
-					log.debug('returning valid username');
-					return {usernameValidity:'valid'};
-				} else {
-					return {
-						usernameValidity:'invalid',
-						usernameMessage: 'Username is not available'
-					};
-				}
-			} catch(e) {
-				let formErrors = {username: 'Error checking username'};
-				this.setState({formErrors});
-			}
-		}
-		return {};
 	}
 	saveUsername(evt){
 		if(evt){

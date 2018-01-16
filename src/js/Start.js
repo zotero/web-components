@@ -20,6 +20,7 @@ import {buildUrl} from './wwwroutes.js';
 import {Notifier} from './Notifier.js';
 import {VerticalExpandable} from './VerticalExpandable.js';
 import {InstallConnectorPrompt} from './InstallConnector.js';
+import {usernameValidation} from './Validate.js';
 
 const currentUser = getCurrentUser();
 
@@ -69,31 +70,10 @@ class RegisterForm extends Component{
 		this.handleChange = this.handleChange.bind(this);
 		this.register = this.register.bind(this);
 	}
-	checkUsername(){
+	async checkUsername(){
 		let username = this.state.formData.username;
-		if(username.indexOf('@') != -1){
-			this.setState({
-				usernameValidity:'invalid',
-				usernameMessage: 'Your email address can be used to log in to your Zotero account, but not as your username.'
-			});
-			return;
-		}
-		let checkUrl = buildUrl('checkUsername', {username});
-		ajax({url:checkUrl}).then((response)=>{
-			response.json().then((data)=>{
-				if(data.valid){
-					this.setState({usernameValidity:'valid'});
-				} else {
-					this.setState({
-						usernameValidity:'invalid',
-						usernameMessage: 'Username is not available'
-					});
-				}
-			});
-		}).catch(()=>{
-			let formErrors = {username: 'Error checking username'};
-			this.setState({formErrors});
-		});
+		let result = await usernameValidation(username, false);
+		this.setState(result);
 	}
 	handleChange(ev){
 		let formData = this.state.formData;

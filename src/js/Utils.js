@@ -135,13 +135,20 @@ let loadInitialState = function(defaultState = {}) {
 	return Object.assign({}, defaultState);
 };
 
+let pageReadyStack = [];
+
 let pageReady = function(fn) {
 	if(document.readyState === 'interactive' || document.readyState === 'complete'){
 		fn();
 	} else {
-		document.onreadystatechange = function () {
+		pageReadyStack.push(fn);
+		document.onreadystatechange = ()=> {
 			if (document.readyState === 'interactive' || document.readyState === 'complete') {
-				fn();
+				let stackCopy = pageReadyStack;
+				pageReadyStack = [];
+				for(let i=0; i<stackCopy.length; i++){
+					stackCopy[i]();
+				}
 			}
 		};
 	}

@@ -39,6 +39,7 @@ globalScope.TWEEN = TWEEN;
 const BezierEasing = require('bezier-easing');
 globalScope.BezierEasing = BezierEasing;
 
+/*
 import {Storage} from './Storage.js';
 import {MakeEditable} from './MakeEditable.js';
 import {UserGroups} from './UserGroups.js';
@@ -58,14 +59,10 @@ import {Combined} from './GlobalSearch/Combined.js';
 import Profile from './profile/profile.jsx';
 import {ChangeUsername} from './ChangeUsername.js';
 import * as Institutional from './Institutional/Institutional.js';
-import {collect} from './animations/collect.js';
-import {organize} from './animations/organize.js';
-let animations = {
-	collect,
-	organize
-};
+*/
 
 let ZoteroWebComponents = {
+/*
 	Storage,
 	MakeEditable,
 	UserGroups,
@@ -89,6 +86,8 @@ let ZoteroWebComponents = {
 	ChangeUsername,
 	animations,
 	Institutional
+	ChangeUsername
+	*/
 };
 
 globalScope.ZoteroWebComponents = ZoteroWebComponents;

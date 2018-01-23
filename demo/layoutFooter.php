@@ -24,6 +24,6 @@
 					</div>
 				</div>
 			</footer>
-		</div>
+		</div><!-- end div.site-wrapper -->
 	</body>
 </html>

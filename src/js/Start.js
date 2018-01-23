@@ -164,13 +164,15 @@ class RegisterForm extends Component{
 			}
 			return (
 				<section className='register-section'>
-					<div className='content'>
-						{heading}
-						<div>
-							<p className='lead'>It looks like you’ve already created an account. Now that you’ve installed Zotero, you can use it to{' '}
-								<a href="https://www.zotero.org/support/sync">sync and access your library from anywhere</a>.
-								It also lets you join <a href="https://www.zotero.org/support/groups">groups</a> and{' '}
-								<a href="https://www.zotero.org/support/sync#file_syncing">back up all your attached files</a>.</p>
+					<div className='container'>
+						<div className='content'>
+							{heading}
+							<div>
+								<p className='lead'>It looks like you’ve already created an account. Now that you’ve installed Zotero, you can use it to{' '}
+									<a href="https://www.zotero.org/support/sync">sync and access your library from anywhere</a>.
+									It also lets you join <a href="https://www.zotero.org/support/groups">groups</a> and{' '}
+									<a href="https://www.zotero.org/support/sync#file_syncing">back up all your attached files</a>.</p>
+							</div>
 						</div>
 					</div>
 				</section>
@@ -229,14 +231,16 @@ class RegisterForm extends Component{
 		return (
 			<section className='register-section'>
 				<div className='container'>
-					{heading}
-					<p className='lead'>If you haven’t already created a Zotero account, please take a few moments to register now.
-					It’s a <b>free</b> way to <a href="https://www.zotero.org/support/sync">sync and access your library from anywhere</a>,
-					and it lets you join <a href="https://www.zotero.org/support/groups">groups</a> and{' '}
-					<a href="https://www.zotero.org/support/sync#file_syncing">back up all your attached files</a>.
-					</p>
-					{registerForm}
-					{notifier}
+					<div className='container'>
+						{heading}
+						<p className='lead'>If you haven’t already created a Zotero account, please take a few moments to register now.
+						It’s a <b>free</b> way to <a href="https://www.zotero.org/support/sync">sync and access your library from anywhere</a>,
+						and it lets you join <a href="https://www.zotero.org/support/groups">groups</a> and{' '}
+						<a href="https://www.zotero.org/support/sync#file_syncing">back up all your attached files</a>.
+						</p>
+						{registerForm}
+						{notifier}
+					</div>
 				</div>
 			</section>
 		);

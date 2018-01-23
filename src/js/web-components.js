@@ -31,7 +31,6 @@ globalScope.WebFont = WebFont;
 require('bootstrap');
 
 
-/*
 import {Storage} from './Storage.js';
 import {MakeEditable} from './MakeEditable.js';
 import {UserGroups} from './UserGroups.js';
@@ -50,10 +49,8 @@ import {cycleTestCases, cycleTestFuncs} from './TestUtils.js';
 import {Combined} from './GlobalSearch/Combined.js';
 import Profile from './profile/profile.jsx';
 import {ChangeUsername} from './ChangeUsername.js';
-*/
 
 let ZoteroWebComponents = {
-/*
 	Storage,
 	MakeEditable,
 	UserGroups,
@@ -75,7 +72,6 @@ let ZoteroWebComponents = {
 	Combined,
 	Profile,
 	ChangeUsername
-	*/
 };
 
 globalScope.ZoteroWebComponents = ZoteroWebComponents;

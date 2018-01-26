@@ -144,7 +144,7 @@ class InstitutionCheckout extends Component{
 		return (
 			<div id='institutional-checkout'>
 				<p>
-					Zotero Institution provides unlimited storage for entire universities, libraries, and research institutions. All members of your organization are automatically added to your Zotero Insitution subscription, based on their organizational email addresses.
+					Zotero Institution provides unlimited storage for entire universities, libraries, and research institutions. All members of your organization are automatically added to your Zotero Institution subscription, based on their organizational email addresses.
 				</p>
 				<p>
 					Zotero Institution costs $2000 for the first 500 FTE, plus $0.40 per additional FTE.
@@ -170,7 +170,7 @@ class InstitutionCheckout extends Component{
 					<FormFieldErrorMessage message={formErrors['name']} />
 				</div>
 				<div className='form-line'>
-					<label htmlFor='institution_domain'>Domain:</label>
+					<label htmlFor='institution_domain'>Domain(s):</label>
 					<input type='text' name='institution_domain' className='form-control' value={domain} onChange={(evt)=>{this.setState({domain:evt.target.value});}} placeholder='@my-institution.edu' />
 					<p className='hint'>The domain(s) you use for your institution's email addresses. This is how we'll identify your users.</p>
 					<FormFieldErrorMessage message={formErrors['domain']} />

@@ -191,6 +191,7 @@ class RegisterForm extends Component{
 					<div className='form-group'>
 						<button type='button' className='btn' onClick={this.register}>Register</button>
 					</div>
+					<p>By using Zotero, you agree to be bound by its <a href='https://www.zotero.org/support/terms/terms_of_service'>Terms of Service</a>.</p>
 				</VerticalExpandable>
 			</form>
 		);

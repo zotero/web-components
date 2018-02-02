@@ -3,7 +3,7 @@
 	.container {
 		padding: 0 15px;
 
-		@media (min-width: map-get($grid-breakpoints, sm)) {
+		@include media-breakpoint-up(sm) {
 			padding: 0 40px;
 		}
 	}
@@ -33,7 +33,7 @@
 		line-height: 24px;
 		background-color: $white;
 
-		@media (min-width: map-get($grid-breakpoints, sm)) {
+		@include media-breakpoint-up(sm) {
 			-js-display: flex;
 			display: flex;
 		}
@@ -74,7 +74,7 @@
 		padding: 0 20px 57px; // 64px
 		position: relative;
 
-		@media (min-width: map-get($grid-breakpoints, sm)) {
+		@include media-breakpoint-up(sm) {
 			padding: 0 20px 89px; // 96px
 			margin: 0 20px;
 		}
@@ -159,14 +159,14 @@
 	.connector {
 		padding-top: 64px;
 
-		@media (min-width: map-get($grid-breakpoints, sm)) {
+		@include media-breakpoint-up(sm) {
 			padding-top: 0;
 		}
 
 		.browser-plus-extension {
 			margin-bottom: 14px;
 
-			@media (min-width: map-get($grid-breakpoints, sm)) {
+			@include media-breakpoint-up(sm) {
 				margin: {
 					top: 10px;
 					bottom: 27px; // align h1
@@ -181,7 +181,7 @@
 			}
 
 			.browser-icon {
-				@media (min-width: map-get($grid-breakpoints, sm)) {
+				@include media-breakpoint-up(sm) {
 					width: 96px;
 					height: 96px;
 				}
@@ -193,7 +193,7 @@
 			}
 
 			.zotero-icon {
-				@media (min-width: map-get($grid-breakpoints, sm)) {
+				@include media-breakpoint-up(sm) {
 					width: 96px;
 					height: 105px;
 				}
@@ -206,7 +206,7 @@
 		}
 
 		.icon-plus {
-			@media (min-width: map-get($grid-breakpoints, sm)) {
+			@include media-breakpoint-up(sm) {
 				width: 36px;
 				height: 36px;
 				background: url($staticPath + "/images/downloads/icon-plus.svg") no-repeat 0 0;
@@ -227,7 +227,7 @@
 			margin: 14px auto 0;
 			word-spacing: -0.5px;
 
-			@media (min-width: map-get($grid-breakpoints, sm)) {
+			@include media-breakpoint-up(sm) {
 				max-width: 330px;
 			}
 		}
@@ -266,7 +266,7 @@
 			line-height: 1.5;
 			margin: 0;
 
-			@media (min-width: map-get($grid-breakpoints, sm)) {
+			@include media-breakpoint-up(sm) {
 				max-width: 500px;
 			}
 		}
@@ -276,7 +276,7 @@
 		display: inline-block;
 		vertical-align: top;
 
-		@media (min-width: map-get($grid-breakpoints, sm)) {
+		@include media-breakpoint-up(sm) {
 			text-align: left;
 			margin-left: 80px;
 		}
@@ -285,7 +285,7 @@
 	.plugins-icon {
 		margin-bottom: 15px; // 32px
 
-		@media (min-width: map-get($grid-breakpoints, sm)) {
+		@include media-breakpoint-up(sm) {
 			float: left;
 			margin-right: 40px;
 			margin-bottom: 0;

@@ -1,0 +1,162 @@
+//
+// Extensions page
+// --------------------------------------------------
+
+@keyframes slide-in {
+	0% {
+		transform: translateY(-30px);
+		opacity: 0;
+	}
+
+	100% {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}
+
+.extensions {
+	animation: slide-in 0.8s ease;
+
+	.jumbotron {
+		background: $gray-100; // IE9 fallback
+		background: linear-gradient($white, $gray-100);
+	}
+
+
+	// Grid
+
+	.container {
+		padding: 0 ($grid-gutter-width / 2);
+
+		@include media-breakpoint-up(sm) {
+			padding: 0 80px;
+		}
+	}
+
+
+  // Extensions picker on extensions page
+
+	.extensions-picker {
+		.inner-extensions {
+			display: block;
+		}
+
+		.inner-start {
+			display: none;
+		}
+	}
+
+
+	// Extensions styles
+
+	h1, h2, h3 {
+		line-height: 1.1;
+	}
+
+	h1, h2 {
+		text-align: center;
+	}
+
+	h1 {
+		font-size: 24px;
+		margin: 19px auto 16px; // 32px
+
+		@include media-breakpoint-up(sm) {
+			font-size: 36px;
+			margin-top: 27px; // 48px
+			letter-spacing: -1px;
+		}
+	}
+
+	h2 {
+		font-size: 20px;
+		color: inherit;
+		margin: 32px 0 16px; // 40px
+
+		@include media-breakpoint-up(sm) {
+			font-size: 30px;
+			margin-top: 48px;
+			letter-spacing: -0.5px;
+		}
+	}
+
+	h3 {
+		font-size: 16px;
+		margin: 22px 0 14px;
+
+		@include media-breakpoint-up(sm) {
+			font-size: 24px;
+			margin-top: 31px;
+			letter-spacing: -0.3px;
+		}
+	}
+
+	hr {
+		border: 0;
+		border-top: 1px solid $gray-200;
+		margin: 0;
+	}
+
+	.btn {
+		color: $white;
+		background: $link-color;
+		text-decoration: none;
+		border-radius: 3px;
+		padding: 5px 15px;
+
+		&:hover {
+			background: darken($link-color, 5%);
+		}
+	}
+
+	.all-extensions {
+		ul {
+			margin-top: 40px;
+		}
+
+		.bookmarklet {
+			margin-bottom: 25px;
+			padding: 0 ($grid-gutter-width / 2);
+		}
+	}
+
+	// Features
+	.features {
+		padding-bottom: 21px;
+
+		@include media-breakpoint-up(sm) {
+			padding-bottom: 41px; // 60px
+		}
+
+		img {
+			display: block;
+			margin: 34px auto 0; // 40px
+			max-width: 100%;
+			width: 100%;
+			height: auto;
+
+			@include media-breakpoint-up(sm) {
+				margin-top: 54px;
+			}
+		}
+
+		.magnifier {
+			@include media-breakpoint-down(xs) {
+				width: 160px;
+				height: 160px;
+			}
+
+			// todo: define size on sm+ size
+		}
+	}
+
+	.features-1 {
+		h2 {
+			margin-top: 45px; // 53px (2/3)
+
+			@include media-breakpoint-up(sm) {
+				margin-top: 69px; // 80px
+			}
+		}
+	}
+}

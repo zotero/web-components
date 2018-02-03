@@ -17,7 +17,8 @@ if($_GET['user']){
 		<nav aria-label="breadcrumb" role="navigation">
 			<ol class="breadcrumb">
 				<li class="breadcrumb-item"><a href="/">Home</a></li>
-				<li class="breadcrumb-item active" aria-current="page">Downloads</li>
+				<li class="breadcrumb-item">Downloads</li>
+				<li class="breadcrumb-item active" aria-current="page">Extensions</li>
 			</ol>
 		</nav>
 	</div>

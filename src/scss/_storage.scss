@@ -16,22 +16,6 @@ div.storage-container {
     text-align:center;
     font-size: 1.5em;
   }
-  div.storage-notification {
-    margin:4px;
-    padding:8px;
-    border-radius: 4px;
-    display:none;
-  }
-  div.storage-notification.success {
-    background-color: $notification-success-color;
-    border-color: $notification-success-border-color;
-    display:block;
-  }
-  div.storage-notification.error {
-    background-color: $notification-error-color;
-    border-color: $notification-error-border-color;
-    display:block;
-  }
 
   div.user-storage {
     display:-webkit-flex;
@@ -57,26 +41,14 @@ div.storage-container {
       padding:15px;
     }
 
-    button.btn {
-      font-size: 12px;
-      background-color: #337ab7;
-      color:#fff;
-    }
-
-    button.btn:hover {
-      background-color: #286090;
-      color:#fff;
-      border-color: #286090;
-    }
-
-    button.btn:disabled {
-      background-color: #a0a0a0;
-    }
-
     tr.current-plan {
       background-color: #dff0d8;
     }
   }
+}
+
+div.purge-storage {
+  margin-bottom: 1rem;
 }
 
 @media all and (max-width: 640px) {

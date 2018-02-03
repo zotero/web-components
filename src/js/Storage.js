@@ -84,7 +84,7 @@ class StoragePlanRow extends Component {
 			onClick={this.props.selectPlan}
 			onMouseOver={this.props.previewPlan}
 			onMouseOut={this.props.unpreviewPlan}
-			className="btn btn-primary selectPlanButton"
+			className="btn btn-secondary selectPlanButton"
 			data-storagelevel={plan.storageLevel}
 			//data-pricecents={priceCents[plan.storageLevel]}
 			//data-description={'Zotero storage'}
@@ -188,12 +188,12 @@ class GroupUsage extends Component {
 class PaymentRow extends Component {
 	render() {
 		if(!this.props.defaultSource || !this.props.userSubscription.recur){
-			let paymentButton = <button className="btn" onClick={this.props.updateCardHandler}>Enable Automatic Renewal</button>;
+			let paymentButton = <button className="btn btn-secondary" onClick={this.props.updateCardHandler}>Enable Automatic Renewal</button>;
 
 			let expiration = new Date(this.props.userSubscription.expirationDate * 1000);
 			if(expiration < (Date.now() + (1000*60*60*24*15))) {
 				//expiration less than 2 weeks away, charge card now
-				paymentButton = <button className="btn" onClick={this.props.renewHandler}>Renew Now</button>;
+				paymentButton = <button className="btn btn-secondary" onClick={this.props.renewHandler}>Renew Now</button>;
 			}
 			return (
 				<tr>
@@ -212,7 +212,7 @@ class PaymentRow extends Component {
 					<p><b>{card.brand} ****-****-****-{card.last4}</b></p>
 					<p>
 						Exp: <b>{card.exp_year}-{card.exp_month}</b>
-						<button className="btn right" onClick={this.props.updateCardHandler}>Update Card</button>
+						<button className="btn btn-secondary right" onClick={this.props.updateCardHandler}>Update Card</button>
 					</p>
 				</td>
 			</tr>
@@ -234,7 +234,7 @@ class NextPaymentRow extends Component {
 					<td>
 						<p>
 							{formattedExpirationDate}
-							<button className="btn right" onClick={this.props.cancelRecur}>Disable Autorenew</button>
+							<button className="btn btn-secondary right" onClick={this.props.cancelRecur}>Disable Autorenew</button>
 						</p>
 					</td>
 				</tr>
@@ -674,7 +674,7 @@ class Storage extends Component {
 							<b>Current Plan</b>
 						</div>
 						<div className='section-body'>
-							<table>
+							<table className='table'>
 								<tbody>
 									<tr>
 										<th>Quota</th>

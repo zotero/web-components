@@ -12,7 +12,7 @@ import {getCurrentUser} from './Utils.js';
 const currentUser = getCurrentUser();
 
 let React = require('react');
-const {Component} = React;
+const {Component, Fragment} = React;
 import PropTypes from 'prop-types';
 
 let accessMap = {
@@ -108,13 +108,19 @@ class GroupNugget extends Component{
 		let manageLinks = null;
 		if(groupManageable){
 			manageLinks = (
-				<nav className="action-links">
-					<li><a href={buildUrl('groupSettings', {group})}>Manage Profile</a></li>
-					<li><a href={buildUrl('groupMemberSettings', {group})}>Manage Members</a></li>
-					<li><a href={buildUrl('groupLibrarySettings', {group})}>Manage Library</a></li>
-				</nav>
+				<Fragment>
+					<a className="nav-link" href={buildUrl('groupSettings', {group})}>Manage Profile</a>
+					<a className="nav-link" href={buildUrl('groupMemberSettings', {group})}>Manage Members</a>
+					<a className="nav-link" href={buildUrl('groupLibrarySettings', {group})}>Manage Library</a>
+				</Fragment>
 			);
 		}
+		let groupLinks = (
+			<nav className="nav">
+				<a className="nav-link" href={buildUrl('groupLibrary', {group})}>Group Library</a>
+				{manageLinks}
+			</nav>
+		);
 
 		let groupDescription = null;
 		if(group.data.description){
@@ -133,19 +139,16 @@ class GroupNugget extends Component{
 		}
 
 		return (
-			<div className="nugget-group">
-				<div className="nugget-full">
+			<div className="card nugget-full">
+				<div className="card-header">
 					{groupImage}
 					<div className="nugget-name">
 						<a href={buildUrl('groupView', {group})}>{group.data.name}</a>
 					</div>
-					<nav id="group-library-link-nav" className="action-links">
-						<ul>
-						<li><a href={buildUrl('groupLibrary', {group})}>Group Library</a></li>
-						</ul>
-					</nav>
-					{manageLinks}
-					<table className="nugget-profile table">
+				</div>
+				<div className="card-body">
+					{groupLinks}
+					<table className="table">
 						<tbody>
 						<tr>
 							<th scope="row">Members</th>

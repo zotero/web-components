@@ -1,0 +1,28 @@
+div.user-groups {
+  .nugget-full {
+    margin-bottom:1rem;
+
+    .nugget-name {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+  }
+}
+
+#group-intro-screencast {
+  display:block;
+  width:500px;
+}
+
+#group-explainer {
+  width:95%;
+  margin:auto;
+
+  video {
+    margin-bottom: 15px;
+  }
+
+  .login-links {
+    margin-bottom:10px;
+  }
+}

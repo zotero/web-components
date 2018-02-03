@@ -1,0 +1,31 @@
+$notification-success-color: #dff0d8;
+$notification-success-border-color: #cfe0c8;
+
+$notification-info-color: #fbd438;
+$notification-info-border-color: #fbd438;
+
+$notification-error-color: #f0dfd8;
+$notification-error-border-color: #e0cfc8;
+
+div.notifier {
+  margin:4px;
+  padding:8px;
+  border-radius: 4px;
+  text-align:center;
+  display:none;
+}
+div.notifier.success {
+  background-color: $notification-success-color;
+  border-color: $notification-success-border-color;
+  display:block;
+}
+div.notifier.info {
+  background-color: $notification-info-color;
+  border-color: $notification-info-border-color;
+  display:block;
+}
+div.notifier.error {
+  background-color: $notification-error-color;
+  border-color: $notification-error-border-color;
+  display:block;
+}

@@ -114,11 +114,13 @@ class GroupInvitations extends React.Component{
 			return null;
 		}
 		return (
-			<div className='group-invitations'>
-				<h2>Group Invitations</h2>
-				<ul>
-					{invitationNodes}
-				</ul>
+			<div className='group-invitations card'>
+				<div className='card-header'>Group Invitations</div>
+				<div className='card-body'>
+					<ul className='list-group list-group-flush'>
+						{invitationNodes}
+					</ul>
+				</div>
 			</div>
 		);
 	}

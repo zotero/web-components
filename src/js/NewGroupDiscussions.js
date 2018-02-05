@@ -33,9 +33,11 @@ class NewGroupDiscussions extends React.Component{
 		let partialHtml = {__html: this.state.partial};
 
 		return (
-			<div className='new-group-discussions'>
-				<h2>New Group Discussions</h2>
-				<div dangerouslySetInnerHTML={partialHtml}></div>
+			<div className='new-group-discussions card'>
+				<div className='card-header'>New Group Discussions</div>
+				<div className='card-body'>
+					<div dangerouslySetInnerHTML={partialHtml}></div>
+				</div>
 			</div>
 		);
 	}

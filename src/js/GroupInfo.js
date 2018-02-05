@@ -286,36 +286,45 @@ class GroupInfo extends React.Component{
 			libraryAccess = 'None';
 		}
 		return (
-			<div>
+			<div className='card border-0 mb-4'>
 				{groupImage}
 				{groupDescription}
 				{groupUrl}
-				<ul className="group-information">
-					<li>
-						<span className="field">Owner:</span> 
-						<span className="value">
-						<a href={buildUrl('profileUrl', {slug:displayNames['slug'][group.data.owner]})}>{displayNames['displayName'][group.data.owner]}</a>
-						</span>
-					</li>
-					<li>
-						<span className="field">Registered:</span> <span className="value">{created.toISOString().substr(0,10)}</span>
-					</li>
-					<li>
-						<span className="field">Type:</span> <span className="value">
-							{group.data.type == 'Private' ? 'Private' : 'Public'}
-						</span>
-					</li>
-					<li>
-						<span className="field">Membership:</span> <span className="value">
-							{groupMembership}
-						</span>
-					</li>
-					<li>
-						<span className="field">Library Access:</span> <span className="value">
-							{libraryAccess}
-						</span>
-					</li>
-				</ul>
+				<table className="table">
+					<tbody>
+						<tr>
+							<th scope="row">Owner:</th>
+							<td>
+								<a href={buildUrl('profileUrl', {slug:displayNames['slug'][group.data.owner]})}>{displayNames['displayName'][group.data.owner]}</a>
+							</td>
+						</tr>
+						<tr>
+							<th scope="row">Registered:</th>
+							<td>
+								{created.toISOString().substr(0,10)}
+							</td>
+						</tr>
+						<tr>
+							<th scope="row">Type:</th>
+							<td>
+								{group.data.type == 'Private' ? 'Private' : 'Public'}
+							</td>
+						</tr>
+						<tr>
+							<th scope="row">Membership:</th>
+							<td>
+								{groupMembership}
+							</td>
+						</tr>
+						<tr>
+							<th scope="row">Library Access:</th>
+							<td>
+								{libraryAccess}
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				
 				<GroupMembershipActions
 					group={group}
 					pending={this.props.pending}

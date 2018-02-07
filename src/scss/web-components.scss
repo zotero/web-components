@@ -37,6 +37,7 @@
 @import "sections";
 @import "jumbotron";
 @import "footer";
+@import "settings-nav";
 
 // Component Sections
 
@@ -44,6 +45,7 @@
 @import "extensions-picker";
 @import "notifier";
 @import "storage";
+@import "react-tabs";
 
 // Pages
 
@@ -52,3 +54,4 @@
 @import "downloads";
 @import "extensions";
 @import "usergroups";
+@import "institution-checkout";

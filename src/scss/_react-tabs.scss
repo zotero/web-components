@@ -2,14 +2,15 @@
 	text-align:left;
 
 	&__tab-list {
-		//border-bottom: 1px solid #aaa;
+		border-bottom: 1px solid #aaa;
 		//margin: 0 0 10px;
 		margin:0;
 		padding: 0;
+		text-align: center;
 	}
 
 	&__tab {
-		width:41%;
+		width:45%;
 		text-align:center;
 		display: inline-block;
 		border: 1px solid transparent;

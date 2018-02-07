@@ -1,0 +1,15 @@
+#settings-nav {
+	a.nav-item {
+		border-radius: 0;
+		border-top:1px solid $gray-200;
+		&:hover {
+			background-color:$gray-100;
+		}
+	}
+	.nav-item.active {
+		color:$link-color;
+		background-color: $white;
+		border-radius: 0;
+		border-left: 3px solid $link-color;
+	}
+}

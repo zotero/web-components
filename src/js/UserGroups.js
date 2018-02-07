@@ -196,8 +196,8 @@ class GroupsExplainer extends Component{
 			);
 		}
 		return (
-			<div id="group-explainer">
-				<h2>What can groups do for you?</h2>
+			<div id="group-explainer card" className="mt-5">
+				<h2 className="text-center">What can groups do for you?</h2>
 				<p>With groups, you can collaborate remotely with project members, set
 				up web-based bibliographies for classes you teach, and so much more.
 				</p>

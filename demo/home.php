@@ -26,7 +26,7 @@ if($_GET['user']){
 							<img
 							  class="img-fluid"
 							  src="../assets/images/home/screenshot-1.1.png"
-							  srcset="../assets/images/home/screenshot-1.2.png 1170w, ../assets/images/home/screenshot-1.2@2x.png 2340w"
+							  srcset="../assets/images/home/screenshot-1.3.png 1170w, ../assets/images/home/screenshot-1.3@2x.png 2340w"
 							  sizes="(min-width: 1234px) 1170px, 100vw"
 							  width="1170"
 							  height="658"

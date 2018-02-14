@@ -35,6 +35,7 @@ import {cycleTestCases, cycleTestFuncs} from './TestUtils.js';
 import {Combined} from './GlobalSearch/Combined.js';
 import Profile from './profile/profile.jsx';
 import {ChangeUsername} from './ChangeUsername.js';
+import {ManageEmails} from './ManageEmails.js';
 import * as Institutional from './Institutional/Institutional.js';
 
 let ZoteroWebComponents = {
@@ -59,6 +60,7 @@ let ZoteroWebComponents = {
 	Combined,
 	Profile,
 	ChangeUsername,
+	ManageEmails,
 	Institutional
 };
 

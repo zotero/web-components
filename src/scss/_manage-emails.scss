@@ -1,0 +1,43 @@
+#manage-emails {
+	.btn {
+		color: $white;
+		background: $link-color;
+
+		&:hover,
+		&:focus {
+			text-decoration: none;
+			color: $white;
+			background: darken($link-color, 5%);
+		}
+	}
+	.form-control {
+		display:inline-block;
+		width:50%;
+	}
+	td {
+		vertical-align: middle;
+		padding-top:8px;
+		padding-bottom:8px;
+	}
+	span.label {
+		border:1px solid #999;
+		border-radius: 4px;
+		margin-left:5px;
+		margin-right:5px;
+		padding:3px;
+	}
+	span.label {
+		background-color:#EEE;
+	}
+	span.label.primary {
+		color:#FFF;
+		background-color:green;
+	}
+
+	div.add-email-input {
+		margin-top:10px;
+	}
+	label {
+		font-weight: bold;
+	}
+}

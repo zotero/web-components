@@ -18,12 +18,17 @@ let collect = function(){
 	let newItem = document.querySelector('#new-item');
 	let chromeMiddle = document.querySelector('#chrome-middle');
 
-	let elements = [ spinner, magnifier, chromeMiddle ];
+	// Helpers
 
-	for (let i of elements) {
-		i.originX = i.getBBox().x + i.getBBox().width / 2;
-		i.originY = i.getBBox().y + i.getBBox().height / 2;
+	let originX = function(element) {
+		return element.getBBox().x + element.getBBox().width / 2;
 	}
+
+	let originY = function(element) {
+		return element.getBBox().y + element.getBBox().height / 2;
+	}
+
+	// Loop
 
 	let loop = function() {
 		let easeInOut = BezierEasing(0.42, 0, 0.58, 1);
@@ -56,8 +61,8 @@ let collect = function(){
 				clipPath.setAttribute('r', magnifierGrowCoords.r);
 				magnifier.setAttribute('transform',
 					`matrix(${magnifierGrowCoords.s}, 0 , 0, ${magnifierGrowCoords.s},
-					${magnifier.originX - magnifierGrowCoords.s * magnifier.originX},
-					${magnifier.originY - magnifierGrowCoords.s * magnifier.originY})`);
+					${originX(magnifier) - magnifierGrowCoords.s * originX(magnifier)},
+					${originY(magnifier) - magnifierGrowCoords.s * originY(magnifier)})`);
 			})
 			.delay(500)
 
@@ -70,8 +75,8 @@ let collect = function(){
 				clipPath.setAttribute('r', magnifierShrinkCoords.r);
 				magnifier.setAttribute('transform',
 					`matrix(${magnifierShrinkCoords.s}, 0 , 0, ${magnifierShrinkCoords.s},
-					${magnifier.originX - magnifierShrinkCoords.s * magnifier.originX},
-					${magnifier.originY - magnifierShrinkCoords.s * magnifier.originY})`);
+					${originX(magnifier) - magnifierShrinkCoords.s * originX(magnifier)},
+					${originY(magnifier) - magnifierShrinkCoords.s * originY(magnifier)})`);
 			})
 			.delay(1300) // 250 after moveToZotero
 
@@ -178,7 +183,7 @@ let collect = function(){
 			})
 			.onUpdate(function() {
 				spinner.setAttribute('transform', `rotate(${spinCoords.r},
-					${spinner.originX}, ${spinner.originY})`);
+					${originX(spinner)}, ${originY(spinner)})`);
 			})
 			.onComplete(function() {
 				spinner.setAttribute('opacity', 0);
@@ -314,7 +319,7 @@ let collect = function(){
 				chromeMiddle.setAttribute('transform',
 					`matrix(${closeChromeCoords.s}, 0, 0, ${closeChromeCoords.s}
 					${188 - closeChromeCoords.s * 188},
-					${chromeMiddle.originX - closeChromeCoords.s * chromeMiddle.originX
+					${originX(chromeMiddle) - closeChromeCoords.s * originX(chromeMiddle)
 					+ closeChromeCoords.ty})`);
 			})
 			.onComplete(function() {
@@ -351,8 +356,8 @@ let collect = function(){
 				chromeMiddle.setAttribute('transform',
 					`matrix(${openChromeCoords.s}, 0, 0, ${openChromeCoords.s}
 					${188 - openChromeCoords.s * 188},
-					${chromeMiddle.originX - openChromeCoords.s
-					* chromeMiddle.originX})`);
+					${originX(chromeMiddle) - openChromeCoords.s
+					* originX(chromeMiddle)})`);
 			})
 			.onComplete(function() {
 				newItem.setAttribute('opacity', 0);

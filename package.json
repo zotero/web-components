@@ -51,9 +51,12 @@
     "watchify": "^3.7.0"
   },
   "dependencies": {
+    "@tweenjs/tween.js": "^17.1.1",
     "babel-polyfill": "^6.26.0",
     "bootstrap": "^4.0.0",
+    "bezier-easing": "^2.0.3",
     "classnames": "^2.2.5",
+    "gsap": "^1.20.3",
     "jquery": "^3.2.1",
     "picturefill": "^3.0.2",
     "popper.js": "^1.12.5",

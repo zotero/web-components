@@ -42,7 +42,9 @@ if($_GET['user']){
 						<section class="section-md">
 							<div class="row align-items-center">
 								<div class="feature-col col-md-6 col-xl-5 text-center right">
-									<img class="img-fluid illu-collect" src="../assets/images/home/collect.svg" width="444" height="514">
+  								<div class="illu-collect illu-container">
+									<?php include "collect-animation.php";?>
+								</div>
 								</div>
 								<div class="feature-col col-md-6 order-md-first col-xl-5 offset-xl-1 left">
 									<h2 class="display-2">Collect with a click.</h2>
@@ -111,4 +113,9 @@ if($_GET['user']){
 					</div>
 				</section>
 			</main>
+	<script>
+		ZoteroWebComponents.pageReady(function() {
+			ZoteroWebComponents.animations.collect();
+		});
+	</script>
 <? include('./layoutFooter.php')?>

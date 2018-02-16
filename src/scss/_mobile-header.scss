@@ -43,13 +43,24 @@
         right: $spacer-xl;
       }
       color: $white;
+      position: relative;
 
       &:hover {
         text-decoration: none;
       }
 
       &.separated {
-        border-top: 1px solid $gray-800;
+        padding-top: $nav-link-padding-y + rem(1);
+
+        &::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: $spacer-xl;
+          right: 0;
+          border-top: 1px solid lighten($gray-900, 8%);
+          z-index: -1;
+        }
       }
     }
   }

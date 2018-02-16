@@ -14,6 +14,17 @@ body {
 }
 
 
+// Lighter headings rendering
+
+h1,
+h2,
+.h1,
+.h2 {
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+}
+
+
 // Display Headings
 
 .display-1,

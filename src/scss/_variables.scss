@@ -339,9 +339,9 @@ $table-dark-color:            $body-bg !default;
 //
 // Shared variables that are reassigned to `$input-` and `$btn-` specific variables.
 
-$input-btn-padding-y:         rem(11);
+$input-btn-padding-y:         rem(7);
 $input-btn-padding-x:         rem(15);
-$input-btn-line-height:       $line-height-base !default;
+$input-btn-line-height:       1;
 
 $input-btn-focus-width:       rem(3);
 $input-btn-focus-color:       rgba(theme-color("secondary"), .5);
@@ -351,8 +351,8 @@ $input-btn-padding-y-sm:      rem(5);
 $input-btn-padding-x-sm:      rem(11);
 $input-btn-line-height-sm:    1;
 
-$input-btn-padding-y-lg:      0.6875rem;
-$input-btn-padding-x-lg:      1.4375rem;
+$input-btn-padding-y-lg:      rem(11);
+$input-btn-padding-x-lg:      rem(23);
 $input-btn-line-height-lg:    1;
 
 $input-btn-border-width:      $border-width !default;

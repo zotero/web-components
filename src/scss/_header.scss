@@ -83,6 +83,9 @@
 
   .upgrade-storage {
     margin-left: $spacer;
+    font-size: $font-size-sm;
+    padding-top: $input-btn-padding-y + ($font-size-base - $font-size-sm) / 2;
+    padding-bottom: $input-btn-padding-y + ($font-size-base - $font-size-sm) / 2;
   }
 
   .nav-toggle {

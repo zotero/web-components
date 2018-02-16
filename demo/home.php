@@ -14,7 +14,7 @@ if($_GET['user']){
 			<main>
 				<section class="jumbotron jumbotron-fluid">
 					<div class="container">
-						<h1 class="display-1">Your personal<br>research assistant.</h1>
+						<h1 class="display-1">Your personal<br>research Assistant.</h1>
 						<p class="lead"><span class="d-sm-block">Zotero is free software that helps you</span> <span class="d-sm-block">collect, cite, and share research.</span></p>
 						<p class="download"><a href="/download" class="btn btn-primary btn-lg">Download</a></p>
 						<p class="platforms">Available for Mac, Windows, and Linux</p>

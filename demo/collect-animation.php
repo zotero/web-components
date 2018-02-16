@@ -81,10 +81,6 @@
         <path id="journal-icon" d="M345.707,93H338v14h12V97.293Zm2.586,4H346V94.707Zm.707,9H339V94h6v4h4Zm-6-8h-2V97h2Zm4,3h-6v-1h6Zm0,3h-6v-1h6Z" fill="#0069e0" opacity="0"/>
         <polygon id="z-icon" points="349.701 94.487 341.505 105.255 350 105.255 350 107.05 338.633 107.05 338.633 105.614 346.829 94.846 339.051 94.846 339.051 93.05 349.701 93.05 349.701 94.487" fill="#cc2936"/>
       </g>
-      <g id="spinner" opacity="0">
-        <path d="M74.5,77H76a5,5,0,0,0-5-5v1.5A3.5,3.5,0,0,1,74.5,77Z" fill="#0069e0"/>
-        <circle cx="71" cy="77" r="5" fill="none"/>
-      </g>
       <rect width="188" height="144" fill="none"/>
     </g>
     <g id="zotero">
@@ -213,6 +209,12 @@
     <use id="zotero-back" xlink:href="#zotero"/>
     <use id="chrome-middle" xlink:href="#chrome"/>
     <use id="zotero-front" xlink:href="#zotero" opacity="0"/>
+
+    <!-- Spinner must not be in defs for getBBox in Firefox -->
+    <g id="spinner" opacity="0">
+      <path d="M74.5,77H76a5,5,0,0,0-5-5v1.5A3.5,3.5,0,0,1,74.5,77Z" fill="#0069e0"/>
+      <circle cx="71" cy="77" r="5" fill="none"/>
+    </g>
 
     <g id="magnifier">
       <g clip-path="url(#clip-path)">

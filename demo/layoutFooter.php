@@ -2,14 +2,13 @@
 				<div class="container">
 					<nav>
 						<ul class="footer-nav">
-							<li class="nav-item"><a href="https://www.zotero.org/blog/" class="nav-link">Blog</a></li>
-							<li class="nav-item"><a href="https://forums.zotero.org/" class="nav-link">Forums</a></li>
-							<li class="nav-item"><a href="https://www.zotero.org/support/dev/start" class="nav-link">Developers</a></li>
 							<li class="nav-item"><a href="https://www.zotero.org/support/" class="nav-link">Documentation</a></li>
+							<li class="nav-item"><a href="https://forums.zotero.org/" class="nav-link">Forums</a></li>
+							<li class="nav-item"><a href="https://www.zotero.org/blog/" class="nav-link">Blog</a></li>
 							<li class="nav-item"><a href="https://www.zotero.org/support/terms/privacy" class="nav-link">Privacy</a></li>
 							<li class="nav-item"><a href="https://www.zotero.org/getinvolved/" class="nav-link">Get Involved</a></li>
+							<li class="nav-item"><a href="https://www.zotero.org/support/dev/start" class="nav-link">Developers</a></li>
 							<li class="nav-item"><a href="https://www.zotero.org/jobs" class="nav-link">Jobs</a></li>
-							<li class="nav-item"><a href="https://www.zotero.org/about/" class="nav-link">About</a></li>
 						</ul>
 						<ul class="social-nav">
 							<li class="nav-item follow-us">Follow us</li>

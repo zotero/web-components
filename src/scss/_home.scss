@@ -28,11 +28,6 @@
       @include media-breakpoint-up("md") {
         margin-bottom: 21px; // 48px
       }
-
-      .kern {
-        letter-spacing: -0.15em;
-        padding-right: calc(7em / 60);
-      }
     }
 
     .lead {

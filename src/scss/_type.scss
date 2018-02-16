@@ -5,6 +5,15 @@
 //
 
 
+// Enable kerning
+
+body {
+  text-rendering: optimizeLegibility;
+  font-kerning: normal;
+  font-feature-settings: "kern" 1;
+}
+
+
 // Display Headings
 
 .display-1,

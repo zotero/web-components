@@ -42,9 +42,9 @@ if($_GET['user']){
 						<section class="section-md">
 							<div class="row align-items-center">
 								<div class="feature-col col-md-6 col-xl-5 text-center right">
-  								<div class="illu-collect illu-container">
-									<?php include "collect-animation.php";?>
-								</div>
+  								<div class="collect-animation illu-container">
+									  <?php include "collect-animation.php";?>
+								  </div>
 								</div>
 								<div class="feature-col col-md-6 order-md-first col-xl-5 offset-xl-1 left">
 									<h2 class="display-2">Collect with a click.</h2>

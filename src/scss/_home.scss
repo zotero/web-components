@@ -122,9 +122,22 @@
       }
     }
 
+    // Older versions of Safari and Mobile Safari don’t render the height of
+    // responsive inline SVGs correctly, that’s why we need the container
+    // padding hack.
     .illu-container {
       margin-left: auto;
       margin-right: auto;
+      position: relative;
+
+      svg {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+      }
     }
 
     p {
@@ -135,34 +148,24 @@
     }
   }
 
-  .illu-collect {
-    svg {
-      overflow: visible;
-    }
-
+  .collect-animation {
     @include media-breakpoint-down("md") {
-      position: relative;
-      padding-top: (100% * 441 / 444);
-
-      svg {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-      }
-    }
-
-    @include media-breakpoint-only("md") {
+      padding-top: (rem(336) * 441 / 444);
       margin-top: rem(-46);
     }
 
-    @include media-breakpoint-up("lg") {
-      margin-top: rem(-61);
+    @include media-breakpoint-down("xs") {
+      padding-top: (rem(200) * 441 / 444);
+      margin-top: rem(-27);
+    }
 
-      svg {
-        width: 444px;
-        height: 441px;
-      }
+    @include media-breakpoint-up("lg") {
+      padding-top: rem(441);
+      margin-top: rem(-61);
+    }
+
+    svg {
+      overflow: visible;
     }
   }
 

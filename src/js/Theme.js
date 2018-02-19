@@ -7,8 +7,7 @@ import {pageReady} from './Utils.js';
 
 let init = function(){
 	if(document){
-		pageReady(function(){
-
+		document.addEventListener("DOMContentLoaded", function() {
 			//add type of user to html element on input events
 			document.addEventListener('click', function(){
 				document.documentElement.classList.add('mouse-user');
@@ -33,7 +32,11 @@ let init = function(){
 
 			if(navToggle){
 				navToggle.addEventListener('click', function() {
-					body.classList.add('nav-opened');
+					if(body.classList.toString().indexOf('nav-opened') == -1){
+						body.classList.add('nav-opened');
+					} else {
+						body.classList.remove('nav-opened');
+					}
 				});
 			}
 			if(navCover){

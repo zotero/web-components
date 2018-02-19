@@ -18,6 +18,12 @@ body {
   }
 }
 
+svg {
+  vertical-align: middle;
+  // Do not set height: auto on all SVGs, it sets the height of inline SVGs to
+  // 150px in IE10 and IE11.
+}
+
 :focus {
   outline: none;
   outline-offset: $outline-offset;

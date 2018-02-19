@@ -128,7 +128,7 @@
         position: absolute;
         left: 0;
         top: 0;
-        width: 100%;
+        // Do not set width for crisp rendering quality
         height: 100%;
         overflow: visible;
       }

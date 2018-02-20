@@ -81,7 +81,7 @@
 							<li class="nav-item"><a href="https://www.zotero.org/user/login/" class="nav-link log-in">Log In</a></li>
 							<? else:?>
 							<div class="btn-group">
-								<button type="button" class="nav-link user-dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								<button type="button" class="nav-link btn btn-link text-truncate user-dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 									<?=$user->displayName?>
 								</button>
 								<div class="dropdown-menu">

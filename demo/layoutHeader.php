@@ -66,7 +66,7 @@
 			<header class="main-header">
 				<div class="container">
 					<a href="/" class="brand">
-						<img src="../assets/images/zotero-logo.svg" width="109" height="32" alt="Zotero">
+						<img src="../assets/images/zotero-logo.svg" width="110" height="32" alt="Zotero">
 					</a>
 					<nav>
 						<ul class="main-nav d-none d-lg-flex">

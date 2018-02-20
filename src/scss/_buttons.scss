@@ -23,7 +23,12 @@
   &:focus,
   &.focus {
     outline: 0;
-    box-shadow: $btn-focus-box-shadow;
+    box-shadow: none; // Zotero focus patch
+
+    // Zotero focus patch
+    .keyboard-user & {
+      box-shadow: $btn-focus-box-shadow;
+    }
   }
 
   // Disabled comes first so active can properly restyle
@@ -44,7 +49,13 @@
     @include box-shadow($btn-active-box-shadow);
 
     &:focus {
-      @include box-shadow($btn-focus-box-shadow, $btn-active-box-shadow);
+
+      // Zotero focus patch
+      box-shadow: none;
+
+      .keyboard-user & {
+        @include box-shadow($btn-focus-box-shadow, $btn-active-box-shadow);
+      }
     }
   }
 }

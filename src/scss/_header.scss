@@ -22,7 +22,7 @@
     }
 
     img {
-      @include media-breakpoint-down("sm") {
+      @include media-breakpoint-down("md") {
         width: auto;
         height: 28px;
       }

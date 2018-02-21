@@ -204,7 +204,6 @@
       </g>
     </g>
   </defs>
-  <title>collect</title>
   <g style="isolation: isolate">
     <use id="zotero-back" xlink:href="#zotero"/>
     <use id="chrome-middle" xlink:href="#chrome"/>

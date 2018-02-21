@@ -38,6 +38,9 @@
   font-style: normal;
   src: font-url('mac/35D2CC_0_0.eot');
   src:
+    font-url('mac/35D2CC_0_0.eot?#iefix') format('embedded-opentype'),
+    font-url('mac/35D2CC_0_0.woff2') format('woff2'),
+    font-url('mac/35D2CC_0_0.woff') format('woff'),
     font-url('mac/35D2CC_0_0.ttf') format('truetype'),
     font-url('mac/35D2CC_0_0.svg#wf') format('svg');
 }

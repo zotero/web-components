@@ -5,31 +5,24 @@
 //
 
 
-// Enable kerning
+// Enable kerning, letter spacing
 
 body {
   text-rendering: optimizeLegibility;
   font-kerning: normal;
   font-feature-settings: "kern" 1;
-}
-
-
-// Lighter headings rendering
-
-h1,
-h2,
-.h1,
-.h2 {
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.005em;
 }
 
 
 // Display Headings
 
-.display-1,
+.display-1 {
+  letter-spacing: -0.035em;
+}
+
 .display-2 {
-  letter-spacing: -0.025em;
+  letter-spacing: -0.03em;
 }
 
 .display-1 {

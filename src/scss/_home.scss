@@ -18,6 +18,8 @@
 
     .display-1 {
       margin-bottom: 11px; // 32px
+      -moz-osx-font-smoothing: grayscale; // Lighter rendering of inverse heading
+      -webkit-font-smoothing: antialiased; // Lighter rendering of inverse heading
 
       @include media-breakpoint-up("md") {
         margin-bottom: 21px; // 48px

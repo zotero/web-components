@@ -1,0 +1,60 @@
+//
+// Fonts
+//
+
+/**
+ * @license
+ * MyFonts Webfont Build ID 3531010, 2018-02-22T12:59:18-0500
+ *
+ * The fonts listed in this notice are subject to the End User License
+ * Agreement(s) entered into by the website owner. All other parties are
+ * explicitly restricted from using the Licensed Webfonts(s).
+ *
+ * You may obtain a valid license at the URLs below.
+ *
+ * Webfont: AvenirNextLTPro-Light by Linotype
+ * URL: https://www.myfonts.com/fonts/linotype/avenir-next-pro/pro-light/
+ * Copyright: Copyright &#x00A9; 2012 - 2017 Monotype GmbH. All rights reserved.
+ *
+ * Webfont: AvenirNextLTPro-Regular by Linotype
+ * URL: https://www.myfonts.com/fonts/linotype/avenir-next-pro/pro-regular/
+ * Copyright: Copyright &#x00A9; 2004 - 2017 Monotype GmbH. All rights reserved.
+ *
+ *
+ * License: https://www.myfonts.com/viewlicense?type=web&buildid=3531010
+ * Licensed pageviews: 250,000
+ *
+ * © 2018 MyFonts Inc
+*/
+
+// Import asset-url helper
+@import "functions";
+
+/* @import must be at top of file, otherwise CSS will not work */
+@import url("//hello.myfonts.net/count/35e102");
+
+@font-face {
+  font-family: 'AvenirNextLTPro';
+  font-weight: 300;
+  font-style: normal;
+  src: font-url('35E102_0_0.eot');
+  src:
+    font-url('35E102_0_0.eot?#iefix') format('embedded-opentype'),
+    font-url('35E102_0_0.woff2') format('woff2'),
+    font-url('35E102_0_0.woff') format('woff'),
+    font-url('35E102_0_0.ttf') format('truetype'),
+    font-url('35E102_0_0.svg#wf') format('svg');
+}
+
+@font-face {
+  font-family: 'AvenirNextLTPro';
+  font-weight: 400;
+  font-style: normal;
+  src: font-url('35E102_1_0.eot');
+  src:
+    font-url('35E102_1_0.eot?#iefix') format('embedded-opentype'),
+    font-url('35E102_1_0.woff2') format('woff2'),
+    font-url('35E102_1_0.woff') format('woff'),
+    font-url('35E102_1_0.ttf') format('truetype'),
+    font-url('35E102_1_0.svg#wf') format('svg');
+}

@@ -63,11 +63,11 @@
     color: $link-color;
 
     @include media-breakpoint-up("lg") {
-      max-width: rem(118); // spacer-xl between brand and first link
+      max-width: rem(126); // spacer-xl between brand and first link
     }
 
     @include media-breakpoint-up("xl") {
-      max-width: rem(316); // spacer-xxxl between brand and first link
+      max-width: rem(324); // spacer-xxxl between brand and first link
     }
 
     &:hover {

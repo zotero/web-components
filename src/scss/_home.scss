@@ -129,8 +129,8 @@
         left: 0;
         top: 0;
         // Do not set width for crisp rendering quality
+        max-width: 100%; // Like img-fluid, needed for bp md
         height: 100%;
-        overflow: visible;
       }
     }
 

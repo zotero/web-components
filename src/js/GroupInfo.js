@@ -177,16 +177,16 @@ class GroupMembershipActions extends React.Component{
 			controls = (
 				<div className='join-group'>
 					<p>You have been offered ownership of this group.</p>
-					<button className={classnames('btn')} onClick={this.acceptOwnership}>Accept</button>
-					<button className={classnames('btn', {'visually-hidden':!member})} onClick={this.leaveGroup}>Leave</button>
+					<button className={classnames('btn', 'mr-3')} onClick={this.acceptOwnership}>Accept</button>
+					<button className={classnames('btn', 'mr-3', {'d-none':!member})} onClick={this.leaveGroup}>Leave</button>
 				</div>
 			);
 		} else if(this.state.membershipInvitation){
 			controls = (
 				<div className='join-group'>
 					<p>You have been invited to join this group.</p>
-					<button className={classnames('btn')} onClick={this.joinGroup}>Join</button>
-					<button className={classnames('btn')} onClick={this.ignoreInvite}>Ignore</button>
+					<button className={classnames('btn', 'mr-3')} onClick={this.joinGroup}>Join</button>
+					<button className={classnames('btn', 'mr-3')} onClick={this.ignoreInvite}>Ignore</button>
 				</div>
 			);
 		} else if(!member && this.state.applicationPending){
@@ -198,8 +198,8 @@ class GroupMembershipActions extends React.Component{
 		} else {
 			controls = (
 				<div className='join-group'>
-					<button className={classnames('btn', {'visually-hidden':member})} onClick={this.joinGroup}>Join</button>
-					<button className={classnames('btn', {'visually-hidden':!member})} onClick={this.leaveGroup}>Leave</button>
+					<button className={classnames('btn', 'mr-3', {'d-none':member})} onClick={this.joinGroup}>Join</button>
+					<button className={classnames('btn', 'mr-3', {'d-none':!member})} onClick={this.leaveGroup}>Leave</button>
 				</div>
 			);
 		}

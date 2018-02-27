@@ -34,6 +34,8 @@ let buildUrl = function(name, params){
 		}
 		case 'groupImage':
 			return groupImageSrc(params.groupID, params.purpose);
+		case 'updateGroupImage':
+			return `/groups/${params.groupID}/settings/image`;
 		case 'groupSettings':
 			return `/groups/${params.group.data.id}/settings`;
 		case 'groupMemberSettings':
@@ -60,6 +62,10 @@ let buildUrl = function(name, params){
 			return `/settings/storage/institution/${params.institutionID}`;
 		case 'institutionemaillist':
 			return `/settings/storage/institution/${params.institutionID}/emaillist`;
+		case 'updateProfileImage':
+			return `/settings/profileimage`;
+		case 'profileImage':
+			return profileImageSrc(params.userID, params.purpose);
 		case 'itemUrl':
 			if(params.item.library.type == 'group'){
 				return `/groups/${params.item.library.id}/${slugify(params.item.library.name)}/items/itemKey/${params.item.key}`;
@@ -89,11 +95,11 @@ let buildUrl = function(name, params){
 };
 
 let groupImageSrc = function(groupID, purpose) {
-	if(config.useS3){
-		var s3Path = `https://s3.amazonaws.com/${config.s3bucketName}/`;
+	let {useS3, groupImagePath, s3bucketName, staticPath} = config;
+	if(useS3){
+		var s3Path = `https://s3.amazonaws.com/${s3bucketName}/`;
 	}
-	let {groupPath, groupImagePath} = config;
-	
+
 	let size;
 	switch(purpose) {
 		case 'thumb':
@@ -109,11 +115,39 @@ let groupImageSrc = function(groupID, purpose) {
 
 	let filename = `/${groupID ? groupID : 'default'}${size}`;
 
-	if(config.useS3){
+	if(useS3){
 		return `${s3Path}${groupImagePath}${filename}`;
 	}
 
-	return `${groupPath}${filename}`;
+	return `${staticPath}${groupImagePath}${filename}`;
 };
+
+let profileImageSrc = function(userID, purpose){
+	let {useS3, profileImagePath, s3bucketName, staticPath} = config;
+	if(useS3){
+		var s3Path = `https://s3.amazonaws.com/${s3bucketName}/`;
+	}
+
+	let size;
+	switch(purpose) {
+		case 'thumb':
+			size = '_squarethumb.png';
+			break;
+		case 'original':
+			size = '_original.png';
+			break;
+		case 'profile':
+		default:
+			size = '_200px.png';
+	}
+
+	let filename = `/${userID ? userID : 'default'}${size}`;
+
+	if(useS3){
+		return `${s3Path}${profileImagePath}${filename}`;
+	}
+
+	return `${staticPath}/${profileImagePath}${filename}`;
+}
 
 export {buildUrl};

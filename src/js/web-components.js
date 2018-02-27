@@ -37,6 +37,7 @@ import Profile from './profile/profile.jsx';
 import {ChangeUsername} from './ChangeUsername.js';
 import {ManageEmails} from './ManageEmails.js';
 import * as Institutional from './Institutional/Institutional.js';
+import {ProfileImageForm} from './ProfileImageForm.js';
 
 let ZoteroWebComponents = {
 	Storage,
@@ -61,7 +62,8 @@ let ZoteroWebComponents = {
 	Profile,
 	ChangeUsername,
 	ManageEmails,
-	Institutional
+	Institutional,
+	ProfileImageForm,
 };
 
 globalScope.ZoteroWebComponents = ZoteroWebComponents;

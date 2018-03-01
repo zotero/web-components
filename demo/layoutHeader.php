@@ -52,7 +52,7 @@
 					<? if(!$user):?>
 					<li><a class="nav-link separated" href="https://www.zotero.org/user/login/">Log In</a></li>
 					<? else:?>
-					<li><a class="nav-link separated" href="<?="/{$user->slug}"?>">My Profile</a></li>
+					<li><a class="nav-link separated" href="<?="/{$user->slug}"?>"><?=$user->displayName?></a></li>
 					<li><a class="nav-link separated" href="https://forums.zotero.org/messages/inbox">Inbox<?=$user->unreadMessages > 0 ? " ({$user->unreadMessages})" : "";?></a></li>
 					<li><a class="nav-link separated" href="/settings">Settings</a></li>
 					<li><a class="nav-link" href="/user/logout">Log Out</a></li>

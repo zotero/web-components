@@ -11,14 +11,14 @@
   background: $gray-900;
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
-  opacity: 0;
+  visibility: hidden;
   transform: translate3d(25%, 0, 0);
   transition:
     transform $mobile-nav-transition,
-    opacity 0s linear $mobile-nav-transition-duration;
+    visibility 0s linear $mobile-nav-transition-duration;
 
   .nav-opened & {
-    opacity: 1;
+    visibility: visible;
     transform: translate3d(0, 0, 0);
     transition: transform $mobile-nav-transition;
   }

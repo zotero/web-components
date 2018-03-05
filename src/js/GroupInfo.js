@@ -251,10 +251,6 @@ class GroupInfo extends React.Component{
 		}
 
 		let groupDescription = null;
-		if(group.data.description){
-			groupDescription = <div dangerouslySetInnerHTML={{__html:group.data.description}}></div>;
-		}
-
 		let groupUrl = null;
 		if(group.data.url){
 			let url = striptags(group.data.url);

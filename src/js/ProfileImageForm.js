@@ -76,6 +76,13 @@ class ProfileImageForm extends React.Component{
 	updateImage() {
 		const {updateUrl} = this.state;
 		let imageFile = this.refs.imageFileInput.files[0];
+		if(imageFile.size > 524288) {
+			this.setState({
+				changeSuccessful:false,
+				formError:'Image too large. Must be less than 512KB'
+			});
+			return;
+		}
 
 		postFormData(updateUrl, {'profile_image': imageFile}, {withSession:true}).then((response)=>{
 			response.json().then((data)=>{

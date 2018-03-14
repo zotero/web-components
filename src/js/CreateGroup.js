@@ -83,27 +83,30 @@ class CreateGroup extends React.Component{
 						</div>
 					</div>
 					<div className="row">
-						<div className="form-group">
-							<legend>Group Type</legend>
-							<div id="public-open" className="group-select">
-								<h2>Public, Open Membership</h2>
-								<p>Anyone can view your group online and join the group instantly.</p>
+						<div className="card">
+							<div id="public-open" className="card-body">
+								<h4 className='card-title'>Public, Open Membership</h4>
+								<p className='muted small'>Anyone can view your group online and join the group instantly.</p>
 								<label htmlFor="group_type-PublicOpen">
 									<input type="radio" name="group_type" id="group_type-PublicOpen" onChange={this.changeType} value="PublicOpen" checked={this.state.type=='PublicOpen'} />
 									Choose a Public, Open Membership
 								</label>
 							</div>
-							<div id="public-closed" className="group-select">
-								<h2>Public, Closed Membership</h2>
-								<p>Anyone can view your group online, but members must apply or be invited.</p>
+						</div>
+						<div className="card">
+							<div id="public-closed" className="card-body">
+								<h4 className='card-title'>Public, Closed Membership</h4>
+								<p className='muted small'>Anyone can view your group online, but members must apply or be invited.</p>
 								<label htmlFor="group_type-PublicClosed">
 									<input type="radio" name="group_type" id="group_type-PublicClosed" onChange={this.changeType} value="PublicClosed" checked={this.state.type=='PublicClosed'} />
 									Choose Public, Closed Membership
 								</label>
 							</div>
-							<div id="private" className="group-select">
-								<h2>Private Membership</h2>
-								<p>Only members can view your group online and must be invited to join.</p>
+						</div>
+						<div className="card">
+							<div id="private" className="card-body">
+								<h4 className='card-title'>Private Membership</h4>
+								<p className='muted small'>Only members can view your group online and must be invited to join.</p>
 								<label htmlFor="group_type-Private">
 									<input type="radio" name="group_type" id="group_type-Private" onChange={this.changeType} value="Private" checked={this.state.type=='Private'} />
 									Choose Private Membership

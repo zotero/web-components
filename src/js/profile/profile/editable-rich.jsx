@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 
 import EditableBase from '../abstract/editable-base.jsx';
 import profileEventSystem from '../profile-event-system.js';
+import {PencilIcon, TrashIcon, CheckIcon, XIcon} from '../../Icons.js';
 
 export default class EditableRich extends EditableBase {
 	constructor(props) {
@@ -43,13 +44,13 @@ export default class EditableRich extends EditableBase {
 				processing: false,
 				editing: false,
 				value: response.data[this.props.field]
-			});			
+			});
 		});
 
 		promise.fail(error => {
 			profileEventSystem.trigger('alert', {
 				level: 'danger',
-				message: error.responseJSON ? error.responseJSON.message : 'Failed to update items'
+				message: error.responseJSON ? error.responseJSON.message : 'Failed to update items editableRich'
 			});
 			this.setState({
 				processing: false,
@@ -98,10 +99,10 @@ export default class EditableRich extends EditableBase {
 				<textarea ref={ c => this.input = c } defaultValue={ this.state.value } />
 				<div className="profile-timeline-form-actions">
 					<a className="profile-editable-action" onClick={ ev => this.saveHandler(ev) }>
-						<span className="glyphicon glyphicon-ok"></span>
+						<CheckIcon />
 					</a>
 					<a className="profile-editable-action" onClick={ ev => this.cancelHandler(ev) }>
-						<span className="glyphicon glyphicon-remove"></span>
+						<XIcon />
 					</a>
 				</div>
 			</form>;
@@ -109,7 +110,7 @@ export default class EditableRich extends EditableBase {
 			return <div className={ cssClasses }>
 				<h2>{ this.props.title }</h2>
 				<a className="profile-editable-action" onClick={ () => this.edit() }>
-					<span className="glyphicon glyphicon-pencil"></span>
+					<PencilIcon />
 				</a>
 				<span dangerouslySetInnerHTML={ this.getMarkup() }></span>
 			</div>;

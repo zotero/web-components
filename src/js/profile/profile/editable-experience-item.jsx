@@ -1,10 +1,11 @@
- 'use strict';
- 
- import React from 'react';
+'use strict';
 
- import EditableTimelineItem from '../abstract/editable-timeline-item.jsx';
+import React from 'react';
 
- export default class EditableExperienceItem extends EditableTimelineItem {
+import EditableTimelineItem from '../abstract/editable-timeline-item.jsx';
+import {PencilIcon, TrashIcon, CheckIcon, XIcon} from '../../Icons.js';
+
+export default class EditableExperienceItem extends EditableTimelineItem {
 	render() {
 		if(this.state.editing) {
 			return <form className="profile-timeline-form-wrapper form-inline" onSubmit={ () => this.save() }>
@@ -48,13 +49,13 @@
 				</div>
 				<div className="profile-timeline-form-actions">
 					<a className="profile-editable-action" onClick={() => this.save() }>
-						<span className="glyphicon glyphicon-ok"></span>
+						<CheckIcon />
 					</a>
 					<a className="profile-editable-action" onClick={() => this.remove() }>
-						<span className="glyphicon glyphicon-trash"></span>
+						<TrashIcon />
 					</a>
 					<a className="profile-editable-action" onClick={() => this.cancel() }>
-						<span className="glyphicon glyphicon-remove"></span>
+						<XIcon />
 					</a>
 				</div>
 			</form>;
@@ -75,7 +76,7 @@
 				</div>
 				<div>
 					<a className="profile-editable-action" onClick={() => this.edit() }>
-						<span className="glyphicon glyphicon-pencil"></span>
+						<PencilIcon />
 					</a>
 				</div>
 			</div>;

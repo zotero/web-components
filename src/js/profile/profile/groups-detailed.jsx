@@ -27,7 +27,7 @@ export default class GroupsDetailed extends GroupsBase {
 			}).catch(error => {
 				profileEventSystem.trigger('alert', {
 					level: 'danger',
-					message: error.responseJSON ? error.responseJSON.message : 'Failed to update items'
+					message: error.responseJSON ? error.responseJSON.message : 'Failed to update items groupsDetailed'
 				});
 			});
 	}

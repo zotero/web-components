@@ -15,15 +15,18 @@ export default class GroupsBase extends React.Component {
 			let url = apiRequestString({
 				'target':'userGroups',
 				'libraryType':'user',
-				'libraryID': this.props.userid,
+				'libraryID': userid,
 				'order':'title',
 				'limit':25,
 				'start':0
 			});
 			cache[userid] = ajax({url: url, credentials:'omit'}).then((resp)=>{
 				let totalResults = parseInt(resp.headers.get('Total-Results'));
-				resp.json().then((data) => {
-					return data;
+				return resp.json().then((data) => {
+					return {
+						fetchedGroups:data,
+						totalResults:totalResults
+					};
 				});
 			});
 		}

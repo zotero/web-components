@@ -4,6 +4,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import EditableField from './editable-field.jsx';
+import {TrashIcon} from '../../Icons.js';
 
 export default class EditableSocialItem extends EditableField {
 	constructor(props) {
@@ -45,7 +46,7 @@ export default class EditableSocialItem extends EditableField {
 				<input className="form-control" ref={ ref => this.valueInput = ref } defaultValue={ this.props.value.value } onChange={ ev => this.saveHandler(ev) } placeholder={'User name on ' + this.props.value.name} />
 				<div className="profile-editable-actions">
 					<a className="profile-editable-action" onClick={ () => this.remove() }>
-						<span className="glyphicon glyphicon-trash"></span>
+						<TrashIcon />
 					</a>
 				</div>
 			</form>;

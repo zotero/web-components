@@ -4,6 +4,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import EditableField from './editable-field.jsx';
+import {PencilIcon, TrashIcon, CheckIcon, XIcon} from '../../Icons.js';
 
 export default class EditableInterestItem extends EditableField {
 	constructor(props) {
@@ -44,21 +45,21 @@ export default class EditableInterestItem extends EditableField {
 					onBlur={ ev => this.blurHandler(ev) } />
 				<div className="profile-editable-actions">
 					<a className="profile-editable-action" onClick={ ev => this.saveHandler(ev) }>
-						<span className="glyphicon glyphicon-ok"></span>
+						<CheckIcon />
 					</a>
 					<a className="profile-editable-action" onClick={ () => this.remove() }>
-						<span className="glyphicon glyphicon-trash"></span>
+						<TrashIcon />
 					</a>
 					<a className="profile-editable-action" onClick={ ev => this.cancelHandler(ev) }>
-						<span className="glyphicon glyphicon-remove"></span>
+						<XIcon />
 					</a>
 				</div>
 			</form>;
 		} else {
-			return <div className="profile-editable-interest profile-editable-{this.state.value ? 'value' : 'emptytext'}">
+			return <div className={`profile-editable-interest profile-editable-${this.state.value ? 'value' : 'emptytext'}`}>
 				<span>{this.state.interest || this.props.emptytext}</span>
 				<a className="profile-editable-action" onClick={ () => this.edit() }>
-					<span className="glyphicon glyphicon-pencil"></span>
+					<PencilIcon />
 				</a>
 			</div>;
 		}	

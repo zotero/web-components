@@ -18,7 +18,7 @@ export default class Groups extends GroupsBase {
 		};
 	}
 
-	componentWillMount() {
+	componentDidMount() {
 		this.fetchUserGroups(this.props.userid)
 			.then(response => {
 				this.setState({
@@ -27,9 +27,10 @@ export default class Groups extends GroupsBase {
 					loading: false
 				});
 			}).catch(error => {
+				console.log(error);
 				profileEventSystem.trigger('alert', {
 					level: 'danger',
-					message: error.responseJSON ? error.responseJSON.message : 'Failed to update items'
+					message: error.responseJSON ? error.responseJSON.message : 'Failed to update items groups'
 				});
 			});
 	}
@@ -58,12 +59,12 @@ export default class Groups extends GroupsBase {
 			{ viewAllButton }
 			<ul>
 				{this.state.groups.map(group => 
-					<li key={ group.get('id') }>
+					<li key={ group.data.id }>
 						<div>
-							{ group.get('name') }
+							{ group.data.name }
 						</div>
 						<div>
-							<a href={ buildUrl('groupView', {group:group.apiObj}) }>Join</a>
+							<a href={ buildUrl('groupView', {group:group}) }>Join</a>
 						</div>
 					</li>)}
 			</ul>

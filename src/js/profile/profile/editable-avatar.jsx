@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 
 import EditableBase from '../abstract/editable-base.jsx';
 import profileEventSystem from '../profile-event-system.js';
+import {PencilIcon, TrashIcon, CheckIcon, XIcon, PlusIcon} from '../../Icons.js';
 
 export default class EditableAvatar extends EditableBase {
 	constructor(props) {
@@ -96,13 +97,13 @@ export default class EditableAvatar extends EditableBase {
 			} else {
 				actions = <div className="profile-editable-actions">
 						<a onClick={ () => this.edit() }>
-							<span className="glyphicon glyphicon-pencil"></span>
+							<PencilIcon />
 						</a>
 						<a className="profile-editable-action" onClick={ () => this.save() }>
-							<span className="glyphicon glyphicon-ok"></span>
+							<CheckIcon />
 						</a>
 						<a className="profile-editable-action" onClick={ () => this.cancel() }>
-							<span className="glyphicon glyphicon-remove"></span>
+							<XIcon />
 						</a>
 					</div>;
 			}
@@ -119,7 +120,7 @@ export default class EditableAvatar extends EditableBase {
 					<img src={this.state.value || this.constructor.FALLBACK_PORTRAIT} />
 					<div className="profile-editable-actions">
 						<a className="profile-editable-action" onClick={ () => this.edit() }>
-							<span className="glyphicon glyphicon-pencil"></span>
+							<PencilIcon />
 						</a>
 					</div>
 				</div>

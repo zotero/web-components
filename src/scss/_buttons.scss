@@ -161,3 +161,57 @@ input[type="button"] {
 .btn-lg {
   font-weight: 300;
 }
+
+//TODO: integrate this properly
+// Common styles
+// --------------------------------------------------
+
+// Scope styles to new pages
+.extensions,
+.downloads,
+.start {
+
+  * {
+    box-sizing: border-box;
+  }
+
+  a {
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+      color: $link-color;
+    }
+  }
+
+  img {
+    vertical-align: middle;
+  }
+
+  .btn {
+    color: $white;
+    background: $link-color;
+
+    &:hover,
+    &:focus {
+      text-decoration: none;
+      color: $white;
+      background: darken($link-color, 5%);
+    }
+  }
+
+  .lead {
+    font-size: 16px;
+    line-height: 1.5;
+    text-align: center;
+    margin: 0 auto;
+
+    @include media-breakpoint-up(sm) {
+      width: 80%;
+    }
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+}

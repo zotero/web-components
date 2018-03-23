@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 
 import EditableBase from '../abstract/editable-base.jsx';
 import profileEventSystem from '../profile-event-system.js';
+import { PencilIcon, XIcon, CheckIcon } from '../../Icons';
 
 export default class EditableField extends EditableBase {
 	constructor(props) {
@@ -104,10 +105,10 @@ export default class EditableField extends EditableBase {
 			} else {
 				actions = <div className="profile-editable-actions">
 					<a className="profile-editable-action" onClick={ev => this.saveHandler(ev) }>
-						<span className="glyphicon glyphicon-ok"></span>
+						<CheckIcon />
 					</a>
 					<a className="profile-editable-action" onClick={ev => this.cancelHandler(ev) }>
-						<span className="glyphicon glyphicon-remove"></span>
+						<XIcon />
 					</a>
 				</div>;
 			}
@@ -124,7 +125,7 @@ export default class EditableField extends EditableBase {
 			return <div className={cssClasses}>
 				<span>{this.state.value || this.props.emptytext}</span>
 				<a className="profile-editable-action" onClick={ () => { this.edit(); }}>
-					<span className="glyphicon glyphicon-pencil"></span>
+					<PencilIcon />
 				</a>
 			</div>;
 		}	

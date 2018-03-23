@@ -24,7 +24,7 @@
 // Mixins
 
 @import "mixins";
-
+@import "profile/respond";
 
 // Partials
 
@@ -39,6 +39,7 @@
 @import "footer";
 @import "settings-nav";
 @import "main";
+@import "profile/social";
 
 // Component Sections
 
@@ -57,3 +58,5 @@
 @import "extensions";
 @import "usergroups";
 @import "institution-checkout";
+@import "profile/profile";
+

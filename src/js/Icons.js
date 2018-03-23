@@ -4,7 +4,7 @@
 //let log = logger.Logger('Icons');
 
 const React = require('react');
-const {Component} = React;
+const {Component, PureComponent} = React;
 
 import classnames from 'classnames';
 
@@ -76,4 +76,45 @@ class PluginsIcon extends Component{
 	}
 }
 
-export {ZoteroIcon, BrowserIcon, BrowserExtensionIcon, PluginsIcon};
+class PencilIcon extends PureComponent {
+	render(){
+		return (
+			<img src={`${imagePath}/icons/octicons/pencil.svg`} />
+		);
+	}
+}
+
+class TrashIcon extends PureComponent {
+	render(){
+		return (
+			<img src={`${imagePath}/icons/octicons/trashcan.svg`} />
+		);
+	}
+}
+
+class CheckIcon extends PureComponent {
+	render(){
+		return (
+			<img src={`${imagePath}/icons/octicons/check.svg`} />
+		);
+	}
+}
+
+class XIcon extends PureComponent {
+	render(){
+		return (
+			<img src={`${imagePath}/icons/octicons/x.svg`} />
+		);
+	}
+}
+
+class PlusIcon extends PureComponent {
+	render(){
+		return (
+			<img src={`${imagePath}/icons/octicons/plus.svg`} />
+		);
+	}
+}
+
+
+export {ZoteroIcon, BrowserIcon, BrowserExtensionIcon, PluginsIcon, PencilIcon, TrashIcon, CheckIcon, XIcon, PlusIcon};

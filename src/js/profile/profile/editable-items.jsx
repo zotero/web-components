@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 
 import EditableBase from '../abstract/editable-base.jsx';
 import profileEventSystem from '../profile-event-system.js';
+import {PencilIcon, TrashIcon, CheckIcon, XIcon, PlusIcon} from '../../Icons.js';
 
 export default class EditableItems extends EditableBase {
 	constructor(props) {
@@ -73,7 +74,7 @@ export default class EditableItems extends EditableBase {
 		promise.fail(error => {
 			profileEventSystem.trigger('alert', {
 				level: 'danger',
-				message: error.responseJSON ? error.responseJSON.message : 'Failed to update items'
+				message: error.responseJSON ? error.responseJSON.message : 'Failed to update items editable'
 			});
 			this.setState({
 				processing: false,
@@ -131,26 +132,26 @@ export default class EditableItems extends EditableBase {
 		if(this.props.uniform && this.state.editing) {
 			edit = <div className="profile-editable-actions profile-social-form-actions">
 				<a className="profile-editable-action" onClick={ () => this.add() }>
-					<span className="glyphicon glyphicon-plus"></span>
+					<PlusIcon />
 				</a>
 				<a className="profile-editable-action" onClick={ () => this.cancel() }>
-					<span className="glyphicon glyphicon-remove"></span>
+					<XIcon />
 				</a>
 				<a className="profile-editable-action" onClick={ () => this.save() } >
-					<span className="glyphicon glyphicon-ok"></span>
+					<CheckIcon />
 				</a>
 			</div>;
 		}
 
 		if(this.props.uniform && !this.state.editing) {
 			edit = <a className="profile-editable-action" onClick={ () => this.edit() }>
-				<span className="glyphicon glyphicon-pencil"></span>
+				<PencilIcon />
 			</a>;
 		}
 
 		if(!this.props.uniform) {
 			add = <a className="profile-editable-action" onClick={ () => this.add() }>
-				<span className="glyphicon glyphicon-plus"></span>
+				<PlusIcon />
 			</a>;
 		}
 

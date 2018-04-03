@@ -52,7 +52,7 @@ class LabCheckout extends Component{
 		return (
 			<div id='lab-checkout'>
 				<p>
-					Zotero Lab is ideal for departments and laboratories. A simple administrative interface lets you add or remove users from your Zotero Lab subscription at any time.
+					Zotero Lab is ideal for departments, laboratories, and small companies. A simple administrative interface lets you add or remove users from your Zotero Lab subscription at any time.
 				</p>
 				<p>
 					Zotero Lab costs $30 per user, with a minimum of 15 users.
@@ -64,6 +64,7 @@ class LabCheckout extends Component{
 				<div className='form-line'>
 					<label>Price</label>
 					{new Intl.NumberFormat('en-US', {style:'currency', currency:'USD'}).format(labPrice(fte)/100)}
+					<span>&nbsp;per year, billed annually</span>
 				</div>
 				{completeAction}
 				<Notifier {...notification} />

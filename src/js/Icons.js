@@ -4,7 +4,7 @@
 //let log = logger.Logger('Icons');
 
 const React = require('react');
-const {Component} = React;
+const {Component, PureComponent} = React;
 
 import classnames from 'classnames';
 
@@ -76,4 +76,17 @@ class PluginsIcon extends Component{
 	}
 }
 
-export {ZoteroIcon, BrowserIcon, BrowserExtensionIcon, PluginsIcon};
+class OrcidIcon extends PureComponent{
+	render(){
+		let orcidImagePath = imagePath + '/icons/ORCiD_icon.svg';
+		return (
+			<img className='orcid-icon' width={this.props.width} height={this.props.height} src={orcidImagePath} />
+		);
+	}
+}
+OrcidIcon.defaultProps = {
+	width:'16px',
+	height:'16px'
+};
+
+export {ZoteroIcon, BrowserIcon, BrowserExtensionIcon, PluginsIcon, OrcidIcon};

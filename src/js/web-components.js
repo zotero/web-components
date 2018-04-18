@@ -39,6 +39,7 @@ import {ManageEmails} from './ManageEmails.js';
 import * as Institutional from './Institutional/Institutional.js';
 import {ProfileImageForm} from './ProfileImageForm.js';
 import {GroupLibrarySettings} from './GroupLibrarySettings.js';
+import {OrcidProfile, OrcidProfileControl} from './components/OrcidProfile.jsx';
 
 let ZoteroWebComponents = {
 	Storage,
@@ -66,6 +67,8 @@ let ZoteroWebComponents = {
 	Institutional,
 	ProfileImageForm,
 	GroupLibrarySettings,
+	OrcidProfile,
+	OrcidProfileControl,
 };
 
 globalScope.ZoteroWebComponents = ZoteroWebComponents;

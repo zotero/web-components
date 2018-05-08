@@ -218,15 +218,23 @@ class DownloadConnector extends Component {
 	}
 	render(){
 		let versionNote = null;
-		if(this.props.featuredBrowser == 'Safari' && this.state.oldSafari){
-			versionNote = (
-				<p className='version-note'>
-					Please note: The link above is for an outdated version of the Safari connector,
-					as the latest version is not compatible with your version of macOS.
-					For the best experience, please upgrade to macOS 10.11 or later and reinstall
-					the Safari connector from this page.
-				</p>
-			);
+		if(this.props.featuredBrowser == 'Safari'){
+			if(this.state.oldSafari){
+				versionNote = (
+					<p className='version-note'>
+						Please note: The link above is for an outdated version of the Safari connector,
+						as the latest version is not compatible with your version of macOS.
+						For the best experience, please upgrade to macOS 10.11 or later and reinstall
+						the Safari connector from this page.
+					</p>
+				);
+			} else {
+				versionNote = (
+					<p className='version-note'>
+						<a href="https://www.zotero.org/support/kb/safari_connector_installation">Need help installing the Connector?</a>
+					</p>
+				);
+			}
 		}
 		let installButton = <InstallButton browser={this.props.featuredBrowser} label={`Install ${this.props.featuredBrowser} Connector`} />;
 		if(this.state.oldFirefox) {

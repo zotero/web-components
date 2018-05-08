@@ -1,0 +1,40 @@
+//
+// Banner
+//
+
+.banner {
+  display: block;
+  background: $white;
+  color: $body-color;
+  font-size: 18px;
+  text-align: center;
+  border-top: 1px solid $gray-200;
+  padding: (20px - 4px) ($grid-gutter-width / 2) (20px - 8px);
+
+  @include media-breakpoint-up(md) {
+    position: absolute;
+    top: 368px;
+    right: 0;
+    padding: (20px - 4px) 20px (20px - 6px);
+    font-size: $font-size-sm;
+    text-align: left;
+    transform: translateY(-50%);
+    box-shadow: 0 0 20px 10px $jumbotron-bg;
+    border-top: none;
+    z-index: 1;
+  }
+
+  &:hover {
+    color: $body-color;
+    text-decoration: none;
+  }
+
+  .logo {
+    font-size: 24px;
+    line-height: 1;
+  }
+
+  strong {
+    color: $secondary;
+  }
+}

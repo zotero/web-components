@@ -230,7 +230,7 @@ class DownloadConnector extends Component {
 				);
 			} else {
 				versionNote = (
-					<p className='version-note'>
+					<p className='installation-help'>
 						<a href="https://www.zotero.org/support/kb/safari_connector_installation">Need help installing the Connector?</a>
 					</p>
 				);

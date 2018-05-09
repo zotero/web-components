@@ -16,7 +16,7 @@
     top: 368px;
     right: 0;
     padding: (20px - 4px) 20px (20px - 6px);
-    font-size: $font-size-sm;
+    font-size: $font-size-base;
     text-align: left;
     transform: translateY(-50%);
     box-shadow: 0 0 20px 10px $jumbotron-bg;
@@ -27,11 +27,26 @@
   &:hover {
     color: $body-color;
     text-decoration: none;
+
+    strong {
+      text-decoration: underline;
+    }
   }
 
   .logo {
-    font-size: 24px;
-    line-height: 1;
+    display: block;
+    width: 94px;
+    height: 20px;
+    background: image-url("zotero-bib-logo.svg");
+    text-indent: -99em;
+    overflow: hidden;
+    margin-bottom: 7px;
+
+    @include media-breakpoint-down(sm) {
+      margin-left: auto;
+      margin-right: auto;
+      margin-bottmo: 6px;
+    }
   }
 
   strong {

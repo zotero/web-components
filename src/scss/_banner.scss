@@ -27,10 +27,6 @@
   &:hover {
     color: $body-color;
     text-decoration: none;
-
-    strong {
-      text-decoration: underline;
-    }
   }
 
   .logo {
@@ -47,9 +43,5 @@
       margin-right: auto;
       margin-bottom: 7px;
     }
-  }
-
-  strong {
-    color: $secondary;
   }
 }

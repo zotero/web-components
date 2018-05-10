@@ -17,7 +17,6 @@ if($_GET['user']){
           <span class="d-md-block">Just need to</span>
           <span class="d-md-block">create a quick</span>
           <span class="d-md-block">bibliography?</span>
-          <span class="d-inline-block d-md-block"><strong>Try ZoteroBib.</strong></span>
         </a>
 				<section class="jumbotron jumbotron-fluid">
 					<div class="container">

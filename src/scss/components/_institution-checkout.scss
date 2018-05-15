@@ -1,0 +1,100 @@
+div.institution-checkout, div.manage-institution {
+	
+	//max-width:800px;
+	padding:10px 20px;
+	text-align: center;
+	font: {
+		family: inherit;
+		size: 14px;
+	}
+	.form-line {
+		display:block;
+		margin-top:8px;
+		padding:4px;
+
+		p {
+			display:block;
+			text-align: center;
+		}
+	}
+	.form-control {
+		display:inline-block;
+		width:60%;
+		margin:auto;
+	}
+	div.button-editable {
+		display:inline-block;
+		width:70%;
+
+		div.button-editable-flex{
+			display:-webkit-flex;
+			display:flex;
+
+			.button-editable-edit,.button-editable-save {
+				flex: 1;
+				min-width:35px;
+			}
+			span.button-editable-value {
+				display:block;
+				flex: 3;
+			}
+			input {
+				flex: 3;
+			}
+		}
+	}
+	label {
+		width:20%;
+		display:inline-block;
+		font-weight: bold;
+		margin-right:8px;
+	}
+
+	.purchase-line {
+		text-align: center;
+	}
+
+	.btn {
+		color: $white;
+		background: $link-color;
+		border-color: $link-color;
+		text-decoration: none;
+		border-radius: 3px;
+		padding: 5px 15px;
+		margin:auto;
+
+		&:hover {
+			background: darken($link-color, 5%);
+		}
+	}
+	.btn.update-list-button{
+		width:90%;
+	}
+
+	.form-field-error {
+		color:#c00;
+	}
+}
+
+div.manage-institution {
+
+	div.flex-container{
+		display:-webkit-flex;
+		display:flex;
+		text-align:left;
+	}
+
+	div.flex-section {
+		margin:5px;
+		-webkit-flex:1 1 45%;
+		flex:1 1 45%;
+		min-width: 200px;
+	}
+
+	textarea.form-control{
+		height:initial;
+		display:block;
+		width:90%;
+		margin-left:0;
+	}
+}

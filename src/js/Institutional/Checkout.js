@@ -144,7 +144,7 @@ class InstitutionCheckout extends Component{
 		return (
 			<div id='institutional-checkout'>
 				<p>
-					Zotero Institution provides unlimited storage for entire universities, libraries, and research institutions. All members of your organization are automatically added to your Zotero Institution subscription, based on their organizational email addresses.
+					Zotero Institution provides unlimited storage for entire universities, research institutions, and corporations. All members of your organization are automatically added to your Zotero Institution subscription, based on their organizational email addresses.
 				</p>
 				<p>
 					Zotero Institution costs $2000 for the first 500 FTE, plus $0.40 per additional FTE.
@@ -157,6 +157,7 @@ class InstitutionCheckout extends Component{
 				<div className='form-line'>
 					<label>Price</label>
 					{new Intl.NumberFormat('en-US', {style:'currency', currency:'USD'}).format(institutionPrice(fte)/100)}
+					<span>&nbsp;per year, billed annually</span>
 				</div>
 				<div className='form-line'>
 					<label>Contact Email:</label>

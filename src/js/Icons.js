@@ -116,5 +116,17 @@ class PlusIcon extends PureComponent {
 	}
 }
 
+class OrcidIcon extends PureComponent{
+	render(){
+		let orcidImagePath = imagePath + '/icons/ORCiD_icon.svg';
+		return (
+			<img className='orcid-icon' width={this.props.width} height={this.props.height} src={orcidImagePath} />
+		);
+	}
+}
+OrcidIcon.defaultProps = {
+	width:'16px',
+	height:'16px'
+};
 
-export {ZoteroIcon, BrowserIcon, BrowserExtensionIcon, PluginsIcon, PencilIcon, TrashIcon, CheckIcon, XIcon, PlusIcon};
+export {ZoteroIcon, BrowserIcon, BrowserExtensionIcon, PluginsIcon, PencilIcon, TrashIcon, CheckIcon, XIcon, PlusIcon, OrcidIcon};

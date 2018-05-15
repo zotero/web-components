@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js"> 
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="keywords" content="Zotero, research, tool, firefox, extension"/>
+		<meta name="description" content="Zotero is a powerful, easy-to-use research tool that
+										  helps you gather, organize, and analyze sources and then
+										  share the results of your research."/>
+
+		<title>Zotero | </title>
+		<link rel="shortcut icon" type="image/ico" href="/favicon.ico" />
+
+		<!-- css -->
+		<link rel="stylesheet" href="../assets/style.css"
+			type="text/css" media="screen" charset="utf-8"/>
+		<link rel="stylesheet" href="../assets/zotero_icons_sprite.css"
+			type="text/css" media="screen" charset="utf-8"/>
+		<link rel="stylesheet" href="../build/web-components.css" type="text/css" media="screen" charset="utf-8"/>
+		<!-- set jsConfig on window.zoteroConfig -->
+		<script type="text/javascript" charset="utf-8">
+			window.zoteroConfig = {"librarySettings":{"allowEdit":1,"allowUpload":1,"libraryPathString":""},"baseApiUrl":"https://apidev.zotero.org","baseWebsiteUrl":"https://zotero.live","baseFeedUrl":"https://apidev.zotero.org","baseZoteroWebsiteUrl":"https://zotero.live","baseDownloadUrl":"/web-library/examples/library/download.php","debugLogEndpoint":"https://test.zotero.net/user/submitdebug","proxyDownloads":false,"staticPath":"/static","proxyPath":"","ignoreLoggedInStatus":false,"storePrefsRemote":false,"proxy":false,"sessionAuth":false,"sessionCookieName":"zotero_www_session_v2","breadcrumbsBase":[{"label":"username","path":"/"}],"apiKey":"","apiVersion":3,"useIndexedDB":true,"preferUrlItem":false,"CORSallowed":true,"locale":"en-US","cacheStoreType":"localStorage","preloadCachedLibrary":true,"rte":"ckeditor","sortOrdering":{"dateAdded":"desc","dateModified":"desc","date":"desc","year":"desc","accessDate":"desc","title":"asc","creator":"asc"},"defaultSortColumn":"title","defaultSortOrder":"asc","largeFields":{"title":1,"abstractNote":1,"extra":1},"richTextFields":{"note":1},"maxFieldSummaryLength":{"title":60},"exportFormats":["bibtex","bookmarks","mods","refer","rdf_bibliontology","rdf_dc","rdf_zotero","ris","wikipedia"],"exportFormatsMap":{"bibtex":"BibTeX","bookmarks":"Bookmarks","mods":"MODS","refer":"Refer/BibIX","rdf_bibliontology":"Bibliontology RDF","rdf_dc":"Unqualified Dublin Core RDF","rdf_zotero":"Zotero RDF","ris":"RIS","wikipedia":"Wikipedia Citation Templates"},"defaultApiArgs":{"order":"title","sort":"asc","limit":50,"start":0,"content":"json","format":"json"},"defaultPrefs":{"server_javascript_enabled":true,"debug_level":3},"recaptchaSitekey":"6LfrWxMUAAAAADBGrtBnRzMB6FdUf4cXzZV5pH6W","imagePath":"../assets/images","installData":{"firefoxHash":"sha1:4d4c464d351a5c05d19746d271713670fe8939a8","firefoxDownload":"https://download.zotero.org/extension/zotero-4.0.29.11.xpi","safariDownloadUrl":"https://download.zotero.org/connector/safari/Zotero_Connector-4.0.28-1.safariextz","operaDownloadUrl":"","macDownloadUrl":"https://download.zotero.org/standalone/4.0.29.15/Zotero-4.0.29.15.dmg","windowsDownloadUrl":"https://download.zotero.org/standalone/4.0.29.17/Zotero-4.0.29.17_setup.exe","linux32DownloadUrl":"https://download.zotero.org/standalone/4.0.29.10/Zotero-4.0.29.10_linux-i686.tar.bz2","linux64DownloadUrl":"https://download.zotero.org/standalone/4.0.29.10/Zotero-4.0.29.10_linux-x86_64.tar.bz2"}};
+		</script>
+		<script type="text/javascript" charset="utf-8" src="../build/web-components.js"></script>
+	</head>
+	<body >
+		<!-- Header -->
+		<header role="banner" class="container">
+			<div class="center container">
+				<h1 id="logohead">
+					<a href="/"><img src="../assets/images/theme/zotero.png" alt="Zotero"></a>
+				</h1>
+
+			<div id="login-links">
+					<a href="https://www.zotero.org/user/login/" title="Log In">Log In</a>
+					<a href="https://www.zotero.org/user/register/" title="Register">Register</a>
+			</div>
+
+			<a href="/settings/storage?ref=usb" class="button" id="purchase-storage-link"><img src="../assets/images/theme/archive.png" /> Upgrade Storage</a>
+
+			<div id="navbar" class="container">
+				<nav id="sitenav">
+					<ul>
+					<li class='selected'><a href="/">Home</a></li>
+					<li ><a href="https://zotero.live/fcheslack/items">My Library</a></li>
+					<li ><a href="/groups/">Groups</a></li>
+					<li ><a href="/people/">People</a></li>
+					<li ><a href="/support/">Documentation</a></li>
+					<li ><a href="https://forums.zotero.live">Forums</a></li>
+					<li ><a href="/getinvolved/">Get Involved</a></li>
+					</ul>
+				</nav>
+					<form action="//zotero.live/search/" class="zform zsearch" id="simple-search">
+					<div>
+						<input type="text" name="q" size="20" id="header-search-query"/>
+						<button class="button clear-field-button" type="reset"><span class="ui-icon ui-icon-circle-close">&nbsp;</span></button>
+						<input class="button" type="submit" value="Search">
+					</div>
+				</form>
+			</div>
+		</div>
+		</header>
+		<div id="content">
+			<div class="center container">
+			<!-- Output the breadcrumb if it's set -->
+			<div id="breadcrumbs">
+				<a href="/">Home</a> &gt; Downloads
+			</div>
+			<!-- Output any stored messages -->
+
+			<!-- hidden area for possible JS messages -->
+			<div id="js-message">
+				<ul id="js-message-list">
+				</ul>
+			</div>
+			
+			<!-- Output content -->
+			<div id='react-orcidprofile' class=''></div>
+
+			<script type="text/javascript" charset="utf-8">
+				let testStates = {
+					"sean":
+				{orcid: "0000-0002-7851-5069", profile:{"orcid-identifier":{"uri":"http:\/\/orcid.org\/0000-0002-7851-5069","path":"0000-0002-7851-5069","host":"orcid.org"},"preferences":{"locale":"EN"},"history":{"creation-method":"WEBSITE","completion-date":{"value":1362090372003},"submission-date":{"value":1362090359105},"last-modified-date":{"value":1517873264543},"claimed":true,"source":null,"deactivation-date":null,"verified-email":true,"verified-primary-email":true},"person":{"last-modified-date":{"value":1517873256636},"name":{"created-date":{"value":1460761521586},"last-modified-date":{"value":1460761521586},"given-names":{"value":"Sean"},"family-name":{"value":"Takats"},"credit-name":{"value":""},"source":null,"visibility":"PUBLIC","path":"0000-0002-7851-5069"},"other-names":{"last-modified-date":null,"other-name":[],"path":"\/0000-0002-7851-5069\/other-names"},"biography":{"created-date":{"value":1460761521588},"last-modified-date":{"value":1460761521588},"content":"","visibility":"PUBLIC","path":"\/0000-0002-7851-5069\/biography"},"researcher-urls":{"last-modified-date":null,"researcher-url":[],"path":"\/0000-0002-7851-5069\/researcher-urls"},"emails":{"last-modified-date":null,"email":[],"path":"\/0000-0002-7851-5069\/email"},"addresses":{"last-modified-date":null,"address":[],"path":"\/0000-0002-7851-5069\/address"},"keywords":{"last-modified-date":{"value":1362090977855},"keyword":[{"created-date":{"value":1362090977855},"last-modified-date":{"value":1362090977855},"source":{"source-orcid":{"uri":"http:\/\/orcid.org\/0000-0002-7851-5069","path":"0000-0002-7851-5069","host":"orcid.org"},"source-client-id":null,"source-name":{"value":"Sean Takats"}},"content":"history, digital humanities","visibility":"PUBLIC","path":"\/0000-0002-7851-5069\/keywords\/9928","put-code":9928,"display-index":0}],"path":"\/0000-0002-7851-5069\/keywords"},"external-identifiers":{"last-modified-date":{"value":1517873256636},"external-identifier":[{"created-date":{"value":1362090977855},"last-modified-date":{"value":1517873256636},"source":{"source-orcid":null,"source-client-id":{"uri":"http:\/\/orcid.org\/client\/0000-0002-5982-8983","path":"0000-0002-5982-8983","host":"orcid.org"},"source-name":{"value":"Scopus - Elsevier"}},"external-id-type":"Scopus Author ID","external-id-value":"40061123600","external-id-url":{"value":"http:\/\/www.scopus.com\/inward\/authorDetails.url?authorID=40061123600&partnerID=MN8TOARS"},"external-id-relationship":"SELF","visibility":"PUBLIC","path":"\/0000-0002-7851-5069\/external-identifiers\/147082","put-code":147082,"display-index":0}],"path":"\/0000-0002-7851-5069\/external-identifiers"},"path":"\/0000-0002-7851-5069\/person"},"activities-summary":{"last-modified-date":{"value":1444938939997},"educations":{"last-modified-date":{"value":1443057245401},"education-summary":[{"created-date":{"value":1387395199256},"last-modified-date":{"value":1443057243939},"source":{"source-orcid":{"uri":"http:\/\/orcid.org\/0000-0002-7851-5069","path":"0000-0002-7851-5069","host":"orcid.org"},"source-client-id":null,"source-name":{"value":"Sean Takats"}},"department-name":"History","role-title":"Ph.D.","start-date":{"year":{"value":"1999"},"month":null,"day":null},"end-date":{"year":{"value":"2005"},"month":null,"day":null},"organization":{"name":"University of Michigan","address":{"city":"Ann Arbor","region":"MI","country":"US"},"disambiguated-organization":{"disambiguated-organization-identifier":"1259","disambiguation-source":"RINGGOLD"}},"visibility":"PUBLIC","put-code":38407,"path":"\/0000-0002-7851-5069\/education\/38407"},{"created-date":{"value":1387395222163},"last-modified-date":{"value":1443057245401},"source":{"source-orcid":{"uri":"http:\/\/orcid.org\/0000-0002-7851-5069","path":"0000-0002-7851-5069","host":"orcid.org"},"source-client-id":null,"source-name":{"value":"Sean Takats"}},"department-name":"Economics, History","role-title":"B.A.","start-date":{"year":{"value":"1992"},"month":null,"day":null},"end-date":{"year":{"value":"1996"},"month":null,"day":null},"organization":{"name":"Yale University","address":{"city":"New Haven","region":"CT","country":"US"},"disambiguated-organization":{"disambiguated-organization-identifier":"5755","disambiguation-source":"RINGGOLD"}},"visibility":"PUBLIC","put-code":38409,"path":"\/0000-0002-7851-5069\/education\/38409"}],"path":"\/0000-0002-7851-5069\/educations"},"employments":{"last-modified-date":{"value":1443057389727},"employment-summary":[{"created-date":{"value":1387395262836},"last-modified-date":{"value":1443057248485},"source":{"source-orcid":{"uri":"http:\/\/orcid.org\/0000-0002-7851-5069","path":"0000-0002-7851-5069","host":"orcid.org"},"source-client-id":null,"source-name":{"value":"Sean Takats"}},"department-name":"History and Art History","role-title":"Associate Professor","start-date":{"year":{"value":"2007"},"month":null,"day":null},"end-date":null,"organization":{"name":"George Mason University","address":{"city":"Fairfax","region":"VA","country":"US"},"disambiguated-organization":{"disambiguated-organization-identifier":"3298","disambiguation-source":"RINGGOLD"}},"visibility":"PUBLIC","put-code":38410,"path":"\/0000-0002-7851-5069\/employment\/38410"},{"created-date":{"value":1387395303906},"last-modified-date":{"value":1443057389727},"source":{"source-orcid":{"uri":"http:\/\/orcid.org\/0000-0002-7851-5069","path":"0000-0002-7851-5069","host":"orcid.org"},"source-client-id":null,"source-name":{"value":"Sean Takats"}},"department-name":"Roy Rosenzweig Center for History and New Media","role-title":"Director of Research Division","start-date":{"year":{"value":"2006"},"month":null,"day":null},"end-date":null,"organization":{"name":"George Mason University","address":{"city":"Fairfax","region":"VA","country":"US"},"disambiguated-organization":{"disambiguated-organization-identifier":"3298","disambiguation-source":"RINGGOLD"}},"visibility":"PUBLIC","put-code":38411,"path":"\/0000-0002-7851-5069\/employment\/38411"}],"path":"\/0000-0002-7851-5069\/employments"},"fundings":{"last-modified-date":{"value":1444938939997},"group":[{"last-modified-date":{"value":1444938939997},"external-ids":{"external-id":[]},"funding-summary":[{"created-date":{"value":1444938921064},"last-modified-date":{"value":1444938939997},"source":{"source-orcid":{"uri":"http:\/\/orcid.org\/0000-0002-7851-5069","path":"0000-0002-7851-5069","host":"orcid.org"},"source-client-id":null,"source-name":{"value":"Sean Takats"}},"title":{"title":{"value":"PressForward 3: Establishing Sustainable Platforms and Communities of Open-Access Scholarship"},"translated-title":null},"external-ids":null,"type":"GRANT","start-date":{"year":{"value":"2015"},"month":{"value":"11"},"day":null},"end-date":{"year":{"value":"2018"},"month":{"value":"10"},"day":null},"organization":{"name":"Alfred P. Sloan Foundation","address":{"city":"NY","region":"NY","country":"US"},"disambiguated-organization":{"disambiguated-organization-identifier":"http:\/\/dx.doi.org\/10.13039\/100000879","disambiguation-source":"FUNDREF"}},"visibility":"PUBLIC","put-code":118564,"path":"\/0000-0002-7851-5069\/funding\/118564","display-index":"7"}]},{"last-modified-date":{"value":1443057658767},"external-ids":{"external-id":[]},"funding-summary":[{"created-date":{"value":1443057167255},"last-modified-date":{"value":1443057658767},"source":{"source-orcid":{"uri":"http:\/\/orcid.org\/0000-0002-7851-5069","path":"0000-0002-7851-5069","host":"orcid.org"},"source-client-id":null,"source-name":{"value":"Sean Takats"}},"title":{"title":{"value":"Scholarship in the Age of Abundance: Enhancing Historical Research With Text-Mining and Analysis Tools"},"translated-title":null},"external-ids":null,"type":"GRANT","start-date":{"year":{"value":"2008"},"month":null,"day":null},"end-date":{"year":{"value":"2010"},"month":null,"day":null},"organization":{"name":"National Endowment for the Humanities","address":{"city":"DC","region":"DC","country":"US"},"disambiguated-organization":{"disambiguated-organization-identifier":"http:\/\/dx.doi.org\/10.13039\/100000103","disambiguation-source":"FUNDREF"}},"visibility":"PUBLIC","put-code":112991,"path":"\/0000-0002-7851-5069\/funding\/112991","display-index":"6"}]},{"last-modified-date":{"value":1443057112561},"external-ids":{"external-id":[]},"funding-summary":[{"created-date":{"value":1443057081555},"last-modified-date":{"value":1443057112561},"source":{"source-orcid":{"uri":"http:\/\/orcid.org\/0000-0002-7851-5069","path":"0000-0002-7851-5069","host":"orcid.org"},"source-client-id":null,"source-name":{"value":"Sean Takats"}},"title":{"title":{"value":"Building the Games Students Want to Play"},"translated-title":null},"external-ids":null,"type":"GRANT","start-date":{"year":{"value":"2008"},"month":null,"day":null},"end-date":{"year":{"value":"2010"},"month":null,"day":null},"organization":{"name":"Institute of Museum and Library Services","address":{"city":"DC","region":"DC","country":"US"},"disambiguated-organization":{"disambiguated-organization-identifier":"http:\/\/dx.doi.org\/10.13039\/100000208","disambiguation-source":"FUNDREF"}},"visibility":"PUBLIC","put-code":112990,"path":"\/0000-0002-7851-5069\/funding\/112990","display-index":"5"}]},{"last-modified-date":{"value":1443057658767},"external-ids":{"external-id":[]},"funding-summary":[{"created-date":{"value":1443057024866},"last-modified-date":{"value":1443057658767},"source":{"source-orcid":{"uri":"http:\/\/orcid.org\/0000-0002-7851-5069","path":"0000-0002-7851-5069","host":"orcid.org"},"source-client-id":null,"source-name":{"value":"Sean Takats"}},"title":{"title":{"value":"Zotero Everywhere"},"translated-title":null},"external-ids":null,"type":"GRANT","start-date":{"year":{"value":"2010"},"month":null,"day":null},"end-date":{"year":{"value":"2013"},"month":null,"day":null},"organization":{"name":"Andrew W. Mellon Foundation","address":{"city":"NY","region":"NY","country":"US"},"disambiguated-organization":{"disambiguated-organization-identifier":"http:\/\/dx.doi.org\/10.13039\/100000873","disambiguation-source":"FUNDREF"}},"visibility":"PUBLIC","put-code":112989,"path":"\/0000-0002-7851-5069\/funding\/112989","display-index":"4"}]},{"last-modified-date":{"value":1443056981767},"external-ids":{"external-id":[]},"funding-summary":[{"created-date":{"value":1443056981767},"last-modified-date":{"value":1443056981767},"source":{"source-orcid":{"uri":"http:\/\/orcid.org\/0000-0002-7851-5069","path":"0000-0002-7851-5069","host":"orcid.org"},"source-client-id":null,"source-name":{"value":"Sean Takats"}},"title":{"title":{"value":"The PressForward Initiative: Creating New Modes and New Platforms for Scholarship Beyond Traditional Forms"},"translated-title":null},"external-ids":null,"type":"GRANT","start-date":{"year":{"value":"2013"},"month":null,"day":null},"end-date":{"year":{"value":"2014"},"month":null,"day":null},"organization":{"name":"Alfred P. Sloan Foundation","address":{"city":"NY","region":"NY","country":"US"},"disambiguated-organization":{"disambiguated-organization-identifier":"http:\/\/dx.doi.org\/10.13039\/100000879","disambiguation-source":"FUNDREF"}},"visibility":"PUBLIC","put-code":112988,"path":"\/0000-0002-7851-5069\/funding\/112988","display-index":"3"}]},{"last-modified-date":{"value":1443056910645},"external-ids":{"external-id":[]},"funding-summary":[{"created-date":{"value":1443056910645},"last-modified-date":{"value":1443056910645},"source":{"source-orcid":{"uri":"http:\/\/orcid.org\/0000-0002-7851-5069","path":"0000-0002-7851-5069","host":"orcid.org"},"source-client-id":null,"source-name":{"value":"Sean Takats"}},"title":{"title":{"value":"Discovery and Archiving with Zotero and Library Resources"},"translated-title":null},"external-ids":null,"type":"GRANT","start-date":{"year":{"value":"2014"},"month":{"value":"04"},"day":null},"end-date":{"year":{"value":"2016"},"month":{"value":"03"},"day":null},"organization":{"name":"Andrew W. Mellon Foundation","address":{"city":"NY","region":"NY","country":"US"},"disambiguated-organization":{"disambiguated-organization-identifier":"http:\/\/dx.doi.org\/10.13039\/100000873","disambiguation-source":"FUNDREF"}},"visibility":"PUBLIC","put-code":112987,"path":"\/0000-0002-7851-5069\/funding\/112987","display-index":"2"}]},{"last-modified-date":{"value":1443056848733},"external-ids":{"external-id":[]},"funding-summary":[{"created-date":{"value":1443056848733},"last-modified-date":{"value":1443056848733},"source":{"source-orcid":{"uri":"http:\/\/orcid.org\/0000-0002-7851-5069","path":"0000-0002-7851-5069","host":"orcid.org"},"source-client-id":null,"source-name":{"value":"Sean Takats"}},"title":{"title":{"value":"PressForward 2: Implementing New Modes and New Platforms of Open-Access Scholarship"},"translated-title":null},"external-ids":null,"type":"GRANT","start-date":{"year":{"value":"2014"},"month":{"value":"11"},"day":null},"end-date":{"year":{"value":"2015"},"month":{"value":"12"},"day":null},"organization":{"name":"Alfred P. Sloan Foundation","address":{"city":"NY","region":"NY","country":"US"},"disambiguated-organization":{"disambiguated-organization-identifier":"http:\/\/dx.doi.org\/10.13039\/100000879","disambiguation-source":"FUNDREF"}},"visibility":"PUBLIC","put-code":112986,"path":"\/0000-0002-7851-5069\/funding\/112986","display-index":"1"}]},{"last-modified-date":{"value":1443057045919},"external-ids":{"external-id":[]},"funding-summary":[{"created-date":{"value":1443056726724},"last-modified-date":{"value":1443057045919},"source":{"source-orcid":{"uri":"http:\/\/orcid.org\/0000-0002-7851-5069","path":"0000-0002-7851-5069","host":"orcid.org"},"source-client-id":null,"source-name":{"value":"Sean Takats"}},"title":{"title":{"value":"Tropy: Digital Image Management for the Humanities Research Community"},"translated-title":null},"external-ids":null,"type":"GRANT","start-date":{"year":{"value":"2015"},"month":{"value":"10"},"day":null},"end-date":{"year":{"value":"2017"},"month":{"value":"09"},"day":null},"organization":{"name":"Andrew W. Mellon Foundation","address":{"city":"NY","region":"NY","country":"US"},"disambiguated-organization":{"disambiguated-organization-identifier":"http:\/\/dx.doi.org\/10.13039\/100000873","disambiguation-source":"FUNDREF"}},"visibility":"PUBLIC","put-code":112985,"path":"\/0000-0002-7851-5069\/funding\/112985","display-index":"0"}]}],"path":"\/0000-0002-7851-5069\/fundings"},"peer-reviews":{"last-modified-date":null,"group":[],"path":"\/0000-0002-7851-5069\/peer-reviews"},"works":{"last-modified-date":{"value":1443057658767},"group":[{"last-modified-date":{"value":1443057658767},"external-ids":{"external-id":[{"external-id-type":"other-id","external-id-value":"11E6F8ACFAE5FA3285257B62001B7C01","external-id-url":null,"external-id-relationship":"SELF"}]},"work-summary":[{"put-code":18676666,"created-date":{"value":1443057462566},"last-modified-date":{"value":1443057658767},"source":{"source-orcid":null,"source-client-id":{"uri":"http:\/\/orcid.org\/client\/APP-C2RLHVNFEFIHAT4Q","path":"APP-C2RLHVNFEFIHAT4Q","host":"orcid.org"},"source-name":{"value":"MLA International Bibliography"}},"title":{"title":{"value":"A Perfect Body of Knowledge: Taste and Digestion in Eighteenth-Century France"},"subtitle":null,"translated-title":null},"external-ids":{"external-id":[{"external-id-type":"other-id","external-id-value":"11E6F8ACFAE5FA3285257B62001B7C01","external-id-url":null,"external-id-relationship":"SELF"}]},"type":"BOOK","publication-date":{"year":{"value":"2012"},"month":null,"day":null,"media-type":null},"visibility":"PUBLIC","path":"\/0000-0002-7851-5069\/work\/18676666","display-index":"0"}]},{"last-modified-date":{"value":1443057658767},"external-ids":{"external-id":[{"external-id-type":"isbn","external-id-value":"1421402831","external-id-url":null,"external-id-relationship":"SELF"}]},"work-summary":[{"put-code":11313722,"created-date":{"value":1387395659873},"last-modified-date":{"value":1443057658767},"source":{"source-orcid":{"uri":"http:\/\/orcid.org\/0000-0002-7851-5069","path":"0000-0002-7851-5069","host":"orcid.org"},"source-client-id":null,"source-name":{"value":"Sean Takats"}},"title":{"title":{"value":"The Expert Cook in Enlightenment France"},"subtitle":null,"translated-title":null},"external-ids":{"external-id":[{"external-id-type":"isbn","external-id-value":"1421402831","external-id-url":null,"external-id-relationship":"SELF"}]},"type":"BOOK","publication-date":{"year":{"value":"2011"},"month":{"value":"11"},"day":null,"media-type":null},"visibility":"PUBLIC","path":"\/0000-0002-7851-5069\/work\/11313722","display-index":"0"}]},{"last-modified-date":{"value":1443057658767},"external-ids":{"external-id":[]},"work-summary":[{"put-code":4767014,"created-date":{"value":1362090977844},"last-modified-date":{"value":1443057658767},"source":{"source-orcid":null,"source-client-id":{"uri":"http:\/\/orcid.org\/client\/0000-0002-5982-8983","path":"0000-0002-5982-8983","host":"orcid.org"},"source-name":{"value":"Scopus - Elsevier"}},"title":{"title":{"value":"Science without scientists: Modern cooking in the eighteenth century"},"subtitle":null,"translated-title":null},"external-ids":null,"type":"JOURNAL_ARTICLE","publication-date":{"year":{"value":"2005"},"month":null,"day":null,"media-type":null},"visibility":"PUBLIC","path":"\/0000-0002-7851-5069\/work\/4767014","display-index":"0"}]}],"path":"\/0000-0002-7851-5069\/works"},"path":"\/0000-0002-7851-5069\/activities"},"path":"\/0000-0002-7851-5069"}},
+
+				"fcheslack": {orcid:"0000-0003-3817-0737", profile:{"orcid-identifier":{"uri":"http:\/\/orcid.org\/0000-0003-3817-0737","path":"0000-0003-3817-0737","host":"orcid.org"},"preferences":{"locale":"EN"},"history":{"creation-method":"DIRECT","completion-date":null,"submission-date":{"value":1415294150717},"last-modified-date":{"value":1523554428924},"claimed":true,"source":null,"deactivation-date":null,"verified-email":true,"verified-primary-email":true},"person":{"last-modified-date":{"value":1523554231474},"name":{"created-date":{"value":1460765203654},"last-modified-date":{"value":1460765203654},"given-names":{"value":"Faolan"},"family-name":{"value":"Cheslack-Postava"},"credit-name":null,"source":null,"visibility":"PUBLIC","path":"0000-0003-3817-0737"},"other-names":{"last-modified-date":{"value":1523554231474},"other-name":[{"created-date":{"value":1523554231474},"last-modified-date":{"value":1523554231474},"source":{"source-orcid":{"uri":"http:\/\/orcid.org\/0000-0003-3817-0737","path":"0000-0003-3817-0737","host":"orcid.org"},"source-client-id":null,"source-name":{"value":"Faolan Cheslack-Postava"}},"content":"Faolan C-P","visibility":"PUBLIC","path":"\/0000-0003-3817-0737\/other-names\/1089424","put-code":1089424,"display-index":1}],"path":"\/0000-0003-3817-0737\/other-names"},"biography":{"created-date":{"value":1460765203656},"last-modified-date":{"value":1460765203656},"content":null,"visibility":"PUBLIC","path":"\/0000-0003-3817-0737\/biography"},"researcher-urls":{"last-modified-date":{"value":1523548472297},"researcher-url":[{"created-date":{"value":1523548472297},"last-modified-date":{"value":1523548472297},"source":{"source-orcid":{"uri":"http:\/\/orcid.org\/0000-0003-3817-0737","path":"0000-0003-3817-0737","host":"orcid.org"},"source-client-id":null,"source-name":{"value":"Faolan Cheslack-Postava"}},"url-name":null,"url":{"value":"http:\/\/faolancp.com"},"visibility":"PUBLIC","path":"\/0000-0003-3817-0737\/researcher-urls\/1408746","put-code":1408746,"display-index":1}],"path":"\/0000-0003-3817-0737\/researcher-urls"},"emails":{"last-modified-date":null,"email":[],"path":"\/0000-0003-3817-0737\/email"},"addresses":{"last-modified-date":{"value":1523548444470},"address":[{"created-date":{"value":1523548444470},"last-modified-date":{"value":1523548444470},"source":{"source-orcid":{"uri":"http:\/\/orcid.org\/0000-0003-3817-0737","path":"0000-0003-3817-0737","host":"orcid.org"},"source-client-id":null,"source-name":{"value":"Faolan Cheslack-Postava"}},"country":{"value":"US"},"visibility":"PUBLIC","path":"\/0000-0003-3817-0737\/address\/945385","put-code":945385,"display-index":1}],"path":"\/0000-0003-3817-0737\/address"},"keywords":{"last-modified-date":{"value":1523548618204},"keyword":[{"created-date":{"value":1416535118076},"last-modified-date":{"value":1523548618204},"source":{"source-orcid":{"uri":"http:\/\/orcid.org\/0000-0003-3817-0737","path":"0000-0003-3817-0737","host":"orcid.org"},"source-client-id":null,"source-name":{"value":"Faolan Cheslack-Postava"}},"content":"Computer Science","visibility":"PUBLIC","path":"\/0000-0003-3817-0737\/keywords\/270764","put-code":270764,"display-index":4},{"created-date":{"value":1523548618201},"last-modified-date":{"value":1523548618201},"source":{"source-orcid":{"uri":"http:\/\/orcid.org\/0000-0003-3817-0737","path":"0000-0003-3817-0737","host":"orcid.org"},"source-client-id":null,"source-name":{"value":"Faolan Cheslack-Postava"}},"content":"Open Source","visibility":"PUBLIC","path":"\/0000-0003-3817-0737\/keywords\/954247","put-code":954247,"display-index":3},{"created-date":{"value":1523548618203},"last-modified-date":{"value":1523548618203},"source":{"source-orcid":{"uri":"http:\/\/orcid.org\/0000-0003-3817-0737","path":"0000-0003-3817-0737","host":"orcid.org"},"source-client-id":null,"source-name":{"value":"Faolan Cheslack-Postava"}},"content":"Zotero","visibility":"PUBLIC","path":"\/0000-0003-3817-0737\/keywords\/954248","put-code":954248,"display-index":2},{"created-date":{"value":1523548618204},"last-modified-date":{"value":1523548618204},"source":{"source-orcid":{"uri":"http:\/\/orcid.org\/0000-0003-3817-0737","path":"0000-0003-3817-0737","host":"orcid.org"},"source-client-id":null,"source-name":{"value":"Faolan Cheslack-Postava"}},"content":"Citations","visibility":"PUBLIC","path":"\/0000-0003-3817-0737\/keywords\/954249","put-code":954249,"display-index":1}],"path":"\/0000-0003-3817-0737\/keywords"},"external-identifiers":{"last-modified-date":null,"external-identifier":[],"path":"\/0000-0003-3817-0737\/external-identifiers"},"path":"\/0000-0003-3817-0737\/person"},"activities-summary":{"last-modified-date":{"value":1523554428920},"educations":{"last-modified-date":{"value":1523554428920},"education-summary":[{"created-date":{"value":1523554428920},"last-modified-date":{"value":1523554428920},"source":{"source-orcid":{"uri":"http:\/\/orcid.org\/0000-0003-3817-0737","path":"0000-0003-3817-0737","host":"orcid.org"},"source-client-id":null,"source-name":{"value":"Faolan Cheslack-Postava"}},"department-name":"Computer Science","role-title":"BSE","start-date":{"year":{"value":"2004"},"month":{"value":"09"},"day":null},"end-date":{"year":{"value":"2008"},"month":{"value":"12"},"day":null},"organization":{"name":"University of Michigan, College of Engineering","address":{"city":"Ann Arbor","region":"MI","country":"US"},"disambiguated-organization":null},"visibility":"PUBLIC","put-code":5676689,"path":"\/0000-0003-3817-0737\/education\/5676689"}],"path":"\/0000-0003-3817-0737\/educations"},"employments":{"last-modified-date":{"value":1523548660387},"employment-summary":[{"created-date":{"value":1523548553255},"last-modified-date":{"value":1523548660387},"source":{"source-orcid":{"uri":"http:\/\/orcid.org\/0000-0003-3817-0737","path":"0000-0003-3817-0737","host":"orcid.org"},"source-client-id":null,"source-name":{"value":"Faolan Cheslack-Postava"}},"department-name":"Center for History and New Media","role-title":"Zotero Developer","start-date":{"year":{"value":"2009"},"month":{"value":"01"},"day":null},"end-date":null,"organization":{"name":"George Mason University","address":{"city":"Fairfax","region":"VA","country":"US"},"disambiguated-organization":null},"visibility":"PUBLIC","put-code":5676104,"path":"\/0000-0003-3817-0737\/employment\/5676104"}],"path":"\/0000-0003-3817-0737\/employments"},"fundings":{"last-modified-date":null,"group":[],"path":"\/0000-0003-3817-0737\/fundings"},"peer-reviews":{"last-modified-date":null,"group":[],"path":"\/0000-0003-3817-0737\/peer-reviews"},"works":{"last-modified-date":null,"group":[],"path":"\/0000-0003-3817-0737\/works"},"path":"\/0000-0003-3817-0737\/activities"},"path":"\/0000-0003-3817-0737"}}
+				};
+
+				let testFuncs = {
+					"sean":function(){
+						window.profileElement = ReactDOM.render(
+							React.createElement(ZoteroWebComponents.OrcidProfile, {orcidProfile:testStates['sean']}),
+							document.getElementById('react-orcidprofile')
+						);
+					},
+					"fcheslack":function(){
+						window.profileElement = ReactDOM.render(
+							React.createElement(ZoteroWebComponents.OrcidProfile, {orcidProfile:testStates['fcheslack']}),
+							document.getElementById('react-orcidprofile')
+						);
+					}
+				};
+
+				ZoteroWebComponents.pageReady(function() {
+					let testFunc = testFuncs['fcheslack'];
+					if(window.location.hash.length > 0){
+						let testLabel = window.location.hash.substr(1);
+						testFunc = testFuncs[testLabel];
+					}
+					testFunc();
+
+					ZoteroWebComponents.cycleTestFuncs(testFuncs);
+				});
+			</script>
+
+			</div>
+		</div>
+		<footer>
+			<div class="center container">
+					<img id="chnm-logo" src="../assets/images/theme/rrchnmlogo-gray.png" alt="Zotero">
+				<nav role="secondary">
+					<ul>
+						<!-- <li><a href="#">Give Us Feedback</a></li> -->
+						<li><a href="/blog/">Blog</a></li>
+						<li><a href="https://forums.zotero.live">Forums</a></li>
+						<li><a href="/support/dev/start">Developers</a></li>
+						<li><a href="/support/">Documentation</a></li>
+						<li><a href="/support/terms/privacy">Privacy</a></li>
+						<li><a href="/getinvolved/">Get Involved</a></li>
+						<li><a href="/jobs">Jobs</a></li>
+						<li><a href="/about/">About</a></li>
+						<li class="last"><a href="?fullsite=0">Mobile Site</a></li>
+					</ul>
+				</nav>
+				<p>
+					Zotero is a project of the <a href="http://chnm.gmu.edu">Roy
+					Rosenzweig Center for History and New Media</a>, and was initially funded
+					 by the <a href="http://mellon.org">Andrew W. Mellon
+					Foundation</a>, the <a href="http://imls.gov">Institute of
+					Museum and Library Services</a>, and the <a
+					href="http://sloan.org">Alfred P. Sloan Foundation</a>.
+				</p>
+
+			</div>
+		</footer>
+
+		<script type="text/javascript" charset="utf-8">
+			if(typeof zoteroData == 'undefined'){
+				var zoteroData = {};
+			}
+			var baseURL = "";
+			var baseDomain = "//zotero.live";
+			var staticPath = "/static";
+		</script>
+		<!-- End zoteroLibrary modules. -->
+		<script type="text/javascript" charset="utf-8">
+			Zotero = {
+				//currentUser: {"userID":"10150","slug":"fcheslack"}
+			};
+		</script>
+	</body>
+</html>

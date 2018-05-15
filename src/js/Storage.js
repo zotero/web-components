@@ -132,9 +132,15 @@ class InstitutionProvides extends Component {
 		if(institution.storageQuota == 1000000){
 			quotaDescription = 'unlimited storage';
 		}
-		return (
-			<p>{institution.name} provides {quotaDescription} for {institution.email}</p>
-		);
+		if(institution.validated == '0'){
+			return (
+				<p>{institution.name} provides {quotaDescription} for {institution.email}. <a href='/settings/account#manage-emails'>Confirm your email address</a> to take advantage.</p>
+			);
+		} else {
+			return (
+				<p>{institution.name} provides {quotaDescription} for {institution.email}</p>
+			);
+		}
 	}
 }
 

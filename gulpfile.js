@@ -21,15 +21,6 @@ const del = require('del');
 const sass = require('gulp-sass');
 const babelify = require('babelify');
 
-const babelifyOpts = {
-	extensions: ['.js', '.jsx'],
-	presets: ['env', 'react'],
-	plugins: [
-		'transform-flow-strip-types',
-		'transform-es2015-modules-commonjs'
-	]
-};
-
 var bundle;
 
 function onError(err) {
@@ -47,9 +38,12 @@ function getBrowserify(dev) {
 			debug: !dev,
 			entries: 'src/js/web-components.js',
 			cache: {},
-			packageCache: {}
+			packageCache: {},
+			extensions: ['.js', '.jsx'],
 		})
-		.transform(babelify, babelifyOpts);
+		.transform(
+			babelify
+		);
 
 		if(dev) {
 			bundle.plugin(watchify);

@@ -1,0 +1,9 @@
+//changeusernametest
+div.react.change-username {
+	.profile-preview.invalid, .username-message.invalid {
+		color:red;
+	}
+	.profile-preview.valid, .username-message.valid {
+		color:green;
+	}
+}

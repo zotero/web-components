@@ -59,4 +59,23 @@
 @import "usergroups";
 @import "institution-checkout";
 @import "profile/profile";
+@import 'components/react-tabs';
+// Components
+// --------------------------------------------------
+
+//@import 'GroupInvitations';
+//@import 'InviteToGroup';
+//@import 'UserGroups';
+//@import 'register-form';
+@import 'start';
+@import 'extensions';
+@import 'extensions-picker';
+@import 'all-extensions';
+@import 'downloads';
+//@import 'group-information';
+//@import 'ApiKeyEditor';
+@import 'components/changeusername';
+@import 'components/institution-checkout';
+@import 'manage-emails';
+@import 'orcid';
 

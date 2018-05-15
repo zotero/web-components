@@ -65,6 +65,9 @@ let animations = {
 	collect,
 	organize
 };
+import {ProfileImageForm} from './ProfileImageForm.js';
+import {GroupLibrarySettings} from './GroupLibrarySettings.js';
+import {OrcidProfile, OrcidProfileControl} from './components/OrcidProfile.jsx';
 
 let ZoteroWebComponents = {
 	Storage,
@@ -92,6 +95,12 @@ let ZoteroWebComponents = {
 	Institutional,
 	ChangeUsername,
 	ManageEmails,
+	ManageEmails,
+	Institutional,
+	ProfileImageForm,
+	GroupLibrarySettings,
+	OrcidProfile,
+	OrcidProfileControl,
 };
 
 globalScope.ZoteroWebComponents = ZoteroWebComponents;

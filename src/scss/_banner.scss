@@ -12,16 +12,7 @@
   padding: (20px - 4px) ($grid-gutter-width / 2) (20px - 8px);
 
   @include media-breakpoint-up(md) {
-    position: absolute;
-    top: 368px;
-    right: 0;
-    padding: (20px - 4px) 20px (20px - 6px);
-    font-size: $font-size-base;
-    text-align: left;
-    transform: translateY(-50%);
-    box-shadow: 0 0 20px 10px $jumbotron-bg;
-    border-top: none;
-    z-index: 1;
+    display: none;
   }
 
   &:hover {
@@ -36,12 +27,6 @@
     background: image-url("zotero-bib-logo.svg");
     text-indent: -99em;
     overflow: hidden;
-    margin-bottom: 6px;
-
-    @include media-breakpoint-down(sm) {
-      margin-left: auto;
-      margin-right: auto;
-      margin-bottom: 7px;
-    }
+    margin: 0 auto 7px;
   }
 }

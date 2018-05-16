@@ -24,6 +24,7 @@ if($_GET['user']){
 						<p class="lead"><span class="d-sm-block">Zotero is free software that helps you</span> <span class="d-sm-block">collect, cite, and share research.</span></p>
 						<p class="download"><a href="/download" class="btn btn-primary btn-lg">Download</a></p>
 						<p class="platforms">Available for Mac, Windows, and Linux</p>
+						<p class="zotero-bib"><strong>New:</strong> Just need to create a quick bibliography? Try <a href="https://zbib.org/">ZoteroBib</a>.</p>
 					</div>
 				</section>
 				<section class="section-screenshot">

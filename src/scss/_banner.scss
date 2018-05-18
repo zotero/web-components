@@ -1,0 +1,32 @@
+//
+// Banner
+//
+
+.banner {
+  display: block;
+  background: $white;
+  color: $body-color;
+  font-size: 18px;
+  text-align: center;
+  border-top: 1px solid $gray-200;
+  padding: (20px - 4px) ($grid-gutter-width / 2) (20px - 8px);
+
+  @include media-breakpoint-up(md) {
+    display: none;
+  }
+
+  &:hover {
+    color: $body-color;
+    text-decoration: none;
+  }
+
+  .logo {
+    display: block;
+    width: 94px;
+    height: 20px;
+    background: image-url("zotero-bib-logo.svg");
+    text-indent: -99em;
+    overflow: hidden;
+    margin: 0 auto 7px;
+  }
+}

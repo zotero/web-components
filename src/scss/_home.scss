@@ -13,7 +13,7 @@
     @include media-breakpoint-up("md") {
       padding-top: 103px; // 128px
       padding-bottom: 282px; // 192px + 96px
-      background: image-url("home/jumbotron.svg") no-repeat center top $jumbotron-bg;
+      background: image-url("home/jumbotron.svg") no-repeat center 18px $jumbotron-bg; // top without zotero-bib hint
     }
 
     .display-1 {
@@ -41,6 +41,20 @@
     .platforms {
       font-size: $font-size-sm;
       margin-bottom: 0;
+    }
+
+    .zotero-bib {
+      font-size: $font-size-sm;
+      margin-top: $font-size-sm;
+
+      @include media-breakpoint-down("sm") {
+        display: none;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: underline;
+      }
     }
   }
 

@@ -12,12 +12,19 @@ if($_GET['user']){
 ?>
 <? include('./layoutHeader.php');?>
 			<main>
+        <a href="https://zbib.org" class="banner">
+          <span class="logo">ZoteroBib</span>
+          <span class="d-md-block">Just need to</span>
+          <span class="d-md-block">create a quick</span>
+          <span class="d-md-block">bibliography?</span>
+        </a>
 				<section class="jumbotron jumbotron-fluid">
 					<div class="container">
 						<h1 class="display-1">Your personal<br>research assistant.</h1>
 						<p class="lead"><span class="d-sm-block">Zotero is free software that helps you</span> <span class="d-sm-block">collect, cite, and share research.</span></p>
 						<p class="download"><a href="/download" class="btn btn-primary btn-lg">Download</a></p>
 						<p class="platforms">Available for Mac, Windows, and Linux</p>
+						<p class="zotero-bib"><strong>New:</strong> Just need to create a quick bibliography? Try <a href="https://zbib.org/">ZoteroBib</a>.</p>
 					</div>
 				</section>
 				<section class="section-screenshot">

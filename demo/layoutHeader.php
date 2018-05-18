@@ -12,11 +12,6 @@
 			$os = 'windows';
 		}
 		?>
-		<?php if($os == 'windows'):?>
-			<link rel="stylesheet" href="../build/fonts-win.css">
-		<?php else:?>
-			<link rel="stylesheet" href="../build/fonts-mac.css">
-		<?php endif;?>
 
 		<!-- set jsConfig on window.zoteroConfig -->
 		<?php $jsConfig = include('./jsConfig.php');?>
@@ -32,7 +27,14 @@
 		<script>
 			WebFont.load({
 				custom: {
-					families: ['AvenirLTPro:n3', 'AvenirLTPro:n4']
+					families: [
+					  'AvenirNextLTPro:n3',
+					  'AvenirNextLTPro:i3',
+					  'AvenirNextLTPro:n4',
+					  'AvenirNextLTPro:i4',
+					  'AvenirNextLTPro:n6',
+					  'AvenirNextLTPro:i6'
+          ]
 				}
 			});
 		</script>

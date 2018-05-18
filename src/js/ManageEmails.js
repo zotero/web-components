@@ -85,7 +85,7 @@ class SecondaryEmailPrompt extends Component{
 			} else {
 				return (
 					<div className='secondary-email-prompt'>
-						<p className='hint'>You only have one verified email address assocaited with your account. If there's a risk you'll lose access to this account in the future, you may want to add a backup so you can always regain access to your Zotero account. Password reset emails can only be sent to verified addresses.</p>
+						<p className='hint'>You only have one verified email address associated with your account. If there's a risk you'll lose access to this account in the future, you may want to add a backup so you can always regain access to your Zotero account. Password reset emails can only be sent to verified addresses.</p>
 					</div>
 				);
 			}
@@ -139,7 +139,7 @@ class AddEmailInput extends Component{
 						<input type='text' className='form-control' onChange={this.inputChanged} value={this.state.email} id='add-email' placeholder="Additional Email" />
 					</div>
 					<div>
-						<button type='submit'>Add</button>
+						<button className='btn' type='submit'>Add</button>
 					</div>
 				</form>
 			</div>

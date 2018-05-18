@@ -162,8 +162,8 @@ class UsernameForm extends Component{
 						</Fragment>
 						: ''
 					}
-					<button onClick={this.saveUsername}>Save</button>
 				</div>
+				<button className='btn btn-secondary' onClick={this.saveUsername}>Save</button>
 			</form>
 		);
 
@@ -177,10 +177,8 @@ class UsernameForm extends Component{
 		
 		return (
 			<section className='change-username-section'>
-				<div className='container'>
-					{usernameForm}
-					{notifier}
-				</div>
+				{usernameForm}
+				{notifier}
 			</section>
 		);
 	}

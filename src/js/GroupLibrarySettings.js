@@ -159,13 +159,11 @@ class GroupLibrarySettings extends Component{
 		return (
 			<div>
 				<form method='POST'>
-					<div style={groupTypeStyle}>
-						{groupTypeRadioNode}
-					</div>
+					{groupTypeRadioNode}
 					{readingRadioNode}
 					{libraryEditingRadioNode}
 					{fileEditingRadioNode}
-					<button type='submit'>Save Settings</button>
+					<button className='btn btn-secondary' type='submit'>Save Settings</button>
 				</form>
 			</div>
 		);

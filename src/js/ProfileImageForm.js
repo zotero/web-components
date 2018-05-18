@@ -40,8 +40,8 @@ class ProfileImage extends React.Component{
 		let style = {
 			'width': this.props.width,
 			'height': this.props.height,
-	   };
-	   let imgSrc = null;
+		};
+		let imgSrc = null;
 		if(!hasImage){
 			return <EmptyImage width={width} height={height} />;
 		}
@@ -145,16 +145,16 @@ class ProfileImageForm extends React.Component{
 
 		let image = <ProfileImage hasImage={hasImage} type={type} entityID={entityID} />
 
-		let updateButton = <button onClick={this.chooseFile}>Choose Image</button>;
+		let updateButton = <button className='btn btn-secondary' onClick={this.chooseFile}>Choose Image</button>;
 		return (
 			<div className='profile-image-form'>
 				<label htmlFor='imageFileInput'>Profile Image</label>
 				{notifier}
 				{image}
 				<div>
-					<input className='visually-hidden' type='file' id='imageFileInput' ref='imageFileInput' onChange={this.updateImage} />
+					<input className='d-none' type='file' id='imageFileInput' ref='imageFileInput' onChange={this.updateImage} />
 					{updateButton}
-					<button className={!hasImage?'visually-hidden':''} onClick={this.deleteImage}>Delete</button>
+					<button className={!hasImage?'d-none':'btn btn-secondary'} onClick={this.deleteImage}>Delete</button>
 				</div>
 			</div>
 		);

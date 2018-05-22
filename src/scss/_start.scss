@@ -4,7 +4,7 @@
   .container {
     padding: 0 15px;
 
-    @media (min-width: map-get($grid-breakpoints, sm) ) {
+    @media (min-width: map-get($grid-breakpoints, sm)) {
       padding: 0 80px;
     }
   }
@@ -51,9 +51,7 @@
     }
   }
 
-
   // Extensions picker on start page
-
   .extensions-picker {
     padding-bottom: 48px;
 
@@ -75,7 +73,7 @@
 
     .jumbotron {
       padding: 0;
-      background-color:transparent;
+      background-color: transparent;
 
       h1 {
         margin: 21px auto 16px; // 32px
@@ -103,7 +101,6 @@
     background: url($staticPath + "/images/start/arrow-down-white.svg") no-repeat center top $gray-100;
     background-size: 51px auto;
     padding: 46px 0 38px; // 2/3
-
 
     @media (min-width: map-get($grid-breakpoints, sm)) {
       background-size: 76px auto;

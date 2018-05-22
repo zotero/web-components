@@ -11,6 +11,7 @@ body {
   text-rendering: optimizeLegibility;
   font-kerning: normal;
   font-feature-settings: "kern" 1;
+  letter-spacing: -0.01em; // Adapt Avenir Next to Avenir Pro. Set to 0 for small text if needed.
 }
 
 
@@ -29,7 +30,7 @@ h2,
 
 .display-1,
 .display-2 {
-  letter-spacing: -0.025em;
+  letter-spacing: -0.035em;
 }
 
 .display-1 {

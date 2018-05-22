@@ -16,7 +16,7 @@
 
     @media (min-width: map-get($grid-breakpoints, sm)) {
       font-size: 30px;
-      letter-spacing: -0.5px;
+      letter-spacing: -0.5px; // Todo: Update to Avenir Next
     }
   }
 
@@ -104,7 +104,7 @@
     background-size: 51px auto;
     padding: 46px 0 38px; // 2/3
 
-    
+
     @media (min-width: map-get($grid-breakpoints, sm)) {
       background-size: 76px auto;
       padding: 68px 0 65px; // 80px

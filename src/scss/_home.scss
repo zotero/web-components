@@ -18,6 +18,8 @@
 
     .display-1 {
       margin-bottom: 12px; // 32px
+      -moz-osx-font-smoothing: grayscale;
+      -webkit-font-smoothing: antialiased;
 
       @include media-breakpoint-up("md") {
         margin-bottom: 23px; // 48px

@@ -51,7 +51,7 @@ h2,
 // Page header
 
 .page-header {
-  margin: rem(48) 0 rem(23);
+  margin: rem(47) 0 rem(24);
 
   @include media-breakpoint-up("md") {
     margin: ($spacer-xxxl + $spacer-max) 0 ($spacer-max - $spacer);

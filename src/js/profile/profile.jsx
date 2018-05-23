@@ -89,10 +89,10 @@ export default class Profile extends React.Component {
 			<div className="container">
 				{alert}
 				<div className="user-profile-personal-details row">
-					<div className="col-xs-12 col-sm-6">
+					<div className="col-12 col-sm-6">
 						<EditableAvatar value={ this.props.profile.meta.avatar } />
 					</div>
-					<div className="col-xs-12 col-sm-6">
+					<div className="col-12 col-sm-6">
 						<h2>
 							<EditableField field="realname" emptytext="Your full name" value={ this.props.profile.meta.realname } />
 						</h2>
@@ -118,33 +118,37 @@ export default class Profile extends React.Component {
 					</div>
 				</div>
 				<div className="row">
-					<Tabs extended={ this.state.extended }>
-						<Tab title="About" active={ this.state.active == 'About' } onMakeActive={ () => this.makeActive('About') }>
-							<div className="col-xs-12 col-sm-8">
-								<EditableRich title="About" field="bio" emptytext="Add a short description of what you are currently working on" value={ this.props.profile.meta.bio } />
-								<EditableItems field="interests" title="Research interests" emptytext="Add your research intereststo show what you are passionate about" value={ this.props.profile.meta.interests }>
-									<EditableInterestItem />
-								</EditableItems>
-								
-								<Publications userid={ this.props.userid } />
+					<div className='col-12'>
+						<Tabs extended={ this.state.extended }>
+							<Tab title="About" active={ this.state.active == 'About' } onMakeActive={ () => this.makeActive('About') }>
+								<div className='row'>
+									<div className="col-12 col-sm-8">
+										<EditableRich title="About" field="bio" emptytext="Add a short description of what you are currently working on" value={ this.props.profile.meta.bio } />
+										<EditableItems field="interests" title="Research interests" emptytext="Add your research intereststo show what you are passionate about" value={ this.props.profile.meta.interests }>
+											<EditableInterestItem />
+										</EditableItems>
 
-								<EditableItems field="experience" title="Professional experience" emptytext="Add your professional experience to share where you have been working" value={ this.props.profile.meta.experience }>
-									<EditableExperienceItem />
-								</EditableItems>
-								
-								<EditableItems field="education" title="Education history" emptytext="Add your education history to show where you have completed your studies" value={ this.props.profile.meta.education }>
-									<EditableEducationItem />
-								</EditableItems>
-							</div>
-							<div className="col-xs-12 col-sm-4">
-								<RelatedPeople people={ this.props.profile.followers.slice(0, 3) } title="Followers" more={ this.props.profile.followers.length > 3 || this.props.profile.followersMore } onViewMore={ () => this.makeActive('Network') } />
-								<RelatedPeople people={ this.props.profile.following.slice(0, 3) } title="Following" more={ this.props.profile.following.length > 3 || this.props.profile.followingMore } onViewMore={ () => this.makeActive('Network') } />
-								<Groups userid={ this.props.userid } onViewMore={ () => this.makeActive('Groups')} />
-							</div>
-						</Tab>
-						{ networkTab }
-						{ groupsTab }
-					</Tabs>
+										<Publications userid={ this.props.userid } />
+
+										<EditableItems field="experience" title="Professional experience" emptytext="Add your professional experience to share where you have been working" value={ this.props.profile.meta.experience }>
+											<EditableExperienceItem />
+										</EditableItems>
+
+										<EditableItems field="education" title="Education history" emptytext="Add your education history to show where you have completed your studies" value={ this.props.profile.meta.education }>
+											<EditableEducationItem />
+										</EditableItems>
+									</div>
+									<div className="col-12 col-sm-4">
+										<RelatedPeople people={ this.props.profile.followers.slice(0, 3) } title="Followers" more={ this.props.profile.followers.length > 3 || this.props.profile.followersMore } onViewMore={ () => this.makeActive('Network') } />
+										<RelatedPeople people={ this.props.profile.following.slice(0, 3) } title="Following" more={ this.props.profile.following.length > 3 || this.props.profile.followingMore } onViewMore={ () => this.makeActive('Network') } />
+										<Groups userid={ this.props.userid } onViewMore={ () => this.makeActive('Groups')} />
+									</div>
+								</div>
+							</Tab>
+							{ networkTab }
+							{ groupsTab }
+						</Tabs>
+					</div>
 				</div>
 			</div>
 		);

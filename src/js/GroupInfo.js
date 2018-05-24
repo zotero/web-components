@@ -12,7 +12,8 @@ import {jsError, jsSuccess, getCurrentUser} from './Utils.js';
 import classnames from 'classnames';
 import striptags from 'striptags';
 
-let React = require('react');
+import React from 'react';
+import PropTypes from 'prop-types';
 
 const currentUser = getCurrentUser();
 
@@ -329,6 +330,10 @@ class GroupInfo extends React.Component{
 			</div>
 		);
 	}
+}
+GroupInfo.propTypes = {
+	displayNames: PropTypes.array.isRequired,
+	pending: PropTypes.bool.isRequired
 }
 
 export {GroupMembershipActions, GroupInfo, groupIsReadable};

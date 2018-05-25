@@ -12,12 +12,6 @@ if($_GET['user']){
 ?>
 <? include('./layoutHeader.php');?>
 <main>
-	<!-- hidden area for possible JS messages -->
-	<div id="js-message">
-		<ul id="js-message-list">
-		</ul>
-	</div>
-
 	<!-- Output content -->
 	<!-- NEW START PAGE -->
 	<script src="https://www.google.com/recaptcha/api.js" async defer></script>

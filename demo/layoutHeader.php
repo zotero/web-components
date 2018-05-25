@@ -40,6 +40,8 @@
 		</script>
 	</head>
 	<body class="<?=$bodyClass?>">
+		<!-- hidden area for possible JS messages -->
+		<ul class="messages"></ul>
 		<header class="mobile-header d-lg-none d-xl-none">
 			<nav>
 				<ul class="mobile-nav">

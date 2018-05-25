@@ -311,20 +311,18 @@ class InstallConnectorPrompt extends Component{
 
 		return (
 			<div className="extensions-picker">
-				<div className="jumbotron jumbotron-fluid">
-					<div className="container-fluid container-fluid-col-10">
-						{connectorImage}
-						<div className='install-connector'>
-							<h1>{headerText}</h1>
-							<p className="lead">
-								<span className="line">Zotero Connectors allow you to save to Zotero</span>
-								{' '}
-								<span className="line">directly from your web browser.</span></p>
-							{installButton}
-							{versionNote}
-							{getStandaloneSection}
-							{showExtensionsLink}
-						</div>
+				<div className="container-fluid container-fluid-col-10">
+					{connectorImage}
+					<div className='install-connector'>
+						<h1>{headerText}</h1>
+						<p className="lead">
+							<span className="d-sm-block">Zotero Connectors allow you to save to Zotero</span>
+							{' '}
+							<span className="d-sm-block">directly from your web browser.</span></p>
+						{installButton}
+						{versionNote}
+						{getStandaloneSection}
+						{showExtensionsLink}
 					</div>
 				</div>
 				{allExtensions}

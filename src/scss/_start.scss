@@ -1,17 +1,6 @@
 .start {
   text-align: center;
 
-  h1 {
-    font-size: 20px;
-    line-height: 1.1;
-    margin: 0 0 16px;
-
-    @media (min-width: map-get($grid-breakpoints, sm)) {
-      font-size: 30px;
-      letter-spacing: -0.5px; // Todo: Update to Avenir Next
-    }
-  }
-
   .install-success {
     font-size: $font-size-lg-mobile;
     font-weight: 300;
@@ -62,23 +51,18 @@
       display: none;
     }
 
-    .jumbotron {
-      padding: 0;
-      background-color: transparent;
+    h1 {
+      margin-top: $spacer-xl - rem(11);
 
-      h1 {
-        margin: 21px auto 16px; // 32px
-
-        @media (min-width: map-get($grid-breakpoints, sm)) {
-          margin-top: 29px; // 48px
-        }
+      @include media-breakpoint-up(md) {
+        margin-top: $spacer-xxl - rem(18);
       }
+    }
 
-      .show-extensions {
-        position: static;
-        text-align: center;
-        margin-bottom: 0;
-      }
+    .show-extensions {
+      position: static;
+      text-align: center;
+      margin-bottom: 0;
     }
 
     .all-extensions {

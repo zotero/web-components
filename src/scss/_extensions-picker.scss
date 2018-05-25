@@ -22,12 +22,6 @@
       }
     }
 
-    .line {
-      @media (min-width: map-get($grid-breakpoints, sm)) {
-        display: block;
-      }
-    }
-
     .btn {
       font-size: 16px;
       min-width: 160px;

@@ -1,3 +1,13 @@
 //
 // Jumbotron
 //
+
+.jumbotron {
+  .lead {
+    font-size: rem(20);
+
+    @include media-breakpoint-up("md") {
+      font-size: rem(24);
+    }
+  }
+}

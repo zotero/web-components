@@ -230,17 +230,15 @@ class RegisterForm extends Component{
 
 		return (
 			<section className='register-section'>
-				<div className='container'>
-					<div className='container'>
-						{heading}
-						<p className='lead'>If you haven’t already created a Zotero account, please take a few moments to register now.
-						It’s a <b>free</b> way to <a href="https://www.zotero.org/support/sync">sync and access your library from anywhere</a>,
-						and it lets you join <a href="https://www.zotero.org/support/groups">groups</a> and{' '}
-						<a href="https://www.zotero.org/support/sync#file_syncing">back up all your attached files</a>.
-						</p>
-						{registerForm}
-						{notifier}
-					</div>
+				<div className='container-fluid container-fluid-col-10'>
+					{heading}
+					<p className='lead'>If you haven’t already created a Zotero account, please take a few moments to register now.
+					It’s a <b>free</b> way to <a href="https://www.zotero.org/support/sync">sync and access your library from anywhere</a>,
+					and it lets you join <a href="https://www.zotero.org/support/groups">groups</a> and{' '}
+					<a href="https://www.zotero.org/support/sync#file_syncing">back up all your attached files</a>.
+					</p>
+					{registerForm}
+					{notifier}
 				</div>
 			</section>
 		);
@@ -257,7 +255,7 @@ class PostRegisterGuide extends Component{
 				<div className='container'>
 					<img src={connectorButtonImagePath} className='connector-button' width='160' height='160' />
 					<h1>3. Start building your library</h1>
-					<p className='lead'>New to Zotero? Explore the documentation and try out some things you can do with Zotero:</p>
+					<p className='lead'>New to Zotero? Explore the documentation and see what Zotero can do.</p>
 					<ul className='register-quick-links'>
 						<li><a href="https://www.zotero.org/support/quick_start_guide">Read the Quick Start Guide</a></li>
 						<li><a href="https://www.zotero.org/support/getting_stuff_into_your_library">Add an item</a></li>

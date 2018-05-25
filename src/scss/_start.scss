@@ -21,21 +21,18 @@
   }
 
   .install-success {
-    display: inline-block;
-    vertical-align: top;
-    font: {
-      size: 24px;
-      weight: 700;
-    }
-    line-height: 1.1;
-    color: #19a15f;
-    border: 3px solid currentColor;
-    border-radius: 6px;
-    padding: 16px 24px;
-    margin: 20px 0 37px; // top/bottom: 40px
+    font-size: $font-size-lg-mobile;
+    font-weight: 300;
+    color: $white;
+    background-color: map-get($theme-colors, success);
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    padding: (27px) ($grid-gutter-width / 2);
 
-    @media (min-width: map-get($grid-breakpoints, sm)) {
-      margin: 10px 0 48px; // 60px
+    @include media-breakpoint-up(md) {
+      font-size: $font-size-lg;
+      padding: (40px - 10px) ($grid-gutter-width / 2);
     }
   }
 

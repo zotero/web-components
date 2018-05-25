@@ -3,91 +3,76 @@
 // --------------------------------------------------
 
 .extensions-picker {
+  text-align: center;
+  position: relative;
+  //padding: 28px 0 48px; // top: 53px (2/3) to breadcrumbs baseline
 
-  // Jumbotron
-  .jumbotron {
-    text-align: center;
-    position: relative;
-    padding: 28px 0 48px; // top: 53px (2/3) to breadcrumbs baseline
+  //@media (min-width: map-get($grid-breakpoints, sm)) {
+  //  padding: 20px 0 80px;
+  //}
+
+  //.lead {
+  //  margin-bottom: 21px; // 27px
+  //
+  //  @media (min-width: map-get($grid-breakpoints, sm)) {
+  //    margin-bottom: 34px; // 40px
+  //  }
+  //}
+
+  .version-note {
+    font-size: 12px;
+    line-height: 1.5;
+    color: $gray-800;
+    margin: 26px auto 0;
 
     @media (min-width: map-get($grid-breakpoints, sm)) {
-      padding: 20px 0 80px;
+      width: 50%;
+    }
+  }
+
+  .show-extensions,
+  .get-zotero-standalone {
+    font-size: 16px;
+    line-height: 22px;
+    margin: 16px 0 0;
+
+    @media (min-width: map-get($grid-breakpoints, sm)) {
+      position: absolute;
+    }
+  }
+
+  .show-extensions {
+    @media (min-width: map-get($grid-breakpoints, sm)) {
+      left: 40px;
+      bottom: 18px;
+      text-align: left;
     }
 
-    .lead {
-      margin-bottom: 21px; // 27px
-
-      @media (min-width: map-get($grid-breakpoints, sm)) {
-        margin-bottom: 34px; // 40px
-      }
+    &.fade-out {
+      opacity: 0;
+      transition: opacity 0.4s ease-in-out;
     }
 
-    .btn {
-      font-size: 16px;
-      min-width: 160px;
-      padding: 9px 23px;
-      border-radius: 4px;
+    .browser-icon {
+      margin-bottom: 3px;
 
-      @media (min-width: map-get($grid-breakpoints, sm)) {
-        font-size: 20px;
+      & + .browser-icon {
+        margin-left: 8px;
       }
     }
+  }
 
-    .version-note {
-      font-size: 12px;
-      line-height: 1.5;
-      color: $gray-800;
-      margin: 26px auto 0;
+  .get-zotero-standalone {
+    margin-top: 32px;
 
-      @media (min-width: map-get($grid-breakpoints, sm)) {
-        width: 50%;
-      }
+    @media (min-width: map-get($grid-breakpoints, sm)) {
+      right: 40px;
+      bottom: 18px;
+      text-align: right;
     }
 
-    .show-extensions,
-    .get-zotero-standalone {
-      font-size: 16px;
-      line-height: 22px;
-      margin: 16px 0 0;
-
-      @media (min-width: map-get($grid-breakpoints, sm)) {
-        position: absolute;
-      }
-    }
-
-    .show-extensions {
-      @media (min-width: map-get($grid-breakpoints, sm)) {
-        left: 40px;
-        bottom: 18px;
-        text-align: left;
-      }
-
-      &.fade-out {
-        opacity: 0;
-        transition: opacity 0.4s ease-in-out;
-      }
-
-      .browser-icon {
-        margin-bottom: 3px;
-
-        & + .browser-icon {
-          margin-left: 8px;
-        }
-      }
-    }
-
-    .get-zotero-standalone {
-      margin-top: 32px;
-
-      @media (min-width: map-get($grid-breakpoints, sm)) {
-        right: 40px;
-        bottom: 18px;
-        text-align: right;
-      }
-
-      img {
-        margin-bottom: 1px;
-      }
+    img {
+      margin-bottom: 1px;
     }
   }
 }

@@ -77,7 +77,7 @@ class InstallChromeButton extends Component{
 	}
 	render(){
 		if(this.props.type == 'button') {
-			return <a href={chromeDownload} onClick={this.installChrome} id="chrome-connector-download-button" className="btn download-link">{this.props.label}</a>;
+			return <a href={chromeDownload} onClick={this.installChrome} id="chrome-connector-download-button" className="btn btn-lg btn-secondary download-link">{this.props.label}</a>;
 		} else if(this.props.type == 'image') {
 			return (
 				<a href={chromeDownload} onClick={this.installChrome}><BrowserIcon browser="chrome" /></a>
@@ -87,7 +87,7 @@ class InstallChromeButton extends Component{
 				<div className='download-full'>
 					<div className='browser-image'><BrowserIcon browser="chrome" /></div>
 					<h3>Chrome connector</h3>
-					<div className='install-button'><a href={chromeDownload} id="chrome-connector-download-button" className="btn download-link">{this.props.label}</a></div>
+					<div className='install-button'><a href={chromeDownload} id="chrome-connector-download-button" className="btn btn-secondary download-link">{this.props.label}</a></div>
 				</div>
 			);
 		}
@@ -104,7 +104,7 @@ class InstallSafariButton extends Component{
 	render(){
 		if(this.props.type == 'button') {
 			return (
-				<a href={safariDownload} id="safari-connector-download-button" className="btn download-link">{this.props.label}</a>
+				<a href={safariDownload} id="safari-connector-download-button" className="btn btn-lg btn-secondary download-link">{this.props.label}</a>
 			);
 		} else if(this.props.type == 'image'){
 			return (
@@ -115,7 +115,7 @@ class InstallSafariButton extends Component{
 				<div className='download-full'>
 					<div className='browser-image'><BrowserIcon browser='safari' /></div>
 					<h3>Safari connector</h3>
-					<a href={safariDownload} id="safari-connector-download-button" className="btn download-link">{this.props.label}</a>
+					<a href={safariDownload} id="safari-connector-download-button" className="btn btn-secondary download-link">{this.props.label}</a>
 				</div>
 			);
 		}
@@ -132,7 +132,7 @@ class InstallOperaButton extends Component{
 	render(){
 		if(this.props.type == 'button') {
 			return (
-				<a href={operaDownload} id="opera-connector-download-button" className="btn download-link">{this.props.label}</a>
+				<a href={operaDownload} id="opera-connector-download-button" className="btn btn-lg btn-secondary download-link">{this.props.label}</a>
 			);
 		} else if(this.props.type == 'image') {
 			return (
@@ -143,7 +143,7 @@ class InstallOperaButton extends Component{
 				<div className='download-full'>
 					<div className='browser-image'><BrowserIcon browser='opera' /></div>
 					<h3>Opera connector</h3>
-					<a href={operaDownload} id="opera-connector-download-button" className="btn download-link">{this.props.label}</a>
+					<a href={operaDownload} id="opera-connector-download-button" className="btn btn-secondary download-link">{this.props.label}</a>
 				</div>
 			);
 		}

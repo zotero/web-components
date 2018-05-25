@@ -17,18 +17,6 @@
     }
   }
 
-  .btn {
-    color: $white;
-    background: $link-color;
-    text-decoration: none;
-    border-radius: 3px;
-    padding: 5px 15px;
-
-    &:hover {
-      background: darken($link-color, 5%);
-    }
-  }
-
   .section-extensions {
     padding-top: $section-padding-md-mobile - rem(3);
 
@@ -39,6 +27,22 @@
 
   // Extensions picker on start page
   .extensions-picker {
+    h1 {
+      margin-top: $spacer-xl - rem(11);
+
+      @include media-breakpoint-up(md) {
+        margin-top: $spacer-xxl - rem(18);
+      }
+    }
+
+    .lead {
+      margin-bottom: $spacer-xl - rem(8);
+
+      @include media-breakpoint-up(md) {
+        margin-bottom: $spacer-xxl - rem(8);
+      }
+    }
+
     .all-extensions ul {
       margin-top: 26px; // 60px
     }
@@ -49,14 +53,6 @@
 
     .inner-extensions {
       display: none;
-    }
-
-    h1 {
-      margin-top: $spacer-xl - rem(11);
-
-      @include media-breakpoint-up(md) {
-        margin-top: $spacer-xxl - rem(18);
-      }
     }
 
     .show-extensions {

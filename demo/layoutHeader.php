@@ -98,7 +98,7 @@
 								</div>
 							</div>
 							<? endif;?>
-							<li class="nav-item"><a href="/settings/storage?ref=usb" class="btn btn-secondary upgrade-storage">Upgrade Storage</a></li>
+							<li class="nav-item"><a href="/settings/storage?ref=usb" class="btn btn-sm btn-secondary upgrade-storage">Upgrade Storage</a></li>
 						</ul>
 					</nav>
 					<button class="btn btn-link nav-toggle d-lg-none">

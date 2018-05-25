@@ -28,13 +28,13 @@
 			WebFont.load({
 				custom: {
 					families: [
-					  'AvenirNextLTPro:n3',
-					  'AvenirNextLTPro:i3',
-					  'AvenirNextLTPro:n4',
-					  'AvenirNextLTPro:i4',
-					  'AvenirNextLTPro:n6',
-					  'AvenirNextLTPro:i6'
-          ]
+						'AvenirNextLTPro:n3',
+						'AvenirNextLTPro:i3',
+						'AvenirNextLTPro:n4',
+						'AvenirNextLTPro:i4',
+						'AvenirNextLTPro:n6',
+						'AvenirNextLTPro:i6'
+					]
 				}
 			});
 		</script>
@@ -103,7 +103,7 @@
 					</nav>
 					<button class="btn btn-link nav-toggle d-lg-none">
 						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 18">
-						  <path d="M1,1H23M1,9H23M1,17H23" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2"/>
+							<path d="M1,1H23M1,9H23M1,17H23" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2"/>
 						</svg>
 					</button>
 				</div>

@@ -281,12 +281,8 @@ class Start extends Component{
 		return (
 			<div className='start react'>
 				<section>
-					<div className='container'>
-						<p className="install-success">Success! You installed Zotero!</p>
-					</div>
-				<div className='extensions-picker'>
+					<p className="install-success">Success! You installed Zotero!</p>
 					<InstallConnectorPrompt ref='installConnectorPrompt' numbered={true} />
-				</div>
 				</section>
 				<RegisterForm ref='registerForm' />
 				<PostRegisterGuide ref='postRegisterGuide' />

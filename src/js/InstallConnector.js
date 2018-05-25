@@ -310,7 +310,7 @@ class InstallConnectorPrompt extends Component{
 		}
 
 		return (
-			<div>
+			<div className="extensions-picker">
 				<div className="jumbotron">
 					<div className="container">
 						{connectorImage}

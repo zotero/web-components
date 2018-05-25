@@ -1,0 +1,7 @@
+//
+// Grid
+//
+
+.container-fluid-col-10 {
+  max-width: map-get($container-max-widths, xl) * 10 / 12;
+}

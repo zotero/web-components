@@ -312,7 +312,7 @@ class InstallConnectorPrompt extends Component{
 		return (
 			<div className="extensions-picker">
 				<div className="jumbotron jumbotron-fluid">
-					<div className="container-fluid">
+					<div className="container-fluid container-fluid-col-10">
 						{connectorImage}
 						<div className='install-connector'>
 							<h1>{headerText}</h1>

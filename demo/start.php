@@ -12,16 +12,6 @@ if($_GET['user']){
 ?>
 <? include('./layoutHeader.php');?>
 <main>
-	<!-- Output the breadcrumb if it's set -->
-	<div class="container">
-		<nav aria-label="breadcrumb" role="navigation">
-			<ol class="breadcrumb">
-				<li class="breadcrumb-item"><a href="/">Home</a></li>
-				<li class="breadcrumb-item active" aria-current="page">Start</li>
-			</ol>
-		</nav>
-	</div>
-
 	<!-- hidden area for possible JS messages -->
 	<div id="js-message">
 		<ul id="js-message-list">

@@ -1,14 +1,6 @@
 .start {
   text-align: center;
 
-  .container {
-    padding: 0 15px;
-
-    @media (min-width: map-get($grid-breakpoints, sm)) {
-      padding: 0 80px;
-    }
-  }
-
   h1 {
     font-size: 20px;
     line-height: 1.1;
@@ -48,14 +40,16 @@
     }
   }
 
+  .section-extensions {
+    padding-top: $section-padding-md-mobile - rem(3);
+
+    @include media-breakpoint-up(md) {
+      padding: ($section-padding-md - rem(6)) 0 $section-padding-md;
+    }
+  }
+
   // Extensions picker on start page
   .extensions-picker {
-    padding-bottom: 48px;
-
-    @media (min-width: map-get($grid-breakpoints, sm)) {
-      padding-bottom: 80px;
-    }
-
     .all-extensions ul {
       margin-top: 26px; // 60px
     }

@@ -194,7 +194,7 @@ class AllExtensionsSection extends Component{
 		});
 		return (
 			<section className='all-extensions'>
-				<h2 className="visually-hidden">All connectors</h2>
+				<h2 className="sr-only">All connectors</h2>
 				<ul>
 					{installNodes}
 				</ul>
@@ -311,8 +311,8 @@ class InstallConnectorPrompt extends Component{
 
 		return (
 			<div className="extensions-picker">
-				<div className="jumbotron">
-					<div className="container">
+				<div className="jumbotron jumbotron-fluid">
+					<div className="container-fluid">
 						{connectorImage}
 						<div className='install-connector'>
 							<h1>{headerText}</h1>

@@ -3,6 +3,30 @@
 //
 
 .home {
+  .section-md {
+    padding: $spacer-xl 0;
+
+    @include media-breakpoint-up("md") {
+      padding: ($spacer-max - $spacer) 0;
+    }
+
+    &.first {
+      padding-top: $spacer-xl * 2;
+
+      @include media-breakpoint-up("md") {
+        padding-top: ($spacer-max - $spacer) * 2;
+      }
+    }
+
+    &.last {
+      padding-bottom: $spacer-xl * 2;
+
+      @include media-breakpoint-up("md") {
+        padding-bottom: ($spacer-max - $spacer) * 2;
+      }
+    }
+  }
+
   .jumbotron {
     text-align: center;
     color: $white;

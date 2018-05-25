@@ -280,8 +280,8 @@ class Start extends Component{
 	render(){
 		return (
 			<div className='start react'>
-				<section>
 					<p className="install-success">Success! You installed Zotero!</p>
+				<section className="section section-md section-extensions">
 					<InstallConnectorPrompt ref='installConnectorPrompt' numbered={true} />
 				</section>
 				<RegisterForm ref='registerForm' />

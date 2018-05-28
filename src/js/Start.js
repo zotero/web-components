@@ -192,10 +192,10 @@ class RegisterForm extends Component{
 						<input className='form-control' type='email' name='email' placeholder='Email' onChange={this.handleChange} value={formData.email}></input>
 						<FormFieldErrorMessage message={this.state.formErrors['email']} />
 					</div>
-					<div className='form-group'>
+					{/*<div className='form-group'>
 						<input className='form-control' type='email' name='email2' placeholder='Confirm Email' onChange={this.handleChange} value={formData.email2}></input>
 						<FormFieldErrorMessage message={this.state.formErrors['email2']} />
-					</div>
+					</div>*/}
 					<div className='form-group'>
 						<input className='form-control' type='password' name='password' placeholder='Password' onChange={this.handleChange} value={formData.password}></input>
 						<FormFieldErrorMessage message={this.state.formErrors['password']} />

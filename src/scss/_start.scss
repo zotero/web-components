@@ -72,7 +72,7 @@
     background-size: 51px auto;
     padding: 46px 0 38px; // 2/3
 
-    @media (min-width: map-get($grid-breakpoints, sm)) {
+    @include media-breakpoint-up(md) {
       background-size: 76px auto;
       padding: 68px 0 65px; // 80px
     }
@@ -81,7 +81,7 @@
   #register-form {
     margin: 34px 0 0; // 40px
 
-    @media (min-width: map-get($grid-breakpoints, sm)) {
+    @include media-breakpoint-up(md) {
       margin: 54px 0 0; // 60px
     }
 
@@ -95,7 +95,7 @@
         size: 16px;
       }
 
-      @media (min-width: map-get($grid-breakpoints, sm)) {
+      @include media-breakpoint-up(md) {
         max-width: 302px; // Adjust to captcha width
         height: 48px;
         font-size: 20px;
@@ -129,7 +129,7 @@
       width: 302px;
       margin: auto;
 
-      @media (max-width: map-get($grid-breakpoints, sm)) {
+      @include media-breakpoint-down(sm) {
         transform-origin: left top;
         transform: scale(0.96);
       }
@@ -166,7 +166,7 @@
     .username-message {
       color: $gray-800;
 
-      @media (min-width: map-get($grid-breakpoints, sm)) {
+      @include media-breakpoint-up(md) {
         width: 450px;
         margin: {
           left: auto;
@@ -185,7 +185,7 @@
     background-size: 51px;
     padding: 53px 0 47px; // 2/3
 
-    @media (min-width: map-get($grid-breakpoints, sm)) {
+    @include media-breakpoint-up(md) {
       background-size: 76px auto;
       padding: 80px 0 72px; // 80px
     }
@@ -194,7 +194,7 @@
   .connector-button {
     margin-bottom: 25px; // 2/3
 
-    @media (min-width: map-get($grid-breakpoints, sm)) {
+    @include media-breakpoint-up(md) {
       margin-bottom: 36px; // 48px
     }
   }
@@ -206,7 +206,7 @@
     line-height: 1.5;
     margin: 25px 0 0; // 2/3
 
-    @media (min-width: map-get($grid-breakpoints, sm)) {
+    @include media-breakpoint-up(md) {
       font-size: 20px;
       margin: 43px 0 0; // 60px;
     }

@@ -79,8 +79,10 @@
   }
 
   .register-form {
-    max-width: map-get($container-max-widths, xl) * 4 / 12 - $grid-gutter-width; // 4 xl cols
-    margin: auto;
+    @include media-breakpoint-up(md) {
+      max-width: map-get($container-max-widths, xl) * 4 / 12 - $grid-gutter-width; // 4 xl cols
+      margin: auto;
+    }
 
     .form-control-lg {
       font-size: rem(20);

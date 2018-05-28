@@ -201,10 +201,6 @@ class RegisterForm extends Component{
 						<FormFieldErrorMessage message={this.state.formErrors['password']} />
 					</div>
 					<div className='form-group'>
-						<input className='form-control' type='password' name='password2' placeholder='Verify Password' onChange={this.handleChange} value={formData.password2}></input>
-						<FormFieldErrorMessage message={this.state.formErrors['password2']} />
-					</div>
-					<div className='form-group'>
 						<div className="g-recaptcha" data-sitekey={recaptchaSitekey}></div>
 						<FormFieldErrorMessage message={this.state.formErrors['recaptcha']} />
 					</div>

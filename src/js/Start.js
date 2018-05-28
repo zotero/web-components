@@ -211,6 +211,7 @@ class RegisterForm extends Component{
 					<div className='form-group'>
 						<button type='button' className='btn' onClick={this.register}>Register</button>
 					</div>
+					<p>By using Zotero, you agree to its <a href="https://www.zotero.org/support/terms/terms_of_service">Terms of Service</a>.</p>
 				</VerticalExpandable>
 			</form>
 		);
@@ -229,7 +230,7 @@ class RegisterForm extends Component{
 		}
 
 		return (
-			<section className='register-section'>
+			<section className='section section-md register-section'>
 				<div className='container-fluid container-fluid-col-10'>
 					{heading}
 					<p className='lead'>If you haven’t already created a Zotero account, please take a few moments to register now.

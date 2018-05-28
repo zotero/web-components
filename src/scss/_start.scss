@@ -70,11 +70,11 @@
   .register-section {
     background: image-url("start/arrow-down-white.svg") no-repeat center top $gray-100;
     background-size: 51px auto;
-    padding: 46px 0 38px; // 2/3
+    padding: ($section-padding-md-mobile - rem(8)) 0 ($section-padding-md-mobile - rem(10));
 
     @include media-breakpoint-up(md) {
       background-size: 76px auto;
-      padding: 68px 0 65px; // 80px
+      padding: ($section-padding-md - rem(12)) 0 ($section-padding-md - rem(10));
     }
   }
 
@@ -144,7 +144,9 @@
     }
 
     p {
-      margin: 5px auto;
+      font-size: $font-size-sm;
+      color: $gray-700;
+      margin: $spacer-min auto;
 
       &:empty {
         display: none;

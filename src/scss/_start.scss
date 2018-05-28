@@ -17,9 +17,10 @@
 
   .section-extensions {
     padding-top: $section-padding-md-mobile - rem(3);
+    padding-bottom: $section-padding-md-mobile - rem(6);
 
     @include media-breakpoint-up(md) {
-      padding: ($section-padding-md - rem(6)) 0 $section-padding-md;
+      padding: ($section-padding-md - rem(6)) 0;
     }
   }
 
@@ -42,7 +43,7 @@
     }
 
     .all-extensions ul {
-      margin-top: 26px; // 60px
+      margin-top: $spacer-xxxl - rem(40);
     }
 
     .inner-start {

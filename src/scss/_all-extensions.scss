@@ -4,12 +4,10 @@
 
 // Other browsers
 .all-extensions {
-  overflow: hidden; // Fix jump in animation caused by negative margin-bottom
-
   h3 {
-    font-size: 16px;
-    line-height: 20px;
-    margin: 8px 0 13px;
+    font-size: 18px;
+    font-weight: 600;
+    margin: (20px - 8px) 0 (20px - 3px);
   }
 
   ul {
@@ -20,25 +18,13 @@
     li {
       display: inline-block;
       padding: 0 $grid-gutter-width;
-      margin-bottom: 30px;
-    }
-  }
-
-  .btn {
-    color: $white;
-    background: $link-color;
-    text-decoration: none;
-    border-radius: 3px;
-    padding: 5px 15px;
-
-    &:hover {
-      background: darken($link-color, 5%);
+      margin-bottom: $spacer-xxl - rem(8);
     }
   }
 
   .bookmarklet {
-    font-size: 13px;
-    line-height: 1.5;
+    font-size: $font-size-sm;
+    color: $gray-700;
     margin: 0;
     text-align: center;
   }

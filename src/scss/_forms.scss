@@ -1,0 +1,11 @@
+//
+// Forms
+//
+
+.form-control-lg {
+  font-size: $font-size-base;
+
+  &:focus {
+    outline: none;
+  }
+}

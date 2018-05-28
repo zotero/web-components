@@ -78,57 +78,14 @@
     }
   }
 
-  #register-form {
-    //margin: 34px 0 0; // 40px
+  .register-form {
+    max-width: map-get($container-max-widths, xl) * 4 / 12 - $grid-gutter-width; // 4 xl cols
+    margin: auto;
 
-    @include media-breakpoint-up(md) {
-      //margin: 54px 0 0; // 60px
-    }
-
-    .form-control,
-    .btn {
-      display: block;
-      margin: auto;
-      height: 42px; // Thumb size
-      font: {
-        family: inherit;
-        size: 16px;
-      }
-
-      @include media-breakpoint-up(md) {
-        max-width: 302px; // Adjust to captcha width
-        height: 48px;
-        font-size: 20px;
-      }
-    }
-
-    .form-control {
-      padding: 13px 12px;
-      color: #222;
-      box-shadow: none;
-
-      &:focus {
-        border-color: mix($white, $link-color, 40%);
-        box-shadow: 0 0 0 2px mix($white, $link-color, 40%);
-      }
-    }
-
-    .g-recaptcha {
-      width: 302px;
-      margin: auto;
-
-      @include media-breakpoint-down(sm) {
-        transform-origin: left top;
-        transform: scale(0.96);
-      }
-    }
-
-    .btn {
-      width: 100%;
-
-      &:hover {
-        border-color: transparent;
-      }
+    .form-control-lg {
+      font-size: rem(20);
+      padding-top: $input-padding-y-lg - rem(3);
+      padding-bottom: $input-padding-y-lg - rem(3);
     }
 
     p {
@@ -142,31 +99,27 @@
     }
 
     .profile-preview {
-      color: #19a15f;
-
-      &.undecided {
-        color: inherit;
+      &.valid {
+        color: $success;
       }
 
       &.invalid {
-        color: #c00;
-      }
-    }
-
-    .username-message {
-      color: $gray-800;
-
-      @include media-breakpoint-up(md) {
-        width: 450px;
-        margin: {
-          left: auto;
-          right: auto;
-        }
+        color: $danger;
       }
     }
 
     .form-field-error {
-      color: #c00;
+      color: $danger;
+    }
+
+    .g-recaptcha {
+      width: 302px;
+      margin: auto;
+
+      @include media-breakpoint-down(sm) {
+        transform-origin: left top;
+        transform: scale(0.96);
+      }
     }
   }
 

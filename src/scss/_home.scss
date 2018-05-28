@@ -177,7 +177,7 @@
     p {
       @include media-breakpoint-up("md") {
         font-size: 1.125rem;
-        line-height: $line-height-lg;
+        line-height: calc(28 / 18);
       }
     }
   }

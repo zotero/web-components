@@ -180,24 +180,24 @@ class RegisterForm extends Component{
 		}
 
 		let registerForm = (
-			<form id='register-form'>
+			<form className='register-form'>
 				<VerticalExpandable expand={!this.state.registrationSuccessful}>
 					<div className='form-group'>
-						<input className='form-control' type='text' name='username' placeholder='Username' onChange={this.handleChange} onBlur={this.checkUsername} value={formData.username}></input>
+						<input className='form-control form-control-lg' type='text' name='username' placeholder='Username' onChange={this.handleChange} onBlur={this.checkUsername} value={formData.username}></input>
 						<p className={previewClass}>{profileUrl}</p>
 						<p className='username-message'>{this.state.usernameMessage}</p>
 						<FormFieldErrorMessage message={this.state.formErrors['username']} />
 					</div>
 					<div className='form-group'>
-						<input className='form-control' type='email' name='email' placeholder='Email' onChange={this.handleChange} value={formData.email}></input>
+						<input className='form-control form-control-lg' type='email' name='email' placeholder='Email' onChange={this.handleChange} value={formData.email}></input>
 						<FormFieldErrorMessage message={this.state.formErrors['email']} />
 					</div>
 					{/*<div className='form-group'>
-						<input className='form-control' type='email' name='email2' placeholder='Confirm Email' onChange={this.handleChange} value={formData.email2}></input>
+						<input className='form-control form-control-lg' type='email' name='email2' placeholder='Confirm Email' onChange={this.handleChange} value={formData.email2}></input>
 						<FormFieldErrorMessage message={this.state.formErrors['email2']} />
 					</div>*/}
 					<div className='form-group'>
-						<input className='form-control' type='password' name='password' placeholder='Password' onChange={this.handleChange} value={formData.password}></input>
+						<input className='form-control form-control-lg' type='password' name='password' placeholder='Password' onChange={this.handleChange} value={formData.password}></input>
 						<FormFieldErrorMessage message={this.state.formErrors['password']} />
 					</div>
 					<div className='form-group'>
@@ -205,7 +205,7 @@ class RegisterForm extends Component{
 						<FormFieldErrorMessage message={this.state.formErrors['recaptcha']} />
 					</div>
 					<div className='form-group'>
-						<button type='button' className='btn' onClick={this.register}>Register</button>
+						<button type='button' className='btn btn-lg btn-block btn-secondary' onClick={this.register}>Register</button>
 					</div>
 					<p>By using Zotero, you agree to its <a href="https://www.zotero.org/support/terms/terms_of_service">Terms of Service</a>.</p>
 				</VerticalExpandable>

@@ -9,7 +9,7 @@
     margin: 0;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    padding: (27px) ($grid-gutter-width / 2);
+    padding: (17px) ($grid-gutter-width / 2); // 64px height
 
     @include media-breakpoint-up(md) {
       font-size: $font-size-lg;

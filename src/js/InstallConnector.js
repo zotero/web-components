@@ -51,7 +51,7 @@ class InstallFirefoxButton extends Component{
 			return (
 				<div className='download-full'>
 					<div className='browser-image'><BrowserIcon browser='firefox' /></div>
-					<h3>Firefox connector</h3>
+					<h3>Firefox Connector</h3>
 					<div><a href={firefoxDownload} className='btn' onClick={this.installFirefox}>{this.props.label}</a></div>
 				</div>
 			);
@@ -86,7 +86,7 @@ class InstallChromeButton extends Component{
 			return (
 				<div className='download-full'>
 					<div className='browser-image'><BrowserIcon browser="chrome" /></div>
-					<h3>Chrome connector</h3>
+					<h3>Chrome Connector</h3>
 					<div className='install-button'><a href={chromeDownload} id="chrome-connector-download-button" className="btn btn-secondary download-link">{this.props.label}</a></div>
 				</div>
 			);
@@ -114,7 +114,7 @@ class InstallSafariButton extends Component{
 			return (
 				<div className='download-full'>
 					<div className='browser-image'><BrowserIcon browser='safari' /></div>
-					<h3>Safari connector</h3>
+					<h3>Safari Connector</h3>
 					<a href={safariDownload} id="safari-connector-download-button" className="btn btn-secondary download-link">{this.props.label}</a>
 				</div>
 			);
@@ -142,7 +142,7 @@ class InstallOperaButton extends Component{
 			return (
 				<div className='download-full'>
 					<div className='browser-image'><BrowserIcon browser='opera' /></div>
-					<h3>Opera connector</h3>
+					<h3>Opera Connector</h3>
 					<a href={operaDownload} id="opera-connector-download-button" className="btn btn-secondary download-link">{this.props.label}</a>
 				</div>
 			);

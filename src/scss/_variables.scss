@@ -14,9 +14,9 @@
 $white:    #fff !default;
 $gray-100: #f6f6f6;
 $gray-200: #e6e6e6;
-$gray-300: #dee2e6 !default;
-$gray-400: #ced4da !default;
-$gray-500: #adb5bd !default;
+$gray-300: #ddd;
+$gray-400: #ccc;
+$gray-500: #bbb;
 $gray-600: #6c757d !default;
 $gray-700: #777;
 $gray-800: #444;
@@ -440,7 +440,7 @@ $input-focus-color:                     $input-color !default;
 $input-focus-width:                     $input-btn-focus-width !default;
 $input-focus-box-shadow:                $input-btn-focus-box-shadow !default;
 
-$input-placeholder-color:               $gray-600 !default;
+$input-placeholder-color:               $gray-500;
 $input-plaintext-color:                 $body-color !default;
 
 $input-height-border:                   $input-border-width * 2 !default;

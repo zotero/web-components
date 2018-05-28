@@ -7,8 +7,6 @@
     color: map-get($theme-colors, success);
     background-color: #d9ffe0;
     margin: 0;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
     padding: (17px) ($grid-gutter-width / 2); // 64px height
 
     @include media-breakpoint-up(md) {

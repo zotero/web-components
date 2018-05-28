@@ -62,10 +62,11 @@ h1,
 // Lead
 
 .lead {
-  @include media-breakpoint-up("md") {
+  margin-bottom: rem(42) - rem(8); // 2/3
+
+  @include media-breakpoint-up(md) {
     width: 80%;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 0 auto $spacer-xxxl - rem(8);
   }
 }
 

@@ -127,6 +127,28 @@
     }
   }
 
+  .notifier {
+    font-size: $font-size-lg-mobile;
+    font-weight: 300;
+    margin-top: rem(-1);
+    margin-bottom: rem(2);
+
+    @include media-breakpoint-up(md) {
+      font-size: $font-size-lg;
+      margin-top: rem(-10); // 64px
+      margin-bottom: 0;
+    }
+
+    &.success {
+      color: $success;
+    }
+
+    &.error {
+      color: $danger;
+      margin-top: $spacer-md;
+    }
+  }
+
   .post-register-guide {
     background: image-url("start/arrow-down-gray.svg") no-repeat center top;
     background-size: 51px;

@@ -69,11 +69,11 @@
 
   .register-section {
     background: image-url("start/arrow-down-white.svg") no-repeat center top $gray-100;
-    background-size: 51px auto;
+    background-size: rem(51) auto;
     padding: ($section-padding-md-mobile - rem(8)) 0 ($section-padding-md-mobile - rem(10));
 
     @include media-breakpoint-up(md) {
-      background-size: 76px auto;
+      background-size: rem(76) auto;
       padding: ($section-padding-md - rem(12)) 0 ($section-padding-md - rem(10));
     }
   }
@@ -151,37 +151,37 @@
 
   .post-register-guide {
     background: image-url("start/arrow-down-gray.svg") no-repeat center top;
-    background-size: 51px;
-    padding: 53px 0 47px; // 2/3
+    background-size: rem(51);
+    padding-bottom: $section-padding-md-mobile - rem(8);
 
     @include media-breakpoint-up(md) {
-      background-size: 76px auto;
-      padding: 80px 0 72px; // 80px
+      background-size: rem(76) auto;
+      padding-bottom: $section-padding-md - rem(10);
     }
   }
 
   .connector-button {
-    margin-bottom: 25px; // 2/3
+    margin-bottom: rem(24); // 32px
 
     @include media-breakpoint-up(md) {
-      margin-bottom: 36px; // 48px
+      margin-bottom: rem(36); // 48px
     }
   }
 
   .register-quick-links {
+    font-size: $font-size-lg-mobile;
     list-style: none;
     padding: 0;
-    font-size: 16px;
-    line-height: 1.5;
-    margin: 25px 0 0; // 2/3
+    margin-top: rem(-1);
+    margin-bottom: 0;
 
     @include media-breakpoint-up(md) {
-      font-size: 20px;
-      margin: 43px 0 0; // 60px;
+      font-size: $font-size-lg;
+      margin-top: rem(-9);
     }
 
     li + li {
-      margin-top: 5px;
+      margin-top: $spacer-min;
     }
   }
 }

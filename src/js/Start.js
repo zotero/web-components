@@ -248,8 +248,8 @@ RegisterForm.defaultProps = {
 class PostRegisterGuide extends Component{
 	render(){
 		return (
-			<section className='post-register-guide'>
-				<div className='container'>
+			<section className='section section-md post-register-guide'>
+				<div className='container-fluid container-fluid-col-10'>
 					<img src={connectorButtonImagePath} className='connector-button' width='160' height='160' />
 					<h1>3. Start building your library</h1>
 					<p className='lead'>New to Zotero? Explore the documentation and see what Zotero can do.</p>

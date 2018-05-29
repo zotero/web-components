@@ -18,26 +18,12 @@ import {ajax, postFormData} from './ajax.js';
 import {slugify, getCurrentUser} from './Utils.js';
 import {buildUrl} from './wwwroutes.js';
 import {Notifier} from './Notifier.js';
-import {VerticalExpandable} from './VerticalExpandable.js';
 import {InstallConnectorPrompt} from './InstallConnector.js';
+import {Collapse} from 'reactstrap';
 
 const currentUser = getCurrentUser();
 
 let validateRegisterForm = function(data) {
-	if(data.email != data.email2){
-		return {
-			valid:false,
-			field:'email',
-			reason:'emails must match'
-		};
-	}
-	if(data.password != data.password2){
-		return {
-			valid:false,
-			field:'password',
-			reason:'passwords must match'
-		};
-	}
 	return {valid:true};
 };
 
@@ -56,9 +42,7 @@ class RegisterForm extends Component{
 			formData:{
 				username:'',
 				email:'',
-				email2:'',
 				password:'',
-				password2:''
 			},
 			usernameValidity:'undecided',
 			usernameMessage:'',
@@ -181,7 +165,7 @@ class RegisterForm extends Component{
 
 		let registerForm = (
 			<form className='register-form'>
-				<VerticalExpandable expand={!this.state.registrationSuccessful}>
+				<Collapse isOpen={!this.state.registrationSuccessful}>
 					<div className='form-group'>
 						<input className='form-control form-control-lg' type='text' name='username' placeholder='Username' onChange={this.handleChange} onBlur={this.checkUsername} value={formData.username}></input>
 						<p className={previewClass}>{profileUrl}</p>
@@ -192,10 +176,6 @@ class RegisterForm extends Component{
 						<input className='form-control form-control-lg' type='email' name='email' placeholder='Email' onChange={this.handleChange} value={formData.email}></input>
 						<FormFieldErrorMessage message={this.state.formErrors['email']} />
 					</div>
-					{/*<div className='form-group'>
-						<input className='form-control form-control-lg' type='email' name='email2' placeholder='Confirm Email' onChange={this.handleChange} value={formData.email2}></input>
-						<FormFieldErrorMessage message={this.state.formErrors['email2']} />
-					</div>*/}
 					<div className='form-group'>
 						<input className='form-control form-control-lg' type='password' name='password' placeholder='Password' onChange={this.handleChange} value={formData.password}></input>
 						<FormFieldErrorMessage message={this.state.formErrors['password']} />
@@ -208,7 +188,7 @@ class RegisterForm extends Component{
 						<button type='button' className='btn btn-lg btn-block btn-secondary' onClick={this.register}>Register</button>
 					</div>
 					<p>By using Zotero, you agree to its <a href="https://www.zotero.org/support/terms/terms_of_service">Terms of Service</a>.</p>
-				</VerticalExpandable>
+				</Collapse>
 			</form>
 		);
 

@@ -63,6 +63,7 @@
     "prop-types": "^15.6.0",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
+    "reactstrap": "^6.0.1",
     "striptags": "^2.2.1",
     "velocity-react": "^1.3.2",
     "webfontloader": "^1.6.28",

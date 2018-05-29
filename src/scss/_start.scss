@@ -116,11 +116,13 @@
 
     .g-recaptcha {
       width: 302px;
-      margin: auto;
+      margin: 0 auto -2px;
 
-      @include media-breakpoint-down(sm) {
+      @include media-breakpoint-down(xs) {
         transform-origin: left top;
-        transform: scale(0.96);
+        transform: scale(0.9536);
+        width: 288px;
+        margin-bottom: -6px;
       }
     }
   }

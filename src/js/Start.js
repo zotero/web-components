@@ -256,7 +256,7 @@ class PostRegisterGuide extends Component{
 					<ul className='register-quick-links'>
 						<li><a href="https://www.zotero.org/support/quick_start_guide">Read the Quick Start Guide</a></li>
 						<li><a href="https://www.zotero.org/support/getting_stuff_into_your_library">Add an item</a></li>
-						{/*<li><a href="https://www.zotero.org/support/archive_the_web">Archive a webpage</a></li>*/}
+						<li><a href="https://www.zotero.org/support/archive_the_web">Archive a webpage</a></li>
 						<li><a href="https://www.zotero.org/support/screencast_tutorials/manually_creating_items">Manually enter an item</a></li>
 						<li><a href="https://www.zotero.org/support/collections">Create a collection</a></li>
 						<li><a href="https://www.zotero.org/support/creating_bibliographies">Create a bibliography</a></li>

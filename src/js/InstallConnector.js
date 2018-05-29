@@ -272,10 +272,10 @@ class InstallConnectorPrompt extends Component{
 				<span className="inner-extensions">
 					{otherBrowserImages}<br />
 					Not using {this.state.browser}?<br />
-					<a href='#' onClick={this.showAllExtensions}>Show all connectors</a>
+					<a href='#' onClick={this.showAllExtensions}>Show all connectors.</a>
 				</span>
 				<span className="inner-start">
-					<a href='#' onClick={this.showAllExtensions}>Not using {this.state.browser}? Show all connectors</a>
+					<a href='#' onClick={this.showAllExtensions}>Not using {this.state.browser}? Show all connectors.</a>
 				</span>
 			</p>
 		);

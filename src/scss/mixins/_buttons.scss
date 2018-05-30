@@ -41,6 +41,10 @@
 
       .keyboard-user & {
         box-shadow: 0 0 0 $btn-focus-width rgba($border, 1);
+
+        &:hover {
+          box-shadow: 0 0 0 $btn-focus-width rgba(lighten($border, 4%), 1); // Zotero patch
+        }
       }
     }
   }
@@ -94,8 +98,8 @@
 
   &:hover {
     color: $color-hover;
-    background-color: $active-background;
-    border-color: $active-border;
+    background-color: lighten($active-background, 4%); // Zotero patch
+    border-color: lighten($active-border, 4%); // Zotero patch
   }
 
   &:focus,
@@ -106,6 +110,10 @@
 
     .keyboard-user & {
       box-shadow: 0 0 0 $btn-focus-width rgba($color, 1);
+
+      &:hover {
+        box-shadow: 0 0 0 $btn-focus-width rgba(lighten($color, 4%), 1); // Zotero patch
+      }
     }
   }
 
@@ -119,15 +127,19 @@
   &:not(:disabled):not(.disabled).active,
   .show > &.dropdown-toggle {
     color: color-yiq($active-background);
-    background-color: $active-background;
-    border-color: $active-border;
+    background-color: darken($active-background, 4%); // Zotero patch
+    border-color: darken($active-border, 4%); // Zotero patch
 
     &:focus {
       // Avoid using mixin so we can pass custom focus shadow properly
       @if $enable-shadows and $btn-active-box-shadow != none {
         box-shadow: $btn-active-box-shadow, 0 0 0 $btn-focus-width rgba($color, 1);
       } @else {
-        box-shadow: 0 0 0 $btn-focus-width rgba($color, 1);
+        box-shadow: none;
+
+        .keyboard-user & {
+          box-shadow: 0 0 0 $btn-focus-width rgba(darken($color, 4%), 1); // Zotero patch
+        }
       }
     }
   }

@@ -9,3 +9,7 @@
     outline: none;
   }
 }
+
+// Needed for Zotero’s opaque focus styles
+@include form-validation-state("valid", $form-feedback-valid-color);
+@include form-validation-state("invalid", $form-feedback-invalid-color);

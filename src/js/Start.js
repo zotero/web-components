@@ -115,8 +115,9 @@ class RegisterForm extends Component{
 		let registerUrl = buildUrl('registerAsync');
 		postFormData(registerUrl, formData).then((resp)=>{
 			resp.json().then((data)=>{
-				if(data.success)
-				this.setState({registrationSuccessful:true});
+				if(data.success){
+					this.setState({registrationSuccessful:true, loading:false});
+				}
 			});
 		}).catch((resp)=>{
 			resp.json().then((data)=>{
@@ -130,12 +131,12 @@ class RegisterForm extends Component{
 						}
 						formErrors[ind] = messages.join(', ');
 					}
-					this.setState({formErrors});
+					this.setState({formErrors, loading:false});
 				}
 			}).catch((e)=>{
 				log.debug('failed decoding json in caught register response');
 				log.debug(e);
-				this.setState({formError:'Error processing registration'});
+				this.setState({formError:'Error processing registration', loading:false});
 			});
 		});
 	}
@@ -202,8 +203,8 @@ class RegisterForm extends Component{
 						<FormFieldErrorMessage message={formErrors['recaptcha']} />
 					</div>
 					<div className='form-group'>
-						<button type='button' className='btn btn-lg btn-block btn-secondary' onClick={this.register}>
-							<span className="inline-feedback">
+						<button type='button' className='btn btn-lg btn-block btn-secondary' onClick={this.register} disabled={loading}>
+							<span className={cn("inline-feedback", {active:loading})}>
 								<span className="default-text">Register</span>
 								<span className="shorter feedback">
 									<img className="icon icon-spin" src={iconSpinImagePath} width="16" height="16" />

@@ -46,11 +46,13 @@ class RegisterForm extends Component{
 				email:'',
 				password:'',
 			},
-			usernameValidity:'undecided',
+			usernameChecked:false,
+			usernameValid:false,
 			usernameMessage:'',
 			formErrors:{},
 			registrationSuccessful:false,
-			passwordVisible:false
+			passwordVisible:false,
+			wasValidated:false
 		};
 		this.checkUsername = this.checkUsername.bind(this);
 		this.handleChange = this.handleChange.bind(this);
@@ -61,7 +63,8 @@ class RegisterForm extends Component{
 		let username = this.state.formData.username;
 		if(username.indexOf('@') != -1){
 			this.setState({
-				usernameValidity:'invalid',
+				usernameChecked:true,
+				usernameValid:false,
 				usernameMessage: 'Your email address can be used to log in to your Zotero account, but not as your username.'
 			});
 			return;
@@ -70,10 +73,14 @@ class RegisterForm extends Component{
 		ajax({url:checkUrl}).then((response)=>{
 			response.json().then((data)=>{
 				if(data.valid){
-					this.setState({usernameValidity:'valid'});
+					this.setState({
+						usernameChecked:true,
+						usernameValid:true
+					});
 				} else {
 					this.setState({
-						usernameValidity:'invalid',
+						usernameChecked:true,
+						usernameValid:false,
 						usernameMessage: 'Username is not available'
 					});
 				}
@@ -89,7 +96,11 @@ class RegisterForm extends Component{
 
 		this.setState({formData:formData});
 		if(ev.target.name == 'username'){
-			this.setState({usernameValidity:'undecided', usernameMessage:''});
+			this.setState({
+				usernameChecked:false,
+				usernameValid:false,
+				usernameMessage:''
+			});
 		}
 	}
 	togglePasswordVisible(ev){
@@ -141,14 +152,14 @@ class RegisterForm extends Component{
 		});
 	}
 	render(){
-		const {formData, usernameValidity, loading, registrationSuccessful, formError, formErrors, usernameMessage, passwordVisible} = this.state;
+		const {formData, usernameChecked, usernameValid, loading, registrationSuccessful, formError, formErrors,
+			usernameMessage, passwordVisible, wasValidated} = this.state;
 
 		let slug = '<username>';
 		if(formData.username) {
 			slug = slugify(formData.username);
 		}
 		let profileUrl = buildUrl('profileUrl', {slug});
-		let previewClass = 'profile-preview ' + usernameValidity;
 		if(currentUser) {
 			let heading = <h1>2. Start syncing to take full advantage of Zotero</h1>;
 			if(!this.props.numbered) {
@@ -175,18 +186,39 @@ class RegisterForm extends Component{
 			<form className='register-form'>
 				<Collapse isOpen={!registrationSuccessful}>
 					<div className='form-group'>
-						<input className='form-control form-control-lg' type='text' name='username' placeholder='Username' onChange={this.handleChange} onBlur={this.checkUsername} value={formData.username}></input>
-						<p className={previewClass}>{profileUrl}</p>
-						<p className='username-message'>{usernameMessage}</p>
-						<FormFieldErrorMessage message={formErrors['username']} />
+						<input
+							className={cn('form-control', 'form-control-lg', {'is-invalid':(usernameChecked && !usernameValid), 'is-valid':(usernameChecked && usernameValid)})}
+							type='text'
+							name='username'
+							placeholder='Username'
+							onChange={this.handleChange}
+							onBlur={this.checkUsername}
+							value={formData.username}>
+						</input>
+						<p className={cn('profile-preview', {valid:usernameValid, invalid:(usernameChecked && !usernameValid)})}>{profileUrl}</p>
+						<div className='invalid-feedback'>{usernameMessage ? usernameMessage : formErrors['username']}</div>
 					</div>
 					<div className='form-group'>
-						<input className='form-control form-control-lg' type='email' name='email' placeholder='Email' onChange={this.handleChange} value={formData.email}></input>
-						<FormFieldErrorMessage message={formErrors['email']} />
+						<input
+							className={cn('form-control', 'form-control-lg', {'is-invalid':formErrors.hasOwnProperty('email')})}
+							type='email'
+							name='email'
+							placeholder='Email'
+							onChange={this.handleChange}
+							value={formData.email}>
+						</input>
+						<div className='invalid-feedback'>{formErrors['email']}</div>
 					</div>
 					<div className='form-group'>
 						<div className="input-group">
-							<input className='form-control form-control-lg' type={passwordVisible ? 'text' : 'password'} name='password' placeholder='Password' onChange={this.handleChange} value={formData.password}></input>
+							<input
+								className={cn('form-control', 'form-control-lg', {'is-invalid':formErrors.hasOwnProperty('password')})}
+								type={passwordVisible ? 'text' : 'password'}
+								name='password'
+								placeholder='Password'
+								onChange={this.handleChange}
+								value={formData.password}>
+							</input>
 							<div className="input-group-append">
 								<button type='button' className="btn btn-outline-secondary" onClick={this.togglePasswordVisible}>
 									<span className={cn('inline-feedback', {active:passwordVisible})}>
@@ -195,12 +227,12 @@ class RegisterForm extends Component{
 									</span>
 								</button>
 							</div>
+							<div className='invalid-feedback'>{formErrors['password']}</div>
 						</div>
-						<FormFieldErrorMessage message={this.state.formErrors['password']} />
 					</div>
 					<div className='form-group'>
 						<div className="g-recaptcha" data-sitekey={recaptchaSitekey}></div>
-						<FormFieldErrorMessage message={formErrors['recaptcha']} />
+						<div className='invalid-feedback'>{formErrors['recaptcha']}</div>
 					</div>
 					<div className='form-group'>
 						<button type='button' className='btn btn-lg btn-block btn-secondary' onClick={this.register} disabled={loading}>

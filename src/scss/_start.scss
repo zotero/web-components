@@ -116,6 +116,7 @@
 
     .g-recaptcha {
       width: 302px;
+      min-height: 78px;
       margin: 0 auto -2px;
 
       @include media-breakpoint-down(xs) {

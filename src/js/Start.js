@@ -21,6 +21,7 @@ import {buildUrl} from './wwwroutes.js';
 import {Notifier} from './Notifier.js';
 import {InstallConnectorPrompt} from './InstallConnector.js';
 import {Collapse} from 'reactstrap';
+import cn from 'classnames';
 
 const currentUser = getCurrentUser();
 
@@ -48,11 +49,13 @@ class RegisterForm extends Component{
 			usernameValidity:'undecided',
 			usernameMessage:'',
 			formErrors:{},
-			registrationSuccessful:false
+			registrationSuccessful:false,
+			passwordVisible:false
 		};
 		this.checkUsername = this.checkUsername.bind(this);
 		this.handleChange = this.handleChange.bind(this);
 		this.register = this.register.bind(this);
+		this.togglePasswordVisible = this.togglePasswordVisible.bind(this);
 	}
 	checkUsername(){
 		let username = this.state.formData.username;
@@ -81,7 +84,7 @@ class RegisterForm extends Component{
 		});
 	}
 	handleChange(ev){
-		let formData = this.state.formData;
+		let {formData} = this.state;
 		formData[ev.target.name] = ev.target.value;
 
 		this.setState({formData:formData});
@@ -89,8 +92,12 @@ class RegisterForm extends Component{
 			this.setState({usernameValidity:'undecided', usernameMessage:''});
 		}
 	}
+	togglePasswordVisible(ev){
+		let {passwordVisible} = this.state;
+		this.setState({passwordVisible:(!passwordVisible)});
+	}
 	register(){
-		let formData = this.state.formData;
+		let {formData} = this.state;
 		//validate form
 		let validated = validateRegisterForm(formData);
 		if(!validated.valid){
@@ -104,15 +111,14 @@ class RegisterForm extends Component{
 		formData.captcha = window.grecaptcha.getResponse();
 
 		//submit form
+		this.setState({loading:true});
 		let registerUrl = buildUrl('registerAsync');
 		postFormData(registerUrl, formData).then((resp)=>{
-			log.debug('successfulish response');
 			resp.json().then((data)=>{
 				if(data.success)
 				this.setState({registrationSuccessful:true});
 			});
 		}).catch((resp)=>{
-			log.debug('caught response');
 			resp.json().then((data)=>{
 				if(data.success === false){
 					let formErrors = {};
@@ -134,14 +140,14 @@ class RegisterForm extends Component{
 		});
 	}
 	render(){
-		//log.debug('RegisterForm render');
-		let formData = this.state.formData;
+		const {formData, usernameValidity, loading, registrationSuccessful, formError, formErrors, usernameMessage, passwordVisible} = this.state;
+
 		let slug = '<username>';
-		if(this.state.formData.username) {
-			slug = slugify(this.state.formData.username);
+		if(formData.username) {
+			slug = slugify(formData.username);
 		}
 		let profileUrl = buildUrl('profileUrl', {slug});
-		let previewClass = 'profile-preview ' + this.state.usernameValidity;
+		let previewClass = 'profile-preview ' + usernameValidity;
 		if(currentUser) {
 			let heading = <h1>2. Start syncing to take full advantage of Zotero</h1>;
 			if(!this.props.numbered) {
@@ -166,23 +172,23 @@ class RegisterForm extends Component{
 
 		let registerForm = (
 			<form className='register-form'>
-				<Collapse isOpen={!this.state.registrationSuccessful}>
+				<Collapse isOpen={!registrationSuccessful}>
 					<div className='form-group'>
 						<input className='form-control form-control-lg' type='text' name='username' placeholder='Username' onChange={this.handleChange} onBlur={this.checkUsername} value={formData.username}></input>
 						<p className={previewClass}>{profileUrl}</p>
-						<p className='username-message'>{this.state.usernameMessage}</p>
-						<FormFieldErrorMessage message={this.state.formErrors['username']} />
+						<p className='username-message'>{usernameMessage}</p>
+						<FormFieldErrorMessage message={formErrors['username']} />
 					</div>
 					<div className='form-group'>
 						<input className='form-control form-control-lg' type='email' name='email' placeholder='Email' onChange={this.handleChange} value={formData.email}></input>
-						<FormFieldErrorMessage message={this.state.formErrors['email']} />
+						<FormFieldErrorMessage message={formErrors['email']} />
 					</div>
 					<div className='form-group'>
 						<div className="input-group">
-							<input className='form-control form-control-lg' type='password' name='password' placeholder='Password' onChange={this.handleChange} value={formData.password}></input>
+							<input className='form-control form-control-lg' type={passwordVisible ? 'text' : 'password'} name='password' placeholder='Password' onChange={this.handleChange} value={formData.password}></input>
 							<div className="input-group-append">
-								<button className="btn btn-outline-secondary">
-									<span className="inline-feedback">
+								<button type='button' className="btn btn-outline-secondary" onClick={this.togglePasswordVisible}>
+									<span className={cn('inline-feedback', {active:passwordVisible})}>
 										<span className="default-text">Show</span>
 										<span className="feedback shorter">Hide</span>
 									</span>
@@ -193,7 +199,7 @@ class RegisterForm extends Component{
 					</div>
 					<div className='form-group'>
 						<div className="g-recaptcha" data-sitekey={recaptchaSitekey}></div>
-						<FormFieldErrorMessage message={this.state.formErrors['recaptcha']} />
+						<FormFieldErrorMessage message={formErrors['recaptcha']} />
 					</div>
 					<div className='form-group'>
 						<button type='button' className='btn btn-lg btn-block btn-secondary' onClick={this.register}>
@@ -211,11 +217,11 @@ class RegisterForm extends Component{
 		);
 
 		let notifier = null;
-		if(this.state.registrationSuccessful){
+		if(registrationSuccessful){
 			let message = 'Thanks for registering. We’ve sent an email to activate your account.';
 			notifier = <Notifier type='success' message={message} />;
-		} else if(this.state.formError){
-			notifier = <Notifier type='error' message={this.state.formError} />;
+		} else if(formError){
+			notifier = <Notifier type='error' message={formError} />;
 		}
 
 		let heading = <h1>2. Register to take full advantage of Zotero</h1>;
@@ -296,7 +302,7 @@ class Start extends Component{
 	render(){
 		return (
 			<div className='start react'>
-					<p className="install-success">Success! You installed Zotero!</p>
+				<p className="install-success">Success! You installed Zotero!</p>
 				<section className="section section-md section-extensions">
 					<InstallConnectorPrompt ref='installConnectorPrompt' numbered={true} />
 				</section>

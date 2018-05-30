@@ -178,7 +178,17 @@ class RegisterForm extends Component{
 						<FormFieldErrorMessage message={this.state.formErrors['email']} />
 					</div>
 					<div className='form-group'>
-						<input className='form-control form-control-lg' type='password' name='password' placeholder='Password' onChange={this.handleChange} value={formData.password}></input>
+						<div className="input-group">
+							<input className='form-control form-control-lg' type='password' name='password' placeholder='Password' onChange={this.handleChange} value={formData.password}></input>
+							<div className="input-group-append">
+								<button className="btn btn-outline-secondary">
+									<span className="inline-feedback">
+										<span className="default-text">Show</span>
+										<span className="feedback shorter">Hide</span>
+									</span>
+								</button>
+							</div>
+						</div>
 						<FormFieldErrorMessage message={this.state.formErrors['password']} />
 					</div>
 					<div className='form-group'>

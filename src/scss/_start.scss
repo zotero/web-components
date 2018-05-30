@@ -114,6 +114,29 @@
       color: $danger;
     }
 
+    .input-group {
+      .btn {
+        font-size: $font-size-sm;
+        background-color: $input-bg;
+        border-color: $input-border-color;
+        color: inherit;
+
+        &:focus {
+          .keyboard-user & {
+            border-color: $secondary;
+          }
+        }
+
+        &:active {
+          background-color: darken($input-bg, 4%);
+        }
+      }
+
+      .feedback {
+        font-style: normal;
+      }
+    }
+
     .g-recaptcha {
       width: 302px;
       min-height: 78px;
@@ -127,15 +150,17 @@
       }
     }
 
-    .feedback {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+    .btn-register {
+      .feedback {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
 
-    .icon-spin {
-      width: $spacer-lg;
-      height: $spacer-lg;
+      .icon-spin {
+        width: $spacer-lg;
+        height: $spacer-lg;
+      }
     }
   }
 

@@ -13,6 +13,7 @@ const recaptchaSitekey = config.recaptchaSitekey;
 const imagePath = config.imagePath;
 
 const connectorButtonImagePath = imagePath + '/start/zotero-button.svg';
+const iconSpinImagePath = imagePath + '/spin-white.svg';
 
 import {ajax, postFormData} from './ajax.js';
 import {slugify, getCurrentUser} from './Utils.js';
@@ -185,7 +186,14 @@ class RegisterForm extends Component{
 						<FormFieldErrorMessage message={this.state.formErrors['recaptcha']} />
 					</div>
 					<div className='form-group'>
-						<button type='button' className='btn btn-lg btn-block btn-secondary' onClick={this.register}>Register</button>
+						<button type='button' className='btn btn-lg btn-block btn-secondary' onClick={this.register}>
+							<span className="inline-feedback">
+								<span className="default-text">Register</span>
+								<span className="shorter feedback">
+									<img className="icon icon-spin" src={iconSpinImagePath} width="16" height="16" />
+								</span>
+							</span>
+						</button>
 					</div>
 					<p>By using Zotero, you agree to its <a href="https://www.zotero.org/support/terms/terms_of_service">Terms of Service</a>.</p>
 				</Collapse>

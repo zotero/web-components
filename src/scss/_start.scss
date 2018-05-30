@@ -126,6 +126,17 @@
         margin-bottom: -6px;
       }
     }
+
+    .feedback {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .icon-spin {
+      width: $spacer-lg;
+      height: $spacer-lg;
+    }
   }
 
   .notifier {

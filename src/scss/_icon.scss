@@ -1,0 +1,21 @@
+//
+// Icon
+//
+
+.icon-spin {
+  @keyframes spin {
+    0% {
+      transform: rotate(0);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  display: block; // todo
+  //width: $icon-spin-size;
+  //height: $icon-spin-size;
+  //color: $spinner-color;
+  animation: spin 1s linear infinite;
+}

@@ -251,13 +251,38 @@ class PostRegisterGuide extends Component{
 					<img src={connectorButtonImagePath} className='connector-button' width='160' height='160' />
 					<h1>3. Start building your library</h1>
 					<p className='lead'>New to Zotero? Explore the documentation and see what Zotero can do.</p>
-					<ul className='register-quick-links'>
-						<li><a href="https://www.zotero.org/support/quick_start_guide">Read the Quick Start Guide</a></li>
-						<li><a href="https://www.zotero.org/support/getting_stuff_into_your_library">Add an item</a></li>
-						<li><a href="https://www.zotero.org/support/collections_and_tags">Create a collection</a></li>
-						<li><a href="https://www.zotero.org/support/creating_bibliographies">Create a bibliography</a></li>
-						<li><a href="https://www.zotero.org/support/word_processor_plugin_usage">Use the Word or LibreOffice plugin</a></li>
-					</ul>
+					<div className="row">
+						<div className="col-md quick-link-container">
+							<a className="quick-link" href="https://www.zotero.org/support/quick_start_guide">
+								<img src={imagePath + '/start/quick-start-guide.svg'} width="72" height="72" alt="" />
+								Read the Quick <span className="d-sm-block">Start Guide</span>
+							</a>
+						</div>
+						<div className="col-md quick-link-container">
+							<a className="quick-link" href="https://www.zotero.org/support/getting_stuff_into_your_library">
+								<img src={imagePath + '/start/new-item.svg'} width="72" height="72" alt="" />
+								Add items to <span className="d-sm-block">Zotero</span>
+							</a>
+						</div>
+						<div className="col-md quick-link-container">
+							<a className="quick-link" href="https://www.zotero.org/support/collections_and_tags">
+								<img src={imagePath + '/start/folder.svg'} width="72" height="72" alt="" />
+								Organize your <span className="d-sm-block">research</span>
+							</a>
+						</div>
+						<div className="col-md quick-link-container">
+							<a className="quick-link" href="https://www.zotero.org/support/creating_bibliographies">
+							<img src={imagePath + '/start/bibliography.svg'} width="72" height="72" alt="" />
+								Create a <span className="d-sm-block">bibliography</span>
+							</a>
+						</div>
+						<div className="col-md quick-link-container">
+							<a className="quick-link" href="https://www.zotero.org/support/word_processor_plugin_usage">
+								<img src={imagePath + '/start/plugin.svg'} width="72" height="72" alt="" />
+								Cite in Word <span className="d-sm-block">or LibreOffice</span>
+							</a>
+						</div>
+					</div>
 				</div>
 			</section>
 		);

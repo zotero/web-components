@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 72 72">
+  <circle cx="36" cy="36" r="36" fill="#d9e8fa"/>
+  <rect x="21" y="18" width="32" height="36" rx="2" ry="2" fill="#99c3f3"/>
+  <rect x="19" y="25" width="6" height="2" rx="1" ry="1" fill="#0069e0"/>
+  <rect x="19" y="21" width="6" height="2" rx="1" ry="1" fill="#0069e0"/>
+  <rect x="19" y="29" width="6" height="2" rx="1" ry="1" fill="#0069e0"/>
+  <rect x="19" y="33" width="6" height="2" rx="1" ry="1" fill="#0069e0"/>
+  <rect x="19" y="37" width="6" height="2" rx="1" ry="1" fill="#0069e0"/>
+  <rect x="19" y="41" width="6" height="2" rx="1" ry="1" fill="#0069e0"/>
+  <rect x="19" y="45" width="6" height="2" rx="1" ry="1" fill="#0069e0"/>
+  <rect x="19" y="49" width="6" height="2" rx="1" ry="1" fill="#0069e0"/>
+  <rect x="29" y="29" width="18" height="2" fill="#0069e0"/>
+  <rect x="31" y="33" width="14" height="2" fill="#0069e0"/>
+  <path d="M44,43a2,2,0,0,0-2,2v9L53,43Z" fill="#0069e0"/>
+  <path d="M51,54a2,2,0,0,0,2-2V43L42,54Z" fill="#b2d2f6"/>
+</svg>

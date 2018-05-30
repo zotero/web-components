@@ -8,7 +8,7 @@ const {Component} = React;
 
 import {buildUrl} from './wwwroutes.js';
 import {BrowserDetect} from './browserdetect.js';
-import {VerticalExpandable} from './VerticalExpandable.js';
+import {Collapse} from 'reactstrap';
 import {ZoteroIcon, BrowserIcon, BrowserExtensionIcon} from './Icons.js';
 import classnames from 'classnames';
 import {Delay} from './Utils.js';
@@ -41,7 +41,7 @@ class InstallFirefoxButton extends Component{
 	render(){
 		if(this.props.type == 'button'){
 			return (
-				<a href={firefoxDownload} className='btn' onClick={this.installFirefox}>{this.props.label}</a>
+				<a href={firefoxDownload} className='btn btn-lg btn-secondary' onClick={this.installFirefox}>{this.props.label}</a>
 			);
 		} else if(this.props.type == 'image') {
 			return (
@@ -282,9 +282,9 @@ class InstallConnectorPrompt extends Component{
 
 		let allExtensions = (
 			<div id='all-extensions'>
-				<VerticalExpandable expand={this.state.allExtensionsShown}>
+				<Collapse isOpen={this.state.allExtensionsShown}>
 					<AllExtensionsSection except={this.state.browser.toLowerCase()} />
-				</VerticalExpandable>
+				</Collapse>
 			</div>
 		);
 

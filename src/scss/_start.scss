@@ -117,8 +117,7 @@
         border-color: $input-border-color;
         color: inherit;
         // Fix https://github.com/twbs/bootstrap/issues/25110
-        border-top-right-radius: $input-border-radius-lg;
-        border-bottom-right-radius: $input-border-radius-lg;
+        @include border-right-radius($input-border-radius-lg);
 
         &:focus {
           .keyboard-user & {

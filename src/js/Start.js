@@ -29,14 +29,6 @@ let validateRegisterForm = function(data) {
 	return {valid:true};
 };
 
-class FormFieldErrorMessage extends Component {
-	render() {
-		return (
-			<p className='form-field-error'>{this.props.message}</p>
-		);
-	}
-}
-
 class RegisterForm extends Component{
 	constructor(props){
 		super(props);

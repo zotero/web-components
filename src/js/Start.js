@@ -235,7 +235,7 @@ class RegisterForm extends Component{
 						<div className='invalid-feedback'>{formErrors['recaptcha']}</div>
 					</div>
 					<div className='form-group'>
-						<button type='button' className='btn btn-lg btn-block btn-secondary' onClick={this.register} disabled={loading}>
+						<button type='button' className='btn btn-lg btn-block btn-secondary btn-register' onClick={this.register} disabled={loading}>
 							<span className={cn("inline-feedback", {active:loading})}>
 								<span className="default-text">Register</span>
 								<span className="shorter feedback">

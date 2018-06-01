@@ -3,6 +3,7 @@
 //
 
 .main-footer {
+  flex: 0 0 auto; // Sticky footer
   background: $blue-dark;
   color: rgba($white, 0.5);
   padding: $spacer-lg 0 rem(41);

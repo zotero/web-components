@@ -3,6 +3,7 @@
 //
 
 .main-header {
+  flex: 0 0 auto; // Sticky footer
   display: flex;
   height: $main-header-height-mobile;
 

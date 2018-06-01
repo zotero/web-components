@@ -2,12 +2,33 @@
 // Forms
 //
 
-.form-control-lg {
-  font-size: $font-size-base;
+.form-control {
+  // Fix height and vertical alignment in IE
+  height:
+   $font-size-base * $input-btn-line-height
+   + 2 * $input-padding-y
+   + 2 * rem(strip-unit($input-border-width));
 
   &:focus {
     outline: none;
   }
+}
+
+.form-control-sm {
+  // Fix height and vertical alignment in IE
+  height:
+  $font-size-base * $input-btn-line-height-sm
+  + 2 * $input-padding-y-sm
+  + 2 * rem(strip-unit($input-border-width));
+}
+
+.form-control-lg {
+  font-size: $font-size-base;
+  // Fix height and vertical alignment in IE
+  height:
+    $font-size-base * $input-btn-line-height-lg
+    + 2 * $input-padding-y-lg
+    + 2 * rem(strip-unit($input-border-width));
 }
 
 // Needed for Zotero’s opaque focus styles

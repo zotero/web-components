@@ -65,8 +65,13 @@ h1,
   margin-bottom: rem(42) - rem(8); // 2/3
 
   @include media-breakpoint-up(md) {
-    width: 80%;
-    margin: 0 auto $spacer-xxxl - rem(8);
+    max-width: 80%;
+    margin-bottom: $spacer-xxxl - rem(8);
+
+    &.text-center {
+      margin-left: auto;
+      margin-right: auto;
+    }
   }
 }
 

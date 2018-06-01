@@ -163,7 +163,7 @@ class RegisterForm extends Component{
 						<div className='content'>
 							{heading}
 							<div>
-								<p className='lead'>It looks like you’ve already created an account. Now that you’ve installed Zotero, you can use it to{' '}
+								<p className='lead text-center'>It looks like you’ve already created an account. Now that you’ve installed Zotero, you can use it to{' '}
 									<a href="https://www.zotero.org/support/sync">sync and access your library from anywhere</a>.
 									It also lets you join <a href="https://www.zotero.org/support/groups">groups</a> and{' '}
 									<a href="https://www.zotero.org/support/sync#file_syncing">back up all your attached files</a>.</p>
@@ -258,7 +258,7 @@ class RegisterForm extends Component{
 			<section className='section section-md register-section'>
 				<div className='container-fluid container-fluid-col-10'>
 					{heading}
-					<p className='lead'>If you haven’t already created a Zotero account, please take a few moments to register now.
+					<p className='lead text-center'>If you haven’t already created a Zotero account, please take a few moments to register now.
 					It’s a <b>free</b> way to <a href="https://www.zotero.org/support/sync">sync and access your library from anywhere</a>,
 					and it lets you join <a href="https://www.zotero.org/support/groups">groups</a> and{' '}
 					<a href="https://www.zotero.org/support/sync#file_syncing">back up all your attached files</a>.
@@ -281,7 +281,7 @@ class PostRegisterGuide extends Component{
 				<div className='container-fluid container-fluid-col-10'>
 					<img src={connectorButtonImagePath} className='connector-button' width='160' height='160' />
 					<h1>3. Start building your library</h1>
-					<p className='lead'>New to Zotero? Explore the documentation and see what Zotero can do.</p>
+					<p className='lead text-center'>New to Zotero? Explore the documentation and see what Zotero can do.</p>
 					<div className="row">
 						<div className="col-md quick-link-container">
 							<a className="quick-link" href="https://www.zotero.org/support/quick_start_guide">

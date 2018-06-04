@@ -11,7 +11,7 @@ let slugify = function(name){
 	slug = slug.toLowerCase();
 	slug = slug.replace( /[^a-z0-9 ._-]/g , '');
 	slug = slug.replace(/\s/g, '_');
-	
+
 	return slug;
 };
 
@@ -159,7 +159,7 @@ let jsError = function(msg) {
 	li.setAttribute('class', 'jsNotificationMessage-error');
 	let newContent = document.createTextNode(msg);
 	li.appendChild(newContent);
-	document.querySelector('#js-message #js-message-list').appendChild(li);
+	document.querySelector('.messages').appendChild(li);
 };
 
 let jsSuccess = function(msg) {
@@ -167,7 +167,7 @@ let jsSuccess = function(msg) {
 	li.setAttribute('class', 'jsNotificationMessage-confirm');
 	let newContent = document.createTextNode(msg);
 	li.appendChild(newContent);
-	document.querySelector('#js-message #js-message-list').appendChild(li);
+	document.querySelector('.messages').appendChild(li);
 };
 
 let Delay = function(delay, val) {

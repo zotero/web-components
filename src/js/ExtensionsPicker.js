@@ -14,7 +14,7 @@ class ExtensionsPicker extends Component {
 	}
 	render(){
 		return (
-			<div id='extensions-container' className='extensions-picker react'>
+			<div id='extensions-container' className='react'>
 				<InstallConnectorPrompt showStandalone={true} ref="installConnectorPrompt" />
 			</div>
 		);

@@ -3,6 +3,7 @@
 //
 
 .main-header {
+  flex: 0 0 auto; // Sticky footer
   display: flex;
   height: $main-header-height-mobile;
 
@@ -88,10 +89,13 @@
   }
 
   .upgrade-storage {
+    $btn-padding-y: $btn-padding-y-sm
+      + ($font-size-base - $font-size-sm) * $btn-line-height-sm / 2;
+
     margin-left: $spacer;
     font-size: $font-size-sm;
-    padding-top: $input-btn-padding-y + ($font-size-base - $font-size-sm) / 2;
-    padding-bottom: $input-btn-padding-y + ($font-size-base - $font-size-sm) / 2;
+    padding-top: $btn-padding-y;
+    padding-bottom: $btn-padding-y;
   }
 
   .nav-toggle {

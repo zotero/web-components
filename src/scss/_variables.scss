@@ -14,11 +14,11 @@
 $white:    #fff !default;
 $gray-100: #f6f6f6;
 $gray-200: #e6e6e6;
-$gray-300: #dee2e6 !default;
-$gray-400: #ced4da !default;
-$gray-500: #adb5bd !default;
+$gray-300: #ddd;
+$gray-400: #ccc;
+$gray-500: #bbb;
 $gray-600: #6c757d !default;
-$gray-700: #495057 !default;
+$gray-700: #777;
 $gray-800: #444;
 $gray-900: #222;
 $black:    #000 !default;
@@ -44,7 +44,7 @@ $pink:      #e83e8c !default;
 $red:       #cc2936;
 $orange:    #fd7e14 !default;
 $yellow:    #ffc107 !default;
-$green:     #28a745 !default;
+$green:     #3abd57;
 $teal:      #20c997 !default;
 $cyan:      #17a2b8 !default;
 
@@ -217,7 +217,7 @@ $grid-gutter-width:           32px;
 //
 // Define common padding and border radius sizes and more.
 
-$line-height-lg:              calc(28 / 18);
+$line-height-lg:              1.5 !default;
 $line-height-sm:              1.5 !default;
 
 $border-width:                1px !default;
@@ -232,7 +232,7 @@ $box-shadow:                  0 .5rem 1rem rgba($black, .15) !default;
 $box-shadow-lg:               0 1rem 3rem rgba($black, .175) !default;
 
 $component-active-color:      $white !default;
-$component-active-bg:         theme-color("primary") !default;
+$component-active-bg:         theme-color("secondary");
 
 $caret-width:                 .3em !default;
 
@@ -253,6 +253,8 @@ $font-size-base:              1rem !default; // Assumes the browser default, typ
 $font-size-lg:                rem(24);
 $font-size-sm:                rem(14);
 
+$font-size-lg-mobile:         rem(20);
+
 $font-weight-light:           300 !default;
 $font-weight-normal:          400 !default;
 $font-weight-bold:            700 !default;
@@ -260,16 +262,18 @@ $font-weight-bold:            700 !default;
 $font-weight-base:            $font-weight-normal !default;
 $line-height-base:            1.5 !default;
 
-$h1-font-size:                rem(60);
+$h1-font-size:                rem(40);
 $h2-font-size:                $font-size-base * 2 !default;
 $h3-font-size:                $font-size-base * 1.75 !default;
 $h4-font-size:                $font-size-base * 1.5 !default;
 $h5-font-size:                $font-size-base * 1.25 !default;
 $h6-font-size:                $font-size-base !default;
 
+$h1-font-size-mobile:         rem(28);
+
 $headings-margin-bottom:      ($spacer / 2) !default;
 $headings-font-family:        inherit !default;
-$headings-font-weight:        500 !default;
+$headings-font-weight:        300;
 $headings-line-height:        1.1;
 $headings-color:              inherit !default;
 
@@ -287,8 +291,8 @@ $display3-weight:             300 !default;
 $display4-weight:             300 !default;
 $display-line-height:         $headings-line-height !default;
 
-$lead-font-size:              1.5rem;
-$lead-font-weight:            300 !default;
+$lead-font-size:              rem(20);
+$lead-font-weight:            400;
 
 $small-font-size:             80% !default;
 
@@ -347,20 +351,20 @@ $table-caption-color:         $text-muted !default;
 // Shared variables that are reassigned to `$input-` and `$btn-` specific variables.
 
 $input-btn-padding-y:         rem(7);
-$input-btn-padding-x:         rem(11);
-$input-btn-line-height:       1;
+$input-btn-padding-x:         rem(12);
+$input-btn-line-height:       $line-height-base !default;
 
-$input-btn-focus-width:       rem(3);
-$input-btn-focus-color:       rgba(theme-color("secondary"), .5);
+$input-btn-focus-width:       rem(2);
+$input-btn-focus-color:       rgba(theme-color("secondary"), 1);
 $input-btn-focus-box-shadow:  0 0 0 $input-btn-focus-width $input-btn-focus-color !default;
 
-$input-btn-padding-y-sm:      rem(5);
-$input-btn-padding-x-sm:      rem(11);
-$input-btn-line-height-sm:    1;
+$input-btn-padding-y-sm:      rem(3);
+$input-btn-padding-x-sm:      rem(12);
+$input-btn-line-height-sm:    $line-height-sm !default;
 
-$input-btn-padding-y-lg:      rem(11);
-$input-btn-padding-x-lg:      rem(23);
-$input-btn-line-height-lg:    1;
+$input-btn-padding-y-lg:      rem(5);
+$input-btn-padding-x-lg:      rem(16);
+$input-btn-line-height-lg:    $line-height-lg !default;
 
 $input-btn-border-width:      $border-width !default;
 
@@ -414,29 +418,29 @@ $input-padding-y-sm:                    $input-btn-padding-y-sm !default;
 $input-padding-x-sm:                    $input-btn-padding-x-sm !default;
 $input-line-height-sm:                  $input-btn-line-height-sm !default;
 
-$input-padding-y-lg:                    $input-btn-padding-y-lg !default;
+$input-padding-y-lg:                    rem(11); // 48px height
 $input-padding-x-lg:                    $input-btn-padding-x-lg !default;
 $input-line-height-lg:                  $input-btn-line-height-lg !default;
 
 $input-bg:                              $white !default;
 $input-disabled-bg:                     $gray-200 !default;
 
-$input-color:                           $gray-700 !default;
-$input-border-color:                    $gray-400 !default;
+$input-color:                           $body-color;
+$input-border-color:                    $gray-300;
 $input-border-width:                    $input-btn-border-width !default;
 $input-box-shadow:                      inset 0 1px 1px rgba($black, .075) !default;
 
-$input-border-radius:                   $border-radius !default;
-$input-border-radius-lg:                $border-radius-lg !default;
+$input-border-radius:                   $border-radius-sm;
+$input-border-radius-lg:                $border-radius-sm;
 $input-border-radius-sm:                $border-radius-sm !default;
 
 $input-focus-bg:                        $input-bg !default;
-$input-focus-border-color:              lighten($component-active-bg, 25%) !default;
+$input-focus-border-color:              $component-active-bg;
 $input-focus-color:                     $input-color !default;
 $input-focus-width:                     $input-btn-focus-width !default;
 $input-focus-box-shadow:                $input-btn-focus-box-shadow !default;
 
-$input-placeholder-color:               $gray-600 !default;
+$input-placeholder-color:               $gray-500;
 $input-plaintext-color:                 $body-color !default;
 
 $input-height-border:                   $input-border-width * 2 !default;
@@ -609,6 +613,7 @@ $zindex-modal-backdrop:             1040 !default;
 $zindex-modal:                      1050 !default;
 $zindex-popover:                    1060 !default;
 $zindex-tooltip:                    1070 !default;
+$zindex-messages:                   1080;
 
 // Navs
 
@@ -964,3 +969,9 @@ $nav-toggle-height: rem(42);
 
 $mobile-nav-transition-duration: 0.6s;
 $mobile-nav-transition: $mobile-nav-transition-duration cubic-bezier(0.23, 1, 0.32, 1);
+
+
+// Sections
+
+$section-padding-md: $spacer-max;
+$section-padding-md-mobile: $spacer-xxxl;

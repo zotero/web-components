@@ -11,25 +11,29 @@ const currentUser = getCurrentUser();
 let usernameValidation = async function(username, skipServer=false){
 	if(username.indexOf('@') != -1){
 		return {
-			usernameValidity:'invalid',
+			usernameChecked:true,
+			usernameValid:false,
 			usernameMessage: 'Your email address can be used to log in to your Zotero account, but not as your username.'
 		};
 	}
 	if(username.trim().indexOf(' ') != -1){
 		return {
-			usernameValidity:'invalid',
+			usernameChecked:true,
+			usernameValid:false,
 			usernameMessage: 'Your username can\'t contain spaces'
 		};
 	}
 	if(!(/^[a-z0-9._-]{3,}$/i.test(username))){
 		return {
-			usernameValidity:'invalid',
+			usernameChecked:true,
+			usernameValid:false,
 			usernameMessage: 'Username must be at least 3 characters and may only use upper and lower case letters, numbers, ., _, or -'
 		};
 	}
 	if((/^[0-9]+$/i.test(username))){
 		return {
-			usernameValidity:'invalid',
+			usernameChecked:true,
+			usernameValid:false,
 			usernameMessage: 'Username can not use exclusively numerals'
 		};
 	}
@@ -43,10 +47,14 @@ let usernameValidation = async function(username, skipServer=false){
 			let response = await ajax({url:checkUrl});
 			let data = await response.json();
 			if(data.valid){
-				return {usernameValidity:'valid'};
+				return {
+					usernameChecked:true,
+					usernameValid:true,
+				};
 			} else {
 				return {
-					usernameValidity:'invalid',
+					usernameChecked:true,
+					usernameValid:false,
 					usernameMessage: 'Username is not available'
 				};
 			}

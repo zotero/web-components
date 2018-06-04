@@ -9,7 +9,7 @@
   font-size: 18px;
   text-align: center;
   border-top: 1px solid $gray-200;
-  padding: (20px - 4px) ($grid-gutter-width / 2) (20px - 8px);
+  padding: (20px - 4px) ($grid-gutter-width / 2) (20px - 7px);
 
   @include media-breakpoint-up(md) {
     display: none;
@@ -27,6 +27,6 @@
     background: image-url("zotero-bib-logo.svg");
     text-indent: -99em;
     overflow: hidden;
-    margin: 0 auto 7px;
+    margin: 0 auto 6px;
   }
 }

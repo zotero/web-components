@@ -1,0 +1,13 @@
+//
+// Messages
+//
+
+.messages {
+  position: sticky;
+  left: 0;
+  top: 0;
+  width: 100%;
+  z-index: $zindex-messages;
+  margin: 0;
+  padding: 0;
+}

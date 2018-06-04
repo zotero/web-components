@@ -3,30 +3,56 @@
 //
 
 .home {
+  .section-md {
+    padding: $spacer-xl 0;
+
+    @include media-breakpoint-up("md") {
+      padding: ($spacer-max - $spacer) 0;
+    }
+
+    &.first {
+      padding-top: $spacer-xl * 2;
+
+      @include media-breakpoint-up("md") {
+        padding-top: ($spacer-max - $spacer) * 2;
+      }
+    }
+
+    &.last {
+      padding-bottom: $spacer-xl * 2;
+
+      @include media-breakpoint-up("md") {
+        padding-bottom: ($spacer-max - $spacer) * 2;
+      }
+    }
+  }
+
   .jumbotron {
     text-align: center;
     color: $white;
-    padding-top: 48px; // 64px
+    padding-top: 47px; // 64px
     padding-bottom: 26px; // 32px
     margin-bottom: 0;
 
     @include media-breakpoint-up("md") {
-      padding-top: 103px; // 128px
+      padding-top: 101px; // 128px
       padding-bottom: 282px; // 192px + 96px
       background: image-url("home/jumbotron.svg") no-repeat center 18px $jumbotron-bg; // top without zotero-bib hint
     }
 
     .display-1 {
-      margin-bottom: 11px; // 32px
+      margin-bottom: 12px; // 32px
+      -moz-osx-font-smoothing: grayscale;
+      -webkit-font-smoothing: antialiased;
 
       @include media-breakpoint-up("md") {
-        margin-bottom: 21px; // 48px
+        margin-bottom: 23px; // 48px
       }
     }
 
     .lead {
       margin: 0 auto 24px; // 32px
-      max-width: 380px;
+      max-width: 420px;
 
       @include media-breakpoint-up("md") {
         margin-bottom: 38px; // 48px
@@ -75,19 +101,19 @@
 
   .section-md {
     @include media-breakpoint-down("sm") {
-      padding-bottom: rem(25);
+      padding-bottom: rem(26);
     }
 
     &.last {
       @include media-breakpoint-down("sm") {
-        padding-bottom: rem(57);
+        padding-bottom: rem(58);
       }
     }
   }
 
   .page-header {
     @include media-breakpoint-up("md") {
-      margin: 135px 0 67px; // 160px
+      margin: 133px 0 67px; // 160px
     }
   }
 
@@ -126,7 +152,7 @@
       }
 
       @include media-breakpoint-down("sm") {
-        margin-bottom: rem(35);
+        margin-bottom: rem(34);
       }
     }
 
@@ -151,7 +177,7 @@
     p {
       @include media-breakpoint-up("md") {
         font-size: 1.125rem;
-        line-height: $line-height-lg;
+        line-height: calc(28 / 18);
       }
     }
   }
@@ -210,11 +236,11 @@
 
   .call-to-action {
     @include media-breakpoint-down("sm") {
-      padding-top: rem(19);
+      padding-top: rem(18);
     }
 
     .display-2 {
-      margin-bottom: rem(21);
+      margin-bottom: rem(22);
 
       @include media-breakpoint-up(md) {
         margin: 0;

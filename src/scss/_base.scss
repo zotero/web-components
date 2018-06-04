@@ -12,10 +12,18 @@ body {
   background: $white;
   position: relative;
   transition: transform $mobile-nav-transition;
+  // Sticky footer
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 
   .nav-opened & {
     transform: translate3d(-100%, 0, 0) translate3d(#{$nav-toggle-width}, 0, 0);
   }
+}
+
+main {
+  flex: 1 1 auto; // Sticky footer
 }
 
 svg {

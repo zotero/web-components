@@ -13,42 +13,22 @@ const recaptchaSitekey = config.recaptchaSitekey;
 const imagePath = config.imagePath;
 
 const connectorButtonImagePath = imagePath + '/start/zotero-button.svg';
+const iconSpinImagePath = imagePath + '/spin-white.svg';
 
 import {ajax, postFormData} from './ajax.js';
 import {slugify, getCurrentUser} from './Utils.js';
 import {buildUrl} from './wwwroutes.js';
 import {Notifier} from './Notifier.js';
-import {VerticalExpandable} from './VerticalExpandable.js';
 import {InstallConnectorPrompt} from './InstallConnector.js';
 import {usernameValidation} from './Validate.js';
+import {Collapse} from 'reactstrap';
+import cn from 'classnames';
 
 const currentUser = getCurrentUser();
 
 let validateRegisterForm = function(data) {
-	if(data.email != data.email2){
-		return {
-			valid:false,
-			field:'email',
-			reason:'emails must match'
-		};
-	}
-	if(data.password != data.password2){
-		return {
-			valid:false,
-			field:'password',
-			reason:'passwords must match'
-		};
-	}
 	return {valid:true};
 };
-
-class FormFieldErrorMessage extends Component {
-	render() {
-		return (
-			<p className='form-field-error'>{this.props.message}</p>
-		);
-	}
-}
 
 class RegisterForm extends Component{
 	constructor(props){
@@ -57,18 +37,20 @@ class RegisterForm extends Component{
 			formData:{
 				username:'',
 				email:'',
-				email2:'',
 				password:'',
-				password2:''
 			},
-			usernameValidity:'undecided',
+			usernameChecked:false,
+			usernameValid:false,
 			usernameMessage:'',
 			formErrors:{},
-			registrationSuccessful:false
+			registrationSuccessful:false,
+			passwordVisible:false,
+			wasValidated:false
 		};
 		this.checkUsername = this.checkUsername.bind(this);
 		this.handleChange = this.handleChange.bind(this);
 		this.register = this.register.bind(this);
+		this.togglePasswordVisible = this.togglePasswordVisible.bind(this);
 	}
 	async checkUsername(){
 		let username = this.state.formData.username;
@@ -76,16 +58,24 @@ class RegisterForm extends Component{
 		this.setState(result);
 	}
 	handleChange(ev){
-		let formData = this.state.formData;
+		let {formData} = this.state;
 		formData[ev.target.name] = ev.target.value;
 
 		this.setState({formData:formData});
 		if(ev.target.name == 'username'){
-			this.setState({usernameValidity:'undecided', usernameMessage:''});
+			this.setState({
+				usernameChecked:false,
+				usernameValid:false,
+				usernameMessage:''
+			});
 		}
 	}
+	togglePasswordVisible(ev){
+		let {passwordVisible} = this.state;
+		this.setState({passwordVisible:(!passwordVisible)});
+	}
 	register(){
-		let formData = this.state.formData;
+		let {formData} = this.state;
 		//validate form
 		let validated = validateRegisterForm(formData);
 		if(!validated.valid){
@@ -99,15 +89,15 @@ class RegisterForm extends Component{
 		formData.captcha = window.grecaptcha.getResponse();
 
 		//submit form
+		this.setState({loading:true});
 		let registerUrl = buildUrl('registerAsync');
 		postFormData(registerUrl, formData).then((resp)=>{
-			log.debug('successfulish response');
 			resp.json().then((data)=>{
-				if(data.success)
-				this.setState({registrationSuccessful:true});
+				if(data.success){
+					this.setState({registrationSuccessful:true, loading:false});
+				}
 			});
 		}).catch((resp)=>{
-			log.debug('caught response');
 			resp.json().then((data)=>{
 				if(data.success === false){
 					let formErrors = {};
@@ -119,24 +109,24 @@ class RegisterForm extends Component{
 						}
 						formErrors[ind] = messages.join(', ');
 					}
-					this.setState({formErrors});
+					this.setState({formErrors, loading:false});
 				}
 			}).catch((e)=>{
 				log.debug('failed decoding json in caught register response');
 				log.debug(e);
-				this.setState({formError:'Error processing registration'});
+				this.setState({formError:'Error processing registration', loading:false});
 			});
 		});
 	}
 	render(){
-		//log.debug('RegisterForm render');
-		let formData = this.state.formData;
+		const {formData, usernameChecked, usernameValid, loading, registrationSuccessful, formError, formErrors,
+			usernameMessage, passwordVisible, wasValidated} = this.state;
+
 		let slug = '<username>';
-		if(this.state.formData.username) {
-			slug = slugify(this.state.formData.username);
+		if(formData.username) {
+			slug = slugify(formData.username);
 		}
 		let profileUrl = buildUrl('profileUrl', {slug});
-		let previewClass = 'profile-preview ' + this.state.usernameValidity;
 		if(currentUser) {
 			let heading = <h1>2. Start syncing to take full advantage of Zotero</h1>;
 			if(!this.props.numbered) {
@@ -148,7 +138,7 @@ class RegisterForm extends Component{
 						<div className='content'>
 							{heading}
 							<div>
-								<p className='lead'>It looks like you’ve already created an account. Now that you’ve installed Zotero, you can use it to{' '}
+								<p className='lead text-center'>It looks like you’ve already created an account. Now that you’ve installed Zotero, you can use it to{' '}
 									<a href="https://www.zotero.org/support/sync">sync and access your library from anywhere</a>.
 									It also lets you join <a href="https://www.zotero.org/support/groups">groups</a> and{' '}
 									<a href="https://www.zotero.org/support/sync#file_syncing">back up all your attached files</a>.</p>
@@ -160,48 +150,78 @@ class RegisterForm extends Component{
 		}
 
 		let registerForm = (
-			<form id='register-form'>
-				<VerticalExpandable expand={!this.state.registrationSuccessful}>
+			<form className='register-form'>
+				<Collapse isOpen={!registrationSuccessful}>
 					<div className='form-group'>
-						<input className='form-control' type='text' name='username' placeholder='Username' onChange={this.handleChange} onBlur={this.checkUsername} value={formData.username}></input>
-						<p className={previewClass}>{profileUrl}</p>
-						<p className='username-message'>{this.state.usernameMessage}</p>
-						<FormFieldErrorMessage message={this.state.formErrors['username']} />
+						<input
+							className={cn('form-control', 'form-control-lg', {'is-invalid':(usernameChecked && !usernameValid), 'is-valid':(usernameChecked && usernameValid)})}
+							type='text'
+							name='username'
+							placeholder='Username'
+							onChange={this.handleChange}
+							onBlur={this.checkUsername}
+							value={formData.username}>
+						</input>
+						<p className={cn('profile-preview', {valid:usernameValid, invalid:(usernameChecked && !usernameValid)})}>{profileUrl}</p>
+						<div className='invalid-feedback'>{usernameMessage ? usernameMessage : formErrors['username']}</div>
 					</div>
 					<div className='form-group'>
-						<input className='form-control' type='email' name='email' placeholder='Email' onChange={this.handleChange} value={formData.email}></input>
-						<FormFieldErrorMessage message={this.state.formErrors['email']} />
+						<input
+							className={cn('form-control', 'form-control-lg', {'is-invalid':formErrors.hasOwnProperty('email')})}
+							type='email'
+							name='email'
+							placeholder='Email'
+							onChange={this.handleChange}
+							value={formData.email}>
+						</input>
+						<div className='invalid-feedback'>{formErrors['email']}</div>
 					</div>
 					<div className='form-group'>
-						<input className='form-control' type='email' name='email2' placeholder='Confirm Email' onChange={this.handleChange} value={formData.email2}></input>
-						<FormFieldErrorMessage message={this.state.formErrors['email2']} />
-					</div>
-					<div className='form-group'>
-						<input className='form-control' type='password' name='password' placeholder='Password' onChange={this.handleChange} value={formData.password}></input>
-						<FormFieldErrorMessage message={this.state.formErrors['password']} />
-					</div>
-					<div className='form-group'>
-						<input className='form-control' type='password' name='password2' placeholder='Verify Password' onChange={this.handleChange} value={formData.password2}></input>
-						<FormFieldErrorMessage message={this.state.formErrors['password2']} />
+						<div className="input-group">
+							<input
+								className={cn('form-control', 'form-control-lg', {'is-invalid':formErrors.hasOwnProperty('password')})}
+								type={passwordVisible ? 'text' : 'password'}
+								name='password'
+								placeholder='Password'
+								onChange={this.handleChange}
+								value={formData.password}>
+							</input>
+							<div className="input-group-append">
+								<button type='button' className="btn btn-outline-secondary" onClick={this.togglePasswordVisible}>
+									<span className={cn('inline-feedback', {active:passwordVisible})}>
+										<span className="default-text">Show</span>
+										<span className="feedback shorter">Hide</span>
+									</span>
+								</button>
+							</div>
+							<div className='invalid-feedback'>{formErrors['password']}</div>
+						</div>
 					</div>
 					<div className='form-group'>
 						<div className="g-recaptcha" data-sitekey={recaptchaSitekey}></div>
-						<FormFieldErrorMessage message={this.state.formErrors['recaptcha']} />
+						<div className='invalid-feedback'>{formErrors['recaptcha']}</div>
 					</div>
 					<div className='form-group'>
-						<button type='button' className='btn' onClick={this.register}>Register</button>
+						<button type='button' className='btn btn-lg btn-block btn-secondary btn-register' onClick={this.register} disabled={loading}>
+							<span className={cn("inline-feedback", {active:loading})}>
+								<span className="default-text">Register</span>
+								<span className="shorter feedback">
+									<img className="icon icon-spin" src={iconSpinImagePath} width="16" height="16" />
+								</span>
+							</span>
+						</button>
 					</div>
-					<p>By using Zotero, you agree to its <a href='https://www.zotero.org/support/terms/terms_of_service'>Terms of Service</a>.</p>
-				</VerticalExpandable>
+					<p>By using Zotero, you agree to its <a href="https://www.zotero.org/support/terms/terms_of_service">Terms of Service</a>.</p>
+				</Collapse>
 			</form>
 		);
 
 		let notifier = null;
-		if(this.state.registrationSuccessful){
+		if(registrationSuccessful){
 			let message = 'Thanks for registering. We’ve sent an email to activate your account.';
 			notifier = <Notifier type='success' message={message} />;
-		} else if(this.state.formError){
-			notifier = <Notifier type='error' message={this.state.formError} />;
+		} else if(formError){
+			notifier = <Notifier type='error' message={formError} />;
 		}
 
 		let heading = <h1>2. Register to take full advantage of Zotero</h1>;
@@ -210,18 +230,16 @@ class RegisterForm extends Component{
 		}
 
 		return (
-			<section className='register-section'>
-				<div className='container'>
-					<div className='container'>
-						{heading}
-						<p className='lead'>If you haven’t already created a Zotero account, please take a few moments to register now.
-						It’s a <b>free</b> way to <a href="https://www.zotero.org/support/sync">sync and access your library from anywhere</a>,
-						and it lets you join <a href="https://www.zotero.org/support/groups">groups</a> and{' '}
-						<a href="https://www.zotero.org/support/sync#file_syncing">back up all your attached files</a>.
-						</p>
-						{registerForm}
-						{notifier}
-					</div>
+			<section className='section section-md register-section'>
+				<div className='container-fluid container-fluid-col-10'>
+					{heading}
+					<p className='lead text-center'>If you haven’t already created a Zotero account, please take a few moments to register now.
+					It’s a <b>free</b> way to <a href="https://www.zotero.org/support/sync">sync and access your library from anywhere</a>,
+					and it lets you join <a href="https://www.zotero.org/support/groups">groups</a> and{' '}
+					<a href="https://www.zotero.org/support/sync#file_syncing">back up all your attached files</a>.
+					</p>
+					{registerForm}
+					{notifier}
 				</div>
 			</section>
 		);
@@ -234,20 +252,43 @@ RegisterForm.defaultProps = {
 class PostRegisterGuide extends Component{
 	render(){
 		return (
-			<section className='post-register-guide'>
-				<div className='container'>
+			<section className='section section-md post-register-guide'>
+				<div className='container-fluid container-fluid-col-10'>
 					<img src={connectorButtonImagePath} className='connector-button' width='160' height='160' />
 					<h1>3. Start building your library</h1>
-					<p className='lead'>New to Zotero? Explore the documentation and try out some things you can do with Zotero:</p>
-					<ul className='register-quick-links'>
-						<li><a href="https://www.zotero.org/support/quick_start_guide">Read the Quick Start Guide</a></li>
-						<li><a href="https://www.zotero.org/support/getting_stuff_into_your_library">Add an item</a></li>
-						<li><a href="https://www.zotero.org/support/archive_the_web">Archive a webpage</a></li>
-						<li><a href="https://www.zotero.org/support/screencast_tutorials/manually_creating_items">Manually enter an item</a></li>
-						<li><a href="https://www.zotero.org/support/collections">Create a collection</a></li>
-						<li><a href="https://www.zotero.org/support/creating_bibliographies">Create a bibliography</a></li>
-						<li><a href="https://www.zotero.org/support/word_processor_plugin_usage">Use the Word or LibreOffice plugin</a></li>
-					</ul>
+					<p className='lead text-center'>New to Zotero? Explore the documentation and see what Zotero can do.</p>
+					<div className="row">
+						<div className="col-md quick-link-container">
+							<a className="quick-link" href="https://www.zotero.org/support/quick_start_guide">
+								<img src={imagePath + '/start/quick-start-guide.svg'} width="72" height="72" alt="" />
+								Read the Quick <span className="d-sm-block">Start Guide</span>
+							</a>
+						</div>
+						<div className="col-md quick-link-container">
+							<a className="quick-link" href="https://www.zotero.org/support/getting_stuff_into_your_library">
+								<img src={imagePath + '/start/new-item.svg'} width="72" height="72" alt="" />
+								Add items to <span className="d-sm-block">Zotero</span>
+							</a>
+						</div>
+						<div className="col-md quick-link-container">
+							<a className="quick-link" href="https://www.zotero.org/support/collections_and_tags">
+								<img src={imagePath + '/start/folder.svg'} width="72" height="72" alt="" />
+								Organize your <span className="d-sm-block">research</span>
+							</a>
+						</div>
+						<div className="col-md quick-link-container">
+							<a className="quick-link" href="https://www.zotero.org/support/creating_bibliographies">
+							<img src={imagePath + '/start/bibliography.svg'} width="72" height="72" alt="" />
+								Create a <span className="d-sm-block">bibliography</span>
+							</a>
+						</div>
+						<div className="col-md quick-link-container">
+							<a className="quick-link" href="https://www.zotero.org/support/word_processor_plugin_usage">
+								<img src={imagePath + '/start/plugin.svg'} width="72" height="72" alt="" />
+								Cite in Word <span className="d-sm-block">or LibreOffice</span>
+							</a>
+						</div>
+					</div>
 				</div>
 			</section>
 		);
@@ -261,13 +302,9 @@ class Start extends Component{
 	render(){
 		return (
 			<div className='start react'>
-				<section>
-					<div className='container'>
-						<p className="install-success">Success! You installed Zotero!</p>
-					</div>
-				<div className='extensions-picker'>
+				<p className="install-success">Success! You installed Zotero!</p>
+				<section className="section section-md section-extensions">
 					<InstallConnectorPrompt ref='installConnectorPrompt' numbered={true} />
-				</div>
 				</section>
 				<RegisterForm ref='registerForm' />
 				<PostRegisterGuide ref='postRegisterGuide' />

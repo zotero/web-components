@@ -11,17 +11,17 @@ body {
   text-rendering: optimizeLegibility;
   font-kerning: normal;
   font-feature-settings: "kern" 1;
+  letter-spacing: -0.01em; // Adapt Avenir Next to Avenir Pro. Set to 0 for small text if needed.
 }
 
-
-// Lighter headings rendering
-
 h1,
-h2,
-.h1,
-.h2 {
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
+.h1 {
+  margin-bottom: rem(20);
+  letter-spacing: -0.035em;
+
+  @include media-breakpoint-down(sm) {
+    font-size: $h1-font-size-mobile;
+  }
 }
 
 
@@ -29,7 +29,7 @@ h2,
 
 .display-1,
 .display-2 {
-  letter-spacing: -0.025em;
+  letter-spacing: -0.035em;
 }
 
 .display-1 {
@@ -51,7 +51,7 @@ h2,
 // Page header
 
 .page-header {
-  margin: rem(48) 0 rem(23);
+  margin: rem(47) 0 rem(24);
 
   @include media-breakpoint-up("md") {
     margin: ($spacer-xxxl + $spacer-max) 0 ($spacer-max - $spacer);
@@ -62,8 +62,16 @@ h2,
 // Lead
 
 .lead {
-  @include media-breakpoint-down("sm") {
-    font-size: rem(20);
+  margin-bottom: rem(42) - rem(8); // 2/3
+
+  @include media-breakpoint-up(md) {
+    max-width: 80%;
+    margin-bottom: $spacer-xxxl - rem(8);
+
+    &.text-center {
+      margin-left: auto;
+      margin-right: auto;
+    }
   }
 }
 

@@ -1,68 +1,49 @@
 .start {
   text-align: center;
 
-  .container {
-    padding: 0 15px;
-
-    @include media-breakpoint-up(sm) {
-      padding: 0 80px;
-    }
-  }
-
-  h1 {
-    font-size: 20px;
-    line-height: 1.1;
-    margin: 0 0 16px;
-
-    @include media-breakpoint-up(sm) {
-      font-size: 30px;
-      letter-spacing: -0.5px;
-    }
-  }
-
   .install-success {
-    display: inline-block;
-    vertical-align: top;
-    font: {
-      size: 24px;
-      weight: 700;
-    }
-    line-height: 1.1;
-    color: #19a15f;
-    border: 3px solid currentColor;
-    border-radius: 6px;
-    padding: 16px 24px;
-    margin: 20px 0 37px; // top/bottom: 40px
+    font-size: $font-size-lg-mobile;
+    font-weight: 300;
+    color: map-get($theme-colors, success);
+    background-color: #d9ffe0;
+    margin: 0;
+    padding: (17px) ($grid-gutter-width / 2); // 64px height
 
-    @include media-breakpoint-up(sm) {
-      margin: 10px 0 48px; // 60px
+    @include media-breakpoint-up(md) {
+      font-size: $font-size-lg;
+      padding: (40px - 10px) ($grid-gutter-width / 2);
     }
   }
 
-  .btn {
-    color: $white;
-    background: $link-color;
-    text-decoration: none;
-    border-radius: 3px;
-    padding: 5px 15px;
+  .section-extensions {
+    padding-top: $section-padding-md-mobile - rem(3);
+    padding-bottom: $section-padding-md-mobile - rem(6);
 
-    &:hover {
-      background: darken($link-color, 5%);
+    @include media-breakpoint-up(md) {
+      padding: ($section-padding-md - rem(6)) 0;
     }
   }
-
 
   // Extensions picker on start page
-
   .extensions-picker {
-    padding-bottom: 48px;
+    h1 {
+      margin-top: $spacer-xl - rem(11);
 
-    @include media-breakpoint-up(sm) {
-      padding-bottom: 80px;
+      @include media-breakpoint-up(md) {
+        margin-top: $spacer-xxl - rem(18);
+      }
+    }
+
+    .lead {
+      margin-bottom: $spacer-xl - rem(8);
+
+      @include media-breakpoint-up(md) {
+        margin-bottom: $spacer-xxl - rem(8);
+      }
     }
 
     .all-extensions ul {
-      margin-top: 26px; // 60px
+      margin-top: $spacer-xxxl - rem(40);
     }
 
     .inner-start {
@@ -73,23 +54,10 @@
       display: none;
     }
 
-    .jumbotron {
-      padding: 0;
-      background-color:transparent;
-
-      h1 {
-        margin: 21px auto 16px; // 32px
-
-        @include media-breakpoint-up(sm) {
-          margin-top: 29px; // 48px
-        }
-      }
-
-      .show-extensions {
-        position: static;
-        text-align: center;
-        margin-bottom: 0;
-      }
+    .show-extensions {
+      position: static;
+      text-align: center;
+      margin-bottom: 0;
     }
 
     .all-extensions {
@@ -100,84 +68,32 @@
   }
 
   .register-section {
-    background: url($staticPath + "/images/start/arrow-down-white.svg") no-repeat center top $gray-100;
-    background-size: 51px auto;
-    padding: 46px 0 38px; // 2/3
+    background: image-url("start/arrow-down-white.svg") no-repeat center top $gray-100;
+    background-size: rem(51) auto;
+    padding: ($section-padding-md-mobile - rem(8)) 0 ($section-padding-md-mobile - rem(10));
 
-    
-    @include media-breakpoint-up(sm) {
-      background-size: 76px auto;
-      padding: 68px 0 65px; // 80px
+    @include media-breakpoint-up(md) {
+      background-size: rem(76) auto;
+      padding: ($section-padding-md - rem(12)) 0 ($section-padding-md - rem(10));
     }
   }
 
-  #register-form {
-    margin: 34px 0 0; // 40px
-
-    @include media-breakpoint-up(sm) {
-      margin: 54px 0 0; // 60px
-    }
-
-    .form-control,
-    .btn {
-      display: block;
+  .register-form {
+    @include media-breakpoint-up(md) {
+      max-width: map-get($container-max-widths, xl) * 4 / 12 - $grid-gutter-width; // 4 xl cols
       margin: auto;
-      height: 42px; // Thumb size
-      font: {
-        family: inherit;
-        size: 16px;
-      }
-
-      @include media-breakpoint-up(sm) {
-        max-width: 302px; // Adjust to captcha width
-        height: 48px;
-        font-size: 20px;
-      }
     }
 
-    .form-control {
-      padding: 13px 12px;
-      color: #222;
-      box-shadow: none;
-
-      &:focus {
-        border-color: mix($white, $link-color, 40%);
-        box-shadow: 0 0 0 2px mix($white, $link-color, 40%);
-      }
-    }
-
-    ::-webkit-input-placeholder {
-      color: $gray-800;
-    }
-
-    ::-moz-input-placeholder {
-      color: $gray-800;
-    }
-
-    ::-ms-input-placeholder {
-      color: $gray-800;
-    }
-
-    .g-recaptcha {
-      width: 302px;
-      margin: auto;
-
-      @include media-breakpoint-down(xs) {
-        transform-origin: left top;
-        transform: scale(0.96);
-      }
-    }
-
-    .btn {
-      width: 100%;
-
-      &:hover {
-        border-color: transparent;
-      }
+    .form-control-lg {
+      font-size: rem(20);
+      padding-top: $input-padding-y-lg - rem(3);
+      padding-bottom: $input-padding-y-lg - rem(3);
     }
 
     p {
-      margin: 5px auto;
+      font-size: $font-size-sm;
+      color: $gray-700;
+      margin: $spacer-min auto;
 
       &:empty {
         display: none;
@@ -185,67 +101,162 @@
     }
 
     .profile-preview {
-      color: #19a15f;
-
-      &.undecided {
-        color: inherit;
+      &.valid {
+        color: $success;
       }
 
       &.invalid {
-        color: #c00;
+        color: $danger;
       }
     }
 
-    .username-message {
-      color: $gray-800;
+    .input-group {
+      .btn {
+        font-size: $font-size-sm;
+        background-color: $input-bg;
+        border-color: $input-border-color;
+        color: inherit;
+        // Fix https://github.com/twbs/bootstrap/issues/25110
+        @include border-right-radius($input-border-radius-lg);
 
-      @include media-breakpoint-up(sm) {
-        width: 450px;
-        margin: {
-          left: auto;
-          right: auto;
+        &:focus {
+          .keyboard-user & {
+            border-color: $secondary;
+          }
+        }
+
+        &:active {
+          background-color: darken($input-bg, 4%);
         }
       }
+
+      .feedback {
+        font-style: normal;
+      }
     }
 
-    .form-field-error {
-      color: #c00;
+    .g-recaptcha {
+      width: 302px;
+      min-height: 78px;
+      margin: 0 auto -2px;
+
+      @include media-breakpoint-down(xs) {
+        transform-origin: left top;
+        transform: scale(0.9536);
+        width: 288px;
+        margin-bottom: -6px;
+      }
+    }
+
+    .btn-register {
+      .feedback {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .icon-spin {
+        width: $spacer-lg;
+        height: $spacer-lg;
+      }
+    }
+  }
+
+  .notifier {
+    font-size: $font-size-lg-mobile;
+    font-weight: 300;
+    margin-top: rem(-1);
+    margin-bottom: rem(2);
+
+    @include media-breakpoint-up(md) {
+      font-size: $font-size-lg;
+      margin-top: rem(-10); // 64px
+      margin-bottom: 0;
+    }
+
+    &.success {
+      color: $success;
+    }
+
+    &.error {
+      color: $danger;
+      margin-top: $spacer-md;
     }
   }
 
   .post-register-guide {
-    background: url($staticPath + "/images/start/arrow-down-gray.svg") no-repeat center top;
-    background-size: 51px;
-    padding: 53px 0 47px; // 2/3
+    background: image-url("start/arrow-down-gray.svg") no-repeat center top;
+    background-size: rem(51);
+    padding-bottom: $section-padding-md-mobile - rem(5);
 
-    @include media-breakpoint-up(sm) {
-      background-size: 76px auto;
-      padding: 80px 0 72px; // 80px
+    @include media-breakpoint-up(md) {
+      background-size: rem(76) auto;
+      padding-bottom: $section-padding-md - rem(5);
+    }
+
+    .quick-link-container {
+      margin-bottom: $spacer-xl - rem(5);
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      @include media-breakpoint-between(sm, md) {
+        flex-basis: percentage(4 / 12);
+        max-width: percentage(4 / 12);
+
+        &:nth-child(n+4) {
+          margin-bottom: 0;
+        }
+
+        &:nth-child(4) {
+          margin-left: percentage(2 / 12);
+        }
+      }
+
+      @include media-breakpoint-only(md) {
+        margin-bottom: $spacer-xxl - rem(5);
+      }
+
+      @include media-breakpoint-up(lg) {
+        margin-bottom: 0;
+      }
+    }
+
+    .quick-link {
+      display: block;
+      font-size: rem(18);
+      line-height: 1.3;
+
+      img {
+        display: block;
+        margin: 0 auto (rem(20) - rem(5)); // 20px
+      }
     }
   }
 
   .connector-button {
-    margin-bottom: 25px; // 2/3
+    margin-bottom: rem(24); // 32px
 
-    @include media-breakpoint-up(sm) {
-      margin-bottom: 36px; // 48px
+    @include media-breakpoint-up(md) {
+      margin-bottom: rem(36); // 48px
     }
   }
 
   .register-quick-links {
+    font-size: $font-size-lg-mobile;
     list-style: none;
     padding: 0;
-    font-size: 16px;
-    line-height: 1.5;
-    margin: 25px 0 0; // 2/3
+    margin-top: rem(-1);
+    margin-bottom: 0;
 
-    @include media-breakpoint-up(sm) {
-      font-size: 20px;
-      margin: 43px 0 0; // 60px;
+    @include media-breakpoint-up(md) {
+      font-size: $font-size-lg;
+      margin-top: rem(-9);
     }
 
     li + li {
-      margin-top: 5px;
+      margin-top: $spacer-min;
     }
   }
 }

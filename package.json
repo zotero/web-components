@@ -56,8 +56,8 @@
   "dependencies": {
     "@tweenjs/tween.js": "^17.1.1",
     "babel-polyfill": "^6.26.0",
-    "bootstrap": "^4.1.0",
     "bezier-easing": "^2.0.3",
+    "bootstrap": "^4.1.0",
     "classnames": "^2.2.5",
     "gsap": "^1.20.3",
     "jquery": "^3.2.1",
@@ -66,6 +66,7 @@
     "prop-types": "^15.6.0",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
+    "react-stripe-elements": "^2.0.0",
     "react-tabs": "^2.1.0",
     "reactstrap": "^6.0.1",
     "striptags": "^2.2.1",

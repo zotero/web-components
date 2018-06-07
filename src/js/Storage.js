@@ -1,16 +1,47 @@
 'use strict';
 
+/*
+TODO:
+ - clean up
+ - clarify when institutional plan makes individual plan unnecessary
+ - clarify when charge won't be made right away, allow to force immediate charge
+ - present detailed receipt more obviously after payment
+ - use new PaymentModal to get token to create source with card or IBAN
+ - don't allow automatic renewal if institution provides storage
+ - show that individual subscription won't be renewed with institutional storage
+
+Flows:
+ - First time subscription
+ - update payment details
+ - renew now, expiration imminent
+ - force payment now (for multiple years?)
+ - Change current plan without immediate payment
+ - change current plan and pay now
+ - Lab Payment
+ - Lab Renewal
+ - Lab receipt
+ - allow payments for third parties
+*/
+
 import {log as logger} from './Log.js';
 var log = logger.Logger('StorageComponent');
 
 const React = require('react');
 const {Component} = React;
+//import {StripeProvider} from 'react-stripe-elements';
 import PropTypes from 'prop-types';
 
 import {ajax, postFormData} from './ajax.js';
 import {Notifier} from './Notifier.js';
+import cn from 'classnames';
+//import PaymentModal from './storage/PaymentModal.jsx';
+import SubscriptionHandler from './storage/SubscriptionHandler.jsx';
+import {calculateNewExpiration} from './storage/calculations.js';
+import { Row, Col } from 'reactstrap';
+import {PaymentSource} from './storage/PaymentSource.jsx';
 
-let priceCents = {'1':0,'2':2000,'3':6000,'4':10000,'5':24000,'6':12000};
+const dateFormatOptions = {year: 'numeric', month: 'long', day: 'numeric'};
+
 let plans = [
 	{
 		storageLevel: 1,
@@ -38,41 +69,6 @@ let plans = [
 	}
 ];
 
-var calculateRemainingValue = function(expiration=Date.now(), storageLevel=2) {
-	log.debug(expiration);
-	if(expiration < Date.now()){
-		return 0;
-	}
-	let secondsPerYear = 31536000; //60*60*24*365
-	
-	let now = new Date(Date.now());
-	let secondsLeft = (expiration.getTime() - now.getTime()) / 1000;
-	let remainingValue = priceCents[storageLevel] * (secondsLeft / secondsPerYear);
-
-	return remainingValue;
-};
-
-var calculateNewExpiration = function(oldExpiration, oldStorageLevel, newStorageLevel) {
-	let secondsPerYear = 31536000; //60*60*24*365
-	
-	if(typeof oldExpiration == 'string'){
-		oldExpiration = new Date(parseInt(oldExpiration)*1000);
-	}
-
-	if(oldExpiration < (Date.now() + (1000*60*60*24*15)) && (oldExpiration > Date.now())) {
-		//expiration less than 2 weeks away, will charge and expiration will be now+1year
-		let newExpiration = new Date((oldExpiration.getTime()) + (secondsPerYear * 1000)); //new Date takes milliseconds
-		return newExpiration;
-	}
-	
-	let remainingValue = calculateRemainingValue(oldExpiration, oldStorageLevel);
-	let extraSecondsAtNewLevel = (remainingValue / priceCents[newStorageLevel]) * secondsPerYear;
-
-	let newExpiration = new Date(Date.now() + (extraSecondsAtNewLevel * 1000)); //new Date takes milliseconds
-
-	return newExpiration;
-};
-
 class StoragePlanRow extends Component {
 	render() {
 		let plan = this.props.plan;
@@ -86,8 +82,6 @@ class StoragePlanRow extends Component {
 			onMouseOut={this.props.unpreviewPlan}
 			className="btn btn-secondary selectPlanButton"
 			data-storagelevel={plan.storageLevel}
-			//data-pricecents={priceCents[plan.storageLevel]}
-			//data-description={'Zotero storage'}
 			>Select Plan
 
 		</button>);
@@ -127,7 +121,7 @@ StoragePlanRow.propTypes = {
 
 class InstitutionProvides extends Component {
 	render(){
-		let institution = this.props.institution;
+		const {institution} = this.props;
 		let quotaDescription = `${institution.storageQuota} MB of storage`;
 		if(institution.storageQuota == 1000000){
 			quotaDescription = 'unlimited storage';
@@ -143,10 +137,18 @@ class InstitutionProvides extends Component {
 		}
 	}
 }
+InstitutionProvides.propTypes = {
+	institution: PropTypes.shape({
+		storageQuota: PropTypes.number,
+		validated: PropTypes.string,
+		name: PropTypes.string,
+		email: PropTypes.string
+	})
+};
 
 class InstitutionalRow extends Component {
 	render(){
-		let institutions = this.props.institutions;
+		const {institutions} = this.props;
 		if(!institutions) {
 			return null;
 		}
@@ -164,14 +166,22 @@ class InstitutionalRow extends Component {
 		return null;
 	}
 }
+InstitutionalRow.propTypes = {
+	institutions: PropTypes.arrayOf(PropTypes.object)
+};
 
 class StorageMeter extends Component {
 	render(){
-		let quota = this.props.quota;
-		let quotaPercentage = this.props.quotaPercentage;
+		const {userSubscription} = this.props;
+
+		let quota = userSubscription.quota;
 		if(quota == 1000000) {
 			return null;
 		}
+
+		let quotaPercentage = parseFloat(userSubscription.usage.total) / parseFloat(quota) * 100.0;
+		quotaPercentage = quotaPercentage.toFixed(1);
+
 		return (
 			<div>
 				<meter id='storage-quota' value={quotaPercentage} max='100' low='40' high='70' optimum='0'></meter>
@@ -183,23 +193,30 @@ class StorageMeter extends Component {
 
 class GroupUsage extends Component {
 	render(){
-		let group = this.props.group;
-		let usage = this.props.usage;
+		const {group, usage} = this.props;
 		return (
 			<p>{group.title} - {usage} MB</p>
 		);
 	}
 }
+GroupUsage.propTypes = {
+	group: PropTypes.shape({
+		title: PropTypes.string
+	}),
+	usage: PropTypes.number
+};
 
 class PaymentRow extends Component {
 	render() {
-		if(!this.props.defaultSource || !this.props.userSubscription.recur){
-			let paymentButton = <button className="btn btn-secondary" onClick={this.props.updateCardHandler}>Enable Automatic Renewal</button>;
+		const {defaultSource, userSubscription, updateCardHandler, renewHandler} = this.props;
 
-			let expiration = new Date(this.props.userSubscription.expirationDate * 1000);
+		if(!defaultSource || !userSubscription.recur){
+			let paymentButton = <button className="btn btn-secondary" onClick={updateCardHandler}>Enable Automatic Renewal</button>;
+
+			let expiration = new Date(userSubscription.expirationDate * 1000);
 			if(expiration < (Date.now() + (1000*60*60*24*15))) {
 				//expiration less than 2 weeks away, charge card now
-				paymentButton = <button className="btn btn-secondary" onClick={this.props.renewHandler}>Renew Now</button>;
+				paymentButton = <button className="btn btn-secondary" onClick={renewHandler}>Renew Now</button>;
 			}
 			return (
 				<tr>
@@ -210,26 +227,35 @@ class PaymentRow extends Component {
 				</tr>
 			);
 		}
-		let card = this.props.defaultSource;
+		let card = defaultSource;
 		return (
 			<tr>
-				<th>Payment Card</th>
+				<th>Payment Method</th>
 				<td>
-					<p><b>{card.brand} ****-****-****-{card.last4}</b></p>
-					<p>
-						Exp: <b>{card.exp_year}-{card.exp_month}</b>
-						<button className="btn btn-secondary right" onClick={this.props.updateCardHandler}>Update Card</button>
-					</p>
+					<PaymentSource source={defaultSource} />
+					<Row className='mt-2'>
+						<Col>
+							<button className="btn btn-sm btn-secondary" onClick={updateCardHandler}>Update Payment</button>
+						</Col>
+						<Col>
+							<button className="btn btn-sm btn-secondary" onClick={renewHandler}>Renew Now</button>
+						</Col>
+					</Row>
 				</td>
 			</tr>
 		);
 	}
 }
+PaymentRow.propTypes = {
+	defaultSource: PropTypes.object,
+	userSubscription: PropTypes.object.isRequired,
+	updateCardHandler: PropTypes.func.isRequired,
+	renewHandler: PropTypes.func.isRequired
+}
 
 class NextPaymentRow extends Component {
 	render() {
-		let userSubscription = this.props.userSubscription;
-		let dateFormatOptions = {year: 'numeric', month: 'long', day: 'numeric'};
+		const {userSubscription, cancelRecur} = this.props;
 		let d = new Date(parseInt(userSubscription.expirationDate)*1000);
 		let formattedExpirationDate = d.toLocaleDateString('en-US', dateFormatOptions);
 
@@ -238,10 +264,14 @@ class NextPaymentRow extends Component {
 				<tr>
 					<th>Next Payment</th>
 					<td>
-						<p>
-							{formattedExpirationDate}
-							<button className="btn btn-secondary right" onClick={this.props.cancelRecur}>Disable Autorenew</button>
-						</p>
+						<Row>
+							<Col>{formattedExpirationDate}</Col>
+						</Row>
+						<Row>
+							<Col>
+								<button className="btn btn-sm btn-secondary" onClick={cancelRecur}>Disable Autorenew</button>
+							</Col>
+						</Row>
 					</td>
 				</tr>
 			);
@@ -262,22 +292,29 @@ class NextPaymentRow extends Component {
 
 class PreviewRow extends Component {
 	render() {
-		let storageLevel = this.props.storageLevel;
+		const {storageLevel, userSubscription} = this.props;
 		if(!storageLevel){
 			return null;
 		}
 
-		let dateFormatOptions = {year: 'numeric', month: 'long', day: 'numeric'};
-		let userSubscription = this.props.userSubscription;
-
 		if(storageLevel == 1) {
 			return (<tr><td colSpan='3'>New Expiration: Never</td></tr>);
 		} else {
+			let oldExpiration = new Date(parseInt(userSubscription.expirationDate) * 1000);
 			let newExpiration = calculateNewExpiration(userSubscription.expirationDate, userSubscription.storageLevel, storageLevel);
 			return (
 				<tr>
 					<td colSpan='3'>
-						New Expiration: {newExpiration.toLocaleDateString('en-US', dateFormatOptions)}
+					<Row>
+						<Col>
+							Current Expiration: {oldExpiration.toLocaleDateString('en-US', dateFormatOptions)}
+						</Col>
+					</Row>
+					<Row>
+						<Col>
+							New Expiration: {newExpiration.toLocaleDateString('en-US', dateFormatOptions)}
+						</Col>
+					</Row>
 					</td>
 				</tr>
 			);
@@ -296,17 +333,6 @@ class Storage extends Component {
 			operationPending:false,
 			notification:null
 		};
-
-		this.getSubscription = this.getSubscription.bind(this);
-		this.getUserCustomer = this.getUserCustomer.bind(this);
-		this.previewPlan = this.previewPlan.bind(this);
-		this.unpreviewPlan = this.unpreviewPlan.bind(this);
-		this.selectPlan = this.selectPlan.bind(this);
-		this.renewNow = this.renewNow.bind(this);
-		this.updateSubscription = this.updateSubscription.bind(this);
-		this.chargeSubscription = this.chargeSubscription.bind(this);
-		this.updatePayment = this.updatePayment.bind(this);
-		this.cancelRecur = this.cancelRecur.bind(this);
 	}
 	componentDidMount(){
 		if((typeof(window.zoteroData.userSubscription) !== 'undefined') && (typeof(window.zoteroData.stripeCustomer) !== 'undefined')){
@@ -323,7 +349,7 @@ class Storage extends Component {
 		this.getSubscription();
 		this.getUserCustomer();
 	}
-	getSubscription() {
+	getSubscription = () => {
 		log.debug('getSubscription');
 		ajax({url:'/storage/usersubscription'}).then((resp) => {
 			log.debug(resp);
@@ -343,7 +369,7 @@ class Storage extends Component {
 			}});
 		});
 	}
-	getUserCustomer() {
+	getUserCustomer = () => {
 		log.debug('getUserCustomer');
 		ajax({url:'/storage/getusercustomer'}).then((resp) => {
 			log.debug(resp);
@@ -359,210 +385,44 @@ class Storage extends Component {
 			}});
 		});
 	}
-	previewPlan(evt) {
+	previewPlan = (evt) => {
 		let storageLevel = evt.target.getAttribute('data-storagelevel');
 		this.setState({previewStorageLevel:storageLevel});
 	}
-	unpreviewPlan() {
+	unpreviewPlan = () => {
 		this.setState({previewStorageLevel:null});
 	}
-	selectPlan(evt) {
-		this.setState({operationPending:true});
-		let storageLevel = evt.target.getAttribute('data-storagelevel');
-		let userSubscription = this.state.userSubscription;
-
-		log.debug(`select plan ${storageLevel}`);
-
-		let planQuota = this.state.planQuotas[storageLevel];
-		if(userSubscription.usage.total > planQuota) {
-			this.setState({
-				operationPending:false,
-				notification:{
-					type: 'error',
-					message: 'Current usage exceeds plan quota.'
-				}
-			});
-			return;
-		}
-		
-		//charge the subscription if no current subscription, or expiration within 5 days
-		let d = new Date(parseInt(userSubscription.expirationDate)*1000);
-		if((!userSubscription.expirationDate) || (d < (Date.now() + (1000*60*60*24*5)) )) {
-			//trigger stripe charge
-			this.chargeSubscription(storageLevel);
-		} else {
-			//just update storage plan without charging
-			this.updateSubscription(storageLevel);
-		}
-	}
-	renewNow() {
-		this.setState({operationPending:true});
-		let userSubscription = this.state.userSubscription;
-		let storageLevel = userSubscription.storageLevel;
-
-		let planQuota = this.state.planQuotas[storageLevel];
-		if(userSubscription.usage.total > planQuota) {
-			this.setState({
-				operationPending:false,
-				notification: {
-					type: 'error',
-					message: 'Current usage exceeds plan quota.'
-				}
-			});
-			return;
-		}
-		
-		//get stripe and charge for the current storage level
-		this.chargeSubscription(storageLevel);
-	}
-	updateSubscription(storageLevel=false) {
-		if(storageLevel === false) {
-			throw 'no storageLevel set for updateSubscription';
-		}
-		this.setState({operationPending:true});
-
-		postFormData('/storage/updatesubscription', {storageLevel:storageLevel}, {withSession:true}).then((resp) => {
-			log.debug(resp);
-			//re-fetch full subscription info now that it's been updated
-			this.getSubscription();
-			this.setState({
-				operationPending:false,
-				notification: {
-					type:'success',
-					message: 'Success'
-				}
-			});
-		}).catch((e) => {
-			log.error(e);
-			this.setState({
-				operationPending:false,
-				notification: {
-					type: 'error',
-					message: 'Error updating subscription. Please try again in a few minutes.'
-				}
-			});
+	selectPlan = (evt) => {
+		let storageLevel = parseInt(evt.target.getAttribute('data-storagelevel'), 10);
+		this.setState({
+			newSubscription:{
+				type:'individualChange',
+				storageLevel
+			}
 		});
+		return;
 	}
-	chargeSubscription(storageLevel=false) {
-		if(storageLevel === false) {
-			throw 'no storageLevel set for updateSubscription';
-		}
+	renewNow = () => {
+		const {userSubscription} = this.state;
+		const storageLevel = userSubscription.storageLevel;
+		this.setState({
+			newSubscription:{
+				type:'individualRenew',
+				storageLevel
+			}
+		});
 
-		this.setState({operationPending:true});
-		
-		let descriptions = {
-			2: '2 GB, 1 year',
-			3: '6 GB, 1 year',
-			6: 'Unlimited storage, 1 year'
-		};
-
-		let tokenHandler = (token) => {
-			// You can access the token ID with `token.id`.
-			// Get the token ID to your server-side code for use.
-			log.debug(`charging stripe ajax. storageLevel:${storageLevel} - token.id:${token.id}`);
-			postFormData('/storage/stripechargeajax', {
-				stripeToken:token.id,
-				recur:1,
-				storageLevel:storageLevel
-			}).then((resp) => {
-				log.debug(resp);
-				this.setState({
-					operationPending:false,
-					notification: {
-						type: 'success',
-						message: <span>Success. <a href='/settings/storage/invoice'>View Payment Receipt</a></span>
-					}
-				});
-			}).catch((resp) => {
-				log.debug(resp);
-				this.setState({
-					operationPending:false,
-					notification: {
-						type: 'error',
-						message: 'Error updating subscription. Please try again in a few minutes.'
-					}
-				});
-				resp.json().then((data)=>{
-					if(data.stripeMessage){
-						this.setState({
-							operationPending:false,
-							notification: {
-								type: 'error',
-								message: `There was an error processing your payment: ${data.stripeMessage}`
-							}
-						});
-					}
-				});
-			}).then(()=>{
-				this.getSubscription();
-				this.getUserCustomer();
-			});
-		};
-		
-		let closedHandler = () => {
-			this.setState({
-				operationPending:false
-			});
-		};
-
-		window.stripeHandler(descriptions[storageLevel], tokenHandler, closedHandler);
+		return;
 	}
-	updatePayment() {
-		let userSubscription = this.state.userSubscription;
-		let storageLevel = userSubscription.storageLevel;
-
-		let planQuota = this.state.planQuotas[storageLevel];
-		if(userSubscription.usage.total > planQuota) {
-			this.setState({
-				operationPending:false,
-				notification: {
-					type: 'error',
-					message: 'Current usage exceeds plan quota.'
-				}
-			});
-			return;
-		}
-
-		this.setState({operationPending:true});
-		let tokenHandler = (token) => {
-			// You can access the token ID with `token.id`.
-			// Get the token ID to your server-side code for use.
-			log.debug(`updating stripe card - token.id:${token.id}`);
-			postFormData('/storage/updatestripecard', {
-				stripeToken:token.id
-			}).then((resp) => {
-				log.debug(resp);
-				this.setState({
-					operationPending:false,
-					notification: {
-						type: 'success',
-						message: 'Success'
-					}
-				});
-			}).catch((resp) => {
-				log.debug(resp);
-				this.setState({
-					operationPending:false,
-					notification: {
-						type: 'error',
-						message: 'Error updating payment method. Please try again in a few minutes.'
-					}
-				});
-			}).then(()=>{
-				this.getSubscription();
-				this.getUserCustomer();
-			});
-		};
-
-		let closedHandler = () => {
-			this.setState({
-				operationPending:false
-			});
-		};
-
-		window.stripeHandler('', tokenHandler, closedHandler);
+	updatePayment = () => {
+		this.setState({
+			newSubscription:{
+				type:'individualPaymentUpdate'
+			}
+		});
+		return ;
 	}
-	cancelRecur(){
+	cancelRecur = () => {
 		this.setState({operationPending:true});
 
 		postFormData('/storage/cancelautorenew').then((resp) => {
@@ -588,16 +448,12 @@ class Storage extends Component {
 			this.getUserCustomer();
 		});
 	}
+	refresh = () => {
+		this.getSubscription();
+		this.getUserCustomer();
+	}
 	render() {
-		window.StorageComponent = this;
-		let reactInstance = this;
-		if(this.state.userSubscription === null){
-			return null;
-		}
-		let userSubscription = this.state.userSubscription;
-		let groups = this.state.storageGroups;
-		let dateFormatOptions = {year: 'numeric', month: 'long', day: 'numeric'};
-
+		const {userSubscription, storageGroups, stripeCustomer, previewStorageLevel, operationPending, notification, newSubscription} = this.state;
 		if(userSubscription === null){
 			return null;
 		}
@@ -631,28 +487,21 @@ class Storage extends Component {
 			quotaDescription = 'Unlimited';
 		}
 
-		let quotaPercentage = parseFloat(userSubscription.usage.total) / parseFloat(userSubscription.quota) * 100.0;
-		quotaPercentage = quotaPercentage.toFixed(1);
-
 		let groupUsageNodes = [];
 		for(let groupID in userSubscription.usage.groups){
 			let usage = userSubscription.usage.groups[groupID];
-			groupUsageNodes.push(<GroupUsage key={groupID} group={groups[groupID]} usage={usage} />);
+			groupUsageNodes.push(<GroupUsage key={groupID} group={storageGroups[groupID]} usage={usage} />);
 		}
 
-		let planRowNodes = plans.map(function(plan){
-			return <StoragePlanRow key={plan.storageLevel} plan={plan} userSubscription={userSubscription} selectPlan={reactInstance.selectPlan} previewPlan={reactInstance.previewPlan} unpreviewPlan={reactInstance.unpreviewPlan} />;
+		let planRowNodes = plans.map((plan)=>{
+			return <StoragePlanRow key={plan.storageLevel} plan={plan} userSubscription={userSubscription} selectPlan={this.selectPlan} previewPlan={this.previewPlan} unpreviewPlan={this.unpreviewPlan} />;
 		});
 
-		let institutionalRow = <InstitutionalRow institutions={userSubscription.institutions} />;
-		
-		let planPreviewRow = <PreviewRow storageLevel={this.state.previewStorageLevel} userSubscription={userSubscription} />;
-		
 		let paymentRow = null;
 		if(userSubscription.storageLevel != 1) {
 			let defaultSource = null;
-			if(this.state.stripeCustomer){
-				defaultSource = this.state.stripeCustomer.default_source;
+			if(stripeCustomer){
+				defaultSource = stripeCustomer.default_source;
 			}
 			paymentRow = (<PaymentRow 
 				defaultSource={defaultSource}
@@ -661,19 +510,26 @@ class Storage extends Component {
 				renewHandler={this.renewNow}
 			/>);
 		}
-
-		let nextPaymentRow = null;
-		nextPaymentRow = <NextPaymentRow cancelRecur={this.cancelRecur} userSubscription={userSubscription} />;
 		
-		let modalSpinner = null;
-		if(this.state.operationPending){
-			modalSpinner = <div className='modal'><div className='modal-text'><p className='modal-text'>Updating...</p></div></div>;
+		let Payment = null;
+		if(newSubscription){
+			Payment = (<SubscriptionHandler
+				newSubscription={newSubscription}
+				userSubscription={userSubscription}
+				stripeCustomer={stripeCustomer}
+				refreshStorage={this.refresh}
+				onClose={()=>{this.setState({newSubscription:false})}}
+			/>);
 		}
 
 		return (
 			<div className='storage-container'>
-				{modalSpinner}
-				<Notifier {...this.state.notification} />
+				{Payment}
+				{operationPending ? 
+					<div className='modal'><div className='modal-text'><p className='modal-text'>Updating...</p></div></div> :
+					null
+				}
+				<Notifier {...notification} />
 				<div className='user-storage'>
 					<div className='current-storage flex-section'>
 						<div className='section-header'>
@@ -696,12 +552,12 @@ class Storage extends Component {
 											<p>My Library - {userSubscription.usage.library} MB</p>
 											{groupUsageNodes}
 											<p>Total - {userSubscription.usage.total} MB</p>
-											<StorageMeter quota={userSubscription.quota} quotaPercentage={quotaPercentage} />
+											<StorageMeter userSubscription={userSubscription} />
 										</td>
 									</tr>
 									{paymentRow}
-									{nextPaymentRow}
-									{institutionalRow}
+									<NextPaymentRow cancelRecur={this.cancelRecur} userSubscription={userSubscription} />
+									<InstitutionalRow institutions={userSubscription.institutions} />
 								</tbody>
 							</table>
 						</div>
@@ -719,7 +575,7 @@ class Storage extends Component {
 										<th></th>
 									</tr>
 									{planRowNodes}
-									{planPreviewRow}
+									<PreviewRow storageLevel={previewStorageLevel} userSubscription={userSubscription} />
 								</tbody>
 							</table>
 						</div>

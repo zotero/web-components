@@ -103,7 +103,7 @@ if($_GET['user']){
 								</div>
 								<div class="feature-col col-md-6 order-md-first col-xl-5 offset-xl-1 left">
 									<h2 class="display-2">Collaborate freely.</h2>
-									<p>Zotero lets you freely collaborate with fellow researchers and distribute class materials to your students. With no restrictions on membership, you can share files, notes, and discussion threads in public or in private.</p>
+									<p>Zotero lets you research with colleagues, distribute course materials to students, or build a collaborative bibliography. Share a Zotero library with as many people you like, at no cost.</p>
 								</div>
 							</div>
 						</section>
@@ -114,7 +114,7 @@ if($_GET['user']){
 								</div>
 								<div class="feature-col col-md-6 col-xl-5 right">
 									<h2 class="display-2">Rest easy.</h2>
-									<p>We are an independent, nonprofit organization that has no financial interest in your private information. You are always in control of your own data.</p>
+									<p>Zotero is developed by an independent, nonprofit organization that has no financial interest in your private information. With Zotero, you always stay in control of your own data.</p>
 								</div>
 							</div>
 						</section>

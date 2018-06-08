@@ -110,7 +110,7 @@ if($_GET['user']){
 						<section class="section-md last">
 							<div class="row align-items-center">
 								<div class="feature-col col-md-6 col-xl-5 offset-xl-1 text-center left">
-									<img class="img-fluid" src="../assets/images/home/privacy.svg" width="444" height="400">
+									<img class="img-fluid" src="../assets/images/home/privacy.svg" width="444" height="336">
 								</div>
 								<div class="feature-col col-md-6 col-xl-5 right">
 									<h2 class="display-2">Rest easy.</h2>

@@ -103,7 +103,7 @@ if($_GET['user']){
 								</div>
 								<div class="feature-col col-md-6 order-md-first col-xl-5 offset-xl-1 left">
 									<h2 class="display-2">Collaborate freely.</h2>
-									<p>Zotero lets you research with colleagues, distribute course materials to students, or build a collaborative bibliography. Share a Zotero library with as many people you like, at no cost.</p>
+									<p>Zotero lets you co-write a paper with a colleague, distribute course materials to students, or build a collaborative bibliography. You can share a Zotero library with as many people you like, at no cost.</p>
 								</div>
 							</div>
 						</section>

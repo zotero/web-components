@@ -355,4 +355,19 @@ let getCurrentUser = function(){
 	}
 };
 
-export {slugify, parseQuery, buildQuery, querystring, parseSearchString, readCookie, loadInitialState, pageReady, jsError, jsSuccess, Delay, formatItemField, getCurrentUser};
+let randomString = function(len, chars) {
+	if (!chars) {
+		chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+	}
+	if (!len) {
+		len = 8;
+	}
+	var randomstring = '';
+	for (var i=0; i<len; i++) {
+		var rnum = Math.floor(Math.random() * chars.length);
+		randomstring += chars.substring(rnum,rnum+1);
+	}
+	return randomstring;
+};
+
+export {slugify, parseQuery, buildQuery, querystring, parseSearchString, readCookie, loadInitialState, pageReady, jsError, jsSuccess, Delay, formatItemField, getCurrentUser, randomString};

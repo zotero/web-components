@@ -22,6 +22,7 @@ import {StyleChooser} from './styleChooser.js';
 import Section from './section.js';
 import {jsError, getCurrentUser} from '../Utils.js';
 import {apiRequestString} from '../ApiRouter.js';
+import {Button, Row, Col} from 'reactstrap';
 
 const currentUser = getCurrentUser();
 
@@ -71,14 +72,6 @@ class CVEditor extends Component{
 			entryOrder:entryOrder,
 			style:this.props.style
 		};
-		this.insertTextSection = this.insertTextSection.bind(this);
-		this.insertCollection = this.insertCollection.bind(this);
-		this.appendSection = this.appendSection.bind(this);
-		this.moveEntry = this.moveEntry.bind(this);
-		this.updateEntry = this.updateEntry.bind(this);
-		this.save = this.save.bind(this);
-		this.loadCollections = this.loadCollections.bind(this);
-		this.edit = this.edit.bind(this);
 	}
 	componentDidMount(){
 		document.documentElement.className += ' react-mounted';
@@ -86,7 +79,7 @@ class CVEditor extends Component{
 		this.loadCollections();
 		this.initializePreviews();
 	}
-	async loadCollections() {
+	loadCollections = async () => {
 		let userID = false;
 		if(this.props.userID){
 			userID = this.props.userID;
@@ -123,7 +116,7 @@ class CVEditor extends Component{
 			jsError('Error loading collections');
 		}
 	}
-	async initializePreviews(){
+	initializePreviews = async () => {
 		try{
 			let collectionPreviews = {};
 			for(let i = 0; i < this.state.entryOrder.length; i++){
@@ -140,7 +133,7 @@ class CVEditor extends Component{
 		}
 	}
 	//load the collection styled with the current style
-	async previewCollection(collectionKey){
+	previewCollection = async (collectionKey) => {
 		log.debug('previewCollection');
 		try{
 			let userID = false;
@@ -166,7 +159,7 @@ class CVEditor extends Component{
 			jsError('Error loading collection preview');
 		}
 	}
-	appendSection(type){
+	appendSection = (type) => {
 		let section = {
 			type:type,
 			heading:'',
@@ -181,15 +174,15 @@ class CVEditor extends Component{
 			entryMap:CVEntryMap
 		}, this.activateEditors);
 	}
-	insertTextSection(evt){
+	insertTextSection = (evt) => {
 		evt.preventDefault();
 		this.appendSection('text');
 	}
-	insertCollection(evt){
+	insertCollection = (evt) => {
 		evt.preventDefault();
 		this.appendSection('collection');
 	}
-	moveEntry(index, newIndex){
+	moveEntry = (index, newIndex) => {
 		let entryOrder = this.state.entryOrder;
 		let removed = entryOrder.splice(index, 1);
 		entryOrder.splice(newIndex, 0, removed[0]);
@@ -197,7 +190,8 @@ class CVEditor extends Component{
 		tinymce.remove('textarea');
 		this.setState({entryOrder:entryOrder, entryMap:CVEntryMap}, this.activateEditors);
 	}
-	activateEditors(){
+	activateEditors = () => {
+		log.debug('activateEditors');
 		tinymce.init({
 			selector: `textarea.rte`,
 			toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignright | subscript superscript blockquote',
@@ -206,7 +200,7 @@ class CVEditor extends Component{
 			statusbar:true
 		});
 	}
-	async updateEntry(tracking, field, value){
+	updateEntry = async (tracking, field, value) => {
 		log.debug('updateEntry');
 		CVEntryMap[tracking][field] = value;
 		if(CVEntryMap[tracking]['type'] == 'collection'){
@@ -217,10 +211,10 @@ class CVEditor extends Component{
 			this.setState({collectionPreviews});
 		}
 	}
-	edit(index){
+	edit = (index) => {
 		this.setState({editing:index}, this.activateEditors);
 	}
-	save(){
+	save = () => {
 		let cventries = [];
 		this.state.entryOrder.map((tracking)=>{
 			let entry = CVEntryMap[tracking];
@@ -264,12 +258,16 @@ class CVEditor extends Component{
 		});
 		return (
 			<div className='CVEditor'>
-				<StyleChooser style={this.state.style} changeStyle={(style)=>{this.setState({style});}}/>
-				{sections}
-				<a href='#' onClick={this.insertTextSection}>Insert a new text section</a>
-				{' | '}
-				<a href='#' onClick={this.insertCollection}>Insert a new collection from library</a>
-				<p><button className='btn' onClick={this.save}>Save C.V.</button></p>
+				<Row>
+					<Col xs='12'>
+						<StyleChooser style={this.state.style} changeStyle={(style)=>{this.setState({style});}}/>
+						{sections}
+						<a href='#' onClick={this.insertTextSection}>Insert a new text section</a>
+						{' | '}
+						<a href='#' onClick={this.insertCollection}>Insert a new collection from library</a>
+						<p><Button onClick={this.save}>Save C.V.</Button></p>
+					</Col>
+				</Row>
 			</div>
 		);
 	}

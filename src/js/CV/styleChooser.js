@@ -6,7 +6,7 @@
 const React = require('react');
 const {Component} = React;
 
-import Select from 'react-select';
+import {Input} from 'reactstrap';
 
 class StyleChooser extends Component {
 	render() {
@@ -28,27 +28,20 @@ class StyleChooser extends Component {
 		};
 		let def = this.props.style;
 
-		let optionsArray = Object.keys(styleOptions).map((key)=>{
-			return {value:key, label:styleOptions[key]};
-		});
-		
-
 		let options = Object.keys(styleOptions).map((key)=>{
 			let label = styleOptions[key];
 			return <option key={key} value={key} label={label}>{label}</option>;
 		});
 		return (
 			<div>
-				<Select 
-					options={optionsArray}
+				<Input
+					type='select'
 					onChange={(val)=>{this.props.changeStyle(val);}}
 					value={this.props.style}
-					clearable={false}
-				/>
-				{/*
-				<select className='form-control' defaultValue={def} onChange={(evt)=>{this.props.changeStyle(evt.target.value);}}>
+					clearable='false'
+				>
 					{options}
-				</select>*/}
+				</Input>
 				<p className='hint'>Style for bibliography sections</p>
 			</div>
 		);

@@ -10,9 +10,8 @@ import {EditableRichText} from './editableTextInput.js';
 class RTE extends Component {
 	constructor(props) {
 		super(props);
-		this.editorChange = this.editorChange.bind(this);
 	}
-	editorChange(content){
+	editorChange = (content) => {
 		this.props.updateEntry(this.props.section.tracking, 'value', content);
 	}
 	render() {

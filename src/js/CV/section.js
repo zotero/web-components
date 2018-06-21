@@ -11,6 +11,7 @@ import { DragSource, DropTarget } from 'react-dnd';
 import {RTE} from './text.js';
 import {Collection} from './collection.js';
 import {EditableTextInput, EditableRichText} from './editableTextInput.js';
+import {Button, ButtonGroup, Card, CardBody} from 'reactstrap';
 
 // Drag sources and drop targets only interact
 // if they have the same string type.
@@ -106,34 +107,25 @@ function dropcollect(connect, monitor){
 }
 
 class Section extends Component {
-	constructor(props){
-		super(props);
-		this.moveUp = this.moveUp.bind(this);
-		this.moveDown = this.moveDown.bind(this);
-		this.headingChange = this.headingChange.bind(this);
-		this.edit = this.edit.bind(this);
-		this.save = this.save.bind(this);
-		this.updateHeading = this.updateHeading.bind(this);
-	}
-	headingChange(evt){
+	headingChange = (evt) => {
 		this.props.updateEntry(this.props.section.tracking, 'heading', evt.target.value);
 	}
-	updateHeading(newval){
+	updateHeading = (newval) => {
 		this.props.updateEntry(this.props.section.tracking, 'heading', newval);
 	}
-	moveUp(){
+	moveUp = () => {
 		this.props.moveEntry(this.props.index, this.props.index-1);
 	}
-	moveDown(){
+	moveDown = () => {
 		this.props.moveEntry(this.props.index, this.props.index+1);
 	}
-	remove(){
+	remove = () => {
 		this.props.removeEntry(this.props.index);
 	}
-	edit(){
+	edit = () => {
 		this.props.edit(this.props.index);
 	}
-	save(){
+	save = () => {
 		this.props.save(this.props.index);
 	}
 	render() {
@@ -149,16 +141,24 @@ class Section extends Component {
 			typedSection = <Collection {...this.props} />;
 		}
 		return connectDropTarget(connectDragPreview(
-			<div className='cv_section'>
-				{connectDragSource(<div className='drag_handle'></div>)}
-				<button className='btn' onClick={this.moveUp} title='Move Up'>▲</button>
-				<button className='btn' onClick={this.moveDown} title='Move Down'>▼</button>
-				<button className='btn' onClick={this.remove} title='Remove Section'>x</button>
-				<button className='btn' onClick={this.edit} title='Edit Section'>Edit</button>
-				<h2 className="profile_cvHead">
-					<EditableTextInput value={this.props.section.heading} save={this.updateHeading} />
-				</h2>
-				{typedSection}
+			<div className='cv_section m-3'>
+				<Card>
+					{connectDragSource(<div className='drag_handle'></div>)}
+					<CardBody>
+						<ButtonGroup className='mb-2'>
+							<Button outline onClick={this.moveUp} title='Move Up'>▲</Button>
+							<Button outline onClick={this.moveDown} title='Move Down'>▼</Button>
+							<Button outline onClick={this.remove} title='Remove Section'>x</Button>
+							{/*<Button outline onClick={this.edit} title='Edit Section'>Edit</Button>*/}
+						</ButtonGroup>
+						<h2 className="profile_cvHead">
+							<EditableTextInput value={this.props.section.heading} save={this.updateHeading} />
+						</h2>
+						<div className='mt-2'>
+							{typedSection}
+						</div>
+					</CardBody>
+				</Card>
 			</div>
 		));
 	}

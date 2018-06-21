@@ -6,14 +6,13 @@ let log = logger.Logger('Collection');
 const React = require('react');
 const {Component} = React;
 
-import Select from 'react-select';
+import {Input} from 'reactstrap';
 
 class Collection extends Component {
 	constructor(props) {
 		super(props);
-		this.collectionChange = this.collectionChange.bind(this);
 	}
-	collectionChange(val){
+	collectionChange = (val) => {
 		this.props.updateEntry(this.props.section.tracking, 'value', val);
 	}
 	render() {
@@ -45,34 +44,19 @@ class Collection extends Component {
 			);
 		});
 
-		let optionsArray = names.map((collectionName)=>{
-			let name = collectionName.name;
-			let key = collectionName.key;
-			return {
-				value:key,
-				label:`${' '.repeat(collectionName.depth)}${name}`
-			};/*
-			return (
-				<option key={key} value={key} label={name}>
-					{`${' '.repeat(collectionName.depth)}${name}`}
-				</option>
-			);*/
-		});
-
-
 		let collectionKey = this.props.section.value;
 		
 		return (
 			<div className='cv-collection'>
-				<Select 
-					options={optionsArray}
+				<Input
+					type="select"
+					name='collectionKey'
+					id="collectionKey"
 					onChange={this.collectionChange}
-					value={collectionKey}
-					clearable={false}
-				/>
-				<select className='form-control' defaultValue={collectionKey} onChange={this.collectionChange}>
+					clearable='false'
+				>
 					{options}
-				</select>
+				</Input>
 				<p className='hint'>Collection from your library that will be formatted as a bibliography</p>
 				{(this.props.section.collectionPreview !== undefined) && true }
 				<div dangerouslySetInnerHTML={{__html:this.props.collectionPreviews[collectionKey]}}></div>

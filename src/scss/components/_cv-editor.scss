@@ -1,53 +1,18 @@
 div.CVEditor {
-	
-	button,.btn {
-		color: #333;
-		background: #f0f0f0;
-		border: 1px solid #b1b1b1;
-		text-decoration: none;
-		border-radius: 3px;
-		padding: 5px 15px;
-		text-shadow:initial;
-
-		&:hover {
-			background: darken(#f0f0f0, 5%);
-		}
-	}
-	
-	input, select {
-		min-width:350px;
-		margin:3px 0;
-	}
-
-	.separator {
-		position: relative;
-		width:100%;
-		height:30px;
-		opacity: 0.2;
-	}
-	
-	.separator-highlight {
-		width: 100%;
-		height: 100%;
-		background-color: blue;
-		opacity: 0.5;
-	}
-	.cv_section {
-		border: 1px dashed rgba(0,0,0,.2);
-		padding:15px;
-	}
-
 	h2.profile_cvHead {
 		display:flex;
 	}
 	span.editable, input.editable, div.editable {
 		border-radius:3px;
 		padding:3px;
-		flex:1 1 auto;
+		//flex:1 1 auto;
+		width:100%;
+		border:1px solid #ddd;
 
 		&:hover {
-			background:rgba(0,0,255,.3);
+			background:rgba(0,0,200,.15);
 		}
+		min-height:2rem;
 	}
 	
 	div.drag_handle {

@@ -57,7 +57,7 @@ class Collection extends Component {
 				>
 					{options}
 				</Input>
-				<p className='hint'>Collection from your library that will be formatted as a bibliography</p>
+				<p className='text-muted'>Collection from your library that will be formatted as a bibliography</p>
 				{(this.props.section.collectionPreview !== undefined) && true }
 				<div dangerouslySetInnerHTML={{__html:this.props.collectionPreviews[collectionKey]}}></div>
 			</div>

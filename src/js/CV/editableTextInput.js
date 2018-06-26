@@ -32,6 +32,9 @@ class EditableTextInput extends Component {
 		evt.target.select();
 	}
 	render() {
+		const {value} = this.state;
+		const {placeholder} = this.props;
+
 		if(this.state.editing){
 			return (
 				<Input 
@@ -42,12 +45,17 @@ class EditableTextInput extends Component {
 					onFocus={this.handleFocus}
 					onChange={this.valueChanged}
 					onBlur={this.blurSave}
-					value={this.state.value} 
+					value={value}
 				/>
 			);
 		} else {
 			return (
-				<span className='editable' tabIndex='0' onClick={this.startEdit} onFocus={this.startEdit}>{this.state.value}</span>
+				<span className='editable' tabIndex='0' onClick={this.startEdit} onFocus={this.startEdit}>
+					{value ?
+						value :
+						<p className='text-muted'>{placeholder}</p>
+					}
+				</span>
 			);
 		}
 	}
@@ -90,27 +98,45 @@ class EditableRichText extends EditableTextInput {
 	}
 	blurSave = (evt) => {
 		log.debug('blurSave');
-		log.debug(evt);
+		let {value} = this.state;
 		let id = evt.target.id;
-		let updatedContent = tinymce.get(id).getContent();
-		log.debug(updatedContent);
-		this.setState({value:updatedContent, editing:false});
-		this.props.save(updatedContent);
+		let tinyInstance = tinymce.get(id);
+		if(tinyInstance != null) {
+			value = tinyInstance.getContent();
+			log.debug(value);
+			tinyInstance.remove();
+			//tinymce.remove('textarea');
+			this.props.save(value);
+		}
+		this.setState({value:value, editing:false});
 	}
 	render() {
+		const {id} = this.props;
+		const {value} = this.state;
 		if(this.state.editing){
 			return (
 				<div className='cv_rte'>
 					<textarea
-						id={this.props.id}
-						defaultValue={this.state.value}
+						id={id}
+						defaultValue={value}
 						className='rte'
 					/>
 				</div>
 			);
 		} else {
 			return (
-				<div id={this.props.id} className='editable' tabIndex='0' onFocus={this.startEdit} onClick={this.startEdit} dangerouslySetInnerHTML={{__html:this.state.value}}></div>
+				<div
+					id={id}
+					className='editable'
+					tabIndex='0'
+					onFocus={this.startEdit}
+					onClick={this.startEdit}
+					dangerouslySetInnerHTML={value ? {__html:value} : null}>
+						{value ?
+							null :
+							<p className='text-muted'>Rich text section</p>
+						}
+				</div>
 			);
 		}
 	}

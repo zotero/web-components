@@ -1,8 +1,6 @@
 'use strict';
 
-//TODO: make click to edit/blur to save
-//add handle for dragging
-//actually save the CV (currently not submitting form)
+//TODO:
 //fix collection preview behaviour
 //decide what to do with editable select
 
@@ -15,7 +13,7 @@ import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 
 import {ajax, postFormData} from '../ajax.js';
-//import {buildUrl} from '../wwwroutes.js';
+import {buildUrl} from '../wwwroutes.js';
 import {randomString} from '../Utils.js';
 
 import {StyleChooser} from './styleChooser.js';
@@ -134,7 +132,6 @@ class CVEditor extends Component{
 	}
 	//load the collection styled with the current style
 	previewCollection = async (collectionKey) => {
-		log.debug('previewCollection');
 		try{
 			let userID = false;
 			if(this.props.userID){
@@ -190,8 +187,17 @@ class CVEditor extends Component{
 		tinymce.remove('textarea');
 		this.setState({entryOrder:entryOrder, entryMap:CVEntryMap}, this.activateEditors);
 	}
+	removeEntry = (index) => {
+		let {entryOrder, entryMap} = this.state;
+		let removed = entryOrder.splice(index, 1);
+		let removedId = removed[0];
+
+		//remove tinyMCE editors before moving around the dom which could break them
+		tinymce.remove('textarea');
+		delete CVEntryMap[removedId];
+		this.setState({entryOrder, entryMap:CVEntryMap}, this.activateEditors);
+	}
 	activateEditors = () => {
-		log.debug('activateEditors');
 		tinymce.init({
 			selector: `textarea.rte`,
 			toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignright | subscript superscript blockquote',
@@ -201,7 +207,6 @@ class CVEditor extends Component{
 		});
 	}
 	updateEntry = async (tracking, field, value) => {
-		log.debug('updateEntry');
 		CVEntryMap[tracking][field] = value;
 		if(CVEntryMap[tracking]['type'] == 'collection'){
 			let collectionPreviews = this.state.collectionPreviews;
@@ -214,45 +219,62 @@ class CVEditor extends Component{
 	edit = (index) => {
 		this.setState({editing:index}, this.activateEditors);
 	}
-	save = () => {
+	save = async () => {
+		const {entryOrder, style} = this.state;
 		let cventries = [];
-		this.state.entryOrder.map((tracking)=>{
+		entryOrder.map((tracking)=>{
 			let entry = CVEntryMap[tracking];
 			if(entry.type !== 'text'){
 				cventries.push(CVEntryMap[tracking]);
 				return;
 			}
 			let id = `cv_${tracking}`;
-			let updatedContent = tinymce.get(id).getContent();
-			CVEntryMap[tracking]['value'] = updatedContent;
+			let tinyInstance = tinymce.get(id);
+			if(tinyInstance != null) {
+				CVEntryMap[tracking]['value'] = tinyInstance.getContent();
+			}
 			cventries.push(CVEntryMap[tracking]);
 		});
+		//make a copy of cv entries without the tracking so it won't be saved
 		let cleancventries = cventries.map((entry)=>{
 			entry = Object.assign({}, entry);
 			delete entry.tracking;
 			return entry;
 		});
 		let saveObj = {
-			style:this.state.style,
+			style,
 			entries:cleancventries
 		};
 		let savestr = JSON.stringify(saveObj);
+		try{
+			let resp = await postFormData(buildUrl('updateCv'), {json_cv:savestr}, {withSession:true});
+			let respData = await resp.json();
+			if(respData.success){
+				console.log('saved');
+			}
+		} catch (e) {
+			console.log('error saving');
+			console.log(e);
+		}
 	}
 	render(){
-		let sections = this.state.entryOrder.map((tracking, index)=>{
+		const {editing, collections, collectionPreviews, entryOrder, style} = this.state;
+
+		let sections = entryOrder.map((tracking, index)=>{
 			let section = CVEntryMap[tracking];
-			let editing = (this.state.editing == index);
+			let editingSection = (editing == index);
 			return <Section
 				ref={tracking}
 				section={section}
 				index={index}
 				key={tracking}
 				id={`cv_${tracking}`}
-				collections={this.state.collections}
-				collectionPreviews={this.state.collectionPreviews}
+				collections={collections}
+				collectionPreviews={collectionPreviews}
 				moveEntry={this.moveEntry}
+				removeEntry={this.removeEntry}
 				updateEntry={this.updateEntry}
-				editing={editing}
+				editing={editingSection}
 				edit={this.edit}
 			/>;
 		});
@@ -260,7 +282,7 @@ class CVEditor extends Component{
 			<div className='CVEditor'>
 				<Row>
 					<Col xs='12'>
-						<StyleChooser style={this.state.style} changeStyle={(style)=>{this.setState({style});}}/>
+						<StyleChooser style={style} changeStyle={(newStyle)=>{this.setState({style:newStyle});}}/>
 						{sections}
 						<a href='#' onClick={this.insertTextSection}>Insert a new text section</a>
 						{' | '}

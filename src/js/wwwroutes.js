@@ -90,6 +90,8 @@ let buildUrl = function(name, params){
 			return '/user/login';
 		case 'register':
 			return '/user/register';
+		case 'updateCv':
+			return '/settings/updatecv';
 	}
 	throw new Error('Unknown route in buildUrl');
 };

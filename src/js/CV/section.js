@@ -152,7 +152,7 @@ class Section extends Component {
 							{/*<Button outline onClick={this.edit} title='Edit Section'>Edit</Button>*/}
 						</ButtonGroup>
 						<h2 className="profile_cvHead">
-							<EditableTextInput value={this.props.section.heading} save={this.updateHeading} />
+							<EditableTextInput value={this.props.section.heading} save={this.updateHeading} placeholder='Section Header' />
 						</h2>
 						<div className='mt-2'>
 							{typedSection}

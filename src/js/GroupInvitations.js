@@ -12,25 +12,6 @@ let React = require('react');
 
 import {buildUrl} from './wwwroutes.js';
 
-let phpgroupToGroup = function(phpgroup){
-	log.debug('phpgroupToGroup');
-	let group = {
-		id: phpgroup.id,
-		data: {
-			id: phpgroup.id,
-			name: phpgroup.name,
-			type: phpgroup.type,
-			owner: phpgroup.owner,
-			description: phpgroup.description,
-			members: phpgroup.memberIDs,
-			admins: phpgroup.adminIDs,
-			libraryReading: phpgroup.libraryReading,
-			libraryEditing: phpgroup.libraryEditing
-		}
-	};
-	return group;
-};
-
 class GroupInvitation extends React.Component{
 	constructor(props){
 		super(props);
@@ -92,7 +73,7 @@ class GroupInvitations extends React.Component{
 				resp.json().then((data) => {
 					let invitationGroups = {};
 					data.invitations.forEach((val) => {
-						invitationGroups[val.groupID] = phpgroupToGroup(data.invitationGroups[val.groupID]);
+						invitationGroups[val.groupID] = data.invitationGroups[val.groupID].apiObj;
 					});
 					this.setState({
 						invitations:data.invitations,

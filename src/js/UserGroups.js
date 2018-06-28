@@ -60,8 +60,9 @@ let groupIsWritable = function(group, userID) {
 
 class IntroVideo extends Component{
 	render(){
+		let style = {'margin':'auto'};
 		return (
-			<video id='group-intro-screencast' src="/static/videos/group_intro.m4v" controls='true' height='450px' poster='/static/images/group/playvideo.jpg'>
+			<video id='group-intro-screencast' src="/static/videos/group_intro.m4v" controls='true' height='450px' poster='/static/images/group/playvideo.jpg' style={style}>
 				Sorry, your browser doesn't support embedded videos.
 			</video>
 		);
@@ -196,7 +197,7 @@ class GroupsExplainer extends Component{
 			);
 		}
 		return (
-			<div id="group-explainer card" className="mt-5">
+			<div id="group-explainer" className="mt-5">
 				<h2 className="text-center">What can groups do for you?</h2>
 				<p>With groups, you can collaborate remotely with project members, set
 				up web-based bibliographies for classes you teach, and so much more.
@@ -206,8 +207,10 @@ class GroupsExplainer extends Component{
 					<li><strong>Collaborate</strong> with colleagues, publicly or privately, on ongoing research.</li>
 					<li><strong>Discover</strong> other people with similar interests and the sources they are citing.</li>
 				</ul>
-				<IntroVideo />
-				{nonUserLink}
+				<div className='text-center'>
+					<IntroVideo />
+					{nonUserLink}
+				</div>
 			</div>
 		);
 	}

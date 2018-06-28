@@ -239,6 +239,7 @@ class CVEditor extends Component{
 		let cleancventries = cventries.map((entry)=>{
 			entry = Object.assign({}, entry);
 			delete entry.tracking;
+			delete entry.collectionPreview;
 			return entry;
 		});
 		let saveObj = {

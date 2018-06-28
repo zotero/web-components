@@ -6,14 +6,15 @@ let log = logger.Logger('Collection');
 const React = require('react');
 const {Component} = React;
 
-import {Input} from 'reactstrap';
+import {Input, CustomInput} from 'reactstrap';
 
 class Collection extends Component {
 	constructor(props) {
 		super(props);
 	}
-	collectionChange = (val) => {
-		this.props.updateEntry(this.props.section.tracking, 'value', val);
+	collectionChange = (evt) => {
+		let v = evt.target.value;
+		this.props.updateEntry(this.props.section.tracking, 'value', v);
 	}
 	render() {
 		let collections = this.props.collections;
@@ -48,15 +49,17 @@ class Collection extends Component {
 		
 		return (
 			<div className='cv-collection'>
-				<Input
+				<CustomInput
 					type="select"
 					name='collectionKey'
 					id="collectionKey"
 					onChange={this.collectionChange}
+					value={collectionKey}
 					clearable='false'
 				>
+					<option value=''>Choose a collection</option>
 					{options}
-				</Input>
+				</CustomInput>
 				<p className='text-muted'>Collection from your library that will be formatted as a bibliography</p>
 				{(this.props.section.collectionPreview !== undefined) && true }
 				<div dangerouslySetInnerHTML={{__html:this.props.collectionPreviews[collectionKey]}}></div>

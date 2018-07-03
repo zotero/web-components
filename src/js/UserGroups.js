@@ -271,10 +271,14 @@ class UserGroups extends Component{
 		this.loadGroups();
 	}
 	render(){
-		let groups = this.state.groups;
-		let userID = this.state.userID;
-		let titleOnly = this.props.titleOnly;
+		let {titleOnly, ownedOnly} = this.props;
+		let {groups, userID} = this.state;
 
+		if(ownedOnly){
+			groups = groups.filter((group)=>{
+				return userID == group.data.owner;
+			})
+		}
 		//Nugget entry for each group
 		var groupNuggets = groups.map(function(group){
 			return (
@@ -303,7 +307,8 @@ class UserGroups extends Component{
 }
 UserGroups.defaultProps =  {
 	titleOnly:false,
-	userID:false
+	userID:false,
+	ownedOnly: false,
 };
 
 export {UserGroups, GroupNugget};

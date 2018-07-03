@@ -1,0 +1,120 @@
+.register {
+  text-align: center;
+
+  .register-section {
+    background-size: rem(51) auto;
+    padding: ($section-padding-md-mobile - rem(8)) 0 ($section-padding-md-mobile - rem(10));
+
+    @include media-breakpoint-up(md) {
+      background-size: rem(76) auto;
+      padding: ($section-padding-md - rem(12)) 0 ($section-padding-md - rem(10));
+    }
+  }
+
+  .register-form {
+    @include media-breakpoint-up(md) {
+      max-width: map-get($container-max-widths, xl) * 4 / 12 - $grid-gutter-width; // 4 xl cols
+      margin: auto;
+    }
+
+    .form-control-lg {
+      font-size: rem(20);
+      padding-top: $input-padding-y-lg - rem(3);
+      padding-bottom: $input-padding-y-lg - rem(3);
+    }
+
+    p {
+      font-size: $font-size-sm;
+      color: $gray-700;
+      margin: $spacer-min auto;
+
+      &:empty {
+        display: none;
+      }
+    }
+
+    .profile-preview {
+      &.valid {
+        color: $success;
+      }
+
+      &.invalid {
+        color: $danger;
+      }
+    }
+
+    .input-group {
+      .btn {
+        font-size: $font-size-sm;
+        background-color: $input-bg;
+        border-color: $input-border-color;
+        color: inherit;
+        // Fix https://github.com/twbs/bootstrap/issues/25110
+        @include border-right-radius($input-border-radius-lg);
+
+        &:focus {
+          .keyboard-user & {
+            border-color: $secondary;
+          }
+        }
+
+        &:active {
+          background-color: darken($input-bg, 4%);
+        }
+      }
+
+      .feedback {
+        font-style: normal;
+      }
+    }
+
+    .g-recaptcha {
+      width: 302px;
+      min-height: 78px;
+      margin: 0 auto -2px;
+
+      @include media-breakpoint-down(xs) {
+        transform-origin: left top;
+        transform: scale(0.9536);
+        width: 288px;
+        margin-bottom: -6px;
+      }
+    }
+
+    .btn-register {
+      .feedback {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .icon-spin {
+        width: $spacer-lg;
+        height: $spacer-lg;
+      }
+    }
+  }
+
+  .notifier {
+    font-size: $font-size-lg-mobile;
+    font-weight: 300;
+    margin-top: rem(-1);
+    margin-bottom: rem(2);
+
+    @include media-breakpoint-up(md) {
+      font-size: $font-size-lg;
+      margin-top: rem(-10); // 64px
+      margin-bottom: 0;
+    }
+
+    &.success {
+      color: $success;
+    }
+
+    &.error {
+      color: $danger;
+      margin-top: $spacer-md;
+    }
+  }
+
+}

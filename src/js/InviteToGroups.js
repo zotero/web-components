@@ -25,24 +25,19 @@ class InviteToGroups extends React.Component{
 			selectedGroup:false,
 			showInvitation:false
 		};
-		this.loadGroupData = this.loadGroupData.bind(this);
-		this.updateSelectedGroup = this.updateSelectedGroup.bind(this);
-		this.inviteToGroup = this.inviteToGroup.bind(this);
-		this.showInvitation = this.showInvitation.bind(this);
-		this.calculateInvitable = this.calculateInvitable.bind(this);
 	}
-	loadGroupData() {
-		log.debug('loadGroupData');
-		let userID = false;
-		let inviteeUserID = this.props.invitee.userID;
-		if(this.props.userID){
-			userID = this.props.userID;
-		} else if(currentUser){
+	loadGroupData = async () => {
+		let {userID, invitee} = this.props;
+		let inviteeUserID = invitee.userID;
+		if(!userID && currentUser){
 			userID = currentUser.userID;
 		}
 
-		if(!userID || !inviteeUserID){
-			return;
+		if(!userID){
+			throw 'no userID';
+		}
+		if(!inviteeUserID){
+			throw 'no user to invite';
 		}
 
 		//load groups of user
@@ -52,86 +47,86 @@ class InviteToGroups extends React.Component{
 			'libraryID': userID,
 			'order':'title'
 		});
-		let userGroupsPromise = ajax({url: userGroupsUrl, credentials:'omit'}).then((resp)=>{
-			return resp.json().then((data) => {
-				this.setState({
-					userGroups:data,
-					userGroupsLoaded:true
-				});
-				return data;
+		let userGroups;
+		try {
+			let resp = await ajax({url: userGroupsUrl, credentials:'omit'});
+			userGroups = await resp.json();
+			this.setState({
+				userGroups,
+				userGroupsLoaded:true
 			});
-		}).catch(()=>{
+		} catch(e){
 			jsError('Error getting groups');
-		});
+			log.error(e);
+		};
 
 		//load list of groups user has already been invited to
 		let alreadyInvitedUrl = `/user/${inviteeUserID}/alreadyinvited`;
-		
-		let alreadyInvitedPromise = ajax({url: alreadyInvitedUrl}).then((resp)=>{
-			return resp.json().then((data) => {
-				this.setState({
-					alreadyInvited:data.alreadyInvited,
-					alreadyInvitedLoaded:true
-				});
-				return data;
+		let alreadyInvited;
+		try {
+			let resp = await ajax({url: alreadyInvitedUrl});
+			let data = await resp.json();
+			alreadyInvited = data.alreadyInvited;
+			this.setState({
+				alreadyInvited,
+				alreadyInvitedLoaded:true
 			});
-		}).catch(()=>{
+		} catch(e){
 			jsError('Error getting invitations');
-		});
+			log.error(e);
+		}
 
-		Promise.all([userGroupsPromise, alreadyInvitedPromise]).then((results)=>{
-			let invitable = this.calculateInvitable(results[0], results[1].alreadyInvited);
-			if(invitable === false){
-				log.debug('error calculating invitable');
-				jsError('Error getting groups');
-			} else {
-				if(invitable.length > 0){
-					this.setState({selectedGroup: invitable[0].id});
-				}
+		let invitable = this.calculateInvitable(userGroups, alreadyInvited);
+		if(invitable === false){
+			log.error('error calculating invitable');
+			jsError('Error getting groups');
+		} else {
+			if(invitable.length > 0){
+				this.setState({selectedGroup: invitable[0].id});
 			}
-		});
+		}
 	}
-	showInvitation(evt) {
+	showInvitation = (evt) => {
 		evt.preventDefault();
 		this.loadGroupData();
 		this.setState({showInvitation:true});
 	}
-	updateSelectedGroup(evt) {
+	updateSelectedGroup = (evt) => {
 		this.setState({selectedGroup:evt.target.value});
 	}
-	inviteToGroup() {
-		let groupID = this.state.selectedGroup;
+	inviteToGroup = async () => {
+		const {selectedGroup, userGroups} = this.state;
+		const {invitee} = this.props;
 		let group;
-		this.state.userGroups.forEach((ugroup)=>{
-			if(ugroup.id == groupID){
+		userGroups.forEach((ugroup)=>{
+			if(ugroup.id == selectedGroup){
 				group = ugroup;
 			}
 		});
 
-		postFormData(buildUrl('groupInvite'), {groupID:group.id, userID:this.props.invitee.userID, ajax:true}).then((resp)=>{
-			resp.json().then((data) => {
-				if(data.success){
-					let invitationsSent = this.state.invitationsSent;
-					invitationsSent.push(parseInt(groupID));
-					this.setState({invitationsSent});
-				} else {
-					throw data;
-				}
-			});
-		}).catch(()=>{
+		try{
+			let resp = await postFormData(buildUrl('groupInvite'), {groupID:group.id, userID:invitee.userID, ajax:true});
+			let data = await resp.json();
+			if(data.success){
+				let invitationsSent = this.state.invitationsSent;
+				invitationsSent.push(parseInt(groupID));
+				this.setState({invitationsSent});
+			} else {
+				throw data;
+			}
+		} catch(e){
 			jsError('Error sending invitation');
-		});
+			log.error(e);
+		}
 	}
-	calculateInvitable(userGroups, alreadyInvited) {
+	calculateInvitable = (userGroups, alreadyInvited) => {
 		if((!this.state.userGroupsLoaded) || (!this.state.alreadyInvitedLoaded)){
 			return false;
 		}
 
-		let userID = this.props.userID;
-		let inviteeUserID = this.props.invitee.userID;
+		const {userID, invitee} = this.props;
+		let inviteeUserID = invitee.userID;
 
-		//log.debug(`userID: ${userID}, inviteeUserID: ${inviteeUserID}`);
-		
 		//build list of groups invitee can be invited to by user
 		let invitableGroups = [];
 		for(let group of userGroups){
@@ -152,29 +147,30 @@ class InviteToGroups extends React.Component{
 		return invitableGroups;
 	}
 	render() {
-		log.debug('InviteToGroups render');
-		if(!this.props.userID){
+		const {userID, invitee} = this.props;
+		const {userGroups, alreadyInvited, invitationsSent, userGroupsLoaded, alreadyInvitedLoaded, showInvitation} = this.state;
+		if(!userID){
 			return null;
 		}
-		if(this.props.userID == this.props.invitee) {
+		if(userID == invitee.userID) {
 			return null;
 		}
-		
+
 		let inviteSection = null;
 		let pendingInvitations = null;
-		
+
 		let groupMap = {};
-		this.state.userGroups.forEach((group)=>{
+		userGroups.forEach((group)=>{
 			groupMap[group.id] = group;
 		});
 
 		//populate list of groups user has permission to send invites for, and profileUser is not already
 		//a member or has an invitation pending
-		let invitableGroups = this.calculateInvitable(this.state.userGroups, this.state.alreadyInvited);
+		let invitableGroups = this.calculateInvitable(userGroups, alreadyInvited);
 		if(invitableGroups !== false){
 			//filter out invitableGroups that user has just invited profileUser to
 			invitableGroups = invitableGroups.filter((group)=>{
-				if(this.state.invitationsSent.includes(group.id)){
+				if(invitationsSent.includes(group.id)){
 					return false;
 				}
 				return true;
@@ -196,16 +192,16 @@ class InviteToGroups extends React.Component{
 						<button type='button' onClick={this.inviteToGroup}>Invite</button>
 					</div>
 				);
-			} else if(this.state.alreadyInvited.length > 0) {
+			} else if(alreadyInvited.length > 0) {
 				inviteSection = (
 					<div>
-						<p>{this.props.invitee.displayName} has already been invited to your groups.</p>
+						<p>{invitee.displayName} has already been invited to your groups.</p>
 					</div>
 				);
 			} else {
 				inviteSection = (
 					<div>
-						<p>You don't currently have any groups to invite {this.props.invitee.displayName} to.
+						<p>You don't currently have any groups to invite {invitee.displayName} to.
 							If you haven't previously invited them to your group, make sure you are an admin for
 							the group, or <a href={buildUrl('groupCreate')}>create a new group</a> to collaborate with other users.
 						</p>
@@ -213,15 +209,15 @@ class InviteToGroups extends React.Component{
 				);
 			}
 
-			if(this.state.invitationsSent.length > 0 || this.state.alreadyInvited.length > 0){
-				let invitationsSentNodes = this.state.invitationsSent.map((groupID)=>{
+			if(invitationsSent.length > 0 || alreadyInvited.length > 0){
+				let invitationsSentNodes = invitationsSent.map((groupID)=>{
 					let group = groupMap[groupID];
 					return (
 						<li key={group.id}><a href={buildUrl('groupView', {group})}>{group.data.name}</a></li>
 					);
 				});
 
-				let alreadyInvitedNodes = this.state.alreadyInvited.map((groupID)=>{
+				let alreadyInvitedNodes = alreadyInvited.map((groupID)=>{
 					let group = groupMap[groupID];
 					return (
 						<li key={group.id}><a href={buildUrl('groupView', {group})}>{group.data.name}</a></li>
@@ -240,14 +236,14 @@ class InviteToGroups extends React.Component{
 			}
 		}
 
-		let loading = (!this.state.userGroupsLoaded) || (!this.state.alreadyInvitedLoaded);
+		const loading = (!userGroupsLoaded) || (!alreadyInvitedLoaded);
 
 		return (
 			<div id='invite-to-group'>
 				<a className='expand-link' href="#" onClick={this.showInvitation}>
-					Invite {this.props.invitee.displayName} to join one of your groups
+					Invite {invitee.displayName} to join one of your groups
 				</a>
-				<VerticalExpandable expand={this.state.showInvitation}>
+				<VerticalExpandable expand={showInvitation}>
 					<LoadingSpinner loading={loading} />
 					{inviteSection}
 					{pendingInvitations}

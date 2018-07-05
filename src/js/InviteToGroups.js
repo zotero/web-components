@@ -7,8 +7,8 @@ import {ajax, postFormData} from './ajax.js';
 import {apiRequestString} from './ApiRouter.js';
 import {LoadingSpinner} from './LoadingSpinner.js';
 import {buildUrl} from './wwwroutes.js';
-import {VerticalExpandable} from './VerticalExpandable.js';
 import {jsError, getCurrentUser} from './Utils.js';
+import {Collapse, Button, CustomInput} from 'reactstrap';
 
 const currentUser = getCurrentUser();
 
@@ -88,8 +88,9 @@ class InviteToGroups extends React.Component{
 	}
 	showInvitation = (evt) => {
 		evt.preventDefault();
-		this.loadGroupData();
+		if(this.state.showInvitation) return;
 		this.setState({showInvitation:true});
+		this.loadGroupData();
 	}
 	updateSelectedGroup = (evt) => {
 		this.setState({selectedGroup:evt.target.value});
@@ -186,10 +187,10 @@ class InviteToGroups extends React.Component{
 
 				inviteSection = (
 					<div>
-						<select onChange={this.updateSelectedGroup}>
+						<CustomInput id='invite-to-group-select' type='select' onChange={this.updateSelectedGroup}>
 							{inviteOptions}
-						</select>
-						<button type='button' onClick={this.inviteToGroup}>Invite</button>
+						</CustomInput>
+						<Button className='mt-2 mb-2' onClick={this.inviteToGroup}>Invite</Button>
 					</div>
 				);
 			} else if(alreadyInvited.length > 0) {
@@ -243,11 +244,11 @@ class InviteToGroups extends React.Component{
 				<a className='expand-link' href="#" onClick={this.showInvitation}>
 					Invite {invitee.displayName} to join one of your groups
 				</a>
-				<VerticalExpandable expand={showInvitation}>
-					<LoadingSpinner loading={loading} />
+				<Collapse isOpen={showInvitation}>
+					<LoadingSpinner loading={loading} width='24' height='24' />
 					{inviteSection}
 					{pendingInvitations}
-				</VerticalExpandable>
+				</Collapse>
 			</div>
 		);
 	}

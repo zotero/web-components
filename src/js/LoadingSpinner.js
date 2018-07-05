@@ -10,8 +10,11 @@ class LoadingSpinner extends Component{
 		if(!this.props.loading){
 			return null;
 		}
-		return <Spinner />;
+		return <Spinner {...this.props} />;
 	}
 }
+LoadingSpinner.defaultProps = {
+	color:'blue'
+};
 
 export {LoadingSpinner};

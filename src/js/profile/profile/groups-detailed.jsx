@@ -7,6 +7,18 @@ import PropTypes from 'prop-types';
 import GroupsBase from '../abstract/groups-base.jsx';
 import profileEventSystem from '../profile-event-system.js';
 import {buildUrl} from '../../wwwroutes.js';
+import {typeMap} from '../../maps/groupMaps.js';
+
+let groupMemberCount = function(group){
+	let count = 1;
+	if(group.data.members){
+		count += group.data.members.length;
+	}
+	if(group.data.admins){
+		count += group.data.admins.length;
+	}
+	return count;
+}
 
 export default class GroupsDetailed extends GroupsBase {
 	constructor(props) {
@@ -37,21 +49,21 @@ export default class GroupsDetailed extends GroupsBase {
 			<h2>Groups</h2>
 			<ul className="row">
 				{this.state.groups.map(group => {
-					return <li key={ group.get('id') }>
+					return <li key={ group.id }>
 						<div className="profile-groups-detailed-details">
 							<div className="profile-groups-detailed-details-groupname">
 								<span>
-									{ group.get('name') }
+									{ group.data.name }
 								</span>
-								<a href={ buildUrl('groupView', {group:group.apiObj}) } className="profile-groups-detailed-details-join">
+								<a href={ buildUrl('groupView', {group:group}) } className="profile-groups-detailed-details-join">
 									Join
 								</a>
 							</div>
 							<div>
-								{ group.get('members').length + group.get('admins').length + 1 } Members
+								{ groupMemberCount(group) } Members
 							</div>
 							<div>
-								{ group.typeMap[group.get('type')] }
+								{ typeMap[group.data.type] }
 							</div>
 						</div>
 					</li>;

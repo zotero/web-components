@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 import profileEventSystem from '../profile-event-system.js';
 import ProfileDataSource from '../profile-data-source.js';
-import {Row, Col} from 'reactstrap';
+import {Row, Col, Button} from 'reactstrap';
 
 export default class RelatedPeopleDetailed extends React.Component {
 	constructor(props) {
@@ -51,9 +51,9 @@ export default class RelatedPeopleDetailed extends React.Component {
 			</div>;
 		} else if(!this.state.all) {
 			footer = <div className="profile-related-people-detailed-action">
-				<button className="btn btn-secondary" onClick={ ev => this.showAllHandler(ev) }>
+				<Button color='secondary' onClick={ ev => this.showAllHandler(ev) }>
 					Show All
-				</button>
+				</Button>
 			</div>;
 		}
 

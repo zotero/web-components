@@ -80,7 +80,7 @@ class CreateGroup extends React.Component{
 								<input
 									className={cn('form-control', 'form-control-lg', {'is-invalid':(groupNameValid === false), 'is-valid':(groupNameValid === true)})}
 									type='text'
-									name='groupName'
+									name='name'
 									id='groupName'
 									placeholder='Group Name'
 									onChange={this.changeName}
@@ -103,7 +103,7 @@ class CreateGroup extends React.Component{
 									<h4 className='card-title'>Public, Open Membership</h4>
 									<p className='muted small'>Anyone can view your group online and join the group instantly.</p>
 									<div className='form-check'>
-										<input className="form-check-input" type="radio" id="publicopenradio" value='PublicOpen' checked={selectedType == 'PublicOpen'} />
+										<input name='group_type' className="form-check-input" type="radio" id="publicopenradio" value='PublicOpen' checked={selectedType == 'PublicOpen'} />
 										<label className="form-check-label" htmlFor="publicopenradio">
 											Select public, open membership
 										</label>
@@ -119,7 +119,7 @@ class CreateGroup extends React.Component{
 									<h4 className='card-title'>Public, Closed Membership</h4>
 									<p className='muted small'>Anyone can view your group online, but members must apply or be invited.</p>
 									<div className='form-check'>
-										<input className="form-check-input" type="radio" id="publicclosedradio" value='PublicClosed' checked={selectedType == 'PublicClosed'} />
+										<input name='group_type' className="form-check-input" type="radio" id="publicclosedradio" value='PublicClosed' checked={selectedType == 'PublicClosed'} />
 										<label className="form-check-label" htmlFor="publicclosedradio">
 											Select public, closed membership
 										</label>
@@ -135,7 +135,7 @@ class CreateGroup extends React.Component{
 									<h4 className='card-title'>Private Membership</h4>
 									<p className='muted small'>Only members can view your group online and must be invited to join.</p>
 									<div className='form-check'>
-										<input className="form-check-input" type="radio" id="privateradio" value='Private' checked={selectedType == 'Private'} />
+										<input name='group_type' className="form-check-input" type="radio" id="privateradio" value='Private' checked={selectedType == 'Private'} />
 										<label className="form-check-label" htmlFor="privateradio">
 											Select private membership
 										</label>

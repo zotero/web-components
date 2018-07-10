@@ -8,6 +8,7 @@ import GroupsBase from '../abstract/groups-base.jsx';
 import profileEventSystem from '../profile-event-system.js';
 import {buildUrl} from '../../wwwroutes.js';
 import {typeMap} from '../../maps/groupMaps.js';
+import {Row, Col} from 'reactstrap';
 
 let groupMemberCount = function(group){
 	let count = 1;
@@ -47,28 +48,31 @@ export default class GroupsDetailed extends GroupsBase {
 	render() {
 		return <div className="profile-groups-detailed">
 			<h2>Groups</h2>
-			<ul className="row">
+			<Row>
 				{this.state.groups.map(group => {
-					return <li key={ group.id }>
-						<div className="profile-groups-detailed-details">
-							<div className="profile-groups-detailed-details-groupname">
-								<span>
-									{ group.data.name }
-								</span>
-								<a href={ buildUrl('groupView', {group:group}) } className="profile-groups-detailed-details-join">
-									Join
-								</a>
+					let groupUrl = buildUrl('groupView', {group:group});
+					return (
+						<Col xs='12' sm='6' md='4' key={ group.id }>
+							<div className="profile-groups-detailed-details">
+								<div className="profile-groups-detailed-details-groupname">
+									<span>
+										<a href={groupUrl}>{ group.data.name }</a>
+									</span>
+									<a href={ groupUrl } className="profile-groups-detailed-details-join">
+										Join
+									</a>
+								</div>
+								<div>
+									{ groupMemberCount(group) } Members
+								</div>
+								<div>
+									{ typeMap[group.data.type] }
+								</div>
 							</div>
-							<div>
-								{ groupMemberCount(group) } Members
-							</div>
-							<div>
-								{ typeMap[group.data.type] }
-							</div>
-						</div>
-					</li>;
+						</Col>
+					);
 				})}
-			</ul>
+			</Row>
 		</div>;
 	}
 

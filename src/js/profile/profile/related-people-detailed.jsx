@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 
 import profileEventSystem from '../profile-event-system.js';
 import ProfileDataSource from '../profile-data-source.js';
+import {Row, Col} from 'reactstrap';
 
 export default class RelatedPeopleDetailed extends React.Component {
 	constructor(props) {
@@ -58,7 +59,7 @@ export default class RelatedPeopleDetailed extends React.Component {
 
 		return <div className="profile-related-people-detailed">
 			<h2>{ this.props.title }</h2>
-			<ul className="row">
+			<Row>
 				{ this.state.people.map(person => {
 					var academic, affiliation;
 					
@@ -74,25 +75,27 @@ export default class RelatedPeopleDetailed extends React.Component {
 						</div>;
 					}
 
-					return <li key={ person.userID }>
-						<div className="profile-related-people-detailed-avatar">
-							<img src={ person.avatar || this.constructor.FALLBACK_AVATAR } />
-						</div>
-						<div className="profile-related-people-detailed-details">
-							<div className="profile-related-people-detailed-details-username">
-								<span>
-									{ person.realname || person.username }
-								</span>
-								<a href={ '/' + person.username } className="profile-related-people-detailed-details-follow">
-									Follow
-								</a>
+					return (
+						<Col xs='12' sm='6' md='4' key={ person.userID }>
+							<div className="profile-related-people-detailed-details">
+								<div className="profile-related-people-detailed-avatar float-left">
+									<img src={ person.avatar || this.constructor.FALLBACK_AVATAR } />
+								</div>
+								<div className="profile-related-people-detailed-details-username">
+									<span>
+										{ person.realname || person.username }
+									</span>
+									<a href={ '/' + person.username } className="profile-related-people-detailed-details-follow">
+										Follow
+									</a>
+								</div>
+								{ academic }
+								{ affiliation }
 							</div>
-							{ academic }
-							{ affiliation }
-						</div>
-					</li>;
+						</Col>
+					);
 				})}
-			</ul>
+			</Row>
 			{ footer }
 		</div>;
 	}
@@ -103,7 +106,14 @@ export default class RelatedPeopleDetailed extends React.Component {
 }
 
 RelatedPeopleDetailed.propTypes = {
-	people: PropTypes.array.isRequired,
+	people: PropTypes.arrayOf(PropTypes.shape({
+		username: PropTypes.string.isRequired,
+		userID: PropTypes.number.isRequired,
+		realname: PropTypes.string,
+		affiliation: PropTypes.string,
+		academic: PropTypes.string,
+		avatar: PropTypes.string
+	})).isRequired,
 	more: PropTypes.bool,
 	title: PropTypes.string.isRequired,
 	dataSource: PropTypes.instanceOf(ProfileDataSource).isRequired

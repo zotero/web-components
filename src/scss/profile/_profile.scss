@@ -310,7 +310,7 @@ $color-profile-tint: rgba(255, 255, 255, .75);
 .profile-related-people-detailed,
 .profile-groups-detailed {
 	margin: 1em 0;
-
+	/*
 	ul {
 		display: flex;
 		flex-wrap: wrap;
@@ -337,8 +337,8 @@ $color-profile-tint: rgba(255, 255, 255, .75);
 			flex: 1 0 calc(100% - 1em);
 		}
 	}
+*/
 }
-
 .profile-related-people-detailed-academic,
 .profile-related-people-detailed-affiliation {
 	overflow: hidden;
@@ -359,7 +359,13 @@ $color-profile-tint: rgba(255, 255, 255, .75);
 .profile-related-people-detailed-details,
 .profile-groups-detailed-details {
 	flex: 1 0 auto;
-	max-width: calc(100% - 80px);
+	//max-width: calc(100% - 80px);
+	border: 1px solid $color-profile-base;
+	box-sizing: border-box;
+	height: 80px;
+	margin: .5em;
+	overflow: hidden;
+	padding: .5em 1em;
 }
 
 .profile-related-people-detailed-details-username,
@@ -399,4 +405,10 @@ $color-profile-tint: rgba(255, 255, 255, .75);
 
 .profile-related-people-detailed-action {
 	text-align: center;
+}
+
+#user-profile{
+	.nav-tabs a {
+		cursor:pointer;
+	}
 }

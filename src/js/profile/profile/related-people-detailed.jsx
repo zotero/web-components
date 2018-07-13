@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import profileEventSystem from '../profile-event-system.js';
 import ProfileDataSource from '../profile-data-source.js';
 import {Row, Col, Button} from 'reactstrap';
+import {Spinner} from '../../spinner.js';
 
 export default class RelatedPeopleDetailed extends React.Component {
 	constructor(props) {
@@ -47,7 +48,7 @@ export default class RelatedPeopleDetailed extends React.Component {
 
 		if(this.state.loading) {
 			footer = <div className="profile-related-people-detailed-action">
-				<div className="profile-editable-spinner"></div>
+				<Spinner color='blue' />
 			</div>;
 		} else if(!this.state.all) {
 			footer = <div className="profile-related-people-detailed-action">
@@ -63,27 +64,27 @@ export default class RelatedPeopleDetailed extends React.Component {
 				{ this.state.people.map(person => {
 					var academic, affiliation;
 					
-					if(person.academic) {
+					if(person.meta.profile.academic) {
 						academic = <div className="profile-related-people-detailed-academic">
-							{ person.academic }
+							{ person.meta.profile.academic }
 						</div>;
 					}
 
-					if(person.affiliation) {
+					if(person.meta.profile.affiliation) {
 						affiliation = <div className="profile-related-people-detailed-affiliation">
-							{ person.affiliation }
+							{ person.meta.profile.affiliation }
 						</div>;
 					}
 
 					return (
 						<Col xs='12' sm='6' md='4' key={ person.userID }>
 							<div className="profile-related-people-detailed-details">
-								<div className="profile-related-people-detailed-avatar float-left">
+								<div className="profile-related-people-detailed-avatar float-left mr-2">
 									<img src={ person.avatar || this.constructor.FALLBACK_AVATAR } />
 								</div>
 								<div className="profile-related-people-detailed-details-username">
 									<span>
-										{ person.realname || person.username }
+										{ person.displayName || person.username }
 									</span>
 									<a href={ '/' + person.username } className="profile-related-people-detailed-details-follow">
 										Follow
@@ -108,7 +109,7 @@ export default class RelatedPeopleDetailed extends React.Component {
 RelatedPeopleDetailed.propTypes = {
 	people: PropTypes.arrayOf(PropTypes.shape({
 		username: PropTypes.string.isRequired,
-		userID: PropTypes.number.isRequired,
+		userID: PropTypes.string.isRequired,
 		realname: PropTypes.string,
 		affiliation: PropTypes.string,
 		academic: PropTypes.string,

@@ -69,6 +69,7 @@ import {ProfileImageForm} from './ProfileImageForm.js';
 import {GroupLibrarySettings} from './GroupLibrarySettings.js';
 import {OrcidProfile, OrcidProfileControl} from './components/OrcidProfile.jsx';
 import {CVEditor} from './CV/cv.js';
+import {FollowButtons, FollowSection} from './FollowButtons.jsx';
 
 let ZoteroWebComponents = {
 	Storage,
@@ -102,7 +103,8 @@ let ZoteroWebComponents = {
 	GroupLibrarySettings,
 	OrcidProfile,
 	OrcidProfileControl,
-	CVEditor
+	CVEditor,
+	FollowButtons, FollowSection
 };
 
 globalScope.ZoteroWebComponents = ZoteroWebComponents;

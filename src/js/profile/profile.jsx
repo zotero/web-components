@@ -18,6 +18,9 @@ import profileEventSystem from './profile-event-system.js';
 import Publications from './profile/publications.jsx';
 import RelatedPeople from './profile/related-people.jsx';
 import RelatedPeopleDetailed from './profile/related-people-detailed.jsx';
+import {FollowButtons} from '../FollowButtons.jsx';
+import {InviteToGroups} from '../InviteToGroups.js';
+import {MessageUserButton} from './profile/message-user-button.jsx';
 import {Alert, Container, Row, Col, Nav, NavItem, NavLink, TabPane, TabContent} from 'reactstrap';
 import cn from 'classnames';
 
@@ -69,7 +72,8 @@ class Profile extends React.Component {
 
 	render() {
 		var networkTab, groupsTab, alert;
-		const {profile, userid} = this.props;
+		const {profile, userid, editable} = this.props;
+		const profileMeta = profile.meta.profile;
 		const activeTab = this.state.active;
 
 		if(this.state.alert.level){
@@ -93,36 +97,57 @@ class Profile extends React.Component {
 			);
 		}
 
+		let userLibraryLink = profile.meta.privacy.publishLibrary ? (
+			<a href='./items'>{profile.displayName}'s public library</a>
+		) : null;
+
 		return (
 			<Container>
 				{alert}
 				<Row className="user-profile-personal-details">
 					<Col xs='12' sm='6'>
-						<EditableAvatar value={ profile.meta.avatar } />
+						<EditableAvatar value={ profileMeta.avatar } />
 					</Col>
 					<Col xs='12' sm='6'>
 						<h2>
-							<EditableField field="realname" emptytext="Your full name" value={ profile.meta.realname } />
+							{!editable ?
+								profile.displayName :
+								<EditableField field="realname" emptytext="Your full name" value={ profileMeta.realname } />
+							}
 						</h2>
 						<ul>
 							<li>
-								<EditableField field="title" emptytext="Add your title" value={ profile.meta.title } />
+								<EditableField field="title" emptytext="Add your title" value={ profileMeta.title } />
 							</li>
 							<li>
-								<EditableField field="academic" emptytext="Add you academic status" value={ profile.meta.academic } />
+								<EditableField field="academic" emptytext="Add your academic status" value={ profileMeta.academic } />
 							</li>
 							<li>
-								<EditableField field="affiliation" emptytext="Add your university" value={ profile.meta.affiliation } />
+								<EditableField field="affiliation" emptytext="Add your university" value={ profileMeta.affiliation } />
 							</li>
 							<li>
-								<EditableField field="location" emptytext="Add you location" value={ profile.meta.location } />
+								<EditableField field="location" emptytext="Add your location" value={ profileMeta.location } />
 							</li>
+							{userLibraryLink}
 							<li>
-								<EditableItems field="social" uniform={true} emptytext="Add social profile" value={profile.meta.social}>
+								<EditableItems field="social" uniform={true} emptytext="Add social profile" value={profileMeta.social}>
 									<EditableSocialItem />
 								</EditableItems>
 							</li>
 						</ul>
+						<div className='user-actions'>
+							<Row>
+								<Col>
+									<FollowButtons profileUserID={userid} isFollowing={this.props.isFollowing} />
+								</Col>
+								<Col>
+									<MessageUserButton username={profile.username} />
+								</Col>
+								<Col>
+									<InviteToGroups invitee={{userID:userid, displayName:profileMeta.realname}} />
+								</Col>
+							</Row>
+						</div>
 					</Col>
 				</Row>
 				<Row>
@@ -148,18 +173,18 @@ class Profile extends React.Component {
 							<TabPane tabId='About'>
 								<Row>
 									<Col xs='12' sm='8'>
-										<EditableRich title="About" field="bio" emptytext="Add a short description of what you are currently working on" value={ profile.meta.bio } />
-										<EditableItems field="interests" title="Research interests" emptytext="Add your research intereststo show what you are passionate about" value={ profile.meta.interests }>
+										<EditableRich title="About" field="bio" emptytext="Add a short description of what you are currently working on" value={ profileMeta.bio } />
+										<EditableItems field="interests" title="Research interests" emptytext="Add your research intereststo show what you are passionate about" value={ profileMeta.interests }>
 											<EditableInterestItem />
 										</EditableItems>
 
 										<Publications userid={ userid } />
 
-										<EditableItems field="experience" title="Professional experience" emptytext="Add your professional experience to share where you have been working" value={ profile.meta.experience }>
+										<EditableItems field="experience" title="Professional experience" emptytext="Add your professional experience to share where you have been working" value={ profileMeta.experience }>
 											<EditableExperienceItem />
 										</EditableItems>
 
-										<EditableItems field="education" title="Education history" emptytext="Add your education history to show where you have completed your studies" value={ profile.meta.education }>
+										<EditableItems field="education" title="Education history" emptytext="Add your education history to show where you have completed your studies" value={ profileMeta.education }>
 											<EditableEducationItem />
 										</EditableItems>
 									</Col>
@@ -186,7 +211,9 @@ class Profile extends React.Component {
 
 Profile.propTypes = {
 	profile: PropTypes.object.isRequired,
-	userid: PropTypes.number.isRequired
+	userid: PropTypes.number.isRequired,
+	editable: PropTypes.bool.isRequired,
+	isFollowing: PropTypes.bool.isRequired,
 };
 
 export {Profile};

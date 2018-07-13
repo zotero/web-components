@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import EditableBase from '../abstract/editable-base.jsx';
 import profileEventSystem from '../profile-event-system.js';
 import { PencilIcon, XIcon, CheckIcon } from '../../Icons';
+import Spinner from '../../spinner.js';
 
 export default class EditableField extends EditableBase {
 	constructor(props) {
@@ -101,7 +102,7 @@ export default class EditableField extends EditableBase {
 
 		if(this.state.editing) {
 			if(this.state.processing) {
-				actions = <div className="profile-editable-spinner"></div>;
+				actions = <Spinner />;
 			} else {
 				actions = <div className="profile-editable-actions">
 					<a className="profile-editable-action" onClick={ev => this.saveHandler(ev) }>

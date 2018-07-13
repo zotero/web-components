@@ -353,6 +353,7 @@ let getCurrentUser = function(){
 	} else if(window.Zotero && window.Zotero.currentUser) {
 		return window.Zotero.currentUser;
 	}
+	return false;
 };
 
 let randomString = function(len, chars) {

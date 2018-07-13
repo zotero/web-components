@@ -165,4 +165,4 @@ ProfileImageForm.defaultProps = {
 	type:'user'
 }
 
-export {ProfileImageForm};
+export {ProfileImageForm, ProfileImage};

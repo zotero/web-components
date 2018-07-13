@@ -6,6 +6,10 @@ import PropTypes from 'prop-types';
 import EditableBase from '../abstract/editable-base.jsx';
 import profileEventSystem from '../profile-event-system.js';
 import {PencilIcon, TrashIcon, CheckIcon, XIcon, PlusIcon} from '../../Icons.js';
+import {postFormData, ajax} from '../../ajax.js';
+import {buildUrl} from '../../wwwroutes.js';
+
+let updateUrl = buildUrl('updateProfileImage');
 
 export default class EditableAvatar extends EditableBase {
 	constructor(props) {
@@ -44,28 +48,42 @@ export default class EditableAvatar extends EditableBase {
 		reader.readAsDataURL(file);
 	}
 
-	save() {
-		var data = new FormData(),
-			file = this.input.files[0],
-			promise;
+	save = async () => {
+		let imageFile = this.input.files[0];
 
-		data.append('profile-avatar', file);
-
-		promise = this.updateProfileImageOnServer(data);
+		if(imageFile.size > 524288) {
+			this.setState({
+				processing: false,
+				editing: true
+			});
+			profileEventSystem.trigger('alert', {
+				level: 'danger',
+				message: error.responseJSON ? error.responseJSON.message : 'Image too large. Must be less than 512KB'
+			});
+			return;
+		}
 
 		this.setState({
 			processing: true
 		});
 
-		promise.done(response => {
-			this.setState({
-				processing: false,
-				editing: false,
-				value: response.data + `?${Date.now()}`
-			});			
-		});
-
-		promise.fail(error => {
+		try{
+			let response = await postFormData(updateUrl, {'profile_image': imageFile}, {withSession:true});
+			let data = await response.json();
+			if(data.success){
+				this.setState({
+					processing: false,
+					editing: false,
+					value: response.data + `?${Date.now()}`
+				});
+			} else {
+				this.setState({
+					processing: false,
+					editing: true
+				});
+			}
+		}
+		catch(error){
 			profileEventSystem.trigger('alert', {
 				level: 'danger',
 				message: error.responseJSON ? error.responseJSON.message : 'Failed to upload an image.'
@@ -74,18 +92,7 @@ export default class EditableAvatar extends EditableBase {
 				processing: false,
 				editing: true
 			});
-		});
-	}
-
-	updateProfileImageOnServer(data) {
-		return $.ajax({
-			url: this.constructor.AVATAR_UPLOAD_HANDLER_URL,
-			data: data,
-			cache: false,
-			contentType: false,
-			processData: false,
-			type: 'POST'
-		});
+		}
 	}
 
 	render() {

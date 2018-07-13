@@ -242,7 +242,7 @@ class InviteToGroups extends React.Component{
 		return (
 			<div id='invite-to-group'>
 				<a className='expand-link' href="#" onClick={this.showInvitation}>
-					Invite {invitee.displayName} to join one of your groups
+					Invite {invitee.displayName} to group
 				</a>
 				<Collapse isOpen={showInvitation}>
 					<LoadingSpinner loading={loading} width='24' height='24' />
@@ -256,7 +256,7 @@ class InviteToGroups extends React.Component{
 InviteToGroups.defaultProps = {
 	titleOnly:false,
 	invitee:false,
-	userID:false
+	userID:currentUser.userID || false
 };
 
 export {InviteToGroups};

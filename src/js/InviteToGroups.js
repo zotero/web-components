@@ -8,23 +8,34 @@ import {apiRequestString} from './ApiRouter.js';
 import {LoadingSpinner} from './LoadingSpinner.js';
 import {buildUrl} from './wwwroutes.js';
 import {jsError, getCurrentUser} from './Utils.js';
-import {Collapse, Button, CustomInput} from 'reactstrap';
+import {ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem} from 'reactstrap';
 
 const currentUser = getCurrentUser();
 
 let React = require('react');
+const {Component, Fragment} = React;
 
 //component to list groups a user can invite another user to
-class InviteToGroups extends React.Component{
+class InviteToGroups extends Component{
 	constructor(props){
 		super(props);
 		this.state = {
 			userGroups: [],
 			invitationsSent: [],
 			userGroupsLoaded:false,
-			selectedGroup:false,
-			showInvitation:false
+			loadingGroups:false,
+			dropdownOpen:false
 		};
+	}
+	toggle = () => {
+		let {userGroupsLoaded, loadingGroups, dropdownOpen} = this.state;
+		if(!userGroupsLoaded){
+			if(!loadingGroups){
+				this.setState({loadingGroups:true});
+				this.loadGroupData();
+			}
+		}
+		this.setState({dropdownOpen:!dropdownOpen});
 	}
 	loadGroupData = async () => {
 		let {userID, invitee} = this.props;
@@ -80,27 +91,15 @@ class InviteToGroups extends React.Component{
 		if(invitable === false){
 			log.error('error calculating invitable');
 			jsError('Error getting groups');
-		} else {
-			if(invitable.length > 0){
-				this.setState({selectedGroup: invitable[0].id});
-			}
 		}
 	}
-	showInvitation = (evt) => {
-		evt.preventDefault();
-		if(this.state.showInvitation) return;
-		this.setState({showInvitation:true});
-		this.loadGroupData();
-	}
-	updateSelectedGroup = (evt) => {
-		this.setState({selectedGroup:evt.target.value});
-	}
-	inviteToGroup = async () => {
-		const {selectedGroup, userGroups} = this.state;
+
+	inviteToGroup = async (groupID) => {
+		const {userGroups} = this.state;
 		const {invitee} = this.props;
 		let group;
 		userGroups.forEach((ugroup)=>{
-			if(ugroup.id == selectedGroup){
+			if(ugroup.id == groupID){
 				group = ugroup;
 			}
 		});
@@ -149,7 +148,7 @@ class InviteToGroups extends React.Component{
 	}
 	render() {
 		const {userID, invitee} = this.props;
-		const {userGroups, alreadyInvited, invitationsSent, userGroupsLoaded, alreadyInvitedLoaded, showInvitation} = this.state;
+		const {userGroups, alreadyInvited, invitationsSent, userGroupsLoaded, alreadyInvitedLoaded} = this.state;
 		if(!userID){
 			return null;
 		}
@@ -180,33 +179,24 @@ class InviteToGroups extends React.Component{
 			//if there are any invitable groups, make an invite section with options
 			//otherwise inform user that profileUser has already been invited, or user has no groups
 			//to issue invites for
+			let inviteOptions;
 			if(invitableGroups.length > 0){
-				let inviteOptions = invitableGroups.map((group)=>{
-					return <option key={group.id} value={group.id} label={group.data.name}>{group.data.name}</option>;
+				inviteOptions = invitableGroups.map((group)=>{
+					return <DropdownItem key={group.id} value={group.id} onClick={()=>{this.inviteToGroup(group.id);}}>{group.data.name}</DropdownItem>
+					/*return <option key={group.id} value={group.id} label={group.data.name}>{group.data.name}</option>;*/
 				});
 
 				inviteSection = (
-					<div>
-						<CustomInput id='invite-to-group-select' type='select' onChange={this.updateSelectedGroup}>
-							{inviteOptions}
-						</CustomInput>
-						<Button className='mt-2 mb-2' onClick={this.inviteToGroup}>Invite</Button>
-					</div>
+					<Fragment>
+						<DropdownItem header>Invite To</DropdownItem>
+						{inviteOptions}
+					</Fragment>
 				);
-			} else if(alreadyInvited.length > 0) {
+			} else if(alreadyInvited.length == 0) {
 				inviteSection = (
-					<div>
-						<p>{invitee.displayName} has already been invited to your groups.</p>
-					</div>
-				);
-			} else {
-				inviteSection = (
-					<div>
-						<p>You don't currently have any groups to invite {invitee.displayName} to.
-							If you haven't previously invited them to your group, make sure you are an admin for
-							the group, or <a href={buildUrl('groupCreate')}>create a new group</a> to collaborate with other users.
-						</p>
-					</div>
+					<DropdownItem>You don't currently have any groups to invite {invitee.displayName} to.
+					If you haven't previously invited them to your group, make sure you are an admin for
+					the group, or <a href={buildUrl('groupCreate')}>create a new group</a> to collaborate with other users.</DropdownItem>
 				);
 			}
 
@@ -214,25 +204,23 @@ class InviteToGroups extends React.Component{
 				let invitationsSentNodes = invitationsSent.map((groupID)=>{
 					let group = groupMap[groupID];
 					return (
-						<li key={group.id}><a href={buildUrl('groupView', {group})}>{group.data.name}</a></li>
+						<DropdownItem key={group.id} disabled>{group.data.name}</DropdownItem>
 					);
 				});
 
 				let alreadyInvitedNodes = alreadyInvited.map((groupID)=>{
 					let group = groupMap[groupID];
 					return (
-						<li key={group.id}><a href={buildUrl('groupView', {group})}>{group.data.name}</a></li>
+						<DropdownItem key={group.id} disabled>{group.data.name}</DropdownItem>
 					);
 				});
 
 				pendingInvitations = (
-					<div>
-						<h3>Pending invitations to</h3>
-						<ul>
-							{invitationsSentNodes}
-							{alreadyInvitedNodes}
-						</ul>
-					</div>
+					<Fragment>
+					<DropdownItem header>Pending invitations</DropdownItem>
+					{invitationsSentNodes}
+					{alreadyInvitedNodes}
+					</Fragment>
 				);
 			}
 		}
@@ -241,14 +229,16 @@ class InviteToGroups extends React.Component{
 
 		return (
 			<div id='invite-to-group'>
-				<a className='expand-link' href="#" onClick={this.showInvitation}>
-					Invite {invitee.displayName} to group
-				</a>
-				<Collapse isOpen={showInvitation}>
-					<LoadingSpinner loading={loading} width='24' height='24' />
-					{inviteSection}
-					{pendingInvitations}
-				</Collapse>
+				<ButtonDropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
+					<DropdownToggle caret>
+						Invite to group
+					</DropdownToggle>
+					<DropdownMenu>
+						<LoadingSpinner loading={loading} />
+						{inviteSection}
+						{pendingInvitations}
+					</DropdownMenu>
+				</ButtonDropdown>
 			</div>
 		);
 	}

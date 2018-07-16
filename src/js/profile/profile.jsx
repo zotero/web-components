@@ -136,17 +136,15 @@ class Profile extends React.Component {
 							</li>
 						</ul>
 						<div className='user-actions'>
-							<Row>
-								<Col>
-									<FollowButtons profileUserID={userid} isFollowing={this.props.isFollowing} />
-								</Col>
-								<Col>
-									<MessageUserButton username={profile.username} />
-								</Col>
-								<Col>
-									<InviteToGroups invitee={{userID:userid, displayName:profileMeta.realname}} />
-								</Col>
-							</Row>
+							<div className='float-left mr-4'>
+								<FollowButtons profileUserID={userid} isFollowing={this.props.isFollowing} />
+							</div>
+							<div className='float-left mr-4'>
+								<MessageUserButton username={profile.username} />
+							</div>
+							<div className='float-left mr-4'>
+								<InviteToGroups invitee={{userID:userid, displayName:profileMeta.realname}} />
+							</div>
 						</div>
 					</Col>
 				</Row>

@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import EditableBase from '../abstract/editable-base.jsx';
 import profileEventSystem from '../profile-event-system.js';
 import { PencilIcon, XIcon, CheckIcon } from '../../Icons';
-import Spinner from '../../spinner.js';
+import {Spinner} from '../../LoadingSpinner.js';
 
 export default class EditableField extends EditableBase {
 	constructor(props) {

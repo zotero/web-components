@@ -4,6 +4,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import ZoteroPublications from 'zotero-publications';
+import {Spinner} from '../../LoadingSpinner.js';
 
 export default class Publications extends React.Component {
 	constructor(props) {
@@ -17,6 +18,7 @@ export default class Publications extends React.Component {
 	componentWillMount() {
 		this.zp = new ZoteroPublications({
 			'group': 'type',
+			'apiBase': 'apidev.zotero.org',
 			'zorgIntegration': true,
 			'showBranding': false,
 			'storeCitationPreference': true
@@ -63,7 +65,7 @@ export default class Publications extends React.Component {
 		if(this.state.loading) {
 			return <div>
 				<h2>Publications</h2>
-				<div className="profile-editable-spinner"></div>
+				<Spinner color='blue' height='36px' width='36px' />
 			</div>;
 		}
 

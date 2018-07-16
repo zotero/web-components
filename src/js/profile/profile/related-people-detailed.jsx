@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import profileEventSystem from '../profile-event-system.js';
 import ProfileDataSource from '../profile-data-source.js';
 import {Row, Col, Button} from 'reactstrap';
-import {Spinner} from '../../spinner.js';
+import {Spinner} from '../../LoadingSpinner.js';
 
 export default class RelatedPeopleDetailed extends React.Component {
 	constructor(props) {

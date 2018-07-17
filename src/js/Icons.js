@@ -79,7 +79,7 @@ class PluginsIcon extends Component{
 class PencilIcon extends PureComponent {
 	render(){
 		return (
-			<img src={`${imagePath}/icons/octicons/pencil.svg`} />
+			<img {...this.props} src={`${imagePath}/icons/octicons/pencil.svg`} />
 		);
 	}
 }
@@ -87,7 +87,7 @@ class PencilIcon extends PureComponent {
 class TrashIcon extends PureComponent {
 	render(){
 		return (
-			<img src={`${imagePath}/icons/octicons/trashcan.svg`} />
+			<img {...this.props} src={`${imagePath}/icons/octicons/trashcan.svg`} />
 		);
 	}
 }
@@ -95,7 +95,7 @@ class TrashIcon extends PureComponent {
 class CheckIcon extends PureComponent {
 	render(){
 		return (
-			<img src={`${imagePath}/icons/octicons/check.svg`} />
+			<img {...this.props} src={`${imagePath}/icons/octicons/check.svg`} />
 		);
 	}
 }
@@ -103,7 +103,7 @@ class CheckIcon extends PureComponent {
 class XIcon extends PureComponent {
 	render(){
 		return (
-			<img src={`${imagePath}/icons/octicons/x.svg`} />
+			<img {...this.props} src={`${imagePath}/icons/octicons/x.svg`} />
 		);
 	}
 }
@@ -111,7 +111,7 @@ class XIcon extends PureComponent {
 class PlusIcon extends PureComponent {
 	render(){
 		return (
-			<img src={`${imagePath}/icons/octicons/plus.svg`} />
+			<img {...this.props} src={`${imagePath}/icons/octicons/plus.svg`} />
 		);
 	}
 }
@@ -120,7 +120,7 @@ class OrcidIcon extends PureComponent{
 	render(){
 		let orcidImagePath = imagePath + '/icons/ORCiD_icon.svg';
 		return (
-			<img className='orcid-icon' width={this.props.width} height={this.props.height} src={orcidImagePath} />
+			<img {...this.props} className='orcid-icon' width={this.props.width} height={this.props.height} src={orcidImagePath} />
 		);
 	}
 }

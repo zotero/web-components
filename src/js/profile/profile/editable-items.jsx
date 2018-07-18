@@ -1,5 +1,8 @@
 'use strict';
 
+import {log as logger} from '../../Log.js';
+let log = logger.Logger('editable-items');
+
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -22,40 +25,37 @@ export default class EditableItems extends EditableBase {
 		this.editableItems = {};
 	}
 
-	add() {
-		var newItemsId = this.state.counter++;
+	add = () => {
+		let {value, counter} = this.state;
+		var newItemsId = counter++;
 		
-		this.state.value.push({
+		value.push({
 			id: newItemsId
 		});
 
-		this.setState({
-			value: this.state.value
-		}, () => {
+		this.setState({value}, () => {
 			if(this.editableItems[newItemsId].focus) {
 				this.editableItems[newItemsId].focus();
 			}
 		});
 	}
 
-	update(updatedItem) {
-		var previous = this.state.value.slice(0),
-			itemIndex = this.state.value.findIndex(item => item.id === updatedItem.id);
+	update = (updatedItem) => {
+		let {value} = this.state;
+		let previous = value.slice(0);
+		let itemIndex = value.findIndex(item => item.id === updatedItem.id);
 		
-		this.state.value[itemIndex] = updatedItem;
-		this.setState({
-			value: this.state.value
-		}, () => {
+		value[itemIndex] = updatedItem;
+		this.setState({value}, () => {
 			if(!this.props.uniform) {
 				this.save(previous);
 			}	
 		});
 	}
 
-	save(previous) {
-		var promise = this.updateFieldOnServer(this.props.field, JSON.stringify(this.state.value));
-		
-		previous = previous || this.state.previous;
+	save = async (previous) => {
+		const {field} = this.props;
+		const {value} = this.state;
 
 		this.setState({
 			editing: true,
@@ -63,15 +63,18 @@ export default class EditableItems extends EditableBase {
 			value: []
 		});
 
-		promise.done(response => {
+		try {
+			let response = await this.updateFieldOnServer(field, JSON.stringify(value));
+
+			previous = previous || this.state.previous;
+
+			let respdata = await response.json();
 			this.setState({
 				processing: false,
 				editing: false,
-				value: JSON.parse(response.data[this.props.field])
-			});			
-		});
-
-		promise.fail(error => {
+				value: JSON.parse(respdata.data[this.props.field])
+			});
+		} catch (error) {
 			profileEventSystem.trigger('alert', {
 				level: 'danger',
 				message: error.responseJSON ? error.responseJSON.message : 'Failed to update items editable'
@@ -81,10 +84,10 @@ export default class EditableItems extends EditableBase {
 				editing: false,
 				value: previous
 			});
-		});
+		}
 	}
 
-	cancel() {
+	cancel = () => {
 		this.setState({
 			editing: false,
 			processing: false,
@@ -92,7 +95,7 @@ export default class EditableItems extends EditableBase {
 		});
 	}
 	
-	delete(deletedItemId) {
+	delete = (deletedItemId) => {
 		var itemIndex = this.state.value.findIndex(item => item.id === deletedItemId);
 
 		this.state.value.splice(itemIndex, 1);
@@ -103,7 +106,7 @@ export default class EditableItems extends EditableBase {
 		this.updateFieldOnServer(this.props.field, JSON.stringify(this.state.value));
 	}
 	
-	edit() {
+	edit = () => {
 		this.setState({
 			editing: true,
 			previous: this.state.value.slice(0)
@@ -163,8 +166,8 @@ export default class EditableItems extends EditableBase {
 						value: item,
 						key: item.id,
 						editing: this.state.editing,
-						onUpdate: this.update.bind(this),
-						onDelete: this.delete.bind(this),
+						onUpdate: this.update,
+						onDelete: this.delete,
 						ref: ref => { this.editableItems[item.id] = ref; }
 					});
 				})}
@@ -178,5 +181,10 @@ EditableItems.propTypes = {
 	title: PropTypes.string,
 	field: PropTypes.string,
 	emptytext: PropTypes.string,
-	value: PropTypes.string
+	value: PropTypes.string,
+	uniform: PropTypes.bool //whether to have a single + button at the top, as well as edit icons for each section, or single edit for the full set
+};
+
+EditableItems.defaultProps = {
+	uniform:false
 };

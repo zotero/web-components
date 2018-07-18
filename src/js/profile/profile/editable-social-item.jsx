@@ -1,55 +1,66 @@
 'use strict';
 
+import {log as logger} from '../../Log.js';
+let log = logger.Logger('editable-social-item');
+
 import React from 'react';
 import PropTypes from 'prop-types';
 
 import EditableField from './editable-field.jsx';
 import {TrashIcon} from '../../Icons.js';
+import {Form, CustomInput, Input} from 'reactstrap';
 
 export default class EditableSocialItem extends EditableField {
 	constructor(props) {
 		super(props);
 		this.state = {
-			name: this.props.value.name,
-			value: this.props.value.value
+			name: this.props.value.name || 'ORCID',
+			value: this.props.value.value,
+			id: this.props.value.id
 		};
 	}
 
 	focus() {
-		this.nameInput.focus();
+		//this.nameInput.focus();
 	}
 
-	save() {
-		var updatedItem = {
-			name: this.nameInput.value,
-			value: this.valueInput.value,
-			id: this.props.value.id
-		};
-	
-		this.setState(updatedItem, () => {
-			this.props.onUpdate(updatedItem);
-		});
+	handleNameChange = (evt) => {
+		//log.debug(`handleNameChange: ${evt.target.value}`);
+		this.setState({name:evt.target.value}, ()=>{this.props.onUpdate(this.state);});
 	}
-
-	remove() {
+	handleValueChange = (evt) => {
+		log.debug(`handleValueChange: ${evt.target.value}`);
+		this.setState({value:evt.target.value}, ()=>{this.props.onUpdate(this.state);});
+	}
+	remove = () => {
 		this.props.onDelete(this.props.value.id);
 	}
 
 	render() {
 		if(this.props.editing) {
-			return <form className="profile-editable-social profile-editable-editing form-inline" onSubmit={ ev => this.saveHandler(ev) }>
-				<select className="form-control" ref={ ref => this.nameInput = ref} defaultValue={ this.props.value.name } onChange={ ev => this.saveHandler(ev) }>
+			return <Form inline className="profile-editable-social profile-editable-editing">
+				<CustomInput
+					type="select"
+					id='social-select'
+					onChange={this.handleNameChange }
+					defaultValue={ this.props.value.name }
+					clearable='false'
+				>
 					{ Object.keys(this.constructor.NETWORKS).map(network => 
 						<option value={ network } key={ network }>{ network }</option>
 					)}
-				</select>
-				<input className="form-control" ref={ ref => this.valueInput = ref } defaultValue={ this.props.value.value } onChange={ ev => this.saveHandler(ev) } placeholder={'User name on ' + this.props.value.name} />
+				</CustomInput>
+				<Input
+					defaultValue={ this.props.value.value }
+					onChange={ this.handleValueChange }
+					placeholder={'User name on ' + this.props.value.name}
+				/>
 				<div className="profile-editable-actions">
-					<a className="profile-editable-action" onClick={ () => this.remove() }>
-						<TrashIcon />
+					<a className="profile-editable-action" onClick={this.remove}>
+						<TrashIcon title='Delete' />
 					</a>
 				</div>
-			</form>;
+			</Form>;
 		} else {
 			var entry = '';
 			if(this.state.value) {
@@ -60,7 +71,7 @@ export default class EditableSocialItem extends EditableField {
 				entry = this.props.emptytext;
 			}
 
-		return <div className="profile-editable-social profile-editable-{this.state.value ? 'value' : 'emptytext'}">
+			return <div className="profile-editable-social profile-editable-{this.state.value ? 'value' : 'emptytext'}">
 				<span>{ entry }</span>
 			</div>;
 		}
@@ -95,7 +106,6 @@ export default class EditableSocialItem extends EditableField {
 		};
 	}
 }
-
 
 EditableSocialItem.propTypes = {
 	value: PropTypes.object,

@@ -15,13 +15,13 @@ export default class EditableTimelineItem extends React.Component {
 		this.state['previous'] = Object.assign({}, props.value);
 	}
 
-	edit() {
+	edit = () => {
 		this.setState({
 			editing: true
 		});
 	}
 	
-	save() {
+	save = () => {
 		var updatedItem = {};
 		Object.keys(this.constructor.EDITABLE_PROPERTIES).forEach(property => {
 			updatedItem[property] = this.state[property];
@@ -35,45 +35,36 @@ export default class EditableTimelineItem extends React.Component {
 		});
 	}
 
-	remove() {
+	remove = () => {
 		this.props.onDelete(this.props.value.id);
 	}
 
-	cancel() {
+	cancel = () => {
 		this.setState(Object.assign({}, this.state.previous, {
 			editing: false
 		}));
 	}
 
-	focus() {
+	focus = () => {
 		this.edit();
 	}
 
-	update() {
+	updateEvt = (evt) => {
+		let name = evt.target.getAttribute('name');
+		let value = evt.target.value;
+		if(evt.target.getAttribute('type') == 'checkbox'){
+			value = evt.target.checked ? true : false;
+		}
+		this.update(name, value);
+	}
+	update = (key, value) => {
 		var updatedItem = {};
 
-		Object.keys(this.constructor.EDITABLE_PROPERTIES).forEach(property => {
-			let inputName = property.replace(/_([a-z])/g, (match, word) => {
-				return word.toUpperCase();
-			}) + 'Input';
-			
-			if(this[inputName]) {
-				switch(this[inputName].getAttribute('type')) {
-					case 'checkbox':
-						updatedItem[property] = this[inputName].checked ? true : false;
-					break;
-					
-					default:
-						updatedItem[property] = this[inputName].value;
-					break;
-				}
-			}
-		});
-
+		updatedItem[key] = value;
 		this.setState(updatedItem);
 	}
 
-	getDuration() {
+	getDuration = () => {
 		var start = new Date(this.state.start_year, this.constructor.MONTHS.indexOf(this.state.start_month) + 1),
 		end = this.state.present ? new Date() : new Date(this.state.end_year, this.constructor.MONTHS.indexOf(this.state.end_month) + 1),
 		diffMonths = end.getMonth() - start.getMonth(),

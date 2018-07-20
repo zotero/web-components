@@ -1,12 +1,17 @@
 /* global CKEDITOR:false */
 'use strict';
 
+import {log as logger} from '../../Log.js';
+let log = logger.Logger('editable-rich');
+
 import React from 'react';
 import PropTypes from 'prop-types';
 
 import EditableBase from '../abstract/editable-base.jsx';
 import profileEventSystem from '../profile-event-system.js';
 import {PencilIcon, TrashIcon, CheckIcon, XIcon} from '../../Icons.js';
+import {Spinner} from '../../LoadingSpinner.js';
+import cn from 'classnames';
 
 export default class EditableRich extends EditableBase {
 	constructor(props) {
@@ -16,87 +21,106 @@ export default class EditableRich extends EditableBase {
 			editing: false,
 			processing: false
 		};
+		this.inputTextarea = React.createRef();
 	}
 
-	edit() {
+	edit = () => {
+		const {id} = this.props;
 		this.setState({
 			editing: true
 		}, () => {
-			this.editor = CKEDITOR.replace(this.input, this.constructor.CKEDITOR_CONFIG);
+			tinymce.init({
+				selector: `#${id}`,
+				toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignright | subscript superscript blockquote',
+				branding:false,
+				menubar:false,
+				statusbar:true,
+				auto_focus:this.props.id,
+				setup:(ed)=>{
+					//ed.on('blur', this.blurSave);
+				}
+			});
 		});
 	}
 
-	save() {
-		var previous = this.state.value,
-			current = this.editor.getData(),
-			promise = this.updateFieldOnServer(this.props.field, current);
+	save = async () => {
+		let previous = this.state.value;
+		let current = previous;
 
-		this.editor.destroy();
+		let {id} = this.props;
+		let tinyInstance = tinymce.get(id);
+		if(tinyInstance != null) {
+			current = tinyInstance.getContent();
+			tinyInstance.remove();
+		}
 
 		this.setState({
 			editing: false,
 			processing: true,
-			value: ''
 		});
 
-		promise.done(response => {
+		try {
+			let response = await this.updateFieldOnServer(this.props.field, current);
+			let respData = await response.json();
+
 			this.setState({
 				processing: false,
 				editing: false,
-				value: response.data[this.props.field]
+				value: respData.data[this.props.field]
 			});
-		});
-
-		promise.fail(error => {
+		} catch (error) {
 			profileEventSystem.trigger('alert', {
 				level: 'danger',
-				message: error.responseJSON ? error.responseJSON.message : 'Failed to update items editableRich'
+				message: error.responseJSON.message
 			});
 			this.setState({
 				processing: false,
 				editing: false,
 				value: previous
 			});
-		});
+		}
 	}
 
-	cancel() {
+	cancel = () => {
 		this.editor.destroy();
 		this.setState({
 			editing: false
 		});
 	}
 
-	getMarkup() {
+	getMarkup = () => {
 		return {
 			__html: this.state.value || this.props.emptytext
 		};
 	}
 
-	saveHandler(ev) {
+	saveHandler = (ev) => {
 		ev.preventDefault();
 		this.save();
 	}
 
-	cancelHandler(ev) {
+	cancelHandler = (ev) => {
 		ev.preventDefault();
 		this.cancel();
 	}
 
 	render() {
-		var cssClasses = 'profile-editable-rich ' + (this.state.value ? 'profile-editable-value' : 'profile-editable-emptytext');
+		const {processing, editing, value} = this.state;
+		const {title, id} = this.props;
 
-		if(this.state.processing) {
+		let cssClasses = cn('profile-editable-rich', (value ? 'profile-editable-value' : 'profile-editable-emptytext'));
+
+		if(processing) {
 			return <div className={ cssClasses }>
-				<h2>{ this.props.title }</h2>
+				<h2>{ title }</h2>
 				<div className="profile-editable-spinner"></div>
 			</div>;
 		}
 
-		if(this.state.editing) {
+		if(editing) {
 			return <form className="profile-editable-rich profile-editable-editing" onSubmit={ ev => this.saveHandler(ev) }>
-				<h2>{ this.props.title }</h2>
-				<textarea ref={ c => this.input = c } defaultValue={ this.state.value } />
+				<h2>{ title }</h2>
+				<textarea ref={ this.inputTextarea } id={id} defaultValue={ value } />
 				<div className="profile-timeline-form-actions">
 					<a className="profile-editable-action" onClick={ ev => this.saveHandler(ev) }>
 						<CheckIcon />
@@ -108,7 +132,7 @@ export default class EditableRich extends EditableBase {
 			</form>;
 		} else {
 			return <div className={ cssClasses }>
-				<h2>{ this.props.title }</h2>
+				<h2>{ title }</h2>
 				<a className="profile-editable-action" onClick={ () => this.edit() }>
 					<PencilIcon />
 				</a>

@@ -19,6 +19,7 @@ export default class EditableAvatar extends EditableBase {
 			editing: false,
 			processing: false
 		};
+		this.fileRef = React.createRef();
 	}
 
 	edit() {
@@ -26,7 +27,7 @@ export default class EditableAvatar extends EditableBase {
 			editing: true,
 			previous: this.props.value
 		}, () => {
-			this.input.click();
+			this.fileRef.current.click();
 		});
 	}
 
@@ -38,7 +39,7 @@ export default class EditableAvatar extends EditableBase {
 	}
 
 	update() {
-		var file = this.input.files[0];
+		var file = this.fileRef.current.files[0];
 		var reader = new FileReader();
 		reader.onload = (changeEv) => {
 			this.setState({
@@ -49,7 +50,7 @@ export default class EditableAvatar extends EditableBase {
 	}
 
 	save = async () => {
-		let imageFile = this.input.files[0];
+		let imageFile = this.fileRef.current.files[0];
 
 		if(imageFile.size > 524288) {
 			this.setState({
@@ -117,7 +118,7 @@ export default class EditableAvatar extends EditableBase {
 			return (
 				<div className="profile-avatar">
 					<img className="user-profile-avatar" src={this.state.value} />
-					<input ref={(c) => this.input = c} onChange={ () => this.update() } type="file" />
+					<input ref={this.fileRef} onChange={ () => this.update() } type="file" />
 					{ actions }
 				</div>
 			);

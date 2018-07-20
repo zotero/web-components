@@ -171,7 +171,7 @@ class Profile extends React.Component {
 							<TabPane tabId='About'>
 								<Row>
 									<Col xs='12' sm='8'>
-										<EditableRich title="About" field="bio" emptytext="Add a short description of what you are currently working on" value={ profileMeta.bio } />
+										<EditableRich id='bio-text' title="About" field="bio" emptytext="Add a short description of what you are currently working on" value={ profileMeta.bio } />
 										<EditableItems field="interests" title="Research interests" emptytext="Add your research intereststo show what you are passionate about" value={ profileMeta.interests }>
 											<EditableInterestItem />
 										</EditableItems>
@@ -187,9 +187,9 @@ class Profile extends React.Component {
 										</EditableItems>
 									</Col>
 									<Col xs='12' sm='4'>
+										<Groups userid={ userid } onViewMore={ () => this.makeActive('Groups')} />
 										<RelatedPeople people={ profile.followers.slice(0, 3) } title="Followers" more={ profile.followers.length > 3 || profile.followersMore } onViewMore={ () => this.makeActive('Network') } />
 										<RelatedPeople people={ profile.following.slice(0, 3) } title="Following" more={ profile.following.length > 3 || profile.followingMore } onViewMore={ () => this.makeActive('Network') } />
-										<Groups userid={ userid } onViewMore={ () => this.makeActive('Groups')} />
 									</Col>
 								</Row>
 							</TabPane>

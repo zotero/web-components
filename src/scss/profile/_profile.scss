@@ -74,19 +74,6 @@ $color-profile-tint: rgba(255, 255, 255, .75);
 	li {
 		margin-top: .25em;
 	}
-
-	.profile-editable-field {
-		@include upto(xga) {
-			.form-control {
-				display: inline-block;
-				width: calc(100% - 48px);
-			}
-
-			.profile-editable-actions {
-				width: 48px;
-			}
-		}
-	}
 }
 
 .profile-editable-action {

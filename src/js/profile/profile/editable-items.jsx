@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import EditableBase from '../abstract/editable-base.jsx';
 import profileEventSystem from '../profile-event-system.js';
 import {PencilIcon, TrashIcon, CheckIcon, XIcon, PlusIcon} from '../../Icons.js';
+import {Button} from 'reactstrap';
 
 export default class EditableItems extends EditableBase {
 	constructor(props) {
@@ -27,13 +28,13 @@ export default class EditableItems extends EditableBase {
 
 	add = () => {
 		let {value, counter} = this.state;
-		var newItemsId = counter++;
+		let newItemsId = counter++;
 		
 		value.push({
 			id: newItemsId
 		});
 
-		this.setState({value}, () => {
+		this.setState({value, counter}, () => {
 			if(this.editableItems[newItemsId].focus) {
 				this.editableItems[newItemsId].focus();
 			}
@@ -134,15 +135,9 @@ export default class EditableItems extends EditableBase {
 
 		if(this.props.uniform && this.state.editing) {
 			edit = <div className="profile-editable-actions profile-social-form-actions">
-				<a className="profile-editable-action" onClick={ () => this.add() }>
-					<PlusIcon />
-				</a>
-				<a className="profile-editable-action" onClick={ () => this.cancel() }>
-					<XIcon />
-				</a>
-				<a className="profile-editable-action" onClick={ () => this.save() } >
-					<CheckIcon />
-				</a>
+				<Button outline size='sm' color='secondary' onClick={this.add} >Add</Button>{' '}
+				<Button outline size='sm' color='secondary' onClick={this.cancel} >Cancel</Button>{' '}
+				<Button outline size='sm' color='secondary' onClick={this.save} >Save</Button>{' '}
 			</div>;
 		}
 
@@ -153,9 +148,7 @@ export default class EditableItems extends EditableBase {
 		}
 
 		if(!this.props.uniform) {
-			add = <a className="profile-editable-action" onClick={ () => this.add() }>
-				<PlusIcon />
-			</a>;
+			add = <Button outline size='sm' color='secondary' onClick={this.add} className='ml-2' >Add</Button>
 		}
 
 		return <div className={cssClasses}>

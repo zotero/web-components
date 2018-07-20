@@ -10,7 +10,7 @@ import EditableBase from '../abstract/editable-base.jsx';
 import profileEventSystem from '../profile-event-system.js';
 import { PencilIcon, XIcon, CheckIcon } from '../../Icons';
 import {Spinner} from '../../LoadingSpinner.js';
-import {Form, Input} from 'reactstrap';
+import {Form, Input, Button} from 'reactstrap';
 import cn from 'classnames';
 
 export default class EditableField extends EditableBase {
@@ -111,13 +111,9 @@ export default class EditableField extends EditableBase {
 			if(processing) {
 				actions = <Spinner />;
 			} else {
-				actions = <div className="profile-editable-actions">
-					<a className="profile-editable-action" onClick={ev => this.saveHandler(ev) }>
-						<CheckIcon />
-					</a>
-					<a className="profile-editable-action" onClick={ev => this.cancelHandler(ev) }>
-						<XIcon />
-					</a>
+				actions = <div className="profile-editable-actions ml-2">
+					<Button outline size='sm' color='secondary' onClick={this.saveHandler} >Save</Button>{' '}
+					<Button outline size='sm' color='secondary' onClick={this.cancelHandler} >Cancel</Button>
 				</div>;
 			}
 			return <Form inline={type == 'text'} className="profile-editable-field profile-editable-editing" onSubmit={this.saveHandler}>

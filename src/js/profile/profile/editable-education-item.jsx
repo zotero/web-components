@@ -4,7 +4,7 @@ import React from 'react';
 
 import EditableTimelineItem from '../abstract/editable-timeline-item.jsx';
 import {PencilIcon, TrashIcon, CheckIcon, XIcon, PlusIcon} from '../../Icons.js';
-import {Form, FormGroup, Col, CustomInput, Input, Label} from 'reactstrap';
+import {Form, FormGroup, Col, CustomInput, Input, Label, Button} from 'reactstrap';
 
 export default class EditableEducationItem extends EditableTimelineItem {
 	render() {
@@ -58,17 +58,9 @@ export default class EditableEducationItem extends EditableTimelineItem {
 						</FormGroup>
 					</Col>
 				</FormGroup>
-				<FormGroup row className="profile-timeline-form-actions">
-					<a className="profile-editable-action" onClick={ () => { this.save(); }}>
-						<CheckIcon />
-					</a>
-					<a className="profile-editable-action" onClick={ () => { this.remove(); }}>
-						<TrashIcon />
-					</a>
-					<a className="profile-editable-action" onClick={ () => { this.cancel(); }}>
-						<XIcon />
-					</a>
-				</FormGroup>
+				<Button outline size='sm' color='secondary' onClick={this.save} >Save</Button>{' '}
+				<Button outline size='sm' color='secondary' onClick={this.remove} >Remove</Button>{' '}
+				<Button outline size='sm' color='secondary' onClick={this.cancel} >Cancel</Button>{' '}
 			</Form>;
 		} else {
 			return <div className="profile-timeline-wrapper">
@@ -86,9 +78,7 @@ export default class EditableEducationItem extends EditableTimelineItem {
 					{degree_name}
 				</div>
 				<div>
-					<a className="profile-editable-action" onClick={() => { this.edit(); }}>
-						<PencilIcon />
-					</a>
+					<Button outline size='sm' onClick={this.edit} ><PencilIcon /></Button>
 				</div>
 			</div>;
 		}

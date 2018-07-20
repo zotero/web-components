@@ -38,7 +38,7 @@ export default class EditableSocialItem extends EditableField {
 
 	render() {
 		if(this.props.editing) {
-			return <Form inline className="profile-editable-social profile-editable-editing">
+			return <Form inline className="profile-editable-social profile-editable-editing mb-2">
 				<CustomInput
 					type="select"
 					id='social-select'
@@ -49,7 +49,7 @@ export default class EditableSocialItem extends EditableField {
 					{ Object.keys(this.constructor.NETWORKS).map(network => 
 						<option value={ network } key={ network }>{ network }</option>
 					)}
-				</CustomInput>
+				</CustomInput>{' '}
 				<Input
 					defaultValue={ this.props.value.value }
 					onChange={ this.handleValueChange }
@@ -83,6 +83,12 @@ export default class EditableSocialItem extends EditableField {
 				iconClass: 'social social-orcid',
 				getUrl: username => {
 					return `http://orcid.org/${username}`;
+				}
+			},
+			'Scopus Author ID': {
+				iconClass: 'social social-scopus',
+				getUrl: username => {
+					return `https://www.scopus.com/authid/detail.uri?authorId=${username}`;
 				}
 			},
 			'Twitter': {

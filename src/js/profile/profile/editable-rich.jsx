@@ -11,6 +11,7 @@ import EditableBase from '../abstract/editable-base.jsx';
 import profileEventSystem from '../profile-event-system.js';
 import {PencilIcon, TrashIcon, CheckIcon, XIcon} from '../../Icons.js';
 import {Spinner} from '../../LoadingSpinner.js';
+import {Button} from 'reactstrap';
 import cn from 'classnames';
 
 export default class EditableRich extends EditableBase {
@@ -117,7 +118,7 @@ export default class EditableRich extends EditableBase {
 		if(processing) {
 			return <div className={ cssClasses }>
 				<h2>{ title }</h2>
-				<div className="profile-editable-spinner"></div>
+				<Spinner />
 			</div>;
 		}
 
@@ -126,20 +127,14 @@ export default class EditableRich extends EditableBase {
 				<h2>{ title }</h2>
 				<textarea ref={ this.inputTextarea } id={id} defaultValue={ value } />
 				<div className="profile-timeline-form-actions">
-					<a className="profile-editable-action" onClick={ ev => this.saveHandler(ev) }>
-						<CheckIcon />
-					</a>
-					<a className="profile-editable-action" onClick={ ev => this.cancelHandler(ev) }>
-						<XIcon />
-					</a>
+					<Button outline size='sm' color='secondary' onClick={this.saveHandler} >Save</Button>{' '}
+					<Button outline size='sm' color='secondary' onClick={this.cancelHandler} >Cancel</Button>
 				</div>
 			</form>;
 		} else {
 			return <div className={ cssClasses }>
 				<h2>{ title }</h2>
-				<a className="profile-editable-action" onClick={ () => this.edit() }>
-					<PencilIcon />
-				</a>
+				<Button outline size='sm' color='secondary' onClick={this.edit} className='mb-2 ml-2'><PencilIcon /></Button>
 				<span dangerouslySetInnerHTML={ this.getMarkup() }></span>
 			</div>;
 		}	

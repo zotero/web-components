@@ -82,7 +82,11 @@ export default class EditableRich extends EditableBase {
 	}
 
 	cancel = () => {
-		this.editor.destroy();
+		let {id} = this.props;
+		let tinyInstance = tinymce.get(id);
+		if(tinyInstance != null) {
+			tinyInstance.remove();
+		}
 		this.setState({
 			editing: false
 		});

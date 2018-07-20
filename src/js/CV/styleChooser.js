@@ -6,7 +6,7 @@
 const React = require('react');
 const {Component} = React;
 
-import {Input} from 'reactstrap';
+import {CustomInput} from 'reactstrap';
 
 class StyleChooser extends Component {
 	render() {
@@ -34,14 +34,14 @@ class StyleChooser extends Component {
 		});
 		return (
 			<div>
-				<Input
+				<CustomInput
 					type='select'
 					onChange={(val)=>{this.props.changeStyle(val);}}
 					value={this.props.style}
 					clearable='false'
 				>
 					{options}
-				</Input>
+				</CustomInput>
 				<p className='hint'>Style for bibliography sections</p>
 			</div>
 		);

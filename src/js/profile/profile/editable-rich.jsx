@@ -111,9 +111,13 @@ export default class EditableRich extends EditableBase {
 
 	render() {
 		const {processing, editing, value} = this.state;
-		const {title, id} = this.props;
+		const {title, id, editable} = this.props;
 
-		let cssClasses = cn('profile-editable-rich', (value ? 'profile-editable-value' : 'profile-editable-emptytext'));
+		let cssClasses = cn({
+			'profile-editable-rich':true,
+			'profile-editable-value':(!!value),
+			'profile-editable-emptytext':(!value)
+		});
 
 		if(processing) {
 			return <div className={ cssClasses }>
@@ -134,7 +138,7 @@ export default class EditableRich extends EditableBase {
 		} else {
 			return <div className={ cssClasses }>
 				<h2>{ title }</h2>
-				<Button outline size='sm' color='secondary' onClick={this.edit} className='mb-2 ml-2'><PencilIcon /></Button>
+				{editable ? <Button outline size='sm' color='secondary' onClick={this.edit} className='mb-2 ml-2'><PencilIcon /></Button> : null}
 				<span dangerouslySetInnerHTML={ this.getMarkup() }></span>
 			</div>;
 		}	

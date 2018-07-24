@@ -4,11 +4,15 @@ import React from 'react';
 
 import EditableTimelineItem from '../abstract/editable-timeline-item.jsx';
 import {PencilIcon, TrashIcon, CheckIcon, XIcon} from '../../Icons.js';
-import {Form, FormGroup, Col, CustomInput, Input, Label} from 'reactstrap';
+import {Button, Form, FormGroup, Col, CustomInput, Input, Label} from 'reactstrap';
 
 export default class EditableExperienceItem extends EditableTimelineItem {
 	render() {
+		const {editable} = this.props;
+		let edit = editable ? <Button outline size='sm' onClick={this.edit} ><PencilIcon /></Button> : null;
+
 		const {editing, start_month, start_year, position_name, end_month, end_year, present, institution} = this.state;
+
 		if(editing) {
 			return <Form className="profile-timeline-form-wrapper" onSubmit={this.save}>
 				<FormGroup row>
@@ -58,17 +62,9 @@ export default class EditableExperienceItem extends EditableTimelineItem {
 						</FormGroup>
 					</Col>
 				</FormGroup>
-				<FormGroup row className="profile-timeline-form-actions">
-					<a className="profile-editable-action" onClick={() => this.save() }>
-						<CheckIcon />
-					</a>
-					<a className="profile-editable-action" onClick={() => this.remove() }>
-						<TrashIcon />
-					</a>
-					<a className="profile-editable-action" onClick={() => this.cancel() }>
-						<XIcon />
-					</a>
-				</FormGroup>
+				<Button outline size='sm' color='secondary' onClick={this.save} >Save</Button>{' '}
+				<Button outline size='sm' color='secondary' onClick={this.remove} >Remove</Button>{' '}
+				<Button outline size='sm' color='secondary' onClick={this.cancel} >Cancel</Button>{' '}
 			</Form>;
 		} else {
 			return <div className="profile-timeline-wrapper">
@@ -86,9 +82,7 @@ export default class EditableExperienceItem extends EditableTimelineItem {
 					{position_name}
 				</div>
 				<div>
-					<a className="profile-editable-action" onClick={() => this.edit() }>
-						<PencilIcon />
-					</a>
+					{edit}
 				</div>
 			</div>;
 		}

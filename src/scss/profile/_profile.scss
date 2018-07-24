@@ -30,6 +30,13 @@ $color-profile-tint: rgba(255, 255, 255, .75);
 	}
 }
 
+.editable-interests {
+	h2 {
+		display:inline-block;
+		margin-top:1rem;
+	}
+}
+
 .profile-editable-interest {
 	align-items: center;
 	border: 1px solid $color-profile-accent;
@@ -363,3 +370,20 @@ $color-profile-tint: rgba(255, 255, 255, .75);
 		cursor:pointer;
 	}
 }
+
+.pointer {
+	cursor:pointer;
+}
+/*
+#user-profile {
+	.hide-empty.empty {
+		display:none;
+	}
+
+	.editable {
+		.empty{
+			display:inherit;
+		}
+	}
+}
+*/

@@ -1,29 +1,25 @@
 'use strict';
 
 import {log as logger} from '../../Log.js';
-let log = logger.Logger('editable-items');
+let log = logger.Logger('editable-timeline');
 
 import React from 'react';
 import PropTypes from 'prop-types';
 
 import EditableBase from '../abstract/editable-base.jsx';
 import profileEventSystem from '../profile-event-system.js';
-import {PencilIcon, TrashIcon, CheckIcon, XIcon, PlusIcon} from '../../Icons.js';
+import {PencilIcon} from '../../Icons.js';
 import {Button} from 'reactstrap';
 
-export default class EditableItems extends EditableBase {
+class EditableTimeline extends EditableBase {
 	constructor(props) {
 		super(props);
 		this.state = {
 			counter: props.value && props.value.length + 1 || 1,
 			value: props.value && JSON.parse(props.value) || [],
-			editing: false,
-			processing: false
+			processing: false,
+			editLast: false
 		};
-	}
-
-	componentWillMount() {
-		this.editableItems = {};
 	}
 
 	add = () => {
@@ -34,7 +30,7 @@ export default class EditableItems extends EditableBase {
 			id: newItemsId
 		});
 
-		this.setState({value, counter});
+		this.setState({value, counter, editLast:true});
 	}
 
 	update = (updatedItem) => {
@@ -69,6 +65,7 @@ export default class EditableItems extends EditableBase {
 			this.setState({
 				processing: false,
 				editing: false,
+				editLast:false,
 				value: JSON.parse(respdata.data[this.props.field])
 			});
 		} catch (error) {
@@ -79,6 +76,7 @@ export default class EditableItems extends EditableBase {
 			this.setState({
 				processing: false,
 				editing: false,
+				editLast:false,
 				value: previous
 			});
 		}
@@ -88,6 +86,7 @@ export default class EditableItems extends EditableBase {
 		this.setState({
 			editing: false,
 			processing: false,
+			editLast:false,
 			value: this.state.previous.slice(0)
 		});
 	}
@@ -111,15 +110,14 @@ export default class EditableItems extends EditableBase {
 	}
 	
 	render() {
-		const {children, uniform, title, editable} = this.props;
-		const {processing, editing, value} = this.state;
+		const {children, title, editable} = this.props;
+		const {processing, editing, value, editLast} = this.state;
 		let edit = null;
-		let add = null;
 		let cssClasses = 'profile-editable-items profile-editable-editing ' + (value.length ? '' : 'profile-editable-items-empty');
 
 		let titleNode = title ? <h2>{title}</h2> : null;
 
-		if(typeof this.props.children === 'undefined') {
+		if(typeof children === 'undefined') {
 			return null;
 		}
 
@@ -130,20 +128,8 @@ export default class EditableItems extends EditableBase {
 			</div>;
 		}
 
-		if(this.props.uniform && editing) {
-			edit = <div className="profile-editable-actions profile-social-form-actions">
-				<Button outline size='sm' color='secondary' onClick={this.add} >Add</Button>{' '}
-				<Button outline size='sm' color='secondary' onClick={this.cancel} >Cancel</Button>{' '}
-				<Button outline size='sm' color='secondary' onClick={this.save} >Save</Button>{' '}
-			</div>;
-		}
-
-		if(uniform && !editing && editable) {
-			edit = <a className="profile-editable-action" onClick={ () => this.edit() }>
-				<PencilIcon />
-			</a>;
-		}
-
+		let add = editable ? <Button outline size='sm' color='secondary' onClick={this.add} className='ml-2' >Add</Button> : null;
+	
 		return <div className={cssClasses}>
 			{titleNode} {add}
 			<div>
@@ -151,10 +137,10 @@ export default class EditableItems extends EditableBase {
 					return React.cloneElement(children, {
 						value: item,
 						key: item.id,
-						editing: editing,
 						onUpdate: this.update,
 						onDelete: this.delete,
 						editable: editable,
+						editing: (editLast && (index == (value.length - 1)))
 					});
 				})}
 				{edit}
@@ -163,7 +149,7 @@ export default class EditableItems extends EditableBase {
 	}
 }
 
-EditableItems.propTypes = {
+EditableTimeline.propTypes = {
 	title: PropTypes.string,
 	field: PropTypes.string,
 	emptytext: PropTypes.string,
@@ -171,6 +157,8 @@ EditableItems.propTypes = {
 	uniform: PropTypes.bool //whether to have a single + button at the top, as well as edit icons for each section, or single edit for the full set
 };
 
-EditableItems.defaultProps = {
+EditableTimeline.defaultProps = {
 	uniform:false
 };
+
+export {EditableTimeline};

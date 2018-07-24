@@ -8,6 +8,7 @@ import {Form, FormGroup, Col, CustomInput, Input, Label, Button} from 'reactstra
 
 export default class EditableEducationItem extends EditableTimelineItem {
 	render() {
+		const {editable} = this.props;
 		const {editing, start_month, start_year, degree_name, end_month, end_year, present, institution} = this.state;
 		if(editing) {
 			return <Form className="profile-timeline-form-wrapper" onSubmit={this.save}>
@@ -78,7 +79,7 @@ export default class EditableEducationItem extends EditableTimelineItem {
 					{degree_name}
 				</div>
 				<div>
-					<Button outline size='sm' onClick={this.edit} ><PencilIcon /></Button>
+					{editable ? <Button outline size='sm' onClick={this.edit} ><PencilIcon /></Button> : null}
 				</div>
 			</div>;
 		}

@@ -104,7 +104,7 @@ export default class EditableField extends EditableBase {
 
 	render() {
 		const {editing, processing, value} = this.state;
-		const {type, emptytext} = this.props;
+		const {type, emptytext, editable} = this.props;
 		let actions;
 
 		if(editing) {
@@ -130,9 +130,9 @@ export default class EditableField extends EditableBase {
 		} else {
 			return <div className={cn('profile-editable-field', (value ? 'profile-editable-value' : 'profile-editable-emptytext'))}>
 				<span>{value || emptytext}</span>
-				<a className="profile-editable-action" onClick={ this.edit }>
-					<PencilIcon />
-				</a>
+				{editable ? <a className="profile-editable-action" onClick={ this.edit }>
+						<PencilIcon />
+					</a> : null}
 			</div>;
 		}	
 	}

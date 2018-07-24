@@ -11,7 +11,7 @@ export default class EditableTimelineItem extends React.Component {
 			this.state[property] = props.value[property] || this.constructor.EDITABLE_PROPERTIES[property];
 		});
 
-		this.state['editing'] = false;
+		this.state['editing'] = this.props.editing;
 		this.state['previous'] = Object.assign({}, props.value);
 	}
 

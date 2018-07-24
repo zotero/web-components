@@ -1,5 +1,8 @@
 'use strict';
 
+import {log as logger} from '../Log.js';
+let log = logger.Logger('Profile');
+
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -7,10 +10,13 @@ import EditableAvatar from './profile/editable-avatar.jsx';
 import EditableEducationItem from './profile/editable-education-item.jsx';
 import EditableExperienceItem from './profile/editable-experience-item.jsx';
 import EditableField from './profile/editable-field.jsx';
-import EditableInterestItem from './profile/editable-interest-item.jsx';
+import {EditableInterests} from './profile/editable-interest-item.jsx';
+//import EditableInterestItem from './profile/editable-interest-item.jsx';
+import {EditableTimeline} from './profile/editable-timeline.jsx';
+import {EditableSocial} from './profile/editable-social-item.jsx';
 import EditableItems from './profile/editable-items.jsx';
 import EditableRich from './profile/editable-rich.jsx';
-import EditableSocialItem from './profile/editable-social-item.jsx';
+//import EditableSocialItem from './profile/editable-social-item.jsx';
 import Groups from './profile/groups.jsx';
 import GroupsDetailed from './profile/groups-detailed.jsx';
 import ProfileDataSource from './profile-data-source.js';
@@ -101,6 +107,27 @@ class Profile extends React.Component {
 			<a href='./items'>{profile.displayName}'s public library</a>
 		) : null;
 
+		let profileTitle = false;
+		//log.debug(profileMeta);
+		if(profileMeta.experience){
+			let expObj = JSON.parse(profileMeta.experience);
+			let lastExp = expObj[expObj.length - 1];
+			if(lastExp.present){
+				profileTitle = lastExp.position_name;
+			}
+		}
+		let termDegree = false;
+		if(profileMeta.education){
+			let eduObj = JSON.parse(profileMeta.education);
+			for(let i=eduObj.length-1; i>0; i--){
+				let lastEdu = eduObj[eduObj.length - 1];
+				if(!lastEdu.present){
+					termDegree = lastEdu.degree_name + ', ' + lastEdu.institution;
+					break;
+				}
+			}
+		}
+
 		return (
 			<Container>
 				{alert}
@@ -112,27 +139,32 @@ class Profile extends React.Component {
 						<h2>
 							{!editable ?
 								profile.displayName :
-								<EditableField field="realname" emptytext="Your full name" value={ profileMeta.realname } />
+								<EditableField field="realname" emptytext="Your full name" value={ profileMeta.realname } editable={editable} />
 							}
 						</h2>
 						<ul>
 							<li>
-								<EditableField field="title" emptytext="Add your title" value={ profileMeta.title } />
+								{profileTitle}
+								<EditableField field="title" emptytext="Add your title" value={ profileMeta.title } editable={editable} />
 							</li>
 							<li>
-								<EditableField field="academic" emptytext="Add your academic status" value={ profileMeta.academic } />
+								{termDegree}
+								<EditableField field="academic" emptytext="Add your academic status" value={ profileMeta.academic } editable={editable} />
 							</li>
 							<li>
-								<EditableField field="affiliation" emptytext="Add your university" value={ profileMeta.affiliation } />
+								<EditableField field="affiliation" emptytext="Add your university" value={ profileMeta.affiliation } editable={editable} />
 							</li>
 							<li>
-								<EditableField field="location" emptytext="Add your location" value={ profileMeta.location } />
+								<EditableField field="location" emptytext="Add your location" value={ profileMeta.location } editable={editable} />
 							</li>
 							{userLibraryLink}
 							<li>
-								<EditableItems field="social" uniform={true} emptytext="Add social profile" value={profileMeta.social}>
+								<EditableSocial value={profileMeta.social} editable={editable} />
+								{/*
+								<EditableItems field="social" uniform={true} emptytext="Add social profile" value={profileMeta.social} editable={editable}>
 									<EditableSocialItem />
 								</EditableItems>
+								*/}
 							</li>
 						</ul>
 						<div className='user-actions'>
@@ -171,20 +203,23 @@ class Profile extends React.Component {
 							<TabPane tabId='About'>
 								<Row>
 									<Col xs='12' sm='8'>
-										<EditableRich id='bio-text' title="About" field="bio" emptytext="Add a short description of what you are currently working on" value={ profileMeta.bio } />
-										<EditableItems field="interests" title="Research interests" emptytext="Add your research intereststo show what you are passionate about" value={ profileMeta.interests }>
+										<EditableRich id='bio-text' title="About" field="bio" emptytext="Add a short description of what you are currently working on" value={ profileMeta.bio } editable={editable} />
+										<EditableInterests interests={profileMeta.interests} editable={editable} />
+										{/*
+										<EditableItems field="interests" title="Research interests" emptytext="Add your research interests to show what you are passionate about" value={ profileMeta.interests }>
 											<EditableInterestItem />
 										</EditableItems>
+										*/}
 
 										<Publications userid={ userid } />
 
-										<EditableItems field="experience" title="Professional experience" emptytext="Add your professional experience to share where you have been working" value={ profileMeta.experience }>
+										<EditableTimeline field="experience" title="Professional experience" emptytext="Add your professional experience to share where you have been working" value={ profileMeta.experience } editable={editable}>
 											<EditableExperienceItem />
-										</EditableItems>
+										</EditableTimeline>
 
-										<EditableItems field="education" title="Education history" emptytext="Add your education history to show where you have completed your studies" value={ profileMeta.education }>
+										<EditableTimeline field="education" title="Education history" emptytext="Add your education history to show where you have completed your studies" value={ profileMeta.education } editable={editable}>
 											<EditableEducationItem />
-										</EditableItems>
+										</EditableTimeline>
 									</Col>
 									<Col xs='12' sm='4'>
 										<Groups userid={ userid } onViewMore={ () => this.makeActive('Groups')} />

@@ -159,7 +159,7 @@ class Profile extends React.Component {
 							</li>
 							{userLibraryLink}
 							<li>
-								<EditableSocial value={profileMeta.social} editable={editable} />
+								<EditableSocial value={profileMeta.social} field='social' editable={editable} template={{name:'ORCID', value:''}} />
 								{/*
 								<EditableItems field="social" uniform={true} emptytext="Add social profile" value={profileMeta.social} editable={editable}>
 									<EditableSocialItem />
@@ -204,7 +204,7 @@ class Profile extends React.Component {
 								<Row>
 									<Col xs='12' sm='8'>
 										<EditableRich id='bio-text' title="About" field="bio" emptytext="Add a short description of what you are currently working on" value={ profileMeta.bio } editable={editable} />
-										<EditableInterests interests={profileMeta.interests} editable={editable} />
+										<EditableInterests value={profileMeta.interests} field='interests' editable={editable} template={{interest:''}} />
 										{/*
 										<EditableItems field="interests" title="Research interests" emptytext="Add your research interests to show what you are passionate about" value={ profileMeta.interests }>
 											<EditableInterestItem />

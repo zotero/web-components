@@ -6,7 +6,7 @@ let log = logger.Logger('editable-timeline');
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import EditableBase from '../abstract/editable-base.jsx';
+import {EditableBase} from '../abstract/editable-base.jsx';
 import profileEventSystem from '../profile-event-system.js';
 import {PencilIcon} from '../../Icons.js';
 import {Button} from 'reactstrap';

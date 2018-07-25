@@ -7,7 +7,7 @@ let log = logger.Logger('editable-rich');
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import EditableBase from '../abstract/editable-base.jsx';
+import {EditableBase} from '../abstract/editable-base.jsx';
 import profileEventSystem from '../profile-event-system.js';
 import {PencilIcon, TrashIcon, CheckIcon, XIcon} from '../../Icons.js';
 import {Spinner} from '../../LoadingSpinner.js';

@@ -3,7 +3,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import EditableBase from '../abstract/editable-base.jsx';
+import {EditableBase} from '../abstract/editable-base.jsx';
 import profileEventSystem from '../profile-event-system.js';
 import {PencilIcon, TrashIcon, CheckIcon, XIcon, PlusIcon} from '../../Icons.js';
 import {postFormData, ajax} from '../../ajax.js';

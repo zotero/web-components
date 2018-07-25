@@ -6,84 +6,18 @@ let log = logger.Logger('editable-interest-item');
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import EditableBase from '../abstract/editable-base.jsx';
-import profileEventSystem from '../profile-event-system.js';
+import {MultipleEditableBase, EditableBase} from '../abstract/editable-base.jsx';
 import EditableField from './editable-field.jsx';
 import {PencilIcon, TrashIcon, CheckIcon, XIcon} from '../../Icons.js';
 import {Row, Col, Form, Input, Button} from 'reactstrap';
 import cn from 'classnames';
 
-class EditableInterests extends EditableBase {
+class EditableInterests extends MultipleEditableBase {
 	constructor(props) {
 		log.debug(props);
 		super(props);
-		this.state = {
-			interests:JSON.parse(props.interests),
-			addValue:'',
-			editing:false,
-		};
-		this.state.counter = this.state.interests.length;
+		this.state.addValue = '';
 	}
-
-	edit = () => {
-		const {interests} = this.state;
-		this.setState({
-			editing:true,
-			previous: interests.slice(0)
-		});
-	}
-
-	add = (evt) => {
-		evt.preventDefault();
-		let {interests, addValue, counter} = this.state;
-		interests.push({interest:addValue, index:counter++});
-		this.setState({interests, addValue:'', counter});
-	}
-
-	remove = (index) => {
-		let {interests} = this.state;
-		interests.splice(index, 1);
-		this.setState({interests});
-	}
-
-	save = async () => {
-		const {interests} = this.state;
-
-		this.setState({
-			processing: true,
-		});
-
-		try {
-			let response = await this.updateFieldOnServer('interests', JSON.stringify(interests));
-			let respdata = await response.json();
-			this.setState({
-				processing: false,
-				editing: false,
-				interests: JSON.parse(respdata.data['interests']),
-				previous:interests.slice(0)
-			});
-		} catch (error) {
-			log.error(error);
-			profileEventSystem.trigger('alert', {
-				level: 'danger',
-				message: error.responseJSON ? error.responseJSON.message : 'Failed to update items editable'
-			});
-			this.setState({
-				processing: false,
-				editing: true,
-			});
-		}
-	}
-
-	cancel = () => {
-		const {previous} = this.state;
-		this.setState({
-			interests:previous,
-			editing:false,
-			processing:false
-		});
-	}
-
 	handleInputChange = (evt) => {
 		this.setState({addValue:evt.target.value});
 	}
@@ -97,8 +31,11 @@ class EditableInterests extends EditableBase {
 	}
 
 	render() {
+		log.debug(this.props);
+		log.debug(this.state);
 		const {editable, title, emptyText} = this.props;
-		const {interests, editing, addValue} = this.state;
+		const {value, editing, addValue} = this.state;
+		const interests = value;
 		let cssClasses = cn({
 			'editable-interests':true,
 			'editable': editable,
@@ -174,83 +111,16 @@ class EditableInterests extends EditableBase {
 }
 
 EditableInterests.defaultProps = {
-	interests: '[]',
+	value: '[]',
 	title:'Research Interests',
 	emptyText:'Add your research interests to show what you are passionate about'
 };
 
-class EditableInterestItem extends EditableField {
-	constructor(props) {
-		super(props);
-		this.state = {
-			interest: props.value.interest,
-			editing: false
-		};
-	}
-
-	save = () => {
-		var updatedItem = {
-			interest: this.input.value,
-			id: this.props.value.id
-		};
-
-		this.cancelPending();
-	
-		this.setState(Object.assign({}, updatedItem, {
-			editing: false
-		}), () => {
-			this.props.onUpdate(updatedItem);
-		});
-	}
-	
-	remove = () => {
-		this.cancelPending();
-		this.props.onDelete(this.props.value.id);
-	}
-
-	render() {
-		if(this.state.editing) {
-			return <Form inline className="profile-editable-interest profile-editable-editing" onSubmit={this.saveHandler}>
-				<Input
-					ref={ ref => this.input = ref } defaultValue={ this.state.interest }
-					onKeyUp={this.keyboardHandler}
-					onBlur={this.blurHandler}
-				/>
-				<div className="profile-editable-actions">
-					<a className="profile-editable-action" onClick={this.saveHandler}>
-						<CheckIcon />
-					</a>
-					<a className="profile-editable-action" onClick={this.remove}>
-						<TrashIcon />
-					</a>
-					<a className="profile-editable-action" onClick={this.cancelHandler}>
-						<XIcon />
-					</a>
-				</div>
-			</Form>;
-		} else {
-			return <div className={`profile-editable-interest profile-editable-${this.state.value ? 'value' : 'emptytext'}`}>
-				<span>{this.state.interest || this.props.emptytext}</span>
-				<a className="profile-editable-action" onClick={this.edit}>
-					<PencilIcon />
-				</a>
-			</div>;
-		}	
-	}
-
-	static get defaultProps() {
-		return {
-			value: {}
-		};
-	}
-}
-
-
-EditableInterestItem.propTypes = {
-	value: PropTypes.object,
-	onUpdate: PropTypes.func,
-	onDelete: PropTypes.func,
-	emptytext: PropTypes.string
+EditableInterests.propTypes = {
+	value: PropTypes.string,
+	field: PropTypes.string.isRequired,
+	editable: PropTypes.bool.isRequired,
+	template: PropTypes.object.isRequired
 };
 
 export {EditableInterests};

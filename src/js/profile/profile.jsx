@@ -24,7 +24,7 @@ import RelatedPeopleDetailed from './profile/related-people-detailed.jsx';
 import {FollowButtons} from '../FollowButtons.jsx';
 import {InviteToGroups} from '../InviteToGroups.js';
 import {MessageUserButton} from './profile/message-user-button.jsx';
-import {Alert, Container, Row, Col, Nav, NavItem, NavLink, TabPane, TabContent} from 'reactstrap';
+import {Alert, Container, Row, Col, Nav, NavItem, NavLink, TabPane, TabContent, Card, CardBody} from 'reactstrap';
 import cn from 'classnames';
 
 class Profile extends React.Component {
@@ -33,7 +33,8 @@ class Profile extends React.Component {
 		this.state = {
 			alert: {},
 			active: 'About',
-			extended: this.checkIfExtendedViewNeeded()
+			extended: this.checkIfExtendedViewNeeded(),
+			hasContent: !this.checkIfEmpty()
 		};
 	}
 
@@ -53,6 +54,24 @@ class Profile extends React.Component {
 		}
 
 		return false;
+	}
+
+	checkIfEmpty = () => {
+		const {profile} = this.props;
+		const profileMeta = profile.meta.profile;
+
+		let emptyMeta = true;
+		Object.keys(profileMeta).map((key)=>{
+			if(profileMeta[key] != '') {
+				emptyMeta = false;
+			}
+		});
+
+		return emptyMeta;
+	}
+
+	hasContent = () => {
+		this.setState({hasContent:true});
 	}
 
 	makeActive = (newActive) => {
@@ -78,7 +97,7 @@ class Profile extends React.Component {
 		var networkTab, groupsTab, alertNode;
 		const {profile, userid, editable, isFollowing} = this.props;
 		const profileMeta = profile.meta.profile;
-		const {active, extended, alert} = this.state;
+		const {active, extended, alert, hasContent} = this.state;
 
 		if(alert.level){
 			alertNode = (
@@ -87,6 +106,16 @@ class Profile extends React.Component {
 				</Alert>
 			);
 		}
+
+		let emptyProfileNode = !hasContent ? (
+			<div id='empty-profile-text' className='mt-6'>
+				<Card>
+					<CardBody>
+						<p>{profile.displayName} hasn't filled out their profile yet.</p>
+					</CardBody>
+				</Card>
+			</div>
+		) : null;
 
 		if(extended) {
 			networkTab = (
@@ -187,7 +216,7 @@ class Profile extends React.Component {
 								<EditableSocial value={profileMeta.social} field='social' editable={editable} template={{name:'ORCID', value:''}} />
 							</li>
 						</ul>
-						<div className='user-actions'>
+						<div className='user-actions clearfix'>
 							<div className='float-left mr-4'>
 								<FollowButtons profileUserID={userid} isFollowing={isFollowing} />
 							</div>
@@ -198,6 +227,7 @@ class Profile extends React.Component {
 								<InviteToGroups invitee={{userID:userid, displayName:profileMeta.realname}} />
 							</div>
 						</div>
+						{emptyProfileNode}
 					</Col>
 				</Row>
 				<Row>
@@ -210,7 +240,7 @@ class Profile extends React.Component {
 										<EditableRich id='bio-text' title="About" field="bio" emptytext="Add a short description of what you are currently working on" value={ profileMeta.bio } editable={editable} />
 										<EditableInterests value={profileMeta.interests} field='interests' editable={editable} template={{interest:''}} />
 
-										<Publications userid={ userid } />
+										<Publications userid={ userid } onPublicationsLoaded={this.hasContent} />
 
 										<EditableTimeline field="experience" title="Professional experience" emptytext="Add your professional experience to share where you have been working" value={ profileMeta.experience } editable={editable}>
 											<EditableExperienceItem />

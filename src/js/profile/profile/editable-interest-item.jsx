@@ -14,7 +14,6 @@ import cn from 'classnames';
 
 class EditableInterests extends MultipleEditableBase {
 	constructor(props) {
-		log.debug(props);
 		super(props);
 		this.state.addValue = '';
 	}
@@ -31,8 +30,6 @@ class EditableInterests extends MultipleEditableBase {
 	}
 
 	render() {
-		log.debug(this.props);
-		log.debug(this.state);
 		const {editable, title, emptyText} = this.props;
 		const {value, editing, addValue} = this.state;
 		const interests = value;
@@ -42,7 +39,6 @@ class EditableInterests extends MultipleEditableBase {
 			'hide-empty':true,
 			'empty': (interests.length > 0)
 		});
-		log.debug(this.state);
 
 		let editNode = editable ? <Button outline size='sm' color='secondary' onClick={this.edit} className='ml-2' ><PencilIcon /></Button> : null;
 

@@ -18,7 +18,7 @@ class MessageUserButton extends Component {
 		if(curUser.username == username){
 			return null;
 		}
-		return (<a className='btn btn-secondary' href={`//forums.zotero.org/messages/add/${username}`} >Send Message</a>);
+		return (<a id='message-user' className='btn btn-secondary' href={`//forums.zotero.org/messages/add/${username}`} >Send Message</a>);
 	}
 }
 MessageUserButton.propTypes = {

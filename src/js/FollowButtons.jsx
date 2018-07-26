@@ -44,9 +44,9 @@ class FollowButtons extends Component{
 			return null;
 		}
 		if(following){
-			return <Button onClick={this.unfollow}>Unfollow</Button>
+			return <Button id='unfollow-button' onClick={this.unfollow}>Unfollow</Button>
 		} else {
-			return <Button onClick={this.follow}>Follow</Button>
+			return <Button id='follow-button' onClick={this.follow}>Follow</Button>
 		}
 	}
 }

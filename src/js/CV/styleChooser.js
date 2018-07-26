@@ -38,6 +38,7 @@ class StyleChooser extends Component {
 					type='select'
 					onChange={(val)=>{this.props.changeStyle(val);}}
 					value={this.props.style}
+					id='cv-style-chooser'
 					clearable='false'
 				>
 					{options}

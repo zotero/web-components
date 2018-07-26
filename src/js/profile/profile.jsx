@@ -43,11 +43,12 @@ class Profile extends React.Component {
 	}
 
 	checkIfExtendedViewNeeded = () => {
-		if(this.props.profile.followers && this.props.profile.followers.length > 1) {
+		const {profile} = this.props;
+		if(profile.followers && profile.followers.length > 3) {
 			return true;
 		}
 
-		if(this.props.profile.following && this.props.profile.following.length > 1) {
+		if(profile.following && profile.following.length > 3) {
 			return true;
 		}
 
@@ -74,18 +75,20 @@ class Profile extends React.Component {
 	}
 
 	render() {
-		var networkTab, groupsTab, alert;
-		const {profile, userid, editable} = this.props;
+		var networkTab, groupsTab, alertNode;
+		const {profile, userid, editable, isFollowing} = this.props;
 		const profileMeta = profile.meta.profile;
-		const activeTab = this.state.active;
+		const {active, extended, alert} = this.state;
 
-		if(this.state.alert.level){
-			alert = <Alert color={this.state.alert.level}>
-					{this.state.alert.message}
-				</Alert>;
+		if(alert.level){
+			alertNode = (
+				<Alert color={alert.level}>
+					{alert.message}
+				</Alert>
+			);
 		}
 
-		if(this.state.extended) {
+		if(extended) {
 			networkTab = (
 				<TabPane tabId='Network'>
 					<RelatedPeopleDetailed people={ profile.followers } title="Followers" more={ profile.followersMore } dataSource={ this.profileDataSource } />
@@ -104,8 +107,8 @@ class Profile extends React.Component {
 			<a href='./items'>{profile.displayName}'s public library</a>
 		) : null;
 
+		//find current job title
 		let profileTitle = false;
-		//log.debug(profileMeta);
 		if(profileMeta.experience){
 			let expObj = JSON.parse(profileMeta.experience);
 			let lastExp = expObj[expObj.length - 1];
@@ -113,6 +116,8 @@ class Profile extends React.Component {
 				profileTitle = lastExp.position_name;
 			}
 		}
+
+		//find last degree that is not currently being pursued
 		let termDegree = false;
 		if(profileMeta.education){
 			let eduObj = JSON.parse(profileMeta.education);
@@ -125,9 +130,32 @@ class Profile extends React.Component {
 			}
 		}
 
+		let navbar = (
+			<Nav tabs>
+				<NavItem>
+					<NavLink className={ cn({active:(active == 'About')}) } onClick={ () => this.makeActive('About') }>
+						About
+					</NavLink>
+				</NavItem>
+				<NavItem>
+					<NavLink className={ cn({active:(active == 'Network')}) } onClick={ () => this.makeActive('Network') }>
+						Network
+					</NavLink>
+				</NavItem>
+				<NavItem>
+					<NavLink className={ cn({active:(active == 'Groups')}) } onClick={ () => this.makeActive('Groups') }>
+						Groups
+					</NavLink>
+				</NavItem>
+			</Nav>
+		);
+		if(!extended){
+			navbar = null;
+		}
+
 		return (
 			<Container>
-				{alert}
+				{alertNode}
 				<Row className="user-profile-personal-details">
 					<Col xs='12' sm='6'>
 						<EditableAvatar value={ profileMeta.avatar } />
@@ -161,7 +189,7 @@ class Profile extends React.Component {
 						</ul>
 						<div className='user-actions'>
 							<div className='float-left mr-4'>
-								<FollowButtons profileUserID={userid} isFollowing={this.props.isFollowing} />
+								<FollowButtons profileUserID={userid} isFollowing={isFollowing} />
 							</div>
 							<div className='float-left mr-4'>
 								<MessageUserButton username={profile.username} />
@@ -174,24 +202,8 @@ class Profile extends React.Component {
 				</Row>
 				<Row>
 					<Col xs='12'>
-						<Nav tabs>
-							<NavItem>
-								<NavLink className={ cn({active:(activeTab == 'About')}) } onClick={ () => this.makeActive('About') }>
-									About
-								</NavLink>
-							</NavItem>
-							<NavItem>
-								<NavLink className={ cn({active:(activeTab == 'Network')}) } onClick={ () => this.makeActive('Network') }>
-									Network
-								</NavLink>
-							</NavItem>
-							<NavItem>
-								<NavLink className={ cn({active:(activeTab == 'Groups')}) } onClick={ () => this.makeActive('Groups') }>
-									Groups
-								</NavLink>
-							</NavItem>
-						</Nav>
-						<TabContent activeTab={this.state.active}>
+						{navbar}
+						<TabContent activeTab={active}>
 							<TabPane tabId='About'>
 								<Row>
 									<Col xs='12' sm='8'>
@@ -209,7 +221,7 @@ class Profile extends React.Component {
 										</EditableTimeline>
 									</Col>
 									<Col xs='12' sm='4'>
-										<Groups userid={ userid } onViewMore={ () => this.makeActive('Groups')} />
+										<Groups userid={ userid } onExtended={()=>{this.setState({extended:true});}} onViewMore={ () => this.makeActive('Groups')} />
 										<RelatedPeople people={ profile.followers.slice(0, 3) } title="Followers" more={ profile.followers.length > 3 || profile.followersMore } onViewMore={ () => this.makeActive('Network') } />
 										<RelatedPeople people={ profile.following.slice(0, 3) } title="Following" more={ profile.following.length > 3 || profile.followingMore } onViewMore={ () => this.makeActive('Network') } />
 									</Col>

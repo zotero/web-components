@@ -21,6 +21,9 @@ export default class Groups extends GroupsBase {
 	componentDidMount = () => {
 		this.fetchUserGroups(this.props.userid)
 			.then(response => {
+				if(response.fetchedGroups.length > this.props.count) {
+					this.props.onExtended();
+				}
 				this.setState({
 					more: response.fetchedGroups.length > this.props.count,
 					groups: response.fetchedGroups.slice(0, this.props.count),

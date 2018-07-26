@@ -15,7 +15,7 @@ export default class Publications extends React.Component {
 		};
 	}
 
-	componentWillMount() {
+	componentWillMount = () => {
 		this.zp = new ZoteroPublications({
 			'group': 'type',
 			'apiBase': 'apidev.zotero.org',

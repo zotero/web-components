@@ -29,7 +29,7 @@ export default class GroupsDetailed extends GroupsBase {
 		};
 	}
 
-	componentWillMount() {
+	componentWillMount = () => {
 		this.fetchUserGroups(this.props.userid)
 			.then(response => {
 				this.setState({

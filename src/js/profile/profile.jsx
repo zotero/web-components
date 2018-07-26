@@ -11,12 +11,9 @@ import EditableEducationItem from './profile/editable-education-item.jsx';
 import EditableExperienceItem from './profile/editable-experience-item.jsx';
 import EditableField from './profile/editable-field.jsx';
 import {EditableInterests} from './profile/editable-interest-item.jsx';
-//import EditableInterestItem from './profile/editable-interest-item.jsx';
 import {EditableTimeline} from './profile/editable-timeline.jsx';
 import {EditableSocial} from './profile/editable-social-item.jsx';
-import EditableItems from './profile/editable-items.jsx';
 import EditableRich from './profile/editable-rich.jsx';
-//import EditableSocialItem from './profile/editable-social-item.jsx';
 import Groups from './profile/groups.jsx';
 import GroupsDetailed from './profile/groups-detailed.jsx';
 import ProfileDataSource from './profile-data-source.js';
@@ -160,11 +157,6 @@ class Profile extends React.Component {
 							{userLibraryLink}
 							<li>
 								<EditableSocial value={profileMeta.social} field='social' editable={editable} template={{name:'ORCID', value:''}} />
-								{/*
-								<EditableItems field="social" uniform={true} emptytext="Add social profile" value={profileMeta.social} editable={editable}>
-									<EditableSocialItem />
-								</EditableItems>
-								*/}
 							</li>
 						</ul>
 						<div className='user-actions'>
@@ -205,11 +197,6 @@ class Profile extends React.Component {
 									<Col xs='12' sm='8'>
 										<EditableRich id='bio-text' title="About" field="bio" emptytext="Add a short description of what you are currently working on" value={ profileMeta.bio } editable={editable} />
 										<EditableInterests value={profileMeta.interests} field='interests' editable={editable} template={{interest:''}} />
-										{/*
-										<EditableItems field="interests" title="Research interests" emptytext="Add your research interests to show what you are passionate about" value={ profileMeta.interests }>
-											<EditableInterestItem />
-										</EditableItems>
-										*/}
 
 										<Publications userid={ userid } />
 

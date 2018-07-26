@@ -4,7 +4,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 export default class RelatedPeople extends React.Component {
-	viewMoreHandler(ev) {
+	viewMoreHandler = (ev) => {
 		ev.preventDefault();
 		this.props.onViewMore();
 	}
@@ -16,7 +16,7 @@ export default class RelatedPeople extends React.Component {
 		}
 
 		if(this.props.more) {
-			viewAllButton = <span className="profile-side-panel-header-link"><a onClick={this.viewMore} href="">View All</a></span>;
+			viewAllButton = <span className="profile-side-panel-header-link"><a onClick={this.viewMoreHandler} href="">View All</a></span>;
 		}
 		return <div className="profile-side-panel">
 			<h3>{this.props.title}</h3>

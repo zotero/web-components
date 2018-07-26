@@ -18,7 +18,7 @@ export default class Groups extends GroupsBase {
 		};
 	}
 
-	componentDidMount() {
+	componentDidMount = () => {
 		this.fetchUserGroups(this.props.userid)
 			.then(response => {
 				this.setState({
@@ -36,7 +36,7 @@ export default class Groups extends GroupsBase {
 	}
 
 	
-	viewMoreHandler(ev) {
+	viewMoreHandler = (ev) => {
 		ev.preventDefault();
 		this.props.onViewMore();
 	}
@@ -50,7 +50,7 @@ export default class Groups extends GroupsBase {
 
 		if(this.state.more) {
 			viewAllButton = (<span className="profile-side-panel-header-link">
-				<a onClick={ ev => this.viewMore(ev) } href="">View All</a>
+				<a onClick={this.viewMoreHandler} href="">View All</a>
 			</span>);
 		}
 

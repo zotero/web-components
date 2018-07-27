@@ -18,7 +18,7 @@ export default class RelatedPeople extends React.Component {
 		if(this.props.more) {
 			viewAllButton = <span className="profile-side-panel-header-link"><a onClick={this.viewMoreHandler} href="">View All</a></span>;
 		}
-		return <div className="profile-side-panel">
+		return <div className="profile-side-panel" id={`${this.props.id}-side-panel`}>
 			<h3>{this.props.title}</h3>
 			{viewAllButton}
 			<ul>

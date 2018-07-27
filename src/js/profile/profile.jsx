@@ -252,8 +252,20 @@ class Profile extends React.Component {
 									</Col>
 									<Col xs='12' sm='4'>
 										<Groups userid={ userid } onExtended={()=>{this.setState({extended:true});}} onViewMore={ () => this.makeActive('Groups')} />
-										<RelatedPeople people={ profile.followers.slice(0, 3) } title="Followers" more={ profile.followers.length > 3 || profile.followersMore } onViewMore={ () => this.makeActive('Network') } />
-										<RelatedPeople people={ profile.following.slice(0, 3) } title="Following" more={ profile.following.length > 3 || profile.followingMore } onViewMore={ () => this.makeActive('Network') } />
+										<RelatedPeople
+											people={ profile.followers.slice(0, 3) }
+											title="Followers"
+											more={ profile.followers.length > 3 || profile.followersMore }
+											onViewMore={ () => this.makeActive('Network') }
+											id='followers'
+										/>
+										<RelatedPeople
+											people={ profile.following.slice(0, 3) }
+											title="Following"
+											more={ profile.following.length > 3 || profile.followingMore }
+											onViewMore={ () => this.makeActive('Network') }
+											id='following'
+										/>
 									</Col>
 								</Row>
 							</TabPane>

@@ -7,8 +7,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import EditableAvatar from './profile/editable-avatar.jsx';
-import EditableEducationItem from './profile/editable-education-item.jsx';
-import EditableExperienceItem from './profile/editable-experience-item.jsx';
+import {EditableEducationItem, OrcidEditableEducationItem} from './profile/editable-education-item.jsx';
+import {EditableExperienceItem} from './profile/editable-experience-item.jsx';
 import EditableField from './profile/editable-field.jsx';
 import {EditableInterests} from './profile/editable-interest-item.jsx';
 import {EditableTimeline} from './profile/editable-timeline.jsx';
@@ -25,6 +25,8 @@ import {FollowButtons} from '../FollowButtons.jsx';
 import {InviteToGroups} from '../InviteToGroups.js';
 import {MessageUserButton} from './profile/message-user-button.jsx';
 import {Alert, Container, Row, Col, Nav, NavItem, NavLink, TabPane, TabContent, Card, CardBody} from 'reactstrap';
+import {OrcidProfile, Name, Biography, Educations, Employments, Fundings, Works, ResearcherUrls, Keywords} from '../components/OrcidProfile.jsx';
+import {Coalesce} from '../components/Coalesce.jsx';
 import cn from 'classnames';
 
 class Profile extends React.Component {
@@ -182,6 +184,86 @@ class Profile extends React.Component {
 			navbar = null;
 		}
 
+		let aboutTab;
+		//if(profile.meta.orcid_profile) {
+		if(false) {
+			let p = JSON.parse(profile.meta.orcid_profile);
+			aboutTab = (
+				<Row>
+					<Col xs='12' sm='8'>
+						<OrcidProfile orcidProfile={p} />
+					</Col>
+					<Col xs='12' sm='4'>
+						<Groups userid={ userid } onExtended={()=>{this.setState({extended:true});}} onViewMore={ () => this.makeActive('Groups')} />
+						<RelatedPeople
+							people={ profile.followers.slice(0, 3) }
+							title="Followers"
+							more={ profile.followers.length > 3 || profile.followersMore }
+							onViewMore={ () => this.makeActive('Network') }
+							id='followers'
+						/>
+						<RelatedPeople
+							people={ profile.following.slice(0, 3) }
+							title="Following"
+							more={ profile.following.length > 3 || profile.followingMore }
+							onViewMore={ () => this.makeActive('Network') }
+							id='following'
+						/>
+					</Col>
+				</Row>
+			);
+		} else {
+			let p = JSON.parse(profile.meta.orcid_profile);
+			aboutTab = (
+				<Row>
+					<Col xs='12' sm='8'>
+						<EditableRich id='bio-text' title="About" field="bio" emptytext="Add a short description of what you are currently working on" value={ profileMeta.bio } editable={editable} />
+						<EditableInterests value={profileMeta.interests} field='interests' editable={editable} template={{interest:''}} />
+
+						<Publications userid={ userid } onPublicationsLoaded={this.hasContent} />
+
+						<EditableTimeline
+							field="experience"
+							title="Professional experience"
+							emptytext="Add your professional experience to share where you have been working"
+							value={ profileMeta.experience }
+							editable={editable}
+							entryClass={EditableExperienceItem}
+						/>
+
+						<EditableTimeline
+							field="education"
+							title="Education history"
+							emptytext="Add your education history to show where you have completed your studies"
+							value={ profileMeta.education }
+							editable={editable}
+							entryClass={OrcidEditableEducationItem}
+						/>
+					</Col>
+					<Col xs='12' sm='4'>
+						<Groups userid={ userid } onExtended={()=>{this.setState({extended:true});}} onViewMore={ () => this.makeActive('Groups')} />
+						<RelatedPeople
+							people={ profile.followers.slice(0, 3) }
+							title="Followers"
+							more={ profile.followers.length > 3 || profile.followersMore }
+							onViewMore={ () => this.makeActive('Network') }
+							id='followers'
+						/>
+						<RelatedPeople
+							people={ profile.following.slice(0, 3) }
+							title="Following"
+							more={ profile.following.length > 3 || profile.followingMore }
+							onViewMore={ () => this.makeActive('Network') }
+							id='following'
+						/>
+					</Col>
+					<Col xs='12' sm='8'>
+						<OrcidProfile orcidProfile={p} />
+					</Col>
+				</Row>
+			);
+		}
+
 		return (
 			<Container>
 				{alertNode}
@@ -235,39 +317,7 @@ class Profile extends React.Component {
 						{navbar}
 						<TabContent activeTab={active}>
 							<TabPane tabId='About'>
-								<Row>
-									<Col xs='12' sm='8'>
-										<EditableRich id='bio-text' title="About" field="bio" emptytext="Add a short description of what you are currently working on" value={ profileMeta.bio } editable={editable} />
-										<EditableInterests value={profileMeta.interests} field='interests' editable={editable} template={{interest:''}} />
-
-										<Publications userid={ userid } onPublicationsLoaded={this.hasContent} />
-
-										<EditableTimeline field="experience" title="Professional experience" emptytext="Add your professional experience to share where you have been working" value={ profileMeta.experience } editable={editable}>
-											<EditableExperienceItem />
-										</EditableTimeline>
-
-										<EditableTimeline field="education" title="Education history" emptytext="Add your education history to show where you have completed your studies" value={ profileMeta.education } editable={editable}>
-											<EditableEducationItem />
-										</EditableTimeline>
-									</Col>
-									<Col xs='12' sm='4'>
-										<Groups userid={ userid } onExtended={()=>{this.setState({extended:true});}} onViewMore={ () => this.makeActive('Groups')} />
-										<RelatedPeople
-											people={ profile.followers.slice(0, 3) }
-											title="Followers"
-											more={ profile.followers.length > 3 || profile.followersMore }
-											onViewMore={ () => this.makeActive('Network') }
-											id='followers'
-										/>
-										<RelatedPeople
-											people={ profile.following.slice(0, 3) }
-											title="Following"
-											more={ profile.following.length > 3 || profile.followingMore }
-											onViewMore={ () => this.makeActive('Network') }
-											id='following'
-										/>
-									</Col>
-								</Row>
+								{aboutTab}
 							</TabPane>
 							{ networkTab }
 							{ groupsTab }

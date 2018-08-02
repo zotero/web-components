@@ -29,6 +29,15 @@ class EditableInterests extends MultipleEditableBase {
 
 	}
 
+	add = (evt) => {
+		evt.preventDefault();
+		let {addValue} = this.state;
+		let entry = {
+			interest: addValue
+		};
+		this._add.apply(this, [entry]);
+		this.setState({addValue:''});
+	}
 	render() {
 		const {editable, title, emptyText} = this.props;
 		const {value, editing, addValue} = this.state;

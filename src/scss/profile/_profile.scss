@@ -374,6 +374,11 @@ $color-profile-tint: rgba(255, 255, 255, .75);
 .pointer {
 	cursor:pointer;
 }
+.profile-timeline-form-wrapper {
+	input, select {
+		margin-top:1rem;
+	}
+}
 /*
 #user-profile {
 	.hide-empty.empty {

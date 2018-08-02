@@ -76,7 +76,7 @@ class EditableSocial extends MultipleEditableBase {
 
 	render() {
 		const {editable} = this.props;
-		const {value, editing, addValue} = this.state;
+		const {value, editing} = this.state;
 
 		let editNode = null;
 		if(editable){

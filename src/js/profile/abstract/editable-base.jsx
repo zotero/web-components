@@ -7,15 +7,13 @@ import React from 'react';
 import {postFormData} from '../../ajax.js';
 import profileEventSystem from '../profile-event-system.js';
 
+const PROFILE_DATA_HANDLER_URL = '/settings/profiledata';
+
 class EditableBase extends React.Component {
 	updateFieldOnServer(field, value) {
 		var data = {};
 		data[field] = value;
-		return postFormData(this.constructor.PROFILE_DATA_HANDLER_URL, data, {withSession:true});
-	}
-
-	static get PROFILE_DATA_HANDLER_URL() {
-		return '/settings/profiledata';
+		return postFormData(PROFILE_DATA_HANDLER_URL, data, {withSession:true});
 	}
 }
 
@@ -30,43 +28,92 @@ class MultipleEditableBase extends EditableBase {
 		this.state.counter = this.state.value.length;
 	}
 
-	edit = () => {
+	_edit() {
 		const {value} = this.state;
 		this.setState({
 			editing:true,
 			previous: value.slice(0)
 		});
 	}
-
-	add = (evt) => {
-		evt.preventDefault();
-		let {value, addValue, counter} = this.state;
-		value.push({interest:addValue, index:counter++});
-		this.setState({value, addValue:'', counter});
+	edit = () => {
+		return this._edit.apply(this);
 	}
 
-	addEmpty = (evt) => {
+	_add(entry) {
+		let {value, addValue, counter} = this.state;
+		value.push(entry);
+		counter++;
+		this.setState({value, addValue:'', counter});
+	}
+	add = (entry) => {
+		return this._add.apply(this, [entry]);
+	}
+
+	_addEmpty(evt) {
 		evt.preventDefault();
 		let {value, counter} = this.state;
 		let {template} = this.props;
 		let addObject;
 		if(template === undefined){
-			addObject = {index:counter++};
+			addObject = {id:++counter};
 		} else {
-			addObject = Object.assign({}, template, {id:counter++});
+			addObject = Object.assign({}, template, {id:++counter});
 		}
 		value.push(addObject);
 		this.setState({value, addValue:'', counter});
 	}
+	addEmpty = (evt) => {
+		return this._addEmpty.apply(this, [evt]);
+	}
 
-	remove = (index) => {
+	_updateEntry(index, entry) {
+		if(index === undefined || entry === undefined){
+			log.error('Insufficient arguments to _updateEntry');
+			throw 'Insufficient arguments to _updateEntry';
+		}
+		let {value} = this.state;
+		let newValue = value.slice(0);
+		newValue[index] = entry;
+		this.setState({value:newValue}, this.save);
+	}
+	updateEntry = (index, entry) => {
+		return this._updateEntry.apply(this, [index, entry]);
+	}
+
+	_remove(index) {
+		if(index === undefined){
+			log.error('Insufficient arguments to _remove');
+			throw 'Insufficient arguments to _remove';
+		}
 		let {value} = this.state;
 		value.splice(index, 1);
 		this.setState({value});
 	}
+	remove = (index) => {
+		return this._remove.apply(this, [index]);
+	}
 
-	save = async (evt) => {
-		evt.preventDefault();
+	//move entry at oldIndex placing it at newIndex
+	_reorder(oldIndex, newIndex) {
+		if(oldIndex === undefined || newIndex === undefined){
+			log.error('Insufficient arguments to _reorder');
+			throw 'Insufficient arguments to _reorder';
+		}
+		
+		let {value} = this.state;
+		let newValue = value.slice(0);
+		let entry = newValue.splice(oldIndex, 1);
+		newValue.splice(newIndex, 0, ...entry);
+		this.setState({value:newValue});
+	}
+	reorder = (oldIndex, newIndex) => {
+		return this._reorder.apply(this, [oldIndex, newIndex]);
+	}
+
+	async _save(evt) {
+		if(evt){
+			evt.preventDefault();
+		}
 		const {field} = this.props;
 		const {value} = this.state;
 
@@ -95,14 +142,20 @@ class MultipleEditableBase extends EditableBase {
 			});
 		}
 	}
+	save = async (evt) => {
+		return this._save.apply(this, [evt]);
+	}
 
-	cancel = () => {
+	_cancel() {
 		const {previous} = this.state;
 		this.setState({
 			value:previous,
 			editing:false,
 			processing:false
 		});
+	}
+	cancel = () => {
+		return this._cancel.apply(this);
 	}
 }
 

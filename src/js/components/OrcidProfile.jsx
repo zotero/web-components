@@ -81,9 +81,20 @@ class TimeSpan extends Component{
 }
 class Organization extends Component{
 	render(){
+		const {name, address} = this.props.organization;
+		let locNode = null;
+		if(address.city || address.region || address.country){
+			locNode = (
+				<span className='organization-location'>
+					: {address.city ? `${address.city}, ` : ''}
+					{address.region ? `${address.region}, ` : ''}
+					{address.country ? address.country : ''}
+				</span>
+			);
+		}
 		return (
 			<span className='organization'>
-				<b>{this.props.organization.name}</b>:{this.props.organization.address.city}, {this.props.organization.address.region}, {this.props.organization.address.country}
+				<b>{name}</b>{locNode}
 			</span>
 		);
 	}

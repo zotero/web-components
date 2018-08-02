@@ -31,10 +31,50 @@ class FuzzyDate extends Component{
 	}
 }
 class TimeSpan extends Component{
+	getDuration = () => {
+		const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+		let {startDate, endDate} = this.props;
+		let start, end;
+		if(months.includes(startDate.month.value)){
+			start = new Date(startDate.year.value, months.indexOf(startDate.month.value));
+			end = endDate && endDate.year ? new Date(endDate.year.value, months.indexOf(endDate.month.value)) : new Date();
+		} else {
+			start = new Date(startDate.year.value, startDate.month.value);
+			end = endDate && endDate.year ? new Date(endDate.year.value, endDate.month.value) : new Date();
+		}
+
+		let diffMonths = end.getMonth() - start.getMonth();
+		let diffYears = end.getYear() - start.getYear();
+		let retVal = '';
+
+		if(end - start < 0) {
+			return '';
+		}
+
+		if (diffMonths < 0) {
+			diffYears -= 1;
+			diffMonths += 12;
+		}
+
+		if(diffYears > 0) {
+			retVal += diffYears;
+			retVal += diffYears == 1 ? ' year' : ' years';
+			diffMonths = diffMonths % 12;
+		}
+
+		if(diffMonths > 0) {
+			retVal += ' ' + diffMonths;
+			retVal += diffMonths == 1 ? ' month' : ' months';
+		}
+
+		return `(${retVal})`;
+	}
 	render(){
 		return (
 			<span className='time-span'>
 				<FuzzyDate date={this.props.startDate} /> to <FuzzyDate date={this.props.endDate} />
+				<br />
+				{this.getDuration()}
 			</span>
 		);
 	}

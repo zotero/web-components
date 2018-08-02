@@ -168,7 +168,7 @@ class Profile extends React.Component {
 						About
 					</NavLink>
 				</NavItem>
-				<NavItem>
+				<NavItem className={cn({'d-none': (profile.followers.length == 0 && profile.following.length == 0)})}>*/}
 					<NavLink className={ cn({active:(active == 'Network')}) } onClick={ () => this.makeActive('Network') }>
 						Network
 					</NavLink>

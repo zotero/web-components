@@ -8,6 +8,7 @@ const {Component, PureComponent, Fragment} = React;
 import {OrcidIcon} from '../Icons.js';
 import {Notifier} from '../Notifier.js';
 import {ajax} from '../ajax.js';
+import {Row, Col} from 'reactstrap';
 
 const config = window.zoteroConfig;
 const orcidClientID = config.orcidClientID;
@@ -102,10 +103,18 @@ class Organization extends Component{
 class OrganizationEntry extends Component{
 	render(){
 		return (
-			<div className='education-entry'>
-				<Organization organization={this.props.entry.organization} />
-				<br />
-				<TimeSpan startDate={this.props.entry['start-date']} endDate={this.props.entry['end-date']} /> | {this.props.entry['role-title']} ({this.props.entry['department-name']})
+			<div className='organization-entry profile-timeline-wrapper'>
+				<Row>
+					<Col xs='4'>
+						<TimeSpan startDate={this.props.entry['start-date']} endDate={this.props.entry['end-date']} />
+					</Col>
+					<Col xs='8' className='profile-timeline'>
+						<div className="profile-timeline-point" />
+						<Organization organization={this.props.entry.organization} />
+						<br />
+						{this.props.entry['role-title']} ({this.props.entry['department-name']})
+					</Col>
+				</Row>
 			</div>
 		);
 	}
@@ -144,7 +153,7 @@ class Educations extends Component{
 		}
 		return (
 		<div className='orcid-educations'>
-			<h3>Education</h3>
+			<h2>Education</h2>
 			{this.props.educations.map(
 				(edu)=>{
 					return <OrganizationEntry key={edu.path} entry={edu} />;
@@ -162,7 +171,7 @@ class Employments extends Component{
 		}
 		return (
 		<div className='orcid-employments'>
-			<h3>Employment</h3>
+			<h2>Employment</h2>
 			{this.props.employments.map(
 				(emp)=>{
 					return <OrganizationEntry key={emp.path} entry={emp} />;
@@ -215,7 +224,7 @@ class Works extends Component{
 		}
 		return (
 		<div className='orcid-works'>
-			<h3>Works</h3>
+			<h2>Works</h2>
 			{this.props.works.map(
 				(work)=>{
 					return <Work key={work['work-summary'][0].path} work={work} />;
@@ -251,7 +260,7 @@ class Fundings extends Component{
 		}
 		return (
 		<div className='orcid-fundings'>
-			<h3>Fundings</h3>
+			<h2>Fundings</h2>
 			{this.props.fundings.map(
 				(funding)=>{
 					return <Funding key={funding['funding-summary'][0].path} funding={funding} />;
@@ -268,7 +277,7 @@ class Keywords extends Component{
 			return null;
 		}
 		return (
-		<div className='orcid-fundings'>
+		<div className='orcid-keywords'>
 			<h4>Keywords</h4>
 			<ul className='researcher-keywords'>
 				{this.props.keywords.map((keyword)=>{
@@ -396,4 +405,4 @@ class OrcidProfileControl extends Component{
 	}
 }
 
-export {OrcidProfile, OrcidProfileControl};
+export {OrcidProfile, OrcidProfileControl, Name, Biography, Educations, Employments, Fundings, Works, ResearcherUrls, Keywords, OrganizationEntry, TimeSpan, Organization};

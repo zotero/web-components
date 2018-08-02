@@ -11,7 +11,7 @@ import {buildUrl} from '../../wwwroutes.js';
 
 let updateUrl = buildUrl('updateProfileImage');
 
-export default class EditableAvatar extends EditableBase {
+class EditableAvatar extends EditableBase {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -149,3 +149,5 @@ export default class EditableAvatar extends EditableBase {
 EditableAvatar.propTypes = {
 	value: PropTypes.string
 };
+
+export {EditableAvatar};

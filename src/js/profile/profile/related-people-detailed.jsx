@@ -8,7 +8,7 @@ import ProfileDataSource from '../profile-data-source.js';
 import {Row, Col, Button} from 'reactstrap';
 import {Spinner} from '../../LoadingSpinner.js';
 
-export default class RelatedPeopleDetailed extends React.Component {
+class RelatedPeopleDetailed extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -119,3 +119,5 @@ RelatedPeopleDetailed.propTypes = {
 	title: PropTypes.string.isRequired,
 	dataSource: PropTypes.instanceOf(ProfileDataSource).isRequired
 };
+
+export {RelatedPeopleDetailed};

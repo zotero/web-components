@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import ZoteroPublications from 'zotero-publications';
 import {Spinner} from '../../LoadingSpinner.js';
 
-export default class Publications extends React.Component {
+class Publications extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -84,3 +84,5 @@ export default class Publications extends React.Component {
 Publications.propTypes = {
 	userid: PropTypes.number
 };
+
+export {Publications};

@@ -27,4 +27,4 @@ ProfileDataSource.prototype.getAllFollowing = function(page) {
 	return this.getData('following', 'all');
 };
 
-module.exports = ProfileDataSource;
+export {ProfileDataSource};

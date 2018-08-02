@@ -13,7 +13,7 @@ import {Spinner} from '../../LoadingSpinner.js';
 import {Form, Input, Button} from 'reactstrap';
 import cn from 'classnames';
 
-export default class EditableField extends EditableBase {
+class EditableField extends EditableBase {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -149,3 +149,5 @@ EditableField.propTypes = {
 EditableField.defaultProps = {
 	type:'text'
 };
+
+export {EditableField};

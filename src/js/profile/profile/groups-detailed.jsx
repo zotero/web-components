@@ -21,7 +21,7 @@ let groupMemberCount = function(group){
 	return count;
 }
 
-export default class GroupsDetailed extends GroupsBase {
+class GroupsDetailed extends GroupsBase {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -88,3 +88,5 @@ GroupsDetailed.propTypes = {
 	count: PropTypes.number,
 	onViewMore: PropTypes.func.isRequired
 };
+
+export {GroupsDetailed};

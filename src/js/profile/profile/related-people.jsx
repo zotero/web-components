@@ -3,7 +3,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-export default class RelatedPeople extends React.Component {
+class RelatedPeople extends React.Component {
 	viewMoreHandler = (ev) => {
 		ev.preventDefault();
 		this.props.onViewMore();
@@ -42,3 +42,5 @@ RelatedPeople.propTypes = {
 	title: PropTypes.string.isRequired,
 	onViewMore: PropTypes.func.isRequired
 };
+
+export {RelatedPeople};

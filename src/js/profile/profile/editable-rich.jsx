@@ -14,7 +14,7 @@ import {Spinner} from '../../LoadingSpinner.js';
 import {Button} from 'reactstrap';
 import cn from 'classnames';
 
-export default class EditableRich extends EditableBase {
+class EditableRich extends EditableBase {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -176,3 +176,5 @@ EditableRich.propTypes = {
 	emptytext: PropTypes.string,
 	value: PropTypes.string
 };
+
+export {EditableRich};

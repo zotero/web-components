@@ -8,7 +8,7 @@ import GroupsBase from '../abstract/groups-base.jsx';
 import profileEventSystem from '../profile-event-system.js';
 import {buildUrl} from '../../wwwroutes.js';
 
-export default class Groups extends GroupsBase {
+class Groups extends GroupsBase {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -86,3 +86,5 @@ Groups.propTypes = {
 	count: PropTypes.number,
 	onViewMore: PropTypes.func.isRequired
 };
+
+export {Groups};

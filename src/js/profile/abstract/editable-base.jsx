@@ -5,7 +5,7 @@ let log = logger.Logger('editable-base');
 
 import React from 'react';
 import {postFormData} from '../../ajax.js';
-import profileEventSystem from '../profile-event-system.js';
+import {eventSystem} from '../../EventSystem.js';
 
 const PROFILE_DATA_HANDLER_URL = '/settings/profiledata';
 
@@ -132,7 +132,7 @@ class MultipleEditableBase extends EditableBase {
 			});
 		} catch (error) {
 			log.error(error);
-			profileEventSystem.trigger('alert', {
+			eventSystem.trigger('alert', {
 				level: 'danger',
 				message: error.responseJSON ? error.responseJSON.message : 'Failed to update items editable'
 			});

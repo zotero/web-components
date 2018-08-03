@@ -5,7 +5,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import GroupsBase from '../abstract/groups-base.jsx';
-import profileEventSystem from '../profile-event-system.js';
+import {eventSystem} from '../../EventSystem.js';
 import {buildUrl} from '../../wwwroutes.js';
 
 class Groups extends GroupsBase {
@@ -31,7 +31,7 @@ class Groups extends GroupsBase {
 				});
 			}).catch(error => {
 				console.log(error);
-				profileEventSystem.trigger('alert', {
+				eventSystem.trigger('alert', {
 					level: 'danger',
 					message: error.responseJSON ? error.responseJSON.message : 'Failed to update items groups'
 				});

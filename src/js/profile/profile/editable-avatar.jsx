@@ -4,7 +4,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {EditableBase} from '../abstract/editable-base.jsx';
-import profileEventSystem from '../profile-event-system.js';
+import {eventSystem} from '../../EventSystem.js';
 import {PencilIcon, TrashIcon, CheckIcon, XIcon, PlusIcon} from '../../Icons.js';
 import {postFormData, ajax} from '../../ajax.js';
 import {buildUrl} from '../../wwwroutes.js';
@@ -57,7 +57,7 @@ class EditableAvatar extends EditableBase {
 				processing: false,
 				editing: true
 			});
-			profileEventSystem.trigger('alert', {
+			eventSystem.trigger('alert', {
 				level: 'danger',
 				message: error.responseJSON ? error.responseJSON.message : 'Image too large. Must be less than 512KB'
 			});
@@ -85,7 +85,7 @@ class EditableAvatar extends EditableBase {
 			}
 		}
 		catch(error){
-			profileEventSystem.trigger('alert', {
+			eventSystem.trigger('alert', {
 				level: 'danger',
 				message: error.responseJSON ? error.responseJSON.message : 'Failed to upload an image.'
 			});

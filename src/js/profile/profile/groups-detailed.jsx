@@ -5,7 +5,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import GroupsBase from '../abstract/groups-base.jsx';
-import profileEventSystem from '../profile-event-system.js';
+import {eventSystem} from '../../EventSystem.js';
 import {buildUrl} from '../../wwwroutes.js';
 import {typeMap} from '../../maps/groupMaps.js';
 import {Row, Col} from 'reactstrap';
@@ -38,7 +38,7 @@ class GroupsDetailed extends GroupsBase {
 					loading: false
 				});
 			}).catch(error => {
-				profileEventSystem.trigger('alert', {
+				eventSystem.trigger('alert', {
 					level: 'danger',
 					message: error.responseJSON ? error.responseJSON.message : 'Failed to update items groupsDetailed'
 				});

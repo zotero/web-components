@@ -3,8 +3,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import profileEventSystem from '../profile-event-system.js';
-import ProfileDataSource from '../profile-data-source.js';
+import {eventSystem} from '../../EventSystem.js';
+import {ProfileDataSource} from '../profile-data-source.js';
 import {Row, Col, Button} from 'reactstrap';
 import {Spinner} from '../../LoadingSpinner.js';
 
@@ -33,7 +33,7 @@ class RelatedPeopleDetailed extends React.Component {
 				all: true
 			});
 		}).fail(error => {
-			profileEventSystem.trigger('alert', {
+			eventSystem.trigger('alert', {
 				level: 'danger',
 				message: error.responseJSON ? error.responseJSON.message : 'Failed to update items people'
 			});

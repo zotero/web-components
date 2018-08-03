@@ -7,7 +7,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {EditableBase} from '../abstract/editable-base.jsx';
-import profileEventSystem from '../profile-event-system.js';
+import {eventSystem} from '../../EventSystem.js';
 import { PencilIcon, XIcon, CheckIcon } from '../../Icons';
 import {Spinner} from '../../LoadingSpinner.js';
 import {Form, Input, Button} from 'reactstrap';
@@ -53,7 +53,7 @@ class EditableField extends EditableBase {
 				value: respData.data[this.props.field]
 			});
 		} catch (error) {
-			profileEventSystem.trigger('alert', {
+			eventSystem.trigger('alert', {
 				level: 'danger',
 				message: error.responseJSON.message
 			});

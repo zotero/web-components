@@ -8,7 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {EditableBase} from '../abstract/editable-base.jsx';
-import profileEventSystem from '../profile-event-system.js';
+import {eventSystem} from '../../EventSystem.js';
 import {PencilIcon, TrashIcon, CheckIcon, XIcon} from '../../Icons.js';
 import {Spinner} from '../../LoadingSpinner.js';
 import {Button} from 'reactstrap';
@@ -70,7 +70,7 @@ class EditableRich extends EditableBase {
 				value: respData.data[this.props.field]
 			});
 		} catch (error) {
-			profileEventSystem.trigger('alert', {
+			eventSystem.trigger('alert', {
 				level: 'danger',
 				message: error.responseJSON.message
 			});

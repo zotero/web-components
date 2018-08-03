@@ -8,9 +8,8 @@ const {Fragment} = React;
 import PropTypes from 'prop-types';
 
 import {MultipleEditableBase} from '../abstract/editable-base.jsx';
-import EditableField from './editable-field.jsx';
 import {PencilIcon, TrashIcon} from '../../Icons.js';
-import {Row, Col, Form, CustomInput, Input, Button} from 'reactstrap';
+import {Form, CustomInput, Input, Button} from 'reactstrap';
 
 
 let social_networks = {

@@ -6,7 +6,7 @@ let log = logger.Logger('Profile');
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import profileEventSystem from './profile-event-system.js';
+import {eventSystem} from '../EventSystem.js';
 import {EditableAvatar} from './profile/editable-avatar.jsx';
 import {EditableEducationItem, OrcidEditableEducationItem} from './profile/editable-education-item.jsx';
 import {EditableExperienceItem} from './profile/editable-experience-item.jsx';
@@ -42,7 +42,7 @@ class Profile extends React.Component {
 
 	componentWillMount = () => {
 		this.profileDataSource = new ProfileDataSource(this.props.profile.userslug);
-		profileEventSystem.addListener('alert', this.onAlert.bind(this));
+		eventSystem.addListener('alert', this.onAlert.bind(this));
 	}
 
 	checkIfExtendedViewNeeded = () => {

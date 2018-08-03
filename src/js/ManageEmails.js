@@ -212,9 +212,9 @@ class SendVerificationLink extends Component{
 		this.state = {
 			done:false
 		};
-		this.requestEmails = this.requestEmails.bind(this);
+		this.requestEmail = this.requestEmail.bind(this);
 	}
-	requestEmails(evt){
+	requestEmail(evt){
 		evt.preventDefault();
 		postFormData(buildUrl('updateEmail'), {ajax:true, emailAction:'validate', email:this.props.email}, {withSession:true}).then(()=>{
 			this.setState({done:true});

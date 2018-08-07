@@ -6,6 +6,7 @@ let log = logger.Logger('Profile');
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import {postFormData} from '../ajax.js';
 import {eventSystem} from '../EventSystem.js';
 import {EditableAvatar} from './profile/editable-avatar.jsx';
 import {EditableEducationItem, OrcidEditableEducationItem} from './profile/editable-education-item.jsx';
@@ -29,6 +30,8 @@ import {OrcidProfile, Name, Biography, Educations, Employments, Fundings, Works,
 import {Coalesce} from '../components/Coalesce.jsx';
 import cn from 'classnames';
 
+const PROFILE_DATA_HANDLER_URL = '/settings/profiledata';
+
 class Profile extends React.Component {
 	constructor(props) {
 		super(props);
@@ -38,6 +41,12 @@ class Profile extends React.Component {
 			extended: this.checkIfExtendedViewNeeded(),
 			hasContent: !this.checkIfEmpty()
 		};
+	}
+
+	saveField = (field, value) => {
+		var data = {};
+		data[field] = value;
+		return postFormData(PROFILE_DATA_HANDLER_URL, data, {withSession:true});
 	}
 
 	componentWillMount = () => {
@@ -217,8 +226,22 @@ class Profile extends React.Component {
 			aboutTab = (
 				<Row>
 					<Col xs='12' sm='8'>
-						<EditableRich id='bio-text' title="About" field="bio" emptytext="Add a short description of what you are currently working on" value={ profileMeta.bio } editable={editable} />
-						<EditableInterests value={profileMeta.interests} field='interests' editable={editable} template={{interest:''}} />
+						<EditableRich
+							id='bio-text'
+							title="About"
+							field="bio"
+							emptytext="Add a short description of what you are currently working on"
+							value={ profileMeta.bio }
+							editable={editable}
+							saveField={this.saveField}
+						/>
+						<EditableInterests
+							value={profileMeta.interests}
+							field='interests'
+							editable={editable}
+							template={{interest:''}}
+							saveField={this.saveField}
+						/>
 
 						<Publications userid={ userid } onPublicationsLoaded={this.hasContent} />
 
@@ -229,6 +252,7 @@ class Profile extends React.Component {
 							value={ profileMeta.experience }
 							editable={editable}
 							entryClass={EditableExperienceItem}
+							saveField={this.saveField}
 						/>
 
 						<EditableTimeline
@@ -238,6 +262,7 @@ class Profile extends React.Component {
 							value={ profileMeta.education }
 							editable={editable}
 							entryClass={OrcidEditableEducationItem}
+							saveField={this.saveField}
 						/>
 					</Col>
 					<Col xs='12' sm='4'>
@@ -269,33 +294,72 @@ class Profile extends React.Component {
 				{alertNode}
 				<Row className="user-profile-personal-details">
 					<Col xs='12' sm='6'>
-						<EditableAvatar value={ profileMeta.avatar } />
+						<EditableAvatar
+							value={ profileMeta.avatar }
+							saveField={this.saveField}
+						/>
 					</Col>
 					<Col xs='12' sm='6'>
 						<h2>
 							{!editable ?
 								profile.displayName :
-								<EditableField field="realname" emptytext="Your full name" value={ profileMeta.realname } editable={editable} />
+								<EditableField
+									field="realname"
+									emptytext="Your full name"
+									value={ profileMeta.realname }
+									editable={editable}
+									saveField={this.saveField}
+								/>
 							}
 						</h2>
 						<ul>
 							<li>
 								{profileTitle}
-								<EditableField field="title" emptytext="Add your title" value={ profileMeta.title } editable={editable} />
+								<EditableField
+									field="title"
+									emptytext="Add your title"
+									value={ profileMeta.title }
+									editable={editable}
+									saveField={this.saveField}
+								/>
 							</li>
 							<li>
 								{termDegree}
-								<EditableField field="academic" emptytext="Add your academic status" value={ profileMeta.academic } editable={editable} />
+								<EditableField
+									field="academic"
+									emptytext="Add your academic status"
+									value={ profileMeta.academic }
+									editable={editable}
+									saveField={this.saveField}
+								/>
 							</li>
 							<li>
-								<EditableField field="affiliation" emptytext="Add your university" value={ profileMeta.affiliation } editable={editable} />
+								<EditableField
+									field="affiliation"
+									emptytext="Add your university"
+									value={ profileMeta.affiliation }
+									editable={editable}
+									saveField={this.saveField}
+								/>
 							</li>
 							<li>
-								<EditableField field="location" emptytext="Add your location" value={ profileMeta.location } editable={editable} />
+								<EditableField
+									field="location"
+									emptytext="Add your location"
+									value={ profileMeta.location }
+									editable={editable}
+									saveField={this.saveField}
+								/>
 							</li>
 							{userLibraryLink}
 							<li>
-								<EditableSocial value={profileMeta.social} field='social' editable={editable} template={{name:'ORCID', value:''}} />
+								<EditableSocial
+									value={profileMeta.social}
+									field='social'
+									editable={editable}
+									template={{name:'ORCID', value:''}}
+									saveField={this.saveField}
+								/>
 							</li>
 						</ul>
 						<div className='user-actions clearfix'>

@@ -44,7 +44,8 @@ class EditableField extends EditableBase {
 		this.cancelPending();
 
 		try {
-			let response = await this.updateFieldOnServer(this.props.field, preSave);
+			let response = this.props.saveField(this.props.field, preSave);
+			//let response = await this.updateFieldOnServer();
 			let respData = await response.json();
 
 			this.setState({
@@ -134,7 +135,7 @@ class EditableField extends EditableBase {
 						<PencilIcon />
 					</a> : null}
 			</div>;
-		}	
+		}
 	}
 }
 

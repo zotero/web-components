@@ -59,6 +59,11 @@ var calculateNewExpiration = function(oldExpiration, oldStorageLevel, newStorage
 		oldExpiration = new Date(parseInt(oldExpiration)*1000);
 	}
 
+	if(oldExpiration <= Date.now()){
+		let newExpiration = new Date(Date.now() + (secondsPerYear * 1000));
+		return newExpiration;
+	}
+
 	if(oldExpiration < (Date.now() + (1000*60*60*24*15)) && (oldExpiration > Date.now())) {
 		//expiration less than 2 weeks away, will charge and expiration will be now+1year
 		let newExpiration = new Date((oldExpiration.getTime()) + (secondsPerYear * 1000)); //new Date takes milliseconds
@@ -68,7 +73,7 @@ var calculateNewExpiration = function(oldExpiration, oldStorageLevel, newStorage
 	let remainingValue = calculateRemainingValue(oldExpiration, oldStorageLevel);
 	let extraSecondsAtNewLevel = (remainingValue / priceCents[newStorageLevel]) * secondsPerYear;
 
-	let newExpiration = new Date(Date.now() + (extraSecondsAtNewLevel * 1000)); //new Date takes milliseconds
+	let newExpiration = new Date(Date.now() + (secondsPerYear * 1000) + (extraSecondsAtNewLevel * 1000)); //new Date takes milliseconds
 
 	return newExpiration;
 };

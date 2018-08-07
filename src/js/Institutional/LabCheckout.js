@@ -11,6 +11,7 @@ import PropTypes from 'prop-types';
 
 import {getCurrentUser} from '../Utils.js';
 import {LabPurchase, labPrice} from './LabPurchase.js';
+import {formatCurrency} from '../Utils.js';
 
 const currentUser = getCurrentUser();
 
@@ -63,7 +64,7 @@ class LabCheckout extends Component{
 				</div>
 				<div className='form-line'>
 					<label>Price</label>
-					{new Intl.NumberFormat('en-US', {style:'currency', currency:'USD'}).format(labPrice(fte)/100)}
+					{formatCurrency(labPrice(fte))}
 					<span>&nbsp;per year, billed annually</span>
 				</div>
 				{completeAction}

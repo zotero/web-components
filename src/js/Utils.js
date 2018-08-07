@@ -327,6 +327,15 @@ let formatItemField = function(field, item, trim=false){
 	}
 };
 
+let formatCurrency = function(cents){
+	let d = cents / 100;
+	if(typeof(Intl) !== 'undefined') {
+		return new Intl.NumberFormat('en-US', {style:'currency', currency:'USD'}).format(d);
+	} else {
+		return `$${d.toFixed(2)}`;
+	}
+};
+
 let trimString = function(s, trimLength=35){
 	var formattedString = s;
 	if(typeof s == 'undefined'){
@@ -348,4 +357,4 @@ let getCurrentUser = function(){
 	}
 };
 
-export {slugify, parseQuery, buildQuery, querystring, parseSearchString, readCookie, loadInitialState, pageReady, jsError, jsSuccess, Delay, formatItemField, getCurrentUser};
+export {slugify, parseQuery, buildQuery, querystring, parseSearchString, readCookie, loadInitialState, pageReady, jsError, jsSuccess, Delay, formatItemField, formatCurrency, getCurrentUser};

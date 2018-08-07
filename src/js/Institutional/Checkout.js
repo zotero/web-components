@@ -8,6 +8,7 @@ const {Component} = React;
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import {LabCheckout} from './LabCheckout.js';
 import {Notifier} from '../Notifier.js';
+import {formatCurrency} from '../Utils.js';
 
 import {postFormData} from '../ajax.js';
 
@@ -156,7 +157,7 @@ class InstitutionCheckout extends Component{
 				</div>
 				<div className='form-line'>
 					<label>Price</label>
-					{new Intl.NumberFormat('en-US', {style:'currency', currency:'USD'}).format(institutionPrice(fte)/100)}
+					{formatCurrency(institutionPrice(fte))}
 					<span>&nbsp;per year, billed annually</span>
 				</div>
 				<div className='form-line'>

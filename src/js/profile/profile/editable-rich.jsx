@@ -7,14 +7,13 @@ let log = logger.Logger('editable-rich');
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {EditableBase} from '../abstract/editable-base.jsx';
 import {eventSystem} from '../../EventSystem.js';
 import {PencilIcon, TrashIcon, CheckIcon, XIcon} from '../../Icons.js';
 import {Spinner} from '../../LoadingSpinner.js';
 import {Button} from 'reactstrap';
 import cn from 'classnames';
 
-class EditableRich extends EditableBase {
+class EditableRich extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -23,6 +22,12 @@ class EditableRich extends EditableBase {
 			processing: false
 		};
 		this.inputTextarea = React.createRef();
+	}
+
+	componentDidUpdate(prevProps) {
+		if(this.props.value != prevProps.value){
+			this.setState({value:this.props.value});
+		}
 	}
 
 	edit = () => {
@@ -45,14 +50,15 @@ class EditableRich extends EditableBase {
 	}
 
 	save = async () => {
-		let previous = this.state.value;
-		let current = previous;
+		let {value} = this.state;
 
-		let {id} = this.props;
+		let {id, field} = this.props;
 		let tinyInstance = tinymce.get(id);
 		if(tinyInstance != null) {
-			current = tinyInstance.getContent();
+			value = tinyInstance.getContent();
 			tinyInstance.remove();
+		} else {
+			log.warn('no tinyMCE instance when saving editable-rich');
 		}
 
 		this.setState({
@@ -60,26 +66,12 @@ class EditableRich extends EditableBase {
 			processing: true,
 		});
 
-		try {
-			let response = await this.updateFieldOnServer(this.props.field, current);
-			let respData = await response.json();
-
-			this.setState({
-				processing: false,
-				editing: false,
-				value: respData.data[this.props.field]
-			});
-		} catch (error) {
-			eventSystem.trigger('alert', {
-				level: 'danger',
-				message: error.responseJSON.message
-			});
-			this.setState({
-				processing: false,
-				editing: false,
-				value: previous
-			});
-		}
+		await this.props.saveField(this.props.field, value);
+		this.setState({
+			processing: false,
+			editing: false,
+			//value: respData.data[this.props.field]
+		});
 	}
 
 	cancel = () => {
@@ -127,7 +119,7 @@ class EditableRich extends EditableBase {
 		}
 
 		if(editing) {
-			return <form className="profile-editable-rich profile-editable-editing" onSubmit={ ev => this.saveHandler(ev) }>
+			return <form className="profile-editable-rich profile-editable-editing" onSubmit={ this.saveHandler }>
 				<h2>{ title }</h2>
 				<textarea ref={ this.inputTextarea } id={id} defaultValue={ value } />
 				<div className="profile-timeline-form-actions">
@@ -142,30 +134,6 @@ class EditableRich extends EditableBase {
 				<span dangerouslySetInnerHTML={ this.getMarkup() }></span>
 			</div>;
 		}	
-	}
-
-	static get CKEDITOR_CONFIG() {
-		return {
-			customConfig: '',
-			toolbar: [
-				{
-					name: 'basicstyles',
-					items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat']
-				},
-				{
-					name: 'paragraph',
-					items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote' ]
-				},
-				{
-					name: 'format',
-					items: [ 'Format' ]
-				},
-				{
-					name: 'document',
-					items: [ 'Maximize', '-', 'Source' ]
-				}
-			]
-		};
 	}
 }
 

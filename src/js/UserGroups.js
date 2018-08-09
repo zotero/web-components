@@ -205,9 +205,8 @@ class UserGroups extends Component{
 			userID:false,
 			groupsLoaded:false
 		};
-		this.loadGroups = this.loadGroups.bind(this);
 	}
-	loadGroups(evt){
+	loadGroups = async (evt) => {
 		if(evt){
 			evt.preventDefault();
 		}
@@ -231,19 +230,17 @@ class UserGroups extends Component{
 				'limit':25,
 				'start':(this.state.groupsLoaded ? this.state.groups.length : 0)
 			});
-			ajax({url: url, credentials:'omit'}).then((resp)=>{
-				let totalResults = parseInt(resp.headers.get('Total-Results'));
-				resp.json().then((data) => {
-					let groups = this.state.groups;
-					groups = groups.concat(data);
-					this.setState({
-						groups:groups,
-						userID: userID,
-						loading:false,
-						groupsLoaded:true,
-						totalResults:totalResults
-					});
-				});
+			let resp = await ajax({url: url, credentials:'omit'});
+			let totalResults = parseInt(resp.headers.get('Total-Results'));
+			let data = await resp.json();
+			let groups = this.state.groups;
+			groups = groups.concat(data);
+			this.setState({
+				groups:groups,
+				userID: userID,
+				loading:false,
+				groupsLoaded:true,
+				totalResults:totalResults
 			});
 		}
 	}

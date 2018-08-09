@@ -6,14 +6,13 @@ let log = logger.Logger('editable-field');
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {EditableBase} from '../abstract/editable-base.jsx';
 import {eventSystem} from '../../EventSystem.js';
 import { PencilIcon, XIcon, CheckIcon } from '../../Icons';
 import {Spinner} from '../../LoadingSpinner.js';
 import {Form, Input, Button} from 'reactstrap';
 import cn from 'classnames';
 
-class EditableField extends EditableBase {
+class EditableField extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -21,6 +20,11 @@ class EditableField extends EditableBase {
 			editing: false,
 			processing: false
 		};
+	}
+	componentDidUpdate(prevProps) {
+		if(this.props.value != prevProps.value){
+			this.setState({value:this.props.value});
+		}
 	}
 
 	focus = () => {
@@ -34,41 +38,25 @@ class EditableField extends EditableBase {
 	}
 
 	save = async () => {
-		let preSave = this.state.value;
+		const {value} = this.state;
 
 		this.setState({
 			processing: true,
 			editing: true,
-			value: ''
 		});
 		this.cancelPending();
 
-		try {
-			let response = this.props.saveField(this.props.field, preSave);
-			//let response = await this.updateFieldOnServer();
-			let respData = await response.json();
-
-			this.setState({
-				processing: false,
-				editing: false,
-				value: respData.data[this.props.field]
-			});
-		} catch (error) {
-			eventSystem.trigger('alert', {
-				level: 'danger',
-				message: error.responseJSON.message
-			});
-			this.setState({
-				processing: false,
-				editing: false,
-				value: previous
-			});
-		}
+		await this.props.saveField(this.props.field, value);
+		this.setState({
+			processing: false,
+			editing: false,
+		});
 	}
 
 	cancel = () => {
 		this.cancelPending();
 		this.setState({
+			value:this.props.value,
 			editing: false
 		});
 	}

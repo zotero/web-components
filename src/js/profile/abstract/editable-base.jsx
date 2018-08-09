@@ -9,15 +9,7 @@ import {eventSystem} from '../../EventSystem.js';
 
 const PROFILE_DATA_HANDLER_URL = '/settings/profiledata';
 
-class EditableBase extends React.Component {
-	updateFieldOnServer(field, value) {
-		var data = {};
-		data[field] = value;
-		return postFormData(PROFILE_DATA_HANDLER_URL, data, {withSession:true});
-	}
-}
-
-class MultipleEditableBase extends EditableBase {
+class MultipleEditableBase extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -26,6 +18,12 @@ class MultipleEditableBase extends EditableBase {
 			editing:false,
 		};
 		this.state.counter = this.state.value.length;
+	}
+
+	updateFieldOnServer(field, value) {
+		var data = {};
+		data[field] = value;
+		return postFormData(PROFILE_DATA_HANDLER_URL, data, {withSession:true});
 	}
 
 	_edit() {
@@ -159,4 +157,4 @@ class MultipleEditableBase extends EditableBase {
 	}
 }
 
-export {EditableBase, MultipleEditableBase};
+export {MultipleEditableBase};

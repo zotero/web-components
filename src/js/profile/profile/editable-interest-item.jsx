@@ -7,7 +7,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {MultipleEditableBase, EditableBase} from '../abstract/editable-base.jsx';
-import EditableField from './editable-field.jsx';
 import {PencilIcon, TrashIcon, CheckIcon, XIcon} from '../../Icons.js';
 import {Row, Col, Form, Input, Button} from 'reactstrap';
 import cn from 'classnames';

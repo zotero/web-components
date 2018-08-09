@@ -31,7 +31,7 @@ class Publications extends React.Component {
 			});
 		}, this.constructor.SHOW_SPINNER_DELAY);
 
-		this.zp.getPublications(this.props.userid)
+		this.zp.getPublications(this.props.userID)
 			.then(data => {
 				clearTimeout(this.slowLoadSpinnerTimeout);
 				if(data.length) {
@@ -82,7 +82,7 @@ class Publications extends React.Component {
 }
 
 Publications.propTypes = {
-	userid: PropTypes.number
+	userID: PropTypes.number
 };
 
 export {Publications};

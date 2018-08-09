@@ -6,7 +6,8 @@ let log = logger.Logger('Profile');
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {postFormData} from '../ajax.js';
+import {ajax, postFormData} from '../ajax.js';
+import {apiRequestString} from '../ApiRouter.js';
 import {eventSystem} from '../EventSystem.js';
 import {EditableAvatar} from './profile/editable-avatar.jsx';
 import {EditableEducationItem, OrcidEditableEducationItem} from './profile/editable-education-item.jsx';
@@ -16,8 +17,7 @@ import {EditableInterests} from './profile/editable-interest-item.jsx';
 import {EditableTimeline} from './profile/editable-timeline.jsx';
 import {EditableSocial} from './profile/editable-social-item.jsx';
 import {EditableRich} from './profile/editable-rich.jsx';
-import {Groups} from './profile/groups.jsx';
-import {GroupsDetailed} from './profile/groups-detailed.jsx';
+import {Groups, GroupsDetailed} from './profile/groups.jsx';
 import {ProfileDataSource} from './profile-data-source.js';
 import {Publications} from './profile/publications.jsx';
 import {RelatedPeople} from './profile/related-people.jsx';
@@ -39,19 +39,47 @@ class Profile extends React.Component {
 			alert: {},
 			active: 'About',
 			extended: this.checkIfExtendedViewNeeded(),
-			hasContent: !this.checkIfEmpty()
+			hasContent: !this.checkIfEmpty(),
+			groups:{
+				groups:[],
+				loading:false,
+				loaded:false
+			},
+			profile:props.profile
 		};
+		this.profileDataSource = new ProfileDataSource(this.props.profile.userslug);
+		eventSystem.addListener('alert', this.onAlert);
 	}
 
-	saveField = (field, value) => {
+	saveField = async (field, value) => {
 		var data = {};
 		data[field] = value;
-		return postFormData(PROFILE_DATA_HANDLER_URL, data, {withSession:true});
+		try{
+			let resp = await postFormData(PROFILE_DATA_HANDLER_URL, data, {withSession:true});
+			let rdata = await resp.json();
+			if(rdata.result !== 'success'){
+				eventSystem.trigger('alert', {
+					level: 'danger',
+					message: 'There was an error saving your data'
+				});
+			} else {
+				let {profile} = this.state;
+				profile.meta.profile[field] = value;
+				this.setState({profile});
+			}
+			return rdata;
+		} catch (error) {
+			log.error(error);
+			eventSystem.trigger('alert', {
+				level: 'danger',
+				message: 'There was an error saving your data'
+			});
+			return {result:'error'};
+		}
 	}
 
-	componentWillMount = () => {
-		this.profileDataSource = new ProfileDataSource(this.props.profile.userslug);
-		eventSystem.addListener('alert', this.onAlert.bind(this));
+	componentDidMount = () => {
+		this.loadUserGroups();
 	}
 
 	checkIfExtendedViewNeeded = () => {
@@ -81,6 +109,42 @@ class Profile extends React.Component {
 		return emptyMeta;
 	}
 
+	loadUserGroups = async (evt) => {
+		if(evt){
+			evt.preventDefault();
+		}
+		let {userID} = this.props;
+		let {extended, groups} = this.state;
+		if(userID){
+			groups.loading = true;
+			this.setState({groups});
+			let url = apiRequestString({
+				'target':'userGroups',
+				'libraryType':'user',
+				'libraryID': userID,
+				'order':'title',
+				'limit':25,
+				'start':(groups.loaded ? this.state.groups.length : 0)
+			});
+			let resp = await ajax({url: url, credentials:'omit'});
+			let totalResults = parseInt(resp.headers.get('Total-Results'));
+			let data = await resp.json();
+			groups.groups = groups.groups.concat(data);
+			if(groups.groups.length > 3){
+				extended = true;
+			}
+			groups.loading = false;
+			groups.loaded = true;
+			groups.totalResults = totalResults;
+			this.setState({
+				groups,
+				extended
+			});
+		} else {
+			log.error("no userID in loadUserGroups");
+		}
+	}
+
 	hasContent = () => {
 		this.setState({hasContent:true});
 	}
@@ -106,9 +170,9 @@ class Profile extends React.Component {
 
 	render() {
 		var networkTab, groupsTab, alertNode;
-		const {profile, userid, editable, isFollowing} = this.props;
+		const {userID, editable, isFollowing} = this.props;
+		const {profile, active, extended, alert, hasContent, groups} = this.state;
 		const profileMeta = profile.meta.profile;
-		const {active, extended, alert, hasContent} = this.state;
 
 		if(alert.level){
 			alertNode = (
@@ -138,7 +202,7 @@ class Profile extends React.Component {
 
 			groupsTab = (
 				<TabPane tabId='Groups'>
-					<GroupsDetailed userid={ userid } onViewMore={ () => this.makeActive('Groups') } />
+					<GroupsDetailed {...groups} onViewMore={ () => this.makeActive('Groups') } />
 				</TabPane>
 			);
 		}
@@ -194,8 +258,8 @@ class Profile extends React.Component {
 		}
 
 		let aboutTab;
-		//if(profile.meta.orcid_profile) {
-		if(false) {
+		if(profile.meta.orcid_profile) {
+		//if(false) {
 			let p = JSON.parse(profile.meta.orcid_profile);
 			aboutTab = (
 				<Row>
@@ -203,7 +267,7 @@ class Profile extends React.Component {
 						<OrcidProfile orcidProfile={p} />
 					</Col>
 					<Col xs='12' sm='4'>
-						<Groups userid={ userid } onExtended={()=>{this.setState({extended:true});}} onViewMore={ () => this.makeActive('Groups')} />
+						<Groups {...groups} onExtended={()=>{this.setState({extended:true});}} onViewMore={ () => this.makeActive('Groups')} />
 						<RelatedPeople
 							people={ profile.followers.slice(0, 3) }
 							title="Followers"
@@ -222,7 +286,7 @@ class Profile extends React.Component {
 				</Row>
 			);
 		} else {
-			let p = JSON.parse(profile.meta.orcid_profile);
+			//let p = JSON.parse(profile.meta.orcid_profile);
 			aboutTab = (
 				<Row>
 					<Col xs='12' sm='8'>
@@ -243,7 +307,7 @@ class Profile extends React.Component {
 							saveField={this.saveField}
 						/>
 
-						<Publications userid={ userid } onPublicationsLoaded={this.hasContent} />
+						<Publications userID={ userID } onPublicationsLoaded={this.hasContent} />
 
 						<EditableTimeline
 							field="experience"
@@ -266,7 +330,7 @@ class Profile extends React.Component {
 						/>
 					</Col>
 					<Col xs='12' sm='4'>
-						<Groups userid={ userid } onExtended={()=>{this.setState({extended:true});}} onViewMore={ () => this.makeActive('Groups')} />
+						<Groups {...groups} onExtended={()=>{this.setState({extended:true});}} onViewMore={ () => this.makeActive('Groups')} />
 						<RelatedPeople
 							people={ profile.followers.slice(0, 3) }
 							title="Followers"
@@ -282,9 +346,11 @@ class Profile extends React.Component {
 							id='following'
 						/>
 					</Col>
+					{/*
 					<Col xs='12' sm='8'>
 						<OrcidProfile orcidProfile={p} />
 					</Col>
+					*/}
 				</Row>
 			);
 		}
@@ -364,19 +430,19 @@ class Profile extends React.Component {
 						</ul>
 						<div className='user-actions clearfix'>
 							<div className='float-left mr-4'>
-								<FollowButtons profileUserID={userid} isFollowing={isFollowing} />
+								<FollowButtons profileUserID={userID} isFollowing={isFollowing} />
 							</div>
 							<div className='float-left mr-4'>
 								<MessageUserButton username={profile.username} />
 							</div>
 							<div className='float-left mr-4'>
-								<InviteToGroups invitee={{userID:userid, displayName:profileMeta.realname}} />
+								<InviteToGroups invitee={{userID, displayName:profileMeta.realname}} />
 							</div>
 						</div>
 						{emptyProfileNode}
 					</Col>
 				</Row>
-				<Row>
+				<Row className='mt-2'>
 					<Col xs='12'>
 						{navbar}
 						<TabContent activeTab={active}>
@@ -399,7 +465,7 @@ class Profile extends React.Component {
 
 Profile.propTypes = {
 	profile: PropTypes.object.isRequired,
-	userid: PropTypes.number.isRequired,
+	userID: PropTypes.number.isRequired,
 	editable: PropTypes.bool.isRequired,
 	isFollowing: PropTypes.bool.isRequired,
 };

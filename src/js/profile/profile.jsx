@@ -11,7 +11,7 @@ import {apiRequestString} from '../ApiRouter.js';
 import {eventSystem} from '../EventSystem.js';
 import {EditableAvatar} from './profile/editable-avatar.jsx';
 import {EditableEducationItem, OrcidEditableEducationItem} from './profile/editable-education-item.jsx';
-import {EditableExperienceItem} from './profile/editable-experience-item.jsx';
+import {EditableExperienceItem, OrcidEditableExperienceItem} from './profile/editable-experience-item.jsx';
 import {EditableField} from './profile/editable-field.jsx';
 import {EditableInterests} from './profile/editable-interest-item.jsx';
 import {EditableTimeline} from './profile/editable-timeline.jsx';
@@ -173,6 +173,7 @@ class Profile extends React.Component {
 		const {userID, editable, isFollowing} = this.props;
 		const {profile, active, extended, alert, hasContent, groups} = this.state;
 		const profileMeta = profile.meta.profile;
+		//log.debug(profile);
 
 		if(alert.level){
 			alertNode = (
@@ -315,7 +316,8 @@ class Profile extends React.Component {
 							emptytext="Add your professional experience to share where you have been working"
 							value={ profileMeta.experience }
 							editable={editable}
-							entryClass={EditableExperienceItem}
+							entryClass={OrcidEditableExperienceItem}
+							template={OrcidEditableExperienceItem.defaultProps.value}
 							saveField={this.saveField}
 						/>
 
@@ -326,6 +328,7 @@ class Profile extends React.Component {
 							value={ profileMeta.education }
 							editable={editable}
 							entryClass={OrcidEditableEducationItem}
+							template={OrcidEditableEducationItem.defaultProps.value}
 							saveField={this.saveField}
 						/>
 					</Col>

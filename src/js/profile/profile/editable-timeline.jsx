@@ -6,10 +6,9 @@ let log = logger.Logger('editable-timeline');
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {MultipleEditableBase} from '../abstract/editable-base.jsx';
 import {Button} from 'reactstrap';
 
-class EditableTimeline extends MultipleEditableBase {
+class EditableTimeline extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -19,14 +18,69 @@ class EditableTimeline extends MultipleEditableBase {
 			editLast: false
 		};
 	}
-
+	componentDidUpdate(prevProps) {
+		if(this.props.value != prevProps.value){
+			this.setState({value:JSON.parse(this.props.value)});
+		}
+	}
 	addEmpty = (evt) => {
-		super._addEmpty.apply(this, [evt]);
-		this.setState({editLast:true});
+		evt.preventDefault();
+		let {value, counter} = this.state;
+		let {template} = this.props;
+		if(!template){
+			throw 'no template';
+		}
+		let addObject;
+		if(template === undefined){
+			addObject = {id:++counter};
+		} else {
+			addObject = Object.assign({}, template, {id:++counter});
+		}
+		value.push(addObject);
+		this.setState({value, addValue:'', counter, editLast:true});
 	}
 
 	updateEntry = (index, entry) => {
-		this._updateEntry.apply(this, [index, entry]);
+		if(index === undefined || entry === undefined){
+			log.error('Insufficient arguments to updateEntry');
+			throw 'Insufficient arguments to updateEntry';
+		}
+		let {value} = this.state;
+		let newValue = value.slice(0);
+		newValue[index] = entry;
+		this.setState({value:newValue, editLast:false}, this.save);
+	}
+
+	save = async (evt) => {
+		if(evt){
+			evt.preventDefault();
+		}
+		const {field} = this.props;
+		const {value} = this.state;
+
+		this.setState({
+			processing: true,
+		});
+
+		await this.props.saveField(field, JSON.stringify(value));
+		this.setState({
+			processing: false,
+			editing: false,
+		});
+		return;
+	}
+
+	remove = (index) => {
+		if(index === undefined){
+			log.error('Insufficient arguments to _remove');
+			throw 'Insufficient arguments to _remove';
+		}
+		let {value} = this.state;
+		value.splice(index, 1);
+		this.setState({
+			value,
+			editLast:false
+		}, this.save);
 	}
 
 	render() {
@@ -59,7 +113,7 @@ class EditableTimeline extends MultipleEditableBase {
 						value: entry,
 						key: index,
 						onUpdate: this.updateEntry,
-						onDelete: this.delete,
+						remove: this.remove,
 						editable: editable,
 						editing: (editLast && (index == (value.length - 1)))
 					});

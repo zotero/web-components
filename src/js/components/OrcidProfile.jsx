@@ -8,7 +8,8 @@ const {Component, PureComponent, Fragment} = React;
 import {OrcidIcon} from '../Icons.js';
 import {Notifier} from '../Notifier.js';
 import {ajax} from '../ajax.js';
-import {Row, Col} from 'reactstrap';
+import {Row, Col, Button} from 'reactstrap';
+import {PencilIcon} from '../Icons.js';
 
 const config = window.zoteroConfig;
 const orcidClientID = config.orcidClientID;
@@ -16,17 +17,17 @@ const orcidRedirectUrl = config.orcidRedirectUrl;
 
 class FuzzyDate extends Component{
 	render(){
-		//return 'present' for null end date
-		if(this.props.date === null){
+		const {date} = this.props;
+		if(date === null){
 			return 'present';
 		}
 
-		let s = this.props.date.year.value;
-		if(this.props.date.month != null){
-			s += '-' + this.props.date.month.value;
+		let s = date.year.value;
+		if(date.month != null){
+			s += '-' + date.month.value;
 		}
-		if(this.props.date.day != null){
-			s += '-' + this.props.date.day.value;
+		if(date.day != null){
+			s += '-' + date.day.value;
 		}
 		return s;
 	}
@@ -71,6 +72,10 @@ class TimeSpan extends Component{
 		return `(${retVal})`;
 	}
 	render(){
+		if(!this.props.startDate.year.value){
+			return null;
+		}
+
 		return (
 			<span className='time-span'>
 				<FuzzyDate date={this.props.startDate} /> to <FuzzyDate date={this.props.endDate} />
@@ -102,23 +107,30 @@ class Organization extends Component{
 }
 class OrganizationEntry extends Component{
 	render(){
+		const {entry, editable} = this.props;
 		return (
 			<div className='organization-entry profile-timeline-wrapper'>
 				<Row>
 					<Col xs='4'>
-						<TimeSpan startDate={this.props.entry['start-date']} endDate={this.props.entry['end-date']} />
+						<TimeSpan startDate={entry['start-date']} endDate={entry['end-date']} />
 					</Col>
-					<Col xs='8' className='profile-timeline'>
+					<Col xs='4' className='profile-timeline'>
 						<div className="profile-timeline-point" />
-						<Organization organization={this.props.entry.organization} />
+						<Organization organization={entry.organization} />
 						<br />
-						{this.props.entry['role-title']} ({this.props.entry['department-name']})
+						{entry['role-title']} {entry['department-name'] ? `(${entry['department-name']})` : null}
+					</Col>
+					<Col xs='1'>
+						{editable ? <Button outline size='sm' onClick={this.props.edit} ><PencilIcon /></Button> : null}
 					</Col>
 				</Row>
 			</div>
 		);
 	}
 }
+OrganizationEntry.defaultProps = {
+	edit: function(){}
+};
 
 class Name extends Component{
 	render(){
@@ -405,4 +417,35 @@ class OrcidProfileControl extends Component{
 	}
 }
 
-export {OrcidProfile, OrcidProfileControl, Name, Biography, Educations, Employments, Fundings, Works, ResearcherUrls, Keywords, OrganizationEntry, TimeSpan, Organization};
+let orcidizeTimelineEntry = function(d){
+	return {
+		'department-name':d.department,
+		organization:{
+			address:{
+				city:d.city,
+				country:d.country,
+				region:d.state,
+			},
+			name:d.institution
+		},
+		'role-title':d.degree_name,
+		'start-date':{
+			month:{
+				value:d.start_month
+			},
+			year:{
+				value:d.start_year
+			}
+		},
+		'end-date': d.present ? null : {
+			month:{
+				value:d.end_month
+			},
+			year:{
+				value:d.end_year
+			}
+		},
+	};
+}
+
+export {OrcidProfile, OrcidProfileControl, Name, Biography, Educations, Employments, Fundings, Works, ResearcherUrls, Keywords, OrganizationEntry, TimeSpan, Organization, orcidizeTimelineEntry};

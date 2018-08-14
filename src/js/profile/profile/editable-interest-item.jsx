@@ -6,36 +6,49 @@ let log = logger.Logger('editable-interest-item');
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {MultipleEditableBase, EditableBase} from '../abstract/editable-base.jsx';
-import {PencilIcon, TrashIcon, CheckIcon, XIcon} from '../../Icons.js';
+import {PencilIcon, XIcon} from '../../Icons.js';
 import {Row, Col, Form, Input, Button} from 'reactstrap';
 import cn from 'classnames';
 
-class EditableInterests extends MultipleEditableBase {
+class EditableInterests extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state.addValue = '';
+		this.state = {
+			value:JSON.parse(props.value),
+			editing:false,
+			counter: props.value.length,
+			addValue: ''
+		};
 	}
 	handleInputChange = (evt) => {
 		this.setState({addValue:evt.target.value});
 	}
-
 	handleKeyboard = () => {
-
 	}
-
 	handleBlur = () => {
-
 	}
 
-	add = (evt) => {
+	addInterest = (evt) => {
 		evt.preventDefault();
-		let {addValue} = this.state;
+		let {addValue, value} = this.state;
 		let entry = {
 			interest: addValue
 		};
-		this._add.apply(this, [entry]);
-		this.setState({addValue:''});
+		value.push(entry);
+		this.setState({addValue:'', value});
+	}
+	remove = (index) => {
+		let {value} = this.state;
+		value.splice(index, 1);
+		this.setState({value});
+	}
+	edit = () => {
+		this.setState({editing:true});
+	}
+	save = async () => {
+		let {value} = this.state;
+		await this.props.saveField(this.props.field, JSON.stringify(value));
+		this.setState({editing:false});
 	}
 	render() {
 		const {editable, title, emptyText} = this.props;
@@ -56,7 +69,7 @@ class EditableInterests extends MultipleEditableBase {
 					<h2>{title}</h2>
 					<Row>
 						<Col>
-							<Form inline onSubmit={this.add}>
+							<Form inline onSubmit={this.addInterest}>
 								<Input
 									type='text'
 									onKeyUp={this.handleKeyboard}

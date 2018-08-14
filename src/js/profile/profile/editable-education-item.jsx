@@ -5,9 +5,8 @@ let log = logger.Logger('editable-education-item');
 
 import React from 'react';
 
-import {PencilIcon} from '../../Icons.js';
 import {Form, FormGroup, Row, Col, CustomInput, Input, Label, Button} from 'reactstrap';
-import {TimeSpan, Organization} from '../../components/OrcidProfile.jsx';
+import {OrganizationEntry, orcidizeTimelineEntry} from '../../components/OrcidProfile.jsx';
 
 let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
@@ -40,7 +39,7 @@ class EditableEducationItem extends React.Component {
 		this.setState({editing:false});
 	}
 	remove = () => {
-		this.props.onDelete(this.props.index);
+		this.props.remove(this.props.index);
 	}
 	cancel = () => {
 		this.setState({
@@ -106,25 +105,8 @@ class EditableEducationItem extends React.Component {
 				<Button outline size='sm' color='secondary' onClick={this.cancel} >Cancel</Button>{' '}
 			</Form>;
 		} else {
-			return <div className="profile-timeline-wrapper">
-				<div>
-					{start_month && start_month.slice(0, 3) + ' '}
-					{start_year}
-					&nbsp;&ndash;&nbsp;
-					{present ? 'present' : end_month && end_month.slice(0, 3) + ' ' + end_year }
-					<br />
-					{//this.getDuration()
-					}
-				</div>
-				<div className="profile-timeline">
-					<div className="profile-timeline-point" />
-					{institution}<br />
-					{degree_name}
-				</div>
-				<div>
-					{editable ? <Button outline size='sm' onClick={this.edit} ><PencilIcon /></Button> : null}
-				</div>
-			</div>;
+			let entry = orcidizeTimelineEntry(value);
+			return <OrganizationEntry entry={entry} editable={editable} edit={this.edit} />;
 		}
 	}
 }
@@ -211,74 +193,27 @@ class OrcidEditableEducationItem extends EditableEducationItem {
 				<Button outline size='sm' color='secondary' onClick={this.cancel} >Cancel</Button>{' '}
 			</Form>;
 		} else {
-			
 			let entry = orcidizeTimelineEntry(value);
-			return (
-				<div className='organization-entry profile-timeline-wrapper'>
-					<Row>
-						<Col xs='4'>
-							<TimeSpan startDate={entry['start-date']} endDate={entry['end-date']} />
-						</Col>
-						<Col xs='4' className='profile-timeline'>
-							<div className="profile-timeline-point" />
-							<Organization organization={entry.organization} />
-							<br />
-							{entry['role-title']} ({entry['department-name']})
-						</Col>
-						<Col xs='1'>
-							{editable ? <Button outline size='sm' onClick={this.edit} ><PencilIcon /></Button> : null}
-						</Col>
-					</Row>
-				</div>
-			);
+			return <OrganizationEntry entry={entry} editable={editable} edit={this.edit} />;
 		}
 	}
 }
 
 OrcidEditableEducationItem.defaultProps = {
-	institution: '',
-	city:'',
-	state:'',
-	country:'',
-	department:'',
-	degree_name: '',
-	url:'',
-	start_month: 'January',
-	start_year: '',
-	end_month: 'January',
-	end_year: '',
-	present: false
-}
-
-let orcidizeTimelineEntry = function(d){
-	return {
-		'department-name':d.department,
-		organization:{
-			address:{
-				city:d.city,
-				country:d.country,
-				region:d.state,
-			},
-			name:d.institution
-		},
-		'role-title':d.degree_name,
-		'start-date':{
-			month:{
-				value:d.start_month
-			},
-			year:{
-				value:d.start_year
-			}
-		},
-		'end-date': d.present ? null : {
-			month:{
-				value:d.end_month
-			},
-			year:{
-				value:d.end_year
-			}
-		},
-	};
-}
+	value:{
+		institution: '',
+		city:'',
+		state:'',
+		country:'',
+		department:'',
+		degree_name: '',
+		url:'',
+		start_month: 'January',
+		start_year: '',
+		end_month: 'January',
+		end_year: '',
+		present: false
+	}
+};
 
 export {EditableEducationItem, OrcidEditableEducationItem};

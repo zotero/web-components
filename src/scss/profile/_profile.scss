@@ -159,10 +159,12 @@ $color-profile-tint: rgba(255, 255, 255, .75);
 	&::after {
 		background: $color-profile-accent;
 		content: '';
-		height: calc(100% - 20px);
+		//height: calc(100% - 20px);
+		height: calc(100% - 5px);
 		left: 8px;
 		position: absolute;
-		top: calc(1em + 20px);
+		//top: calc(1em + 20px);
+		top: 20px;
 		width: 4px;
 	}
 }
@@ -175,7 +177,7 @@ $color-profile-tint: rgba(255, 255, 255, .75);
 	height: 20px;
 	left: 0;
 	position: absolute;
-	top: 1em;
+	//top: 1em;
 	width: 20px;
 }
 

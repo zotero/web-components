@@ -7,7 +7,6 @@ import React from 'react';
 const {Fragment} = React;
 import PropTypes from 'prop-types';
 
-import {MultipleEditableBase} from '../abstract/editable-base.jsx';
 import {PencilIcon, TrashIcon} from '../../Icons.js';
 import {Form, CustomInput, Input, Button} from 'reactstrap';
 
@@ -45,9 +44,45 @@ let social_networks = {
 	}
 };
 
-class EditableSocial extends MultipleEditableBase {
+class EditableSocial extends React.Component {
 	constructor(props) {
 		super(props);
+		this.state = {
+			value:JSON.parse(props.value),
+			editing:false,
+			counter: props.value.length
+		};
+	}
+	edit = () => {
+		this.setState({editing:true});
+	}
+	addEmpty = () => {
+		let {value, counter} = this.state;
+		let {template} = this.props;
+		let addObject;
+		if(template === undefined){
+			addObject = {id:++counter};
+		} else {
+			addObject = Object.assign({}, template, {id:++counter});
+		}
+		value.push(addObject);
+		this.setState({value, addValue:'', counter});
+	}
+	save = async () => {
+		let {value} = this.state;
+		await this.props.saveField(this.props.field, JSON.stringify(value));
+		this.setState({editing:false});
+	}
+	remove = (index) => {
+		let {value} = this.state;
+		value.splice(index, 1);
+		this.setState({value});
+	}
+	cancel = () => {
+		this.setState({
+			value:this.props.value,
+			editing:false
+		});
 	}
 
 	handleNameChange = (evt) => {

@@ -113,7 +113,8 @@ class EditableField extends React.Component {
 					onKeyUp={ this.keyboardHandler }
 					onChange={this.changeHandler}
 					//onBlur={ this.blurHandler }
-					autoFocus={true} />
+					autoFocus={true}
+				/>
 				{actions}
 			</Form>;
 		} else {

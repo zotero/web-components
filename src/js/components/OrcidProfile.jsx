@@ -358,7 +358,8 @@ class OrcidProfileControl extends Component{
 		let oauthWindow = window.open(`https://orcid.org/oauth/authorize?client_id=${orcidClientID}&response_type=code&scope=/authenticate&show_login=false&redirect_uri=${orcidRedirectUrl}`, "_blank", "toolbar=no, scrollbars=yes, width=500, height=600, top=500, left=500");
 	}
 	*/
-	unlinkOrcid = async () => {
+	unlinkOrcid = async (evt) => {
+		evt.preventDefault();
 		let resp = await ajax({url:`/settings/unlinkorcid`});
 		let data = await resp.json();
 		if(!data.success){
@@ -396,28 +397,33 @@ class OrcidProfileControl extends Component{
 		}
 	}
 	render(){
-		log.debug('OrcidProfileControlRender');
 		let {orcidProfile, notification} = this.state;
-		log.debug(orcidProfile);
 		if(orcidProfile){
+			let fullProfile = null;
+			if(this.props.showFull){
+				fullProfile = <OrcidProfile orcidProfile={orcidProfile} />
+			};
 			return (
 				<div className='orcid-profile-control'>
 					<Notifier {...notification} />
 					<p>Your Zotero profile is currently linked to an ORCID iD.</p>
 					<p><a href='https://orcid.org/my-orcid'>Edit ORCID profile</a> | <a href='#' onClick={this.refreshOrcid}>Refresh ORCID profile</a> | <a onClick={this.unlinkOrcid} href='#'>Unlink Orcid iD</a></p>
-					<OrcidProfile orcidProfile={orcidProfile} />
+					{fullProfile}
 				</div>
 			)
 		} else {
 			return (
 				<div className='orcid-profile-control'>
 					<Notifier {...this.state.notification} />
-					<OrcidIcon /> <a href='/settings/linkorcid'>Link ORCID iD</a>
+					<OrcidIcon /> <a href='/settings/linkorcid'>Use data from your ORCID iD profile</a>
 					<p>ORCID is an independent non-profit effort to provide an open registry of unique researcher identifiers and open services to link research activities and organizations to these identifiers. Learn more at <a href='https://orcid.org'>orcid.org</a>.</p>
 				</div>
 			)
 		}
 	}
+}
+OrcidProfileControl.defaultProps = {
+	showFull:true
 }
 
 let orcidizeTimelineEntry = function(d){

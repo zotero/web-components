@@ -26,7 +26,7 @@ import {FollowButtons} from '../FollowButtons.jsx';
 import {InviteToGroups} from '../InviteToGroups.js';
 import {MessageUserButton} from './profile/message-user-button.jsx';
 import {Alert, Container, Row, Col, Nav, NavItem, NavLink, TabPane, TabContent, Card, CardBody} from 'reactstrap';
-import {OrcidProfile, Name, Biography, Educations, Employments, Fundings, Works, ResearcherUrls, Keywords} from '../components/OrcidProfile.jsx';
+import {OrcidProfile, OrcidProfileControl} from '../components/OrcidProfile.jsx';
 import {Coalesce} from '../components/Coalesce.jsx';
 import cn from 'classnames';
 
@@ -173,7 +173,6 @@ class Profile extends React.Component {
 		const {userID, editable, isFollowing} = this.props;
 		const {profile, active, extended, alert, hasContent, groups} = this.state;
 		const profileMeta = profile.meta.profile;
-		//log.debug(profile);
 
 		if(alert.level){
 			alertNode = (
@@ -212,29 +211,6 @@ class Profile extends React.Component {
 			<a href='./items'>{profile.displayName}'s public library</a>
 		) : null;
 
-		//find current job title
-		let profileTitle = false;
-		if(profileMeta.experience){
-			let expObj = JSON.parse(profileMeta.experience);
-			let lastExp = expObj[expObj.length - 1];
-			if(lastExp.present){
-				profileTitle = lastExp.position_name;
-			}
-		}
-
-		//find last degree that is not currently being pursued
-		let termDegree = false;
-		if(profileMeta.education){
-			let eduObj = JSON.parse(profileMeta.education);
-			for(let i=eduObj.length-1; i>0; i--){
-				let lastEdu = eduObj[eduObj.length - 1];
-				if(!lastEdu.present){
-					termDegree = lastEdu.degree_name + ', ' + lastEdu.institution;
-					break;
-				}
-			}
-		}
-
 		let navbar = (
 			<Nav tabs>
 				<NavItem>
@@ -259,13 +235,14 @@ class Profile extends React.Component {
 		}
 
 		let aboutTab;
+		let orcidProfile = false;
+
 		if(profile.meta.orcid_profile) {
-		//if(false) {
-			let p = JSON.parse(profile.meta.orcid_profile);
+			orcidProfile = JSON.parse(profile.meta.orcid_profile);
 			aboutTab = (
 				<Row>
 					<Col xs={12} md={8}>
-						<OrcidProfile orcidProfile={p} />
+						<OrcidProfile orcidProfile={orcidProfile} />
 						<Publications userID={ userID } onPublicationsLoaded={this.hasContent} />
 					</Col>
 					<Col xs={12} md={4}>
@@ -288,7 +265,6 @@ class Profile extends React.Component {
 				</Row>
 			);
 		} else {
-			//let p = JSON.parse(profile.meta.orcid_profile);
 			aboutTab = (
 				<Row>
 					<Col xs={12} md={8}>
@@ -350,13 +326,12 @@ class Profile extends React.Component {
 							id='following'
 						/>
 					</Col>
-					{/*
-					<Col xs={12} md={8}>
-						<OrcidProfile orcidProfile={p} />
-					</Col>
-					*/}
 				</Row>
 			);
+		}
+		let orcidProfileControl = null;
+		if(editable){
+			orcidProfileControl = <OrcidProfileControl orcidProfile={orcidProfile} showFull={false} />;
 		}
 
 		return (
@@ -384,7 +359,6 @@ class Profile extends React.Component {
 						</h2>
 						<ul>
 							<li>
-								{profileTitle}
 								<EditableField
 									field="title"
 									emptytext="Add your title"
@@ -394,7 +368,6 @@ class Profile extends React.Component {
 								/>
 							</li>
 							<li>
-								{termDegree}
 								<EditableField
 									field="academic"
 									emptytext="Add your academic status"
@@ -432,6 +405,7 @@ class Profile extends React.Component {
 								/>
 							</li>
 						</ul>
+						{orcidProfileControl}
 						<div className='user-actions clearfix'>
 							<div className='float-left mr-4'>
 								<FollowButtons profileUserID={userID} isFollowing={isFollowing} />

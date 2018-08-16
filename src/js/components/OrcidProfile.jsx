@@ -111,16 +111,19 @@ class OrganizationEntry extends Component{
 		return (
 			<div className='organization-entry profile-timeline-wrapper'>
 				<Row>
-					<Col xs='4'>
+					<Col sm={4} className='d-none d-sm-block'>
 						<TimeSpan startDate={entry['start-date']} endDate={entry['end-date']} />
 					</Col>
-					<Col xs='4' className='profile-timeline'>
+					<Col sm={7} className='profile-timeline'>
 						<div className="profile-timeline-point" />
 						<Organization organization={entry.organization} />
 						<br />
 						{entry['role-title']} {entry['department-name'] ? `(${entry['department-name']})` : null}
+						<div className='d-block d-sm-none'>
+							<TimeSpan startDate={entry['start-date']} endDate={entry['end-date']} />
+						</div>
 					</Col>
-					<Col xs='1'>
+					<Col xs={1}>
 						{editable ? <Button outline size='sm' onClick={this.props.edit} ><PencilIcon /></Button> : null}
 					</Col>
 				</Row>

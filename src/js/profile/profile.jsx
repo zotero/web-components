@@ -264,10 +264,11 @@ class Profile extends React.Component {
 			let p = JSON.parse(profile.meta.orcid_profile);
 			aboutTab = (
 				<Row>
-					<Col xs='12' sm='8'>
+					<Col xs={12} md={8}>
 						<OrcidProfile orcidProfile={p} />
+						<Publications userID={ userID } onPublicationsLoaded={this.hasContent} />
 					</Col>
-					<Col xs='12' sm='4'>
+					<Col xs={12} md={4}>
 						<Groups {...groups} onExtended={()=>{this.setState({extended:true});}} onViewMore={ () => this.makeActive('Groups')} />
 						<RelatedPeople
 							people={ profile.followers.slice(0, 3) }
@@ -290,7 +291,7 @@ class Profile extends React.Component {
 			//let p = JSON.parse(profile.meta.orcid_profile);
 			aboutTab = (
 				<Row>
-					<Col xs='12' sm='8'>
+					<Col xs={12} md={8}>
 						<EditableRich
 							id='bio-text'
 							title="About"
@@ -332,7 +333,7 @@ class Profile extends React.Component {
 							saveField={this.saveField}
 						/>
 					</Col>
-					<Col xs='12' sm='4'>
+					<Col xs={12} md={4}>
 						<Groups {...groups} onExtended={()=>{this.setState({extended:true});}} onViewMore={ () => this.makeActive('Groups')} />
 						<RelatedPeople
 							people={ profile.followers.slice(0, 3) }
@@ -350,7 +351,7 @@ class Profile extends React.Component {
 						/>
 					</Col>
 					{/*
-					<Col xs='12' sm='8'>
+					<Col xs={12} md={8}>
 						<OrcidProfile orcidProfile={p} />
 					</Col>
 					*/}
@@ -362,13 +363,13 @@ class Profile extends React.Component {
 			<Container>
 				{alertNode}
 				<Row className="user-profile-personal-details">
-					<Col xs='12' sm='6'>
+					<Col xs={12} md={6}>
 						<EditableAvatar
 							value={ profileMeta.avatar }
 							saveField={this.saveField}
 						/>
 					</Col>
-					<Col xs='12' sm='6'>
+					<Col xs={12} md={6}>
 						<h2>
 							{!editable ?
 								profile.displayName :
@@ -446,7 +447,7 @@ class Profile extends React.Component {
 					</Col>
 				</Row>
 				<Row className='mt-2'>
-					<Col xs='12'>
+					<Col xs={12}>
 						{navbar}
 						<TabContent activeTab={active}>
 							<TabPane tabId='About'>

@@ -3,7 +3,7 @@
 //import {log as logger} from './Log.js';
 //let log = logger.Logger('RecentItems');
 
-import {ItemMaps} from './ItemMaps.js';
+import {ItemMaps} from './maps/ItemMaps.js';
 import {ajax} from './ajax.js';
 import {apiRequestString} from './ApiRouter.js';
 import {formatItemField, getCurrentUser} from './Utils.js';

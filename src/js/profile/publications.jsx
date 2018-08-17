@@ -4,7 +4,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import ZoteroPublications from 'zotero-publications';
-import {Spinner} from '../../LoadingSpinner.js';
+import {Spinner} from '../LoadingSpinner.js';
 
 class Publications extends React.Component {
 	constructor(props) {

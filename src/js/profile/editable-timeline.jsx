@@ -1,6 +1,6 @@
 'use strict';
 
-import {log as logger} from '../../Log.js';
+import {log as logger} from '../Log.js';
 let log = logger.Logger('editable-timeline');
 
 import React from 'react';

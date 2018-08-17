@@ -1,15 +1,14 @@
 /* global Zotero:false */
 'use strict';
 
-import {log as logger} from '../../Log.js';
+import {log as logger} from '../Log.js';
 let log = logger.Logger('groups.jsx');
 
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import GroupsBase from '../abstract/groups-base.jsx';
-import {buildUrl} from '../../wwwroutes.js';
-import {typeMap} from '../../maps/groupMaps.js';
+import {buildUrl} from '../wwwroutes.js';
+import {typeMap} from '../maps/groupMaps.js';
 import {Row, Col} from 'reactstrap';
 
 let groupMemberCount = function(group){

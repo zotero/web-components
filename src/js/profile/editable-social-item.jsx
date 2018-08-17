@@ -1,13 +1,13 @@
 'use strict';
 
-import {log as logger} from '../../Log.js';
+import {log as logger} from '../Log.js';
 const log = logger.Logger('editable-social-item');
 
 import React from 'react';
 const {Fragment} = React;
 import PropTypes from 'prop-types';
 
-import {PencilIcon, TrashIcon} from '../../Icons.js';
+import {PencilIcon, TrashIcon} from '../Icons.js';
 import {Form, CustomInput, Input, Button} from 'reactstrap';
 
 

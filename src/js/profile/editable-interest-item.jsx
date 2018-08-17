@@ -1,12 +1,12 @@
 'use strict';
 
-import {log as logger} from '../../Log.js';
+import {log as logger} from '../Log.js';
 let log = logger.Logger('editable-interest-item');
 
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {PencilIcon, XIcon} from '../../Icons.js';
+import {PencilIcon, XIcon} from '../Icons.js';
 import {Row, Col, Form, Input, Button} from 'reactstrap';
 import cn from 'classnames';
 

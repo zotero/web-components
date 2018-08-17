@@ -1,15 +1,14 @@
 /* global CKEDITOR:false */
 'use strict';
 
-import {log as logger} from '../../Log.js';
+import {log as logger} from '../Log.js';
 let log = logger.Logger('editable-rich');
 
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {eventSystem} from '../../EventSystem.js';
-import {PencilIcon, TrashIcon, CheckIcon, XIcon} from '../../Icons.js';
-import {Spinner} from '../../LoadingSpinner.js';
+import {PencilIcon} from '../Icons.js';
+import {Spinner} from '../LoadingSpinner.js';
 import {Button} from 'reactstrap';
 import cn from 'classnames';
 

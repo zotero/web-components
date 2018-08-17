@@ -3,10 +3,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {eventSystem} from '../../EventSystem.js';
-import {PencilIcon, TrashIcon, CheckIcon, XIcon, PlusIcon} from '../../Icons.js';
-import {postFormData, ajax} from '../../ajax.js';
-import {buildUrl} from '../../wwwroutes.js';
+import {eventSystem} from '../EventSystem.js';
+import {PencilIcon, TrashIcon, CheckIcon, XIcon, PlusIcon} from '../Icons.js';
+import {postFormData, ajax} from '../ajax.js';
+import {buildUrl} from '../wwwroutes.js';
 
 let updateUrl = buildUrl('updateProfileImage');
 

@@ -1,12 +1,12 @@
 'use strict';
 
-import {log as logger} from '../../Log.js';
+import {log as logger} from '../Log.js';
 let log = logger.Logger('MessageUserButton');
 
 const React = require('react');
 const {Component} = React;
 import {PropTypes} from 'prop-types';
-import {getCurrentUser} from '../../Utils.js';
+import {getCurrentUser} from '../Utils.js';
 
 class MessageUserButton extends Component {
 	render(){

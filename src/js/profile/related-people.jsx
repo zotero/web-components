@@ -3,10 +3,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {eventSystem} from '../../EventSystem.js';
-import {ProfileDataSource} from '../profile-data-source.js';
+import {eventSystem} from '../EventSystem.js';
+import {ProfileDataSource} from './profile-data-source.js';
 import {Row, Col, Button} from 'reactstrap';
-import {Spinner} from '../../LoadingSpinner.js';
+import {Spinner} from '../LoadingSpinner.js';
 
 class RelatedPeople extends React.Component {
 	viewMoreHandler = (ev) => {

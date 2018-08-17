@@ -1,16 +1,16 @@
 'use strict';
 
-import {log as logger} from '../../Log.js';
-let log = logger.Logger('editable-education-item');
+import {log as logger} from '../Log.js';
+let log = logger.Logger('editable-experience-item');
 
 import React from 'react';
 
-import {Form, FormGroup, Row, Col, CustomInput, Input, Label, Button} from 'reactstrap';
-import {OrganizationEntry, orcidizeTimelineEntry} from '../../components/OrcidProfile.jsx';
+import {Row, Col, Button, Form, FormGroup, CustomInput, Input, Label} from 'reactstrap';
+import {OrganizationEntry, orcidizeTimelineEntry} from '../components/OrcidProfile.jsx';
 
 let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-class EditableEducationItem extends React.Component {
+class EditableExperienceItem  extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -50,7 +50,8 @@ class EditableEducationItem extends React.Component {
 	render() {
 		const {editable} = this.props;
 		const {editing, value} = this.state;
-		const {start_month, start_year, degree_name, end_month, end_year, present, institution} = value;
+		const {start_month, start_year, position_name, end_month, end_year, present, institution} = value;
+		
 		if(editing) {
 			return <Form className="profile-timeline-form-wrapper" onSubmit={this.save}>
 				<FormGroup row>
@@ -63,7 +64,7 @@ class EditableEducationItem extends React.Component {
 						<Input id='start_year' name='start_year' onChange={this.updateEvt} defaultValue={start_year} placeholder='Start year' type='number' />
 					</Col>
 					<Col>
-						<Input id='degree_name' name='degree_name' onChange={this.updateEvt} defaultValue={degree_name} placeholder='Degree name' />
+						<Input id='position_name' name='position_name' onChange={this.updateEvt} defaultValue={position_name} placeholder='Position name' />
 					</Col>
 				</FormGroup>
 				<FormGroup row>
@@ -76,7 +77,7 @@ class EditableEducationItem extends React.Component {
 							defaultValue={end_month}
 							disabled={present}
 							>
-							{months.map(month => <option value={month} key={month}>{month}</option>)}
+							{months.map(month => <option  value={month} key={month}>{month}</option>)}
 						</CustomInput>
 					</Col>
 					<Col>
@@ -95,54 +96,105 @@ class EditableEducationItem extends React.Component {
 									onChange={this.updateEvt}
 									checked={present}
 								/>
-								&nbsp;Current
+								&nbsp;I currently work here
 							</Label>
 						</FormGroup>
 					</Col>
 				</FormGroup>
 				<Button outline size='sm' color='secondary' onClick={this.save} >Save</Button>{' '}
-				<Button outline size='sm' color='secondary' onClick={this.remove} >Remove</Button>{' '}
+				<Button outline size='sm' color='secondary' onClick={this.props.remove} >Remove</Button>{' '}
 				<Button outline size='sm' color='secondary' onClick={this.cancel} >Cancel</Button>{' '}
 			</Form>;
 		} else {
-			let entry = orcidizeTimelineEntry(value);
-			return <OrganizationEntry entry={entry} editable={editable} edit={this.edit} />;
+			return <div className="profile-timeline-wrapper">
+				<div>
+					{start_month && start_month.slice(0, 3) + ' '}
+					{start_year}
+					&nbsp;&ndash;&nbsp;
+					{present ? 'present' : end_month && end_month.slice(0, 3) + ' ' + end_year }
+					<br />
+					{//this.getDuration()
+					}
+				</div>
+				<div className="profile-timeline">
+					<div className="profile-timeline-point" />
+					{institution}<br />
+					{position_name}
+				</div>
+				<div>
+					{edit}
+				</div>
+			</div>;
 		}
 	}
 }
 
-EditableEducationItem.defaultProps = {
+EditableExperienceItem.defaultProps = {
 	value: {
-		institution: '',
-		degree_name: '',
 		start_month: 'January',
 		start_year: '',
+		position_name: '',
 		end_month: 'January',
 		end_year: '',
+		institution: '',
 		present: false
 	}
-};
+}
 
-class OrcidEditableEducationItem extends EditableEducationItem {
-	constructor(props){
-		super(props)
+class OrcidEditableExperienceItem  extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			value:props.value,
+			editing:props.editing
+		};
+	}
+	updateEvt = (evt) => {
+		let stateValue = this.state.value;
+		let newValue = Object.assign({}, stateValue);
+		let el = evt.target;
+		let name = el.getAttribute('name');
+		if(el.type == 'checkbox'){
+			newValue[name] = el.checked;
+		} else {
+			newValue[name] = el.value;
+		}
+		this.setState({value:newValue});
+	}
+	edit = () => {
+		this.setState({editing:true});
+	}
+	save = () => {
+		let {value} = this.state;
+		this.props.onUpdate(this.props.index, value);
+		this.setState({editing:false});
+	}
+	remove = () => {
+		this.props.onDelete(this.props.index);
+	}
+	cancel = () => {
+		this.setState({
+			value:this.props.value,
+			editing:false
+		});
 	}
 	render() {
 		const {editable} = this.props;
 		const {editing, value} = this.state;
-		const {city, state, country, department, url, start_month, start_year, degree_name, end_month, end_year, present, institution} = value;
+		const {city, state, country, department, url, start_month, start_year, position_name, end_month, end_year, present, institution} = value;
+
 		if(editing) {
 			return <Form className="profile-timeline-form-wrapper" onSubmit={this.save}>
 				<FormGroup row>
 					<Col>
-						<Input id='institution' name='institution' onChange={this.updateEvt} defaultValue={institution} placeholder='Name of your institution' />
+						<Input id='institution' name='institution' onChange={this.updateEvt} defaultValue={institution} placeholder='Institution' />
 						<Input id='city' name='city' onChange={this.updateEvt} defaultValue={city} placeholder='City' />
 						<Input id='state' name='state' onChange={this.updateEvt} defaultValue={state} placeholder='State/region' />
 						<Input id='country' name='country' onChange={this.updateEvt} defaultValue={country} placeholder='Country' />
 					</Col>
 					<Col>
 						<Input id='department' name='department' onChange={this.updateEvt} defaultValue={department} placeholder='Department' />
-						<Input id='degree_name' name='degree_name' onChange={this.updateEvt} defaultValue={degree_name} placeholder='Degree name' />
+						<Input id='position_name' name='position_name' onChange={this.updateEvt} defaultValue={position_name} placeholder='Role/Title' />
 						<Input id='url' name='url' onChange={this.updateEvt} defaultValue={url} placeholder='URL' />
 
 						<Row>
@@ -199,8 +251,8 @@ class OrcidEditableEducationItem extends EditableEducationItem {
 	}
 }
 
-OrcidEditableEducationItem.defaultProps = {
-	value:{
+OrcidEditableExperienceItem.defaultProps = {
+	value: {
 		institution: '',
 		city:'',
 		state:'',
@@ -214,6 +266,6 @@ OrcidEditableEducationItem.defaultProps = {
 		end_year: '',
 		present: false
 	}
-};
+}
 
-export {EditableEducationItem, OrcidEditableEducationItem};
+export {EditableExperienceItem, OrcidEditableExperienceItem};

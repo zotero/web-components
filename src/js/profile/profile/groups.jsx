@@ -23,7 +23,7 @@ let groupMemberCount = function(group){
 	return count;
 }
 
-class Groups extends GroupsBase {
+class Groups extends React.Component {
 	constructor(props) {
 		super(props);
 	}
@@ -75,7 +75,7 @@ Groups.propTypes = {
 };
 
 
-class GroupsDetailed extends GroupsBase {
+class GroupsDetailed extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -96,8 +96,8 @@ class GroupsDetailed extends GroupsBase {
 									<span>
 										<a href={groupUrl}>{ group.data.name }</a>
 									</span>
-									<a href={ groupUrl } className="profile-groups-detailed-details-join">
-										Join
+									<a href={ groupUrl } className="profile-groups-detailed-details-view">
+										View
 									</a>
 								</div>
 								<div>

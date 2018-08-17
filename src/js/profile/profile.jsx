@@ -20,8 +20,7 @@ import {EditableRich} from './profile/editable-rich.jsx';
 import {Groups, GroupsDetailed} from './profile/groups.jsx';
 import {ProfileDataSource} from './profile-data-source.js';
 import {Publications} from './profile/publications.jsx';
-import {RelatedPeople} from './profile/related-people.jsx';
-import {RelatedPeopleDetailed} from './profile/related-people-detailed.jsx';
+import {RelatedPeople, RelatedPeopleDetailed} from './profile/related-people.jsx';
 import {FollowButtons} from '../FollowButtons.jsx';
 import {InviteToGroups} from '../InviteToGroups.js';
 import {MessageUserButton} from './profile/message-user-button.jsx';
@@ -218,7 +217,7 @@ class Profile extends React.Component {
 						About
 					</NavLink>
 				</NavItem>
-				<NavItem className={cn({'d-none': (profile.followers.length == 0 && profile.following.length == 0)})}>*/}
+				<NavItem className={cn({'d-none': (profile.followers.length == 0 && profile.following.length == 0)})}>
 					<NavLink className={ cn({active:(active == 'Network')}) } onClick={ () => this.makeActive('Network') }>
 						Network
 					</NavLink>

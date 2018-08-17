@@ -9,7 +9,7 @@ const {Component} = React;
 import {ZoteroIcon, PluginsIcon} from './Icons.js';
 import classnames from 'classnames';
 import {AllExtensionsSection} from './InstallConnector.js';
-import {VerticalExpandable} from './VerticalExpandable.js';
+import {Collapse} from 'reactstrap';
 import {InstallButton} from './InstallConnector.js';
 
 const config = window.zoteroConfig;
@@ -175,7 +175,7 @@ class DownloadStandalone extends Component {
 					? <p><a href="#" onClick={this.showOldVersions}>Looking for Zotero 4.0?</a></p>
 					: ''
 				}
-				<VerticalExpandable expand={this.state.showOldVersions}>
+				<Collapse isOpen={this.state.showOldVersions}>
 					<ul className='old-versions'>
 						<li>
 							<h3>Zotero 4.0 for Firefox</h3>
@@ -196,7 +196,7 @@ class DownloadStandalone extends Component {
 							</ul>
 						</li>
 					</ul>
-				</VerticalExpandable>
+				</Collapse>
 			</section>
 		);
 	}
@@ -258,9 +258,9 @@ class DownloadConnector extends Component {
 				{!this.state.showAllExtensions
 					? <p className='other-versions'><a href='#' onClick={this.showAllExtensions}>Zotero Connectors for other browsers</a></p>
 					: ''}
-				<VerticalExpandable expand={this.state.showAllExtensions}>
+				<Collapse isOpen={this.state.showAllExtensions}>
 					<AllExtensionsSection except={this.props.featuredBrowser} type='full' />
-				</VerticalExpandable>
+				</Collapse>
 			</section>
 		);
 	}

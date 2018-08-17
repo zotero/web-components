@@ -6,7 +6,7 @@ let log = logger.Logger('Manage');
 const React = require('react');
 const {Component} = React;
 
-import {VerticalExpandable} from '../VerticalExpandable.js';
+import {Collapse} from 'reactstrap';
 import {Notifier} from '../Notifier.js';
 import PropTypes from 'prop-types';
 import {ButtonEditable} from '../components/ButtonEditable.js';
@@ -33,7 +33,7 @@ class LabRenew extends Component{
 		return (
 			<div>
 				<a href='#' onClick={(evt)=>{evt.preventDefault(); this.setState({showRenew:true});}}>Renew</a>
-				<VerticalExpandable expand={this.state.showRenew}>
+				<Collapse isOpen={this.state.showRenew}>
 					<div className='form-line'>
 						<label htmlFor='lab_fte'>Users:</label>
 						<input type='text' name='lab_fte' className='lab_fte form-control' value={fte} onChange={(evt)=>{this.setState({fte:evt.target.value});}} />
@@ -43,7 +43,7 @@ class LabRenew extends Component{
 						{new Intl.NumberFormat('en-US', {style:'currency', currency:'USD'}).format(labPrice(fteNum)/100)}
 					</div>
 					<LabPurchase fte={fteNum} name={name} institutionID={institutionID} />
-				</VerticalExpandable>
+				</Collapse>
 			</div>
 		);
 	}

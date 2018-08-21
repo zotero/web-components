@@ -337,13 +337,13 @@ class Profile extends React.Component {
 			<Container>
 				{alertNode}
 				<Row className="user-profile-personal-details">
-					<Col xs={12} md={6}>
+					<Col xs={12} md={4}>
 						<EditableAvatar
 							value={ profileMeta.avatar }
 							saveField={this.saveField}
 						/>
 					</Col>
-					<Col xs={12} md={6}>
+					<Col xs={12} md={8}>
 						<h2>
 							{!editable ?
 								profile.displayName :

@@ -55,4 +55,4 @@ let calculateNewExpiration = function(oldExpiration, oldStorageLevel, newStorage
 	return newExpiration;
 };
 
-export {calculateRemainingValue, calculateNewExpiration, immediateCharge};
+export {calculateRemainingValue, calculateNewExpiration, immediateCharge, priceCents};

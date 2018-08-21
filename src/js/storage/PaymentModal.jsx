@@ -202,15 +202,21 @@ class PaymentModal extends Component {
 	}
 	render(){
 		const {selectedMethod} = this.state;
-		const {handleToken} = this.props;
+		const {handleToken, chargeAmount} = this.props;
 
+		let paymentRequest = null;
+		if(chargeAmount) {
+			paymentRequest = (
+				<Elements>
+					<InjectedPaymentRequestForm handleToken={handleToken} paymentAmount={chargeAmount} />
+				</Elements>
+			);
+		}
 		return (
 			<div className='payment-chooser'>
 				<Card>
 					<CardHeader>
-						<Elements>
-							<InjectedPaymentRequestForm handleToken={handleToken} />
-						</Elements>
+						{paymentRequest}
 						<Nav card tabs>
 							<NavItem>
 								<NavLink active={(selectedMethod == 'card')} onClick={()=>{this.setPaymentChoice('card')}} href='#'>

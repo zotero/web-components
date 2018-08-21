@@ -24,7 +24,7 @@ import {StripeProvider} from 'react-stripe-elements';
 import PaymentModal from './PaymentModal.jsx';
 import { Card, CardBody, FormGroup, Input, Modal, ModalBody, ModalHeader, Label } from 'reactstrap';
 
-import {immediateCharge, calculateNewExpiration} from './calculations.js';
+import {immediateCharge, calculateNewExpiration, priceCents} from './calculations.js';
 import {postFormData} from '../ajax.js';
 
 const dateFormatOptions = {year: 'numeric', month: 'long', day: 'numeric'};
@@ -63,6 +63,7 @@ class SubscriptionHandler extends Component {
 		const {type, storageLevel} = newSubscription;
 		let description = [];
 		let error = '';
+		let chargeAmount = false;
 		switch (type) {
 			case 'individualChange':
 				log.debug('individualChange');
@@ -72,6 +73,7 @@ class SubscriptionHandler extends Component {
 					let newExp = calculateNewExpiration(userSubscription.expirationDate, userSubscription.storageLevel, storageLevel);
 					description.push(`Expiring on ${newExp.toLocaleDateString('en-US', dateFormatOptions)}.`)
 					description.push(`A charge will be made to your account once you confirm your order.`);
+					chargeAmount = priceCents[storageLevel];
 				} else {
 					description.push(`A charge will not be made to your account until your new expiration date.`);
 				}
@@ -82,6 +84,7 @@ class SubscriptionHandler extends Component {
 			case 'individualRenew':
 				description.push(`Renew your current ${storageLevelDescriptions[storageLevel]} subscription.`);
 				description.push(`Your card or bank account will be charged immediately after confirming.`);
+				chargeAmount = priceCents[storageLevel];
 				break;
 			case 'lab':
 
@@ -100,7 +103,8 @@ class SubscriptionHandler extends Component {
 		this.state = {
 			autorenew:true,
 			description,
-			error
+			error,
+			chargeAmount,
 		}
 	}
 	renewNow = async () => {
@@ -249,9 +253,9 @@ class SubscriptionHandler extends Component {
 		};
 	}
 	render() {
+		//log.debug('SubscriptionHandler render');
 		let {subscriptionChange, userSubscription} = this.props;
-		let {autorenew, description} = this.state;
-		log.debug(this.state);
+		let {autorenew, description, chargeAmount} = this.state;
 
 		let descriptionPs = description.map((d, i)=>{
 			return <p key={i}>{d}</p>;
@@ -268,7 +272,7 @@ class SubscriptionHandler extends Component {
 							</CardBody>
 						</Card>
 						<StripeProvider apiKey={'pk_test_u8WpYkXuG2X155p0rC4YqkvO'}>
-							<PaymentModal handleToken={this.handleToken} />
+							<PaymentModal handleToken={this.handleToken} chargeAmount={chargeAmount} />
 						</StripeProvider>
 						<Card className='mt-4'>
 							<CardBody>

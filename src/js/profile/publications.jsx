@@ -41,7 +41,7 @@ class Publications extends React.Component {
 					}, () => {
 						this.zp.render(data, this.publicationsContainer);
 					});
-					//this.props.onPublicationsLoaded();
+					this.props.onPublicationsLoaded();
 				} else {
 					this.setState({
 						loading: false,

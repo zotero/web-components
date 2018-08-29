@@ -10,6 +10,7 @@ import PropTypes from 'prop-types';
 import {buildUrl} from '../wwwroutes.js';
 import {typeMap} from '../maps/groupMaps.js';
 import {Row, Col} from 'reactstrap';
+import {Spinner} from '../LoadingSpinner';
 
 let groupMemberCount = function(group){
 	let count = 1;
@@ -77,16 +78,18 @@ Groups.propTypes = {
 class GroupsDetailed extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {
-			groups: props.groups,
-			loading: !props.loaded
-		};
 	}
 	render() {
+		let {groups, loaded} = this.props;
+		if(!loaded){
+			return (<div className="profile-groups-detailed">
+				<Spinner />
+			</div>);
+		}
 		return <div className="profile-groups-detailed">
 			<h2>Groups</h2>
 			<Row>
-				{this.state.groups.map(group => {
+				{groups.map(group => {
 					let groupUrl = buildUrl('groupView', {group:group});
 					return (
 						<Col xs='12' sm='6' md='4' key={ group.id }>

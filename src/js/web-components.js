@@ -59,6 +59,7 @@ import Profile from './profile/profile.jsx';
 import {ChangeUsername} from './ChangeUsername.js';
 import {collect} from './animations/collect.js';
 import {organize} from './animations/organize.js';
+import {activateFootnotes} from './footnotes.js';
 let animations = {
 	collect,
 	organize
@@ -86,7 +87,8 @@ let ZoteroWebComponents = {
 	Combined,
 	Profile,
 	ChangeUsername,
-	animations
+	animations,
+	activateFootnotes
 };
 
 globalScope.ZoteroWebComponents = ZoteroWebComponents;

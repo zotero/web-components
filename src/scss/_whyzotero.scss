@@ -1,0 +1,164 @@
+//
+// Why Zotero?
+//
+
+// Move to base partial
+:root {
+  scroll-behavior: smooth;
+}
+
+// Move to grid partial
+.container-fluid-col-8 {
+  max-width: map-get($container-max-widths, xl) * 8 / 12;
+}
+
+.why-zotero {
+  .container-fluid {
+    @include media-breakpoint-up(md) {
+      width: calc(100% - #{$spacer-xxl});
+    }
+  }
+
+  h1, h2, h3 {
+    text-align: center;
+  }
+
+  h1, h2 {
+    letter-spacing: -0.035em;
+  }
+
+  h1 {
+    font-size: $display1-size;
+    margin-bottom: rem(36);
+
+    @include media-breakpoint-down(sm) {
+      font-size: $display1-size-mobile;
+      margin-bottom: rem(30);
+    }
+  }
+
+  h2 {
+    font-size: $display2-size;
+    margin-top: $spacer-max - rem(27);
+    margin-bottom: rem(32);
+
+    @include media-breakpoint-down(sm) {
+      font-size: $display2-size-mobile;
+      margin-top: $spacer-xxxl - rem(21);
+      margin-bottom: rem(32 * 2 / 3);
+    }
+  }
+
+  h3 {
+    font-size: $display3-size;
+    margin-top: $spacer-xxxl - rem(24);
+    margin-bottom: rem(18);
+    letter-spacing: -0.025em;
+
+    @include media-breakpoint-down(sm) {
+      font-size: rem(24);
+      margin-top: rem(43 - 17);
+    }
+  }
+
+  .lead {
+    //max-width: none;
+    font-weight: 300;
+    margin-bottom: rem(80 * 2 / 3 - 16);
+
+    @include media-breakpoint-up(md) {
+      font-size: rem(24);
+      margin-bottom: rem(80) - rem(18);
+    }
+  }
+
+  sup {
+    top: -0.75em;
+    display: inline-block;
+    min-width: $spacer-md;
+    height: $spacer-md;
+    padding: $spacer-xs $spacer-min 0;
+    color: $white;
+    background: $link-color;
+    font-size: rem(11);
+    font-weight: 600;
+    text-align: center;
+    border-radius: $spacer-xs;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+
+    &:hover {
+      background-color: lighten($link-color, 8%);
+    }
+  }
+
+  hr {
+    margin-top: $spacer-xxxl - rem(7);
+    margin-bottom: $spacer-xxxl - rem(14);
+
+    @include media-breakpoint-up(md) {
+      margin-top: $spacer-max - rem(10);
+      margin-bottom: $spacer-max - rem(17);
+    }
+  }
+
+  main {
+    margin-bottom: $spacer-xxxl - rem(7);
+
+    @include media-breakpoint-up(md) {
+      margin-bottom: $spacer-max - rem(10);
+    }
+
+    p:not(.lead) {
+      font-size: rem(18);
+      margin-bottom: 1em;
+
+      @include media-breakpoint-up(md) {
+        line-height: (32 / 18);
+      }
+    }
+  }
+
+  .signpost {
+    display: block;
+    margin: $spacer-xxxl auto ($spacer-xxxl - rem(37));
+
+    @include media-breakpoint-up(md) {
+      margin: rem(128) auto ($spacer-max - rem(46));
+    }
+  }
+
+  .section-nav {
+    font-size: rem(20);
+    line-height: (32 / 20);
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    & + h2 {
+      margin-top: rem(80 * 2 / 3 - 16);
+
+      @include media-breakpoint-up(md) {
+        margin-top: rem(80 - 16); // Exception: caps heigh
+      }
+    }
+  }
+
+  #footnotes {
+    margin-top: $spacer-xxxl - rem(7);
+    margin-bottom: $spacer-xxxl - rem(7);
+    border-top: 1px solid $gray-200;
+
+    @include media-breakpoint-up(md) {
+      margin-top: $spacer-max - rem(10);;
+      margin-bottom: $spacer-max - rem(7);
+    }
+
+    li {
+      margin-top: 1em;
+      line-height: 1.6;
+    }
+  }
+}

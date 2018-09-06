@@ -36,6 +36,12 @@ let activateFootnotes = function() {
 			currentPopover = null;
 		}
 	});
+	portalEl.addEventListener('touchstart', ev => {
+		if(currentPopover && ev.target.closest('.popover') == null) {
+			currentPopover.destroy();
+			currentPopover = null;
+		}
+	});
 
 	portalEl.addEventListener('keyup', ev => {
 		if(currentPopover && (ev.key === "Escape" || ev.key === "Tab")) {

@@ -103,12 +103,6 @@
   }
 
   main {
-    margin-bottom: $spacer-xxxl - rem(7);
-
-    @include media-breakpoint-up(md) {
-      margin-bottom: $spacer-max - rem(10);
-    }
-
     p:not(.lead) {
       font-size: rem(18);
       margin-bottom: 1em;
@@ -146,13 +140,13 @@
     }
   }
 
-  #footnotes {
-    margin-top: $spacer-xxxl - rem(7);
+  .footnotes {
+    margin-top: $spacer-xxxl - rem(8);
     margin-bottom: $spacer-xxxl - rem(7);
     border-top: 1px solid $gray-200;
 
     @include media-breakpoint-up(md) {
-      margin-top: $spacer-max - rem(10);;
+      margin-top: $spacer-max - rem(10);
       margin-bottom: $spacer-max - rem(7);
     }
 

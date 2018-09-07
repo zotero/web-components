@@ -66,9 +66,9 @@ if($_GET['user']){
 
 		<hr>
 		<h2>Ready to try Zotero?</h2>
-		<p class="download" style="text-align: center"><a href="/download" class="btn btn-primary btn-lg">Download</a></p>
+		<p class="download text-center"><a href="/download" class="btn btn-primary btn-lg">Download</a></p>
 
-		<ol id="footnotes">
+		<ol id="footnotes" class="footnotes">
 			<li>Other reference managers go through long periods of little to no development that disrupt productivity and even prevent access to research data. For example, EndNote didn’t support Word 2016 <a href="https://twitter.com/EndNoteNews/status/694563436408143872">until 7 months after its release</a>. Mendeley has <a href="https://www.mendeley.com/release-notes/v1_18">taken years to support the latest versions of macOS</a>, and <a href="https://blog.mendeley.com/2018/07/18/how-to-recover-your-files-and-annotations-in-mendeley-desktop-july-2018/">took two months</a> to address reports of PDFs disappearing from users’ libraries.</li>
 			<li>Mendeley, RefWorks, and EndNote Web require you to be logged in, so if their owners decided to stop supporting their software, or even if their services were down temporarily, you would be unable to open your library.</li>
 			<li><a href="/support/kb/mendeley_import">Mendeley encrypts your database</a>, preventing you from exporting your data in full to other tools and even from accessing your data at all if you can’t open the program. <a href="https://en.wikipedia.org/wiki/EndNote#Legal_dispute_with_Zotero">EndNote has claimed</a> that no one can open EndNote files without their software.</li>

@@ -107,7 +107,7 @@ if($_GET['user']){
 								</div>
 							</div>
 						</section>
-						<section class="section-md last">
+						<section class="section-md">
 							<div class="row align-items-center">
 								<div class="feature-col col-md-6 col-xl-5 offset-xl-1 text-center left">
 									<img class="img-fluid" src="../assets/images/home/privacy.svg" width="444" height="336">
@@ -118,6 +118,11 @@ if($_GET['user']){
 								</div>
 							</div>
 						</section>
+					</div>
+				</section>
+				<section class="section-md text-center why">
+					<div class="container">
+						<p>Still not sure which program to use for your research? See <a href="/why">why we think you should choose Zotero</a>.</p>
 					</div>
 				</section>
 				<section class="section-sm separated call-to-action">

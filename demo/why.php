@@ -79,3 +79,4 @@ if($_GET['user']){
 <script>
 	ZoteroWebComponents.activateFootnotes();
 </script>
+<? include('./layoutFooter.php')?>

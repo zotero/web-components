@@ -279,7 +279,7 @@ $headings-color:              inherit !default;
 
 $display1-size:               rem(60);
 $display2-size:               rem(40);
-$display3-size:               4.5rem !default;
+$display3-size:               rem(30);
 $display4-size:               3.5rem !default;
 
 $display1-size-mobile:        rem(40);
@@ -742,9 +742,9 @@ $tooltip-arrow-color:         $tooltip-bg !default;
 
 // Popovers
 
-$popover-font-size:                 $font-size-sm !default;
+$popover-font-size:                 $font-size-base;
 $popover-bg:                        $white !default;
-$popover-max-width:                 276px !default;
+$popover-max-width:                 320px;
 $popover-border-width:              $border-width !default;
 $popover-border-color:              rgba($black, .2) !default;
 $popover-border-radius:             $border-radius-lg !default;

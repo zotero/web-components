@@ -125,34 +125,6 @@ InstallSafariButton.defaultProps = {
 	label:'Install'
 };
 
-class InstallOperaButton extends Component{
-	installOpera(){
-	}
-	render(){
-		if(this.props.type == 'button') {
-			return (
-				<a href={operaDownload} id="opera-connector-download-button" className="btn btn-lg btn-secondary">{this.props.label}</a>
-			);
-		} else if(this.props.type == 'image') {
-			return (
-				<a href={operaDownload} onClick={this.installOpera}><BrowserIcon browser='opera' /></a>
-			);
-		} else if(this.props.type == 'full') {
-			return (
-				<div className='download-full'>
-					<div className='browser-image'><BrowserIcon browser='opera' /></div>
-					<h3>Opera Connector</h3>
-					<a href={operaDownload} id="opera-connector-download-button" className="btn btn-sm btn-secondary">{this.props.label}</a>
-				</div>
-			);
-		}
-	}
-}
-InstallOperaButton.defaultProps = {
-	type:'button',
-	label:'Install'
-};
-
 class InstallButton extends Component{
 	render(){
 		let browserName = this.props.browser;
@@ -258,9 +230,6 @@ class InstallConnectorPrompt extends Component{
 					);
 				}
 				break;
-			default:
-				connectorText = 'Zotero Connector for Chrome';
-				connectorImage = <BrowserExtensionIcon browser='chrome' />;
 		}
 
 		let otherBrowsers = ['chrome', 'firefox', 'safari'].filter((browser)=>{return browser.toLowerCase() != this.state.browser.toLowerCase();});

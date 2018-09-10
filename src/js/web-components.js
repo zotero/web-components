@@ -61,6 +61,7 @@ import {ManageEmails} from './ManageEmails.js';
 import * as Institutional from './Institutional/Institutional.js';
 import {collect} from './animations/collect.js';
 import {organize} from './animations/organize.js';
+import {activateFootnotes} from './footnotes.js';
 let animations = {
 	collect,
 	organize
@@ -104,7 +105,8 @@ let ZoteroWebComponents = {
 	OrcidProfile,
 	OrcidProfileControl,
 	CVEditor,
-	FollowButtons, FollowSection
+	FollowButtons, FollowSection,
+	activateFootnotes
 };
 
 globalScope.ZoteroWebComponents = ZoteroWebComponents;

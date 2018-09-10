@@ -12,7 +12,7 @@ const uglify = require('gulp-uglify');
 const autoprefixer = require('gulp-autoprefixer');
 const gulpif = require('gulp-if');
 const plumber = require('gulp-plumber');
-const cssminify = require('gulp-minify-css');
+const cleanCSS = require('gulp-clean-css');
 const babel = require('gulp-babel');
 const rename = require('gulp-rename');
 const merge = require('merge-stream');
@@ -83,7 +83,7 @@ function getSass(dev) {
 			browsers: ['last 2 versions', 'IE 10']
 		}))
 		.pipe(gulpif(!dev, gulp.dest('./build')))
-		.pipe(gulpif(!dev, cssminify()))
+		.pipe(gulpif(!dev, cleanCSS()))
 		.pipe(gulpif(!dev, rename({ extname: '.min.css' })))
 		.pipe(gulpif(dev, sourcemaps.write('./')))
 		.pipe(gulp.dest('./build'));

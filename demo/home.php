@@ -96,17 +96,33 @@ if($_GET['user']){
 								</div>
 							</div>
 						</section>
-						<section class="section-md last">
+						<section class="section-md">
 							<div class="row align-items-center">
 								<div class="feature-col col-md-6 col-xl-5 text-center right">
 									<img class="img-fluid" src="../assets/images/home/collaborate.svg" width="444" height="331">
 								</div>
 								<div class="feature-col col-md-6 order-md-first col-xl-5 offset-xl-1 left">
 									<h2 class="display-2">Collaborate freely.</h2>
-									<p>Zotero lets you freely collaborate with fellow researchers and distribute class materials to your students. With no restrictions on membership, you can share files, notes, and discussion threads in public or in private.</p>
+									<p>Zotero lets you co-write a paper with a colleague, distribute course materials to students, or build a collaborative bibliography. You can share a Zotero library with as many people you like, at no cost.</p>
 								</div>
 							</div>
 						</section>
+						<section class="section-md">
+							<div class="row align-items-center">
+								<div class="feature-col col-md-6 col-xl-5 offset-xl-1 text-center left">
+									<img class="img-fluid" src="../assets/images/home/privacy.svg" width="444" height="336">
+								</div>
+								<div class="feature-col col-md-6 col-xl-5 right">
+									<h2 class="display-2">Rest easy.</h2>
+									<p>Zotero is developed by an independent, nonprofit organization that has no financial interest in your private information. With Zotero, you always stay in control of your own data.</p>
+								</div>
+							</div>
+						</section>
+					</div>
+				</section>
+				<section class="section-md text-center why">
+					<div class="container">
+						<p>Still not sure which program to use for your research? See <a href="/why">why we think you should choose Zotero</a>.</p>
 					</div>
 				</section>
 				<section class="section-sm separated call-to-action">

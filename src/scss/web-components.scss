@@ -51,7 +51,7 @@
 @import "forms";
 @import "inline-feedback";
 @import "icon";
-
+@import "popover";
 
 // Component Sections
 
@@ -73,10 +73,12 @@
 @import "usergroups";
 @import "institution-checkout";
 @import "profile/profile";
-@import 'components/react-tabs';
+@import "whyzotero";
+
 // Components
 // --------------------------------------------------
 
+@import 'components/react-tabs';
 //@import 'GroupInvitations';
 //@import 'InviteToGroup';
 //@import 'UserGroups';
@@ -94,4 +96,3 @@
 @import 'orcid';
 @import 'components/create-group';
 @import 'components/cv-editor';
-

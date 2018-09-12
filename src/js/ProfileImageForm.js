@@ -4,7 +4,7 @@ import {log as logger} from './Log.js';
 let log = logger.Logger('ProfileImageForm');
 
 import {postFormData, ajax} from './ajax.js';
-import {slugify, readCookie, getCurrentUser} from './Utils.js';
+import {getCurrentUser} from './Utils.js';
 import {buildUrl} from './wwwroutes.js';
 import {Notifier} from './Notifier.js';
 
@@ -36,14 +36,18 @@ class ProfileImage extends React.Component{
 		super(props);
 	}
 	render(){
-		let {type, hasImage, purpose, entityID, width, height} = this.props;
+		let {type, hasImage, purpose, entityID, width, height, usePlaceholder} = this.props;
 		let style = {
 			'width': this.props.width,
 			'height': this.props.height,
 		};
 		let imgSrc = null;
 		if(!hasImage){
-			return <EmptyImage width={width} height={height} />;
+			if(usePlaceholder){
+				return <EmptyImage width={width} height={height} />;
+			} else {
+				return null;
+			}
 		}
 		if(type == 'user'){
 			imgSrc = hasImage ? buildUrl('profileImage', {userID: entityID, 'purpose':purpose}) : buildUrl('profileImage', {'purpose':purpose});
@@ -55,7 +59,8 @@ class ProfileImage extends React.Component{
 }
 ProfileImage.defaultProps = {
 	width: '150px',
-	height: '150px'
+	height: '150px',
+	usePlaceholder:true
 };
 
 class ProfileImageForm extends React.Component{

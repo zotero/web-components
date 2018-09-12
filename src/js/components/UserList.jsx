@@ -36,6 +36,37 @@ class SmallUser extends Component {
 		);
 	}
 }
+
+class LargeUser extends Component {
+	render() {
+		log.debug('LargeUser');
+		const {user} = this.props;
+		const {profile} = user.meta;
+
+		const profileUrl = buildUrl('profileUrl', {slug:user.slug});
+		//const profileImageSrc = buildUrl('profileImage', {userID:user.userID, purpose:'thumb'});
+		return (
+			<div className="nugget-user-small card border-0">
+				<div className='card-body border-top'>
+					<a href={profileUrl}>
+						<ProfileImage hasImage={user.hasImage} type='user' entityID={user.userID} width='100px' height='100px' usePlaceholder={false} />
+						{/*<img className="small-profile-image float-left mr-3" src={profileImageSrc} alt={user.slug} title={user.slug} />*/}
+					</a>
+					<div className="nugget-name card-title">
+						<a href={profileUrl}>{user.displayName}</a>
+					</div>
+					{profile.hasOwnProperty('affiliation') ?
+						<div className="nugget-affiliation card-subtitle text-muted">{profile.affiliation}</div> :
+						null}
+					{profile.hasOwnProperty('location') ?
+						<div className="nugget-location card-subtitle text-muted">{profile.location}</div> :
+						null}
+				</div>
+			</div>
+		);
+	}
+}
+
 class UserList extends Component{
 	constructor(props){
 		super(props);
@@ -82,4 +113,4 @@ UserList.propTypes = {
 	
 };
 
-export {UserList};
+export {UserList, SmallUser, LargeUser};

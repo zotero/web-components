@@ -10,7 +10,7 @@ const config = window.zoteroConfig;
 import {ajax} from '../ajax.js';
 import {LoadingSpinner} from '../LoadingSpinner.js';
 
-let LocationState = require('../LocationState.js');
+import {LocationState} from '../LocationState.js';
 let locationState = new LocationState();
 
 import {LibraryItem} from './LibraryItemSearchResult.js';

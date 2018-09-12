@@ -11,7 +11,7 @@ const config = window.zoteroConfig;
 
 let LibraryItemResult = require('./LibraryItemSearchResult.js');
 
-let LocationState = require('../LocationState.js');
+import {LocationState} from '../LocationState.js';
 let locationState = new LocationState();
 
 const baseSearchUrl = config.baseGlobalApiUrl;

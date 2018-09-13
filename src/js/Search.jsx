@@ -18,8 +18,8 @@ class SearchPagination extends Component{
 		let numPages = Math.min(Math.ceil(totalResults / resultsPerPage), 10);
 		let pageLinks = [];
 		for(let i=1; i<numPages+1; i++){
-			locationState.setPathVar(pageVar, i);
-			let url = locationState.buildUrl(locationState.vars.path);
+			locationState.setQueryVar(pageVar, i);
+			let url = locationState.buildUrl({}, locationState.vars.q);
 
 			pageLinks.push(<PaginationItem active={i == page}>
 				<PaginationLink href={url}>{i}</PaginationLink>
@@ -34,7 +34,7 @@ class SearchPagination extends Component{
 }
 SearchPagination.defaultProps = {
 	pageVar:'p',
-	pageType:'path',
+	pageType:'query',
 	page:1,
 	resultsPerPage:10,
 	basePath:'/'
@@ -49,7 +49,7 @@ class Search extends Component{
 			query:'',
 			totalResults:null,
 			results:[],
-			page:null
+			page:1
 		}
 		this.ls.parseVars();
 		if(this.ls.getVar('type')){
@@ -67,7 +67,7 @@ class Search extends Component{
 		evt.preventDefault();
 		let type = evt.target.getAttribute('data-type');
 		this.setState({type, results:[], totalResults:null});
-		this.ls.setPathVar('type', type);
+		this.ls.setQueryVar('type', type);
 		this.ls.pushState();
 	}
 	handleQueryChange = (evt) => {
@@ -80,7 +80,7 @@ class Search extends Component{
 		const {query, type, page} = this.state;
 
 		//change url
-		this.ls.setPathVar('q', query);
+		this.ls.setQueryVar('q', query);
 		this.ls.pushState();
 		
 		//perform query

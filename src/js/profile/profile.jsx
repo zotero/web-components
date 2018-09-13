@@ -206,8 +206,8 @@ class Profile extends React.Component {
 			);
 		}
 
-		let userLibraryLink = profile.meta.privacy.publishLibrary ? (
-			<a href='./items'>{profile.displayName}'s public library</a>
+		let userLibraryLink = profile.meta.privacy.publishLibrary == '1' ? (
+			<a href={`/${profile.slug}/items`}>{profile.displayName}'s public library</a>
 		) : null;
 
 		let navbar = (

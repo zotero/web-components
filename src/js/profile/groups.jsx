@@ -98,9 +98,6 @@ class GroupsDetailed extends React.Component {
 									<span>
 										<a href={groupUrl}>{ group.data.name }</a>
 									</span>
-									<a href={ groupUrl } className="profile-groups-detailed-details-view">
-										View
-									</a>
 								</div>
 								<div>
 									{ groupMemberCount(group) } Members

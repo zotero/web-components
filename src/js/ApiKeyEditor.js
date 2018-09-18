@@ -5,7 +5,7 @@ var log = logger.Logger('ApiKeyEditor');
 
 const React = require('react');
 
-const {Component} = React;
+const {Component, Fragment} = React;
 import PropTypes from 'prop-types';
 
 import {RadioGroup, Radio} from './react-radio-group.js';
@@ -13,12 +13,17 @@ import {ajax} from './ajax.js';
 import {buildUrl} from './wwwroutes.js';
 import {Notifier} from './Notifier.js';
 import {querystring, parseQuery, loadInitialState} from './Utils.js';
+import {Label, Button, Input, Form, FormGroup, Row, Col} from 'reactstrap';
+import {ErrorWrapper} from './components/ErrorWrapper.jsx';
 
 let scrollToTop = function() {
 	window.scrollBy(0, -5000);
 };
 
 let stringToBool = function(val){
+	if(val === true || val === false){
+		return val;
+	}
 	if(val === '0' || val === 0) {
 		return false;
 	} else if(val === '1' || val === 1) {
@@ -95,9 +100,9 @@ let requestedPermissions = function(userGroups = []) {
 
 	for(let key in userGroups) {
 		let group = userGroups[key];
-		let varname = `group_${group.groupID}`;
+		let varname = `group_${group.id}`;
 		if(queryVars[varname] && queryVars[varname] != 'none'){
-			access.groups[group.groupID] = queryVars[varname];
+			access.groups[group.id] = queryVars[varname];
 		}
 	}
 
@@ -108,8 +113,8 @@ class AcceptOAuth extends Component {
 	render() {
 		return (
 			<div className='oauth-options'>
-				<button type='button'>Accept Defaults</button>
-				<button type='button'>Change Permissions</button>
+				<Button>Accept Defaults</Button>{' '}
+				<Button>Change Permissions</Button>
 			</div>
 		);
 	}
@@ -135,7 +140,7 @@ class PermissionsSummary extends Component {
 		let access = this.props.access;
 		let userGroupsByKey = {};
 		for(let group of this.props.userGroups){
-			userGroupsByKey[group.groupID] = group;
+			userGroupsByKey[group.id] = group;
 		}
 		let summary = [];
 		
@@ -197,9 +202,8 @@ PermissionsSummary.propTypes = {
 class PersonalLibraryPermissions extends Component {
 	constructor(props) {
 		super(props);
-		this.handleChange = this.handleChange.bind(this);
 	}
-	handleChange(evt){
+	handleChange = (evt) => {
 		log.debug('PersonalLibraryPermissions handleChange');
 		if(!this.props.updateAccess){
 			log.Error('updateAccess not set on PersonalLibraryPermissions');
@@ -230,24 +234,32 @@ class PersonalLibraryPermissions extends Component {
 		let access = this.props.access;
 		return (
 			<div id="personal-library-permissions">
-				<fieldset id="fieldset-personalLibrary"><legend>Personal Library</legend>
-					<ul>
-						<li>
-							<label htmlFor="library">Allow library access
-							<input name="library" id="library" checked={access.library} className="checkbox" type="checkbox" onChange={this.handleChange} /></label>
-							<p className="hint">Allow third party to access your library.</p>
-						</li>
-						<li>
-							<label htmlFor="notes">Allow notes access
-							<input name="notes" id="notes" checked={access.notes} className="checkbox" type="checkbox" onChange={this.handleChange} /></label>
-							<p className="hint">Allow third party to access your notes.</p>
-						</li>
-						<li><label htmlFor="write">Allow write access
-							<input name="write" id="write" checked={access.write} className="checkbox" type="checkbox" onChange={this.handleChange} /></label>
-							<p className="hint">Allow third party to make changes to your library.</p>
-						</li>
-					</ul>
-				</fieldset>
+				<Form>
+				<FormGroup tag="fieldset">
+					<legend>Personal Library</legend>
+					<FormGroup check>
+						<Label check htmlFor="library">
+							<Input name="library" id="library" checked={access.library} type="checkbox" onChange={this.handleChange} />
+							Allow library access
+						</Label>
+						<p className="text-muted small">Allow third party to access your library.</p>
+					</FormGroup>
+					<FormGroup check>
+						<Label check htmlFor="notes">
+							<Input name="notes" id="notes" checked={access.notes} type="checkbox" onChange={this.handleChange} />
+							Allow notes access
+						</Label>
+						<p className="text-muted small">Allow third party to access your notes.</p>
+					</FormGroup>
+					<FormGroup check>
+						<Label check htmlFor="write">
+							<Input name="write" id="write" checked={access.write} type="checkbox" onChange={this.handleChange} />
+							Allow write access
+						</Label>
+						<p className="text-muted small">Allow third party to make changes to your library.</p>
+					</FormGroup>
+				</FormGroup>
+				</Form>
 			</div>
 		);
 	}
@@ -256,9 +268,8 @@ class PersonalLibraryPermissions extends Component {
 class AllGroupsPermissions extends Component {
 	constructor(props){
 		super(props);
-		this.handleChange = this.handleChange.bind(this);
 	}
-	handleChange(newAllValue){
+	handleChange = (newAllValue) => {
 		if(!this.props.updateAccess){
 			log.Error('updateAccess not set on AllGroupsPermissions');
 			return;
@@ -286,26 +297,50 @@ class AllGroupsPermissions extends Component {
 
 		return (
 			<div className="all-groups-permissions">
-				<legend>Default Group Permissions</legend>
-				<label htmlFor="all_groups">All Groups
-					<RadioGroup name={radioName} selectedValue={selectedValue} onChange={this.handleChange}>
-						<label htmlFor={radioName+'none'}>
-							<Radio value="none" id={radioName+'none'} className="radio" />
-							None
-						</label>
-						<br />
-						<label htmlFor={radioName+'read'}>
-							<Radio value="read" id={radioName+'read'} className="radio" />
-							Read Only
-						</label>
-						<br />
-						<label htmlFor={radioName+'write'}>
-							<Radio value="write" id={radioName+'write'} className="radio" />
-							Read/Write
-						</label>
-					</RadioGroup>
-				</label>
-				<p className="hint">Allow access to all current and future groups.</p>
+				<Form>
+				<FormGroup tag="fieldset">
+					<legend>Default Group Permissions</legend>
+					<Label htmlFor="all_groups">All Groups
+						{/*
+						<FormGroup check>
+							<Label check>
+								<Input type="radio" name={radioName+'_none'} checked={selectedValue=='none'} onChange={this.handleChange} />{' '}
+								None
+							</Label>
+						</FormGroup>
+						<FormGroup check>
+							<Label check>
+								<Input type="radio" name={radioName+'_read'} onChange={this.handleChange} />{' '}
+								Read Only
+							</Label>
+						</FormGroup>
+						<FormGroup check>
+							<Label check>
+								<Input type="radio" name={radioName+'_write'} onChange={this.handleChange} />{' '}
+								Read/Write
+							</Label>
+						</FormGroup>
+						*/}
+						<RadioGroup name={radioName} selectedValue={selectedValue} onChange={this.handleChange}>
+							<Label htmlFor={radioName+'none'}>
+								<Radio value="none" id={radioName+'none'} className="radio" />{' '}
+								None
+							</Label>
+							<br />
+							<Label htmlFor={radioName+'read'}>
+								<Radio value="read" id={radioName+'read'} className="radio" />{' '}
+								Read Only
+							</Label>
+							<br />
+							<Label htmlFor={radioName+'write'}>
+								<Radio value="write" id={radioName+'write'} className="radio" />{' '}
+								Read/Write
+							</Label>
+						</RadioGroup>
+					</Label>
+					<p className="text-muted small">Allow access to all current and future groups.</p>
+				</FormGroup>
+				</Form>
 			</div>
 		);
 	}
@@ -314,9 +349,8 @@ class AllGroupsPermissions extends Component {
 class IndividualGroupPermissions extends Component {
 	constructor(props){
 		super(props);
-		this.handleChange = this.handleChange.bind(this);
 	}
-	handleChange(newGroupValue){
+	handleChange = (newGroupValue) => {
 		if(!this.props.updateAccess){
 			log.Error('updateAccess not set on IndividualGroupPermissions');
 			return;
@@ -337,37 +371,38 @@ class IndividualGroupPermissions extends Component {
 
 	render(){
 		log.debug('IndividualGroupPermissions render');
-		let group = this.props.group;
-		let groupID = group.groupID;
+		log.debug(this.props);
+		const {group, access} = this.props;
+		let groupID = group.id;
 		let groupName = group.name;
 		let radioName = `group_${groupID}`;
-		let selectedValue = this.props.access.groups[groupID];
+		let selectedValue = access.groups[groupID];
 		if(!selectedValue){
 			selectedValue = 'none';
 		}
 
 		return (
-			<li>
-				<label htmlFor={`group_${groupID}`}>{groupName}
+			<Fragment>
+				<Label htmlFor={`group_${groupID}`}>{groupName}
 					<RadioGroup name={radioName} selectedValue={selectedValue} onChange={this.handleChange}>
-						<label htmlFor={radioName+'none'}>
-							<Radio value="none" id={radioName+'_none'} className="radio" />
+						<Label htmlFor={radioName+'_none'}>
+							<Radio value="none" id={radioName+'_none'} className="radio" />{' '}
 							None
-						</label>
+						</Label>
 						<br />
-						<label htmlFor={radioName+'read'}>
-							<Radio value="read" id={radioName+'_read'} className="radio" />
+						<Label htmlFor={radioName+'_read'}>
+							<Radio value="read" id={radioName+'_read'} className="radio" />{' '}
 							Read Only
-						</label>
+						</Label>
 						<br />
-						<label htmlFor={radioName+'write'}>
-							<Radio value="write" id={radioName+'_write'} className="radio" />
+						<Label htmlFor={radioName+'_write'}>
+							<Radio value="write" id={radioName+'_write'} className="radio" />{' '}
 							Read/Write
-						</label>
+						</Label>
 					</RadioGroup>
-				</label>
-				<p className="hint">Access level to this group.</p>
-			</li>
+				</Label>
+				<p className="text-muted small">Access level to this group.</p>
+			</Fragment>
 		);
 	}
 }
@@ -377,8 +412,8 @@ class AcceptDefaults extends Component {
 	render(){
 		return (
 			<div>
-				<button type='button' onClick={this.props.acceptDefaults}>Accept Defaults</button>
-				<button type='button' onClick={this.props.editPermissions}>Edit Permissions</button>
+				<Button onClick={this.props.acceptDefaults}>Accept Defaults</Button>{' '}
+				<Button onClick={this.props.editPermissions}>Edit Permissions</Button>
 			</div>
 		);
 	}
@@ -386,15 +421,12 @@ class AcceptDefaults extends Component {
 
 class KeyAccessEditor extends Component {
 	render(){
-		let access = this.props.access;
-		let userGroups = this.props.userGroups;
-		let updateAccess = this.props.updateAccess;
-		let changePerGroup = this.props.changePerGroup;
+		const {perGroup, access, userGroups, updateAccess, changePerGroup} = this.props;
 
 		let individualGroupNodes = null;
-		if(this.props.perGroup){
+		if(perGroup){
 			individualGroupNodes = userGroups.map((group) => {
-				let groupID = group.groupID;
+				let groupID = group.id;
 				return <IndividualGroupPermissions key={groupID} groupID={groupID} group={group} access={access} updateAccess={updateAccess} />;
 			});
 		}
@@ -403,19 +435,17 @@ class KeyAccessEditor extends Component {
 			<div>
 				<PersonalLibraryPermissions access={access} updateAccess={updateAccess} />
 				<AllGroupsPermissions access={access} updateAccess={updateAccess} />
-				<fieldset>
+				<FormGroup tag="fieldset">
 					<legend>Specific Groups</legend>
-					<ul>
-						<li><label htmlFor="individual_groups">Per Group Permissions
-								<input name="individual_groups" className="checkbox" type="checkbox" onChange={changePerGroup} checked={this.props.perGroup} />
-							</label>
-							<p className="hint">Set group by group permissions for this key</p>
-						</li>
-					</ul>
-					<ul>
-						{individualGroupNodes}
-					</ul>
-				</fieldset>
+					<FormGroup>
+						<Label check htmlFor="individual_groups">
+							<Input name="individual_groups" id="individual_groups" type="checkbox" onChange={changePerGroup} checked={perGroup} />
+							Per Group Permissions
+						</Label>
+						<p className="text-muted small">Set group by group permissions for this key</p>
+					</FormGroup>
+					{individualGroupNodes}
+				</FormGroup>
 			</div>
 		);
 	}
@@ -472,30 +502,21 @@ class ApiKeyEditor extends Component {
 				this.state.name = this.state.oauthClientName;
 			}
 		}
-
-		//bind callback functions to component
-		this.updateAccess = this.updateAccess.bind(this);
-		this.changePerGroup = this.changePerGroup.bind(this);
-		this.saveKey = this.saveKey.bind(this);
-		this.changeName = this.changeName.bind(this);
 	}
-	componentDidMount() {
-	}
-
-	updateAccess(updatedAccess) {
+	updateAccess = (updatedAccess) => {
 		log.debug('updating access');
 		log.debug(updatedAccess);
 		this.setState({access: updatedAccess});
 	}
 
-	changeName(evt) {
+	changeName = (evt) => {
 		this.setState({name:evt.target.value});
 	}
 
-	saveKey(){
+	saveKey = async () => {
 		let key;
 		if(this.state.editKey){
-			key = editKey.key;
+			key = this.state.editKey.key;
 		}
 
 		let keyObject = {
@@ -503,7 +524,7 @@ class ApiKeyEditor extends Component {
 			name: this.state.name,
 			access: this.state.access
 		};
-
+		
 		//if perGroup is off, don't send anything other than the 'all' setting
 		if(!this.state.perGroup){
 			keyObject.access.groups = {
@@ -511,35 +532,33 @@ class ApiKeyEditor extends Component {
 			};
 		}
 		let saveUrl = buildUrl('saveKey', {key:key});
-		ajax({url:saveUrl, type:'POST', withSession:true, data:JSON.stringify(keyObject)}).then((resp)=>{
-			scrollToTop();
-			if(!resp.ok){
-				log.error('Error saving key');
-			}
-			resp.json().then((data) => {
-				if(data.success){
-					this.setState({notification: {type:'success', message:'Key Saved'}});
-					let queryVars = parseQuery(querystring(window.document.location.href));
+		let resp = await ajax({url:saveUrl, type:'POST', withSession:true, data:JSON.stringify(keyObject)});
+		scrollToTop();
+		if(!resp.ok){
+			log.error('Error saving key');
+		}
+		let data = await resp.json()
+		if(data.success){
+			this.setState({notification: {type:'success', message:'Key Saved'}});
+			let queryVars = parseQuery(querystring(window.document.location.href));
 
-					//check for redirect used in private feed url flow and forward if present
-					if(queryVars['redirect']){
-						let target = queryVars['redirect'];
-						if(target.includes('?')){
-							target = target + `&key=${data.updatedKey.key}`;
-						} else {
-							target = target + `?key=${data.updatedKey.key}`;
-						}
-						window.location.href = target;
-					}
+			//check for redirect used in private feed url flow and forward if present
+			if(queryVars['redirect']){
+				let target = queryVars['redirect'];
+				if(target.includes('?')){
+					target = target + `&key=${data.updatedKey.key}`;
 				} else {
-					this.setState({notification: {type:'error', message:'Error saving key'}});
+					target = target + `?key=${data.updatedKey.key}`;
 				}
-				log.debug(data);
-			});
-		});
+				window.location.href = target;
+			}
+		} else {
+			this.setState({notification: {type:'error', message:'Error saving key'}});
+		}
+		log.debug(data);
 	}
 
-	changePerGroup(evt) {
+	changePerGroup = (evt) => {
 		this.setState({perGroup: evt.target.checked});
 	}
 	render() {
@@ -573,21 +592,23 @@ class ApiKeyEditor extends Component {
 			notifier = <Notifier {...this.state.notification} />;
 		}
 		return (
-			<div className='key-editor'>
-				{title}
-				{notifier}
-				{requesterNode}
-				<label htmlFor='name'>Key Name
-					<input type='text' placeholder='Key Name' name='name' id='name' onChange={this.changeName} value={this.state.name} />
-				</label>
+			<ErrorWrapper>
+				<div className='key-editor'>
+					{title}
+					{notifier}
+					{requesterNode}
+					<Label htmlFor='name'>Key Name
+						<Input type='text' placeholder='Key Name' name='name' id='name' onChange={this.changeName} value={this.state.name} />
+					</Label>
 
-				<PermissionsSummary access={this.state.access} userGroups={this.state.userGroups} />
+					<PermissionsSummary access={this.state.access} userGroups={this.state.userGroups} />
 
-				{editingSection}
+					{editingSection}
 
-				<button type='button' onClick={this.saveKey}>Save Key</button>
-				<button type='button'>Revoke Key</button>
-			</div>
+					<Button onClick={this.saveKey}>Save Key</Button>{' '}
+					<Button>Revoke Key</Button>
+				</div>
+			</ErrorWrapper>
 		);
 	}
 }

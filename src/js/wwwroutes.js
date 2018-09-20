@@ -48,6 +48,12 @@ let buildUrl = function(name, params){
 			} else {
 				return `/settings/savekey`;
 			}
+		case 'revokeKey':
+			if(params.key){
+				return `/settings/revokekey?key=${params.key}`;
+			} else {
+				throw 'No key specified in revokeKey';
+			}
 		case 'checkGroupName':
 			return `/groups/checkname?input=${params.name}`;
 		case 'checkUsername':

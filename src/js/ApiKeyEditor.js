@@ -9,12 +9,16 @@ const {Component, Fragment} = React;
 import PropTypes from 'prop-types';
 
 import {RadioGroup, Radio} from './react-radio-group.js';
-import {ajax} from './ajax.js';
+import {ajax, postFormData, loadAllUserGroups} from './ajax.js';
 import {buildUrl} from './wwwroutes.js';
 import {Notifier} from './Notifier.js';
 import {querystring, parseQuery, loadInitialState} from './Utils.js';
-import {Label, Button, Input, Form, FormGroup, Row, Col} from 'reactstrap';
+import {Alert, Label, Button, Input, Form, FormGroup, Card, CardBody, CardTitle} from 'reactstrap';
 import {ErrorWrapper} from './components/ErrorWrapper.jsx';
+import {getCurrentUser} from './Utils.js';
+import { Spinner } from './LoadingSpinner.js';
+
+const currentUser = getCurrentUser();
 
 let scrollToTop = function() {
 	window.scrollBy(0, -5000);
@@ -69,11 +73,21 @@ let accessShape = PropTypes.shape({
 }).isRequired;
 
 //TODO: identity request
-//TODO: Accept default permissions for oauth requests
 //TODO: redirect oauth on key creation
 //TODO: Specify requesting application when oauth request
 //TODO: complete handshake with verifier instead of forwarding if OOB
 //TODO: display key when created and/or change url to editing new key, or forward to manage keys
+
+//cases:
+// - identity request
+// - create key with no permissions specified
+// - create key with permissions specified
+// - create key oauth with permissions specified
+// - create key for private feed with redirect
+// - edit existing key
+// - revoke existing key
+// -  
+
 
 let defaultValue = function(v, def){
 	if(typeof v === 'undefined'){
@@ -191,7 +205,14 @@ class PermissionsSummary extends Component {
 			summary.push(<li key='empty_permssions'>No additional permissions selected</li>);
 		}
 
-		return <div id='key-permissions-summary'><ul>{summary}</ul></div>;
+		return (
+			<Card id='key-permissions-summary' className="mb-4">
+				<CardBody>
+					<CardTitle>Permissions</CardTitle>
+					<ul>{summary}</ul>
+				</CardBody>
+			</Card>
+		)
 	}
 }
 
@@ -412,7 +433,7 @@ class AcceptDefaults extends Component {
 	render(){
 		return (
 			<div>
-				<Button onClick={this.props.acceptDefaults}>Accept Defaults</Button>{' '}
+				<Button onClick={this.props.saveKey}>Accept Defaults</Button>{' '}
 				<Button onClick={this.props.editPermissions}>Edit Permissions</Button>
 			</div>
 		);
@@ -454,58 +475,53 @@ class KeyAccessEditor extends Component {
 class ApiKeyEditor extends Component {
 	constructor(props) {
 		super(props);
-		let defaultState = {
-			defaultsPending:false
-		};
-		defaultState = loadInitialState(defaultState);
-		this.state = defaultState;
-		
-		if(this.state.editKey){
-			//set up initial state for an existing key
-			let editKey = this.state.editKey;
-			let access = boolAccess(editKey.access);
-			let perGroup = false;
-			let accessGroupIDs = Object.keys(access['groups']);
-			for(let groupID of accessGroupIDs){
-				if(groupID != 'all'){
-					perGroup = true;
-					break;
-				}
-			}
+		const {editKey} = props;
+		this.state = {loading:true, editKey};
+		this.initializeRequested();
+	}
+	initializeRequested = async () => {
+		log.debug('initializeRequested');
+		const {editKey, oauthRequest} = this.props;
+		const userGroups = await loadAllUserGroups(currentUser.userID);
 
-			this.state.access = access;
-			this.state.name = editKey.name;
-			this.state.perGroup = perGroup;
+		let access, perGroup, name;
+		if(editKey){
+			//set up initial state for an existing key
+			access = boolAccess(editKey.access);
+			name = editKey.name;
 		} else {
 			//set up initial state for new key, including checking for permissions requested
 			//in query params
-			this.state.access = requestedPermissions(this.state.userGroups);
-
-			if(this.state.oauthClientName) {
-				this.state.defaultsPending = true;
-			}
-
-			let perGroup = false;
-			let accessGroupIDs = Object.keys(this.state.access['groups']);
-			for(let groupID of accessGroupIDs){
-				if(groupID != 'all'){
-					perGroup = true;
-					break;
-				}
-			}
-			this.state.perGroup = perGroup;
-
+			access = requestedPermissions(userGroups);
 			let queryVars = parseQuery(querystring(window.document.location.href));
+			name = '';
 			if(queryVars['name']){
-				this.state.name = queryVars['name'];
-			} else if(this.state.oauthClientName) {
-				this.state.name = this.state.oauthClientName;
+				name = queryVars['name'];
+			} else if(props.oauthClientName) {
+				name = props.oauthClientName;
 			}
 		}
+
+		perGroup = false;
+		let accessGroupIDs = Object.keys(access['groups']);
+		for(let groupID of accessGroupIDs){
+			if(groupID != 'all'){
+				perGroup = true;
+				break;
+			}
+		}
+
+		this.setState({
+			editKey,
+			access,
+			name:name,
+			perGroup,
+			defaultsPending: oauthRequest ? true : false,
+			userGroups,
+			loading:false
+		});
 	}
 	updateAccess = (updatedAccess) => {
-		log.debug('updating access');
-		log.debug(updatedAccess);
 		this.setState({access: updatedAccess});
 	}
 
@@ -514,19 +530,20 @@ class ApiKeyEditor extends Component {
 	}
 
 	saveKey = async () => {
-		let key;
-		if(this.state.editKey){
-			key = this.state.editKey.key;
+		const {editKey, name, access, perGroup} = this.state;
+		let key = false;
+		if(editKey){
+			key = editKey.key;
 		}
 
 		let keyObject = {
 			key:key,
-			name: this.state.name,
-			access: this.state.access
+			name: name,
+			access: access
 		};
 		
 		//if perGroup is off, don't send anything other than the 'all' setting
-		if(!this.state.perGroup){
+		if(!perGroup){
 			keyObject.access.groups = {
 				all: keyObject.access.groups['all']
 			};
@@ -551,45 +568,93 @@ class ApiKeyEditor extends Component {
 					target = target + `?key=${data.updatedKey.key}`;
 				}
 				window.location.href = target;
+			} else {
+				//if this is a newly created key, display it for user to copy
+				if(!key){
+					this.setState({createdKey:data.updatedKey.key});
+				}
 			}
 		} else {
 			this.setState({notification: {type:'error', message:'Error saving key'}});
 		}
 		log.debug(data);
 	}
+	
+	revokeKey = async () => {
+		const {editKey} = this.state;
+		const key = editKey.key;
+		
+		let revokeUrl = buildUrl('revokeKey', {key:key});
+		let resp = await postFormData(revokeUrl, {revoke:'1', key:key});
+		scrollToTop();
+		if(!resp.ok){
+			log.error('Error deleting key');
+		}
+		let data = await resp.json()
+		if(data.success){
+			this.setState({notification: {type:'success', message:'Key Revoked'}});
+		} else {
+			this.setState({notification: {type:'error', message:'Error deleting key'}});
+		}
+	}
 
 	changePerGroup = (evt) => {
 		this.setState({perGroup: evt.target.checked});
 	}
 	render() {
+		const {userGroups} = this.props;
+		const {loading, createdKey, editKey, defaultsPending, oauthClientName, access, perGroup, notification, name} = this.state;
 		let title = <h1>New Key</h1>;
-		if(this.state.editKey){
+		if(editKey){
 			title = <h1>Edit Key</h1>;
+		}
+
+		if(loading){
+			return <Spinner />
+		}
+
+		if(createdKey){
+			return (
+				<ErrorWrapper>
+					<div className='key-editor'>
+						<p>Your new API key has been created and is displayed below. Please save it now as it will not be accessible again after this point.</p>
+						<Alert color='success'>
+							<p className='text-center large'>{createdKey}</p>
+						</Alert>
+					</div>
+				</ErrorWrapper>
+			);
 		}
 
 		let requesterNode = null;
 		let defaultAccepter = null;
-		if(this.state.oauthClientName){
+		if(oauthClientName){
 			requesterNode = (<div>
 				<h2>An application would like to connect to your account</h2>
-				<p>The application '{this.state.oauthClientName}' would like to access your account.</p>
+				<p>The application '{oauthClientName}' would like to access your account.</p>
 			</div>);
 		}
 
-		let editingSection = (<KeyAccessEditor
-			access={this.state.access}
-			updateAccess={this.updateAccess}
-			userGroups={this.state.userGroups}
-			perGroup={this.state.perGroup}
-			changePerGroup={this.changePerGroup}
-		/>);
-		if(this.state.defaultsPending){
-			editingSection = <AcceptDefaults />;
+		let accessSection = (
+			<Fragment>
+				<KeyAccessEditor
+					access={access}
+					updateAccess={this.updateAccess}
+					userGroups={userGroups}
+					perGroup={perGroup}
+					changePerGroup={this.changePerGroup}
+				/>
+				<Button onClick={this.saveKey}>Save Key</Button>{' '}
+				<Button onClick={this.revokeKey}>Revoke Key</Button>
+			</Fragment>
+		);
+		if(defaultsPending){
+			accessSection = <AcceptDefaults saveKey={this.saveKey} editPermissions={()=>{this.setState({defaultsPending:false})}} />;
 		}
 
 		let notifier = null;
-		if(this.state.notification){
-			notifier = <Notifier {...this.state.notification} />;
+		if(notification){
+			notifier = <Notifier {...notification} />;
 		}
 		return (
 			<ErrorWrapper>
@@ -598,15 +663,12 @@ class ApiKeyEditor extends Component {
 					{notifier}
 					{requesterNode}
 					<Label htmlFor='name'>Key Name
-						<Input type='text' placeholder='Key Name' name='name' id='name' onChange={this.changeName} value={this.state.name} />
+						<Input type='text' placeholder='Key Name' name='name' id='name' onChange={this.changeName} value={name} />
 					</Label>
 
-					<PermissionsSummary access={this.state.access} userGroups={this.state.userGroups} />
+					<PermissionsSummary access={access} userGroups={userGroups} />
 
-					{editingSection}
-
-					<Button onClick={this.saveKey}>Save Key</Button>{' '}
-					<Button>Revoke Key</Button>
+					{accessSection}
 				</div>
 			</ErrorWrapper>
 		);

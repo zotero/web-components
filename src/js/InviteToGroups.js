@@ -3,7 +3,7 @@
 import {log as logger} from './Log.js';
 let log = logger.Logger('InviteToGroups');
 
-import {ajax, postFormData} from './ajax.js';
+import {ajax, postFormData, loadAllUserGroups} from './ajax.js';
 import {apiRequestString} from './ApiRouter.js';
 import {LoadingSpinner} from './LoadingSpinner.js';
 import {buildUrl} from './wwwroutes.js';
@@ -51,17 +51,9 @@ class InviteToGroups extends Component{
 			throw 'no user to invite';
 		}
 
-		//load groups of user
-		let userGroupsUrl = apiRequestString({
-			'target':'userGroups',
-			'libraryType':'user',
-			'libraryID': userID,
-			'order':'title'
-		});
 		let userGroups;
 		try {
-			let resp = await ajax({url: userGroupsUrl, credentials:'omit'});
-			userGroups = await resp.json();
+			userGroups = await loadAllUserGroups(userID);
 			this.setState({
 				userGroups,
 				userGroupsLoaded:true

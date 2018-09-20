@@ -4,6 +4,7 @@ import {log as logger} from './Log.js';
 var log = logger.Logger('ajax');
 
 import {readCookie} from './Utils.js';
+import {apiRequestString} from './ApiRouter.js';
 
 const zoteroConfig = window.zoteroConfig;
 const apiKey = zoteroConfig.apiKey;
@@ -62,4 +63,35 @@ let postFormData = function(url, data, config={}){
 	return ajax(config);
 };
 
-export {ajax, postFormData};
+let loadAllUserGroups = async function(userID, start=0) {
+	//load groups of user
+	let params = {
+		'target':'userGroups',
+		'libraryType':'user',
+		'libraryID': userID,
+		'order':'title',
+		'limit':100,
+		'start':start
+	};
+	let userGroups = [];
+	let allFetched = false;
+	while(!allFetched){
+		let userGroupsUrl = apiRequestString(params);
+		let resp = await ajax({url: userGroupsUrl, credentials:'omit'});
+		if(!resp.ok){
+			log.error(resp.statusText);
+			throw "Error fetching groups";
+		}
+		let batch = await resp.json();
+		userGroups = userGroups.concat(batch);
+		let totalResults = parseInt(resp.headers.get('Total-Results'));
+		if(totalResults > (params.start + params.limit)){
+			params.start = params.start + params.limit;
+		} else {
+			allFetched = true;
+		}
+	}
+	return userGroups;
+}
+
+export {ajax, postFormData, loadAllUserGroups};

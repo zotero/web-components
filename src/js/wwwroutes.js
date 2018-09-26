@@ -46,6 +46,9 @@ let buildUrl = function(name, params){
 			if(params.key){
 				return `/settings/savekey?key=${params.key}`;
 			} else {
+				if(params.oauth){
+					return `/settings/savekey?oauth=1`;
+				}
 				return `/settings/savekey`;
 			}
 		case 'revokeKey':

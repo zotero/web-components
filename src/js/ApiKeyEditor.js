@@ -136,14 +136,13 @@ class AcceptOAuth extends Component {
 
 class OAuthVerify extends Component {
 	render() {
-		let applicationName = window.zoteroData.oauthClientName;
-		let verifier = window.zoteroData.oauthVerifier;
+		let {applicationName, verifier} = this.props;
 		return (
-			<div>
-				<h1>Access Granted</h1>
+			<Alert color='success'>
+				<h1 className='text-center'>Access Granted</h1>
 				<p>To complete the transaction, return to {applicationName} and enter the verification code below.</p>
-				<div id="oauth_verifier">{verifier}</div>
-			</div>
+				<p id="oauth_verifier" className='text-center'>{verifier}</p>
+			</Alert>
 		);
 	}
 }
@@ -475,14 +474,22 @@ class KeyAccessEditor extends Component {
 class ApiKeyEditor extends Component {
 	constructor(props) {
 		super(props);
-		const {editKey} = props;
-		this.state = {loading:true, editKey};
+		const {editKey, userGroups} = props;
+		this.state = {loading:true, editKey, userGroups:userGroups};
+	}
+	componentDidMount = async () => {
 		this.initializeRequested();
 	}
 	initializeRequested = async () => {
 		log.debug('initializeRequested');
-		const {editKey, oauthRequest} = this.props;
-		const userGroups = await loadAllUserGroups(currentUser.userID);
+		const {editKey, oauthRequest, oauthClientName} = this.props;
+		let userGroups;
+		if(this.props.userGroups) {
+			userGroups = this.props.userGroups;
+		} else {
+			userGroups = await loadAllUserGroups(currentUser.userID);
+			userGroups = userGroups.map((ug) => {return ug.data;});
+		}
 
 		let access, perGroup, name;
 		if(editKey){
@@ -497,8 +504,8 @@ class ApiKeyEditor extends Component {
 			name = '';
 			if(queryVars['name']){
 				name = queryVars['name'];
-			} else if(props.oauthClientName) {
-				name = props.oauthClientName;
+			} else if(oauthClientName) {
+				name = oauthClientName;
 			}
 		}
 
@@ -530,6 +537,7 @@ class ApiKeyEditor extends Component {
 	}
 
 	saveKey = async () => {
+		const {oauthRequest} = this.props;
 		const {editKey, name, access, perGroup} = this.state;
 		let key = false;
 		if(editKey){
@@ -548,15 +556,25 @@ class ApiKeyEditor extends Component {
 				all: keyObject.access.groups['all']
 			};
 		}
-		let saveUrl = buildUrl('saveKey', {key:key});
+		let saveUrl = buildUrl('saveKey', {key:key, oauth:oauthRequest});
 		let resp = await ajax({url:saveUrl, type:'POST', withSession:true, data:JSON.stringify(keyObject)});
 		scrollToTop();
 		if(!resp.ok){
 			log.error('Error saving key');
 		}
 		let data = await resp.json()
-		if(data.success){
+		let {success, verifier, redirect, updatedKey} = data;
+		if(success){
 			this.setState({notification: {type:'success', message:'Key Saved'}});
+			
+			//redirect if savekey response indicates one
+			//this would be an oauth app redirect, otherwise the redirect will in in our own url parsed below
+			if(redirect){
+				log.debug(`redirect to ${redirect}`);
+				window.location.href = redirect;
+				return;
+			}
+
 			let queryVars = parseQuery(querystring(window.document.location.href));
 
 			//check for redirect used in private feed url flow and forward if present
@@ -567,12 +585,20 @@ class ApiKeyEditor extends Component {
 				} else {
 					target = target + `?key=${data.updatedKey.key}`;
 				}
+				log.debug(`redirect to ${target}`);
 				window.location.href = target;
-			} else {
-				//if this is a newly created key, display it for user to copy
-				if(!key){
-					this.setState({createdKey:data.updatedKey.key});
-				}
+				return;
+			}
+			
+			//if there is a verifier, display it for user to pass on to the oauth app
+			if(verifier){
+				this.setState({verifier});
+				return;
+			}
+			//if no previously existing key and no verifier this is a new key:
+			//display it for user to copy
+			if(!key){
+				this.setState({createdKey:data.updatedKey.key});
 			}
 		} else {
 			this.setState({notification: {type:'error', message:'Error saving key'}});
@@ -602,8 +628,9 @@ class ApiKeyEditor extends Component {
 		this.setState({perGroup: evt.target.checked});
 	}
 	render() {
-		const {userGroups} = this.props;
-		const {loading, createdKey, editKey, defaultsPending, oauthClientName, access, perGroup, notification, name} = this.state;
+		//const {userGroups} = this.props;
+		const {oauthRequest, oauthClientName} = this.props;
+		const {loading, createdKey, editKey, defaultsPending, access, perGroup, notification, name, userGroups, verifier} = this.state;
 		let title = <h1>New Key</h1>;
 		if(editKey){
 			title = <h1>Edit Key</h1>;
@@ -611,6 +638,10 @@ class ApiKeyEditor extends Component {
 
 		if(loading){
 			return <Spinner />
+		}
+
+		if(verifier){
+			return <OAuthVerify verifier={verifier} applicationName={oauthClientName} />
 		}
 
 		if(createdKey){
@@ -628,11 +659,12 @@ class ApiKeyEditor extends Component {
 
 		let requesterNode = null;
 		let defaultAccepter = null;
-		if(oauthClientName){
-			requesterNode = (<div>
+		if(oauthRequest){
+			requesterNode = (
+			<Alert color='secondary' className='my-3'>
 				<h2>An application would like to connect to your account</h2>
 				<p>The application '{oauthClientName}' would like to access your account.</p>
-			</div>);
+			</Alert>);
 		}
 
 		let accessSection = (

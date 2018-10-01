@@ -51,6 +51,8 @@ let buildUrl = function(name, params){
 				}
 				return `/settings/savekey`;
 			}
+		case 'authorizeIdentity':
+			return `/settings/authorizeidentity`;
 		case 'revokeKey':
 			if(params.key){
 				return `/settings/revokekey?key=${params.key}`;

@@ -37,15 +37,6 @@ let stringToBool = function(val){
 	return false;
 };
 
-/*
-let boolToString = function(val){
-	if(val){
-		return '1';
-	} else {
-		return '0';
-	}
-};
-*/
 let boolAccess = function(access){
 	access.library = stringToBool(access.library);
 	access.notes = stringToBool(access.notes);
@@ -57,37 +48,12 @@ let boolAccess = function(access){
 	}
 	return access;
 };
-/*
-let stringAccess = function(access){
-	access.library = boolToString(access.library);
-	access.notes = boolToString(access.notes);
-	access.write = boolToString(access.write);
-	return access;
-};
-*/
 let accessShape = PropTypes.shape({
 	library: PropTypes.bool,
 	notes: PropTypes.bool,
 	write: PropTypes.bool,
 	groups: PropTypes.object
 }).isRequired;
-
-//TODO: identity request
-//TODO: redirect oauth on key creation
-//TODO: Specify requesting application when oauth request
-//TODO: complete handshake with verifier instead of forwarding if OOB
-//TODO: display key when created and/or change url to editing new key, or forward to manage keys
-
-//cases:
-// - identity request
-// - create key with no permissions specified
-// - create key with permissions specified
-// - create key oauth with permissions specified
-// - create key for private feed with redirect
-// - edit existing key
-// - revoke existing key
-// -  
-
 
 let defaultValue = function(v, def){
 	if(typeof v === 'undefined'){
@@ -123,17 +89,6 @@ let requestedPermissions = function(userGroups = []) {
 	return access;
 };
 
-class AcceptOAuth extends Component {
-	render() {
-		return (
-			<div className='oauth-options'>
-				<Button>Accept Defaults</Button>{' '}
-				<Button>Change Permissions</Button>
-			</div>
-		);
-	}
-}
-
 class OAuthVerify extends Component {
 	render() {
 		let {applicationName, verifier} = this.props;
@@ -150,9 +105,9 @@ class OAuthVerify extends Component {
 //human readable summary of currently selected permissions
 class PermissionsSummary extends Component {
 	render() {
-		let access = this.props.access;
+		let {access, userGroups} = this.props;
 		let userGroupsByKey = {};
-		for(let group of this.props.userGroups){
+		for(let group of userGroups){
 			userGroupsByKey[group.id] = group;
 		}
 		let summary = [];
@@ -169,12 +124,8 @@ class PermissionsSummary extends Component {
 		}
 		
 		let individualGroups = [];
-		log.debug('PermissionsSummary render');
-		log.debug(access);
 		if(access.groups){
-			log.debug('have groups');
 			for(let id in access.groups) {
-				log.debug(id);
 				if(id != 'all'){
 					individualGroups.push(id);
 				}
@@ -224,13 +175,11 @@ class PersonalLibraryPermissions extends Component {
 		super(props);
 	}
 	handleChange = (evt) => {
-		log.debug('PersonalLibraryPermissions handleChange');
-		if(!this.props.updateAccess){
+		let {updateAccess, access} = this.props;
+		if(!updateAccess){
 			log.Error('updateAccess not set on PersonalLibraryPermissions');
 			return;
 		}
-		log.debug('updateAccess is available');
-		let access = this.props.access;
 		switch(evt.target.name) {
 			case 'library':
 			case 'notes':
@@ -245,13 +194,11 @@ class PersonalLibraryPermissions extends Component {
 			default:
 				log.error('Unexpected target for PersonalLibraryPermissions');
 		}
-		this.props.updateAccess(access);
+		updateAccess(access);
 	}
 
 	render() {
-		log.debug('PersonalLibraryPermissions render');
-		log.debug(this);
-		let access = this.props.access;
+		let {access} = this.props;
 		return (
 			<div id="personal-library-permissions">
 				<Form>
@@ -294,7 +241,6 @@ class AllGroupsPermissions extends Component {
 			log.Error('updateAccess not set on AllGroupsPermissions');
 			return;
 		}
-		log.debug(newAllValue);
 		let access = this.props.access;
 		switch(newAllValue){
 			case 'none':
@@ -308,7 +254,6 @@ class AllGroupsPermissions extends Component {
 		this.props.updateAccess(access);
 	}
 	render() {
-		log.debug('AllGroupPermissions render');
 		let radioName = 'all_groups';
 		let selectedValue = this.props.access.groups['all'];
 		if(!selectedValue){
@@ -321,26 +266,6 @@ class AllGroupsPermissions extends Component {
 				<FormGroup tag="fieldset">
 					<legend>Default Group Permissions</legend>
 					<Label htmlFor="all_groups">All Groups
-						{/*
-						<FormGroup check>
-							<Label check>
-								<Input type="radio" name={radioName+'_none'} checked={selectedValue=='none'} onChange={this.handleChange} />{' '}
-								None
-							</Label>
-						</FormGroup>
-						<FormGroup check>
-							<Label check>
-								<Input type="radio" name={radioName+'_read'} onChange={this.handleChange} />{' '}
-								Read Only
-							</Label>
-						</FormGroup>
-						<FormGroup check>
-							<Label check>
-								<Input type="radio" name={radioName+'_write'} onChange={this.handleChange} />{' '}
-								Read/Write
-							</Label>
-						</FormGroup>
-						*/}
 						<RadioGroup name={radioName} selectedValue={selectedValue} onChange={this.handleChange}>
 							<Label htmlFor={radioName+'none'}>
 								<Radio value="none" id={radioName+'none'} className="radio" />{' '}
@@ -376,7 +301,6 @@ class IndividualGroupPermissions extends Component {
 			return;
 		}
 		let access = this.props.access;
-		log.debug(this.props.groupID);
 		switch(newGroupValue){
 			case 'none':
 			case 'read':
@@ -390,8 +314,6 @@ class IndividualGroupPermissions extends Component {
 	}
 
 	render(){
-		log.debug('IndividualGroupPermissions render');
-		log.debug(this.props);
 		const {group, access} = this.props;
 		let groupID = group.id;
 		let groupName = group.name;
@@ -471,6 +393,87 @@ class KeyAccessEditor extends Component {
 	}
 }
 
+class IdentityRequest extends Component {
+	constructor(props){
+		super(props);
+		this.state = {};
+	}
+	saveKey = async () => {
+		let resp;
+		let identityUrl = buildUrl('authorizeIdentity');
+		resp = await ajax({url:identityUrl, type:'POST', withSession:true})
+
+		scrollToTop();
+		if(!resp.ok){
+			log.error('Error processing request');
+		}
+		let data = await resp.json()
+		let {success, verifier, redirect} = data;
+		if(success){
+			this.setState({notification: {type:'success', message:'Permission granted'}});
+			
+			//redirect if savekey response indicates one
+			//this would be an oauth app redirect, otherwise the redirect will in in our own url parsed below
+			if(redirect){
+				log.debug(`redirect to ${redirect}`);
+				window.location.href = redirect;
+				return;
+			}
+
+			let queryVars = parseQuery(querystring(window.document.location.href));
+
+			//check for redirect used in private feed url flow and forward if present
+			if(queryVars['redirect']){
+				let target = queryVars['redirect'];
+				if(target.includes('?')){
+					target = target + `&key=${updatedKey.key}`;
+				} else {
+					target = target + `?key=${updatedKey.key}`;
+				}
+				log.debug(`redirect to ${target}`);
+				window.location.href = target;
+				return;
+			}
+			
+			//if there is a verifier, display it for user to pass on to the oauth app
+			if(verifier){
+				this.setState({verifier});
+				return;
+			}
+		} else {
+			this.setState({notification: {type:'error', message:'Error processing request'}});
+		}
+	}
+
+	render(){
+		let {oauthClientName} = this.props;
+		let {notification, verifier} = this.state;
+
+		if(verifier){
+			return <OAuthVerify verifier={verifier} applicationName={oauthClientName} />
+		}
+
+		return (
+			<ErrorWrapper>
+				<div className='identity-request'>
+					<h1>Permissions Request</h1>
+					<Notifier {...notification} />
+					<Alert color='secondary' className='my-3'>
+						<h2>An application would like to connect to your account</h2>
+						<p>The application '{oauthClientName}' would like to access your account.</p>
+					</Alert>
+
+					<Alert color='secondary'>
+						Share identity information with this application?
+					</Alert>
+					<Button onClick={this.saveKey}>Allow Access</Button>{' '}
+					<Button onClick={this.revokeKey}>Cancel</Button>
+				</div>
+			</ErrorWrapper>
+		);
+	}
+}
+
 class ApiKeyEditor extends Component {
 	constructor(props) {
 		super(props);
@@ -531,11 +534,9 @@ class ApiKeyEditor extends Component {
 	updateAccess = (updatedAccess) => {
 		this.setState({access: updatedAccess});
 	}
-
 	changeName = (evt) => {
 		this.setState({name:evt.target.value});
 	}
-
 	saveKey = async () => {
 		const {oauthRequest} = this.props;
 		const {editKey, name, access, perGroup} = this.state;
@@ -556,8 +557,10 @@ class ApiKeyEditor extends Component {
 				all: keyObject.access.groups['all']
 			};
 		}
+		let resp;
 		let saveUrl = buildUrl('saveKey', {key:key, oauth:oauthRequest});
-		let resp = await ajax({url:saveUrl, type:'POST', withSession:true, data:JSON.stringify(keyObject)});
+		resp = await ajax({url:saveUrl, type:'POST', withSession:true, data:JSON.stringify(keyObject)});
+	
 		scrollToTop();
 		if(!resp.ok){
 			log.error('Error saving key');
@@ -581,9 +584,9 @@ class ApiKeyEditor extends Component {
 			if(queryVars['redirect']){
 				let target = queryVars['redirect'];
 				if(target.includes('?')){
-					target = target + `&key=${data.updatedKey.key}`;
+					target = target + `&key=${updatedKey.key}`;
 				} else {
-					target = target + `?key=${data.updatedKey.key}`;
+					target = target + `?key=${updatedKey.key}`;
 				}
 				log.debug(`redirect to ${target}`);
 				window.location.href = target;
@@ -598,12 +601,11 @@ class ApiKeyEditor extends Component {
 			//if no previously existing key and no verifier this is a new key:
 			//display it for user to copy
 			if(!key){
-				this.setState({createdKey:data.updatedKey.key});
+				this.setState({createdKey:updatedKey.key});
 			}
 		} else {
 			this.setState({notification: {type:'error', message:'Error saving key'}});
 		}
-		log.debug(data);
 	}
 	
 	revokeKey = async () => {
@@ -629,8 +631,13 @@ class ApiKeyEditor extends Component {
 	}
 	render() {
 		//const {userGroups} = this.props;
-		const {oauthRequest, oauthClientName} = this.props;
+		const {identity, oauthRequest, oauthClientName} = this.props;
 		const {loading, createdKey, editKey, defaultsPending, access, perGroup, notification, name, userGroups, verifier} = this.state;
+
+		if(identity) {
+			return <IdentityRequest oauthClientName={oauthClientName} />;
+		}
+
 		let title = <h1>New Key</h1>;
 		if(editKey){
 			title = <h1>Edit Key</h1>;
@@ -658,7 +665,6 @@ class ApiKeyEditor extends Component {
 		}
 
 		let requesterNode = null;
-		let defaultAccepter = null;
 		if(oauthRequest){
 			requesterNode = (
 			<Alert color='secondary' className='my-3'>
@@ -667,23 +673,25 @@ class ApiKeyEditor extends Component {
 			</Alert>);
 		}
 
-		let accessSection = (
-			<Fragment>
-				<KeyAccessEditor
-					access={access}
-					updateAccess={this.updateAccess}
-					userGroups={userGroups}
-					perGroup={perGroup}
-					changePerGroup={this.changePerGroup}
-				/>
-				<Button onClick={this.saveKey}>Save Key</Button>{' '}
-				<Button onClick={this.revokeKey}>Revoke Key</Button>
-			</Fragment>
-		);
+		let accessSection;
 		if(defaultsPending){
 			accessSection = <AcceptDefaults saveKey={this.saveKey} editPermissions={()=>{this.setState({defaultsPending:false})}} />;
+		} else {
+			accessSection = (
+				<Fragment>
+					<KeyAccessEditor
+						access={access}
+						updateAccess={this.updateAccess}
+						userGroups={userGroups}
+						perGroup={perGroup}
+						changePerGroup={this.changePerGroup}
+					/>
+					<Button onClick={this.saveKey}>Save Key</Button>{' '}
+					<Button onClick={this.revokeKey}>Revoke Key</Button>
+				</Fragment>
+			);
 		}
-
+		
 		let notifier = null;
 		if(notification){
 			notifier = <Notifier {...notification} />;

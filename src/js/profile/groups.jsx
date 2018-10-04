@@ -55,10 +55,7 @@ class Groups extends React.Component {
 				{groups.slice(0, 3).map(group => 
 					<li key={ group.data.id }>
 						<div>
-							{ group.data.name }
-						</div>
-						<div>
-							<a href={ buildUrl('groupView', {group:group}) }>Join</a>
+							<a href={ buildUrl('groupView', {group:group}) }>{ group.data.name }</a>
 						</div>
 					</li>)}
 			</ul>

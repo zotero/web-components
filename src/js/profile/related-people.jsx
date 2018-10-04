@@ -30,10 +30,7 @@ class RelatedPeople extends React.Component {
 				{this.props.people.map(person => 
 				<li key={person.userID}>
 					<div>
-						{person.displayName}
-					</div>
-					<div>
-						<a href={'/' + person.slug}>Follow</a>
+						<a href={'/' + person.slug}>{person.displayName}</a>
 					</div>
 				</li>)}
 			</ul>

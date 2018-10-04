@@ -46,6 +46,9 @@ class Profile extends React.Component {
 			},
 			profile:props.profile
 		};
+		if(['#About', '#Network', '#Groups'].indexOf(window.location.hash) != -1){
+			this.state.active = window.location.hash.substring(1);
+		}
 		this.profileDataSource = new ProfileDataSource(this.props.profile.userslug);
 		eventSystem.addListener('alert', this.onAlert);
 	}
@@ -152,6 +155,7 @@ class Profile extends React.Component {
 		this.setState({
 			active: newActive
 		});
+		window.location.hash = newActive;
 	}
 
 	onAlert = (alert) => {

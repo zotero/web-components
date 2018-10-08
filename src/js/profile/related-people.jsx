@@ -1,5 +1,8 @@
 'use strict';
 
+import {log as logger} from '../Log.js';
+let log = logger.Logger('related-people');
+
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -121,11 +124,10 @@ class RelatedPeopleDetailed extends React.Component {
 								</div>
 								<div className="profile-related-people-detailed-details-username">
 									<span>
-										{ person.displayName || person.username }
+										<a href={ '/' + person.slug } className="profile-related-people-detailed-details">
+											{ person.displayName || person.username }
+										</a>
 									</span>
-									<a href={ '/' + person.slug } className="profile-related-people-detailed-details-follow">
-										Follow
-									</a>
 								</div>
 								{ academic }
 								{ affiliation }

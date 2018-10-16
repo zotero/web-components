@@ -84,7 +84,7 @@ class RegisterForm extends Component{
 			this.setState({usernameValidity:'undecided', usernameMessage:''});
 		}
 	}
-	register(){
+	async register(){
 		let formData = this.state.formData;
 		//validate form
 		let validated = validateRegisterForm(formData);
@@ -100,15 +100,18 @@ class RegisterForm extends Component{
 
 		//submit form
 		let registerUrl = buildUrl('registerAsync');
-		postFormData(registerUrl, formData).then((resp)=>{
-			log.debug('successfulish response');
-			resp.json().then((data)=>{
-				if(data.success)
+		try{
+			let resp = await postFormData(registerUrl, formData);
+			let data = await resp.json();
+			if(data.success) {
 				this.setState({registrationSuccessful:true});
-			});
-		}).catch((resp)=>{
+			} else {
+				this.setState({formError:'Error processing registration'});
+			}
+		} catch (resp) {
 			log.debug('caught response');
-			resp.json().then((data)=>{
+			if(resp instanceof Response){
+				let data = await resp.json();
 				if(data.success === false){
 					let formErrors = {};
 					for(let ind in data.messages){
@@ -120,13 +123,15 @@ class RegisterForm extends Component{
 						formErrors[ind] = messages.join(', ');
 					}
 					this.setState({formErrors});
+				} else {
+					log.error(resp);
+					this.setState({formError:'Error processing registration'});
 				}
-			}).catch((e)=>{
-				log.debug('failed decoding json in caught register response');
-				log.debug(e);
+			} else {
+				log.error(resp);
 				this.setState({formError:'Error processing registration'});
-			});
-		});
+			}
+		}
 	}
 	render(){
 		//log.debug('RegisterForm render');

@@ -250,7 +250,7 @@ class DownloadConnector extends Component {
 					full-featured extensions such as the Zotero Connector in Safari 12. For now,
 					we recommend using the Zotero Connector for Firefox or Chrome for the best
 					experience. Alternatively, you can use
-					the <a href="/downloadbookmarklet">Zotero Bookmarklet</a> for basic saving in
+					the <a href="/download/bookmarklet">Zotero Bookmarklet</a> for basic saving in
 					Safari.
 				</p>
 			);

@@ -182,9 +182,6 @@ class InstallConnectorPrompt extends Component{
 		this.state = {
 			browser:BrowserDetect.browser,
 			oldSafari:installData.oldSafari,
-			safari12: navigator.userAgent.includes('Safari/')
-				&& !navigator.userAgent.includes('Chrome/')
-				&& /Version\/12\./.test(navigator.userAgent),
 			showAllExtensions:false
 		};
 		this.showAllExtensions = this.showAllExtensions.bind(this);
@@ -216,19 +213,7 @@ class InstallConnectorPrompt extends Component{
 			case 'Safari':
 				connectorText = 'Zotero Connector for Safari';
 				connectorImage = <BrowserExtensionIcon browser='safari' />;
-				if (this.state.safari12) {
-					installButton = (
-						<p className='safari12'>Apple
-							has <a href="/support/kb/safari_12_connector">discontinued support</a> for
-							full-featured extensions such as the Zotero Connector in Safari 12.
-							For now, we recommend using the Zotero Connector for Firefox or Chrome
-							for the best experience. Alternatively, you can use
-							the <a href="/download/bookmarklet">Zotero Bookmarklet</a> for basic
-							saving in Safari.
-						</p>
-					);
-				}
-				else if (this.state.oldSafari) {
+				if(this.state.oldSafari){
 					versionNote = (
 						<p className='version-note'>
 							Please note: The link above is for an outdated version of the Safari connector,

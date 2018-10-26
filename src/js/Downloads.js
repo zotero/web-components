@@ -208,10 +208,7 @@ class DownloadConnector extends Component {
 		this.state = {
 			showAllExtensions:false,
 			oldSafari: installData.oldSafari,
-			oldFirefox: /Firefox\/(4[56789]|5[01])\./.test(navigator.userAgent),
-			safari12: navigator.userAgent.includes('Safari/')
-				&& !navigator.userAgent.includes('Chrome/')
-				&& /Version\/12\./.test(navigator.userAgent),
+			oldFirefox: /Firefox\/(4[56789]|5[01])\./.test(navigator.userAgent)
 		};
 		this.showAllExtensions = this.showAllExtensions.bind(this);
 	}
@@ -242,19 +239,6 @@ class DownloadConnector extends Component {
 		let installButton = <InstallButton browser={this.props.featuredBrowser} label={`Install ${this.props.featuredBrowser} Connector`} />;
 		if(this.state.oldFirefox) {
 			installButton = <p className='danger'>It looks like you’re using an outdated version of Firefox. Please install Firefox 52 or later to use the Zotero Connector.</p>;
-		}
-		if (this.state.safari12) {
-			installButton = (
-				<p className='safari12'>Apple
-					has <a href="/support/kb/safari_12_connector">discontinued support</a> for
-					full-featured extensions such as the Zotero Connector in Safari 12. For now,
-					we recommend using the Zotero Connector for Firefox or Chrome for the best
-					experience. Alternatively, you can use
-					the <a href="/download/bookmarklet">Zotero Bookmarklet</a> for basic saving in
-					Safari.
-				</p>
-			);
-			versionNote = null;
 		}
 		return (
 			<section className='connector'>

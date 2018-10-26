@@ -12,12 +12,12 @@ if($_GET['user']){
 ?>
 <? include('./layoutHeader.php');?>
 			<main>
-        <a href="https://zbib.org" class="banner">
-          <span class="logo">ZoteroBib</span>
-          <span class="d-md-block">Just need to</span>
-          <span class="d-md-block">create a quick</span>
-          <span class="d-md-block">bibliography?</span>
-        </a>
+				<a href="https://zbib.org" class="banner">
+					<span class="logo">ZoteroBib</span>
+					<span class="d-md-block">Just need to</span>
+					<span class="d-md-block">create a quick</span>
+					<span class="d-md-block">bibliography?</span>
+				</a>
 				<section class="jumbotron jumbotron-fluid">
 					<div class="container">
 						<h1 class="display-1">Your personal<br>research assistant</h1>

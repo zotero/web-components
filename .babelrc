@@ -1,4 +1,34 @@
 {
-	"presets": ["es2015", "react"],
-	"plugins": ["transform-object-rest-spread"]
+	"env": {
+		"browser": {
+			"presets": [
+			"es2015",
+			"stage-2",
+			"react"
+			],
+			"plugins": [
+				"transform-async-to-generator",
+				"transform-class-properties",
+				"transform-object-rest-spread",
+				[
+					"transform-runtime",
+					{
+						"helpers": false,
+						"polyfill": false,
+						"regenerator": true
+					}
+				]
+			]
+		}
+	},
+	"presets": [
+		"env",
+		"react"
+	],
+	"plugins": [
+		"transform-async-to-generator",
+		"transform-class-properties",
+		"transform-object-rest-spread",
+		"transform-es2015-modules-commonjs"
+	]
 }

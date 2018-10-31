@@ -251,7 +251,7 @@ PaymentRow.propTypes = {
 	userSubscription: PropTypes.object.isRequired,
 	updateCardHandler: PropTypes.func.isRequired,
 	renewHandler: PropTypes.func.isRequired
-}
+};
 
 class NextPaymentRow extends Component {
 	render() {
@@ -518,7 +518,7 @@ class Storage extends Component {
 				userSubscription={userSubscription}
 				stripeCustomer={stripeCustomer}
 				refreshStorage={this.refresh}
-				onClose={()=>{this.setState({newSubscription:false})}}
+				onClose={()=>{this.setState({newSubscription:false});}}
 			/>);
 		}
 

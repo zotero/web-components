@@ -1,6 +1,8 @@
 .react-tabs {
 	text-align:left;
 
+	-webkit-tap-highlight-color: transparent;
+
 	&__tab-list {
 		//border-bottom: 1px solid #aaa;
 		//margin: 0 0 10px;
@@ -32,6 +34,12 @@
 			//border-radius: 5px 5px 0 0;
 			border-top: 3px solid salmon;
 		}
+
+		&--disabled {
+			color: GrayText;
+			cursor: default;
+		}
+
 		&:focus {
 			box-shadow: 0 0 5px hsl(208, 99%, 50%);
 			border-color: hsl(208, 99%, 50%);
@@ -55,11 +63,6 @@
 
 		&--selected {
 			display: block;
-		}
-
-		&--disabled {
-			color: GrayText;
-			cursor: default;
 		}
 	}
 }

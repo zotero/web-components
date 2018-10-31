@@ -11,6 +11,7 @@ import {Notifier} from '../Notifier.js';
 import PropTypes from 'prop-types';
 import {ButtonEditable} from '../components/ButtonEditable.js';
 import {LabPurchase, labPrice} from './LabPurchase.js';
+import {formatCurrency} from '../Utils.js';
 
 import {postFormData} from '../ajax.js';
 import {buildUrl} from '../wwwroutes.js';
@@ -40,7 +41,7 @@ class LabRenew extends Component{
 					</div>
 					<div className='form-line'>
 						<label>Price</label>
-						{new Intl.NumberFormat('en-US', {style:'currency', currency:'USD'}).format(labPrice(fteNum)/100)}
+						{formatCurrency(labPrice(fteNum))}
 					</div>
 					<LabPurchase fte={fteNum} name={name} institutionID={institutionID} />
 				</Collapse>

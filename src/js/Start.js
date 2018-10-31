@@ -74,7 +74,7 @@ class RegisterForm extends Component{
 		let {passwordVisible} = this.state;
 		this.setState({passwordVisible:(!passwordVisible)});
 	}
-	register(){
+	async register(){
 		let {formData} = this.state;
 		//validate form
 		let validated = validateRegisterForm(formData);
@@ -91,14 +91,18 @@ class RegisterForm extends Component{
 		//submit form
 		this.setState({loading:true});
 		let registerUrl = buildUrl('registerAsync');
-		postFormData(registerUrl, formData).then((resp)=>{
-			resp.json().then((data)=>{
-				if(data.success){
-					this.setState({registrationSuccessful:true, loading:false});
-				}
-			});
-		}).catch((resp)=>{
-			resp.json().then((data)=>{
+		try{
+			let resp = await postFormData(registerUrl, formData);
+			let data = await resp.json();
+			if(data.success) {
+				this.setState({registrationSuccessful:true});
+			} else {
+				this.setState({formError:'Error processing registration'});
+			}
+		} catch (resp) {
+			log.debug('caught response');
+			if(resp instanceof Response){
+				let data = await resp.json();
 				if(data.success === false){
 					let formErrors = {};
 					for(let ind in data.messages){
@@ -109,14 +113,16 @@ class RegisterForm extends Component{
 						}
 						formErrors[ind] = messages.join(', ');
 					}
-					this.setState({formErrors, loading:false});
+					this.setState({formErrors});
+				} else {
+					log.error(resp);
+					this.setState({formError:'Error processing registration'});
 				}
-			}).catch((e)=>{
-				log.debug('failed decoding json in caught register response');
-				log.debug(e);
-				this.setState({formError:'Error processing registration', loading:false});
-			});
-		});
+			} else {
+				log.error(resp);
+				this.setState({formError:'Error processing registration'});
+			}
+		}
 	}
 	render(){
 		const {formData, usernameChecked, usernameValid, loading, registrationSuccessful, formError, formErrors,

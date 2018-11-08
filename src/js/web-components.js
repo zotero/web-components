@@ -1,6 +1,6 @@
 'use strict';
 
-import 'babel-polyfill';
+import '@babel/polyfill';
 import 'whatwg-fetch';
 import 'picturefill';
 import 'picturefill/dist/plugins/mutation/pf.mutation.min';

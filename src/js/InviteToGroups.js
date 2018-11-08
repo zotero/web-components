@@ -4,7 +4,6 @@ import {log as logger} from './Log.js';
 let log = logger.Logger('InviteToGroups');
 
 import {ajax, postFormData, loadAllUserGroups} from './ajax.js';
-import {apiRequestString} from './ApiRouter.js';
 import {LoadingSpinner} from './LoadingSpinner.js';
 import {buildUrl} from './wwwroutes.js';
 import {jsError, getCurrentUser} from './Utils.js';
@@ -61,7 +60,7 @@ class InviteToGroups extends Component{
 		} catch(e){
 			jsError('Error getting groups');
 			log.error(e);
-		};
+		}
 
 		//load list of groups user has already been invited to
 		let alreadyInvitedUrl = `/user/${inviteeUserID}/alreadyinvited`;
@@ -174,7 +173,7 @@ class InviteToGroups extends Component{
 			let inviteOptions;
 			if(invitableGroups.length > 0){
 				inviteOptions = invitableGroups.map((group)=>{
-					return <DropdownItem key={group.id} value={group.id} onClick={()=>{this.inviteToGroup(group.id);}}>{group.data.name}</DropdownItem>
+					return (<DropdownItem key={group.id} value={group.id} onClick={()=>{this.inviteToGroup(group.id);}}>{group.data.name}</DropdownItem>);
 					/*return <option key={group.id} value={group.id} label={group.data.name}>{group.data.name}</option>;*/
 				});
 

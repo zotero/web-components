@@ -150,12 +150,6 @@ class GroupLibrarySettings extends Component{
 			</div>
 		);
 
-		let groupTypeStyle = {
-			paddingBottom:'8px',
-			marginBottom:'10px',
-			borderBottom:'2px solid #DDD'
-		};
-
 		return (
 			<div>
 				<form method='POST'>

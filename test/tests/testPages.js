@@ -1,11 +1,12 @@
 'use strict';
 
+/* eslint no-console: "off" */
 const {initDriver, LogCollector} = require('../utils.js');
 
 const {By, Key, until} = require('selenium-webdriver');
 const {assert} = require('chai');
 const testBrowser = process.env.TEST_BROWSER || 'chrome';
-import {Headers, Request, Response, fetch} from 'whatwg-fetch';
+//import {Headers, Request, Response, fetch} from 'whatwg-fetch';
 
 const baseUrl = 'https://dockerzotero.test:8081';
 
@@ -426,7 +427,8 @@ describe('Zotero Pages', async function(){
 			});
 		});
 	});
-
+*/
+/*
 	describe('placeholder', async function(){
 		it('placeholder', async function(){
 			

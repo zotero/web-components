@@ -1,5 +1,7 @@
 'use strict';
 
+/* eslint no-console: "off" */
+
 var log = {};
 
 var prefLevel = 1;

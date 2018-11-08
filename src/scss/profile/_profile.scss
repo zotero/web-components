@@ -368,21 +368,12 @@ $color-profile-tint: rgba(255, 255, 255, .75);
 }
 
 #user-profile{
+	margin-bottom:2rem;
+
 	.nav-tabs a {
 		cursor:pointer;
 	}
-}
 
-.pointer {
-	cursor:pointer;
-}
-.profile-timeline-form-wrapper {
-	input, select {
-		margin-top:1rem;
-	}
-}
-
-#user-profile {
 	h2 {
 		margin-top:1rem;
 	}
@@ -396,7 +387,15 @@ $color-profile-tint: rgba(255, 255, 255, .75);
 		margin-top:.5rem;
 		margin-bottom:.5rem;
 	}
+}
 
+.pointer {
+	cursor:pointer;
+}
+.profile-timeline-form-wrapper {
+	input, select {
+		margin-top:1rem;
+	}
 }
 
 /*

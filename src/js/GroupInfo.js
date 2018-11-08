@@ -334,6 +334,6 @@ class GroupInfo extends React.Component{
 GroupInfo.propTypes = {
 	displayNames: PropTypes.array.isRequired,
 	pending: PropTypes.bool.isRequired
-}
+};
 
 export {GroupMembershipActions, GroupInfo, groupIsReadable};

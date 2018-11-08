@@ -1,7 +1,7 @@
 'use strict';
 
-import {log as logger} from '../Log.js';
-const log = logger.Logger('editable-social-item');
+// import {log as logger} from '../Log.js';
+// const log = logger.Logger('editable-social-item');
 
 import React from 'react';
 const {Fragment} = React;
@@ -187,6 +187,6 @@ EditableSocial.propTypes = {
 	field: PropTypes.string.isRequired,
 	editable: PropTypes.bool.isRequired,
 	template: PropTypes.object.isRequired
-}
+};
 
 export {EditableSocial};

@@ -33,7 +33,6 @@ import PropTypes from 'prop-types';
 
 import {ajax, postFormData} from './ajax.js';
 import {Notifier} from './Notifier.js';
-import cn from 'classnames';
 //import PaymentModal from './storage/PaymentModal.jsx';
 import SubscriptionHandler from './storage/SubscriptionHandler.jsx';
 import {calculateNewExpiration} from './storage/calculations.js';
@@ -227,7 +226,6 @@ class PaymentRow extends Component {
 				</tr>
 			);
 		}
-		let card = defaultSource;
 		return (
 			<tr>
 				<th>Payment Method</th>

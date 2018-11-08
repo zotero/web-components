@@ -12,7 +12,7 @@ import {RadioGroup, Radio} from './react-radio-group.js';
 import {ajax, postFormData, loadAllUserGroups} from './ajax.js';
 import {buildUrl} from './wwwroutes.js';
 import {Notifier} from './Notifier.js';
-import {querystring, parseQuery, loadInitialState} from './Utils.js';
+import {querystring, parseQuery} from './Utils.js';
 import {Alert, Label, Button, Input, Form, FormGroup, Card, CardBody, CardTitle} from 'reactstrap';
 import {ErrorWrapper} from './components/ErrorWrapper.jsx';
 import {getCurrentUser} from './Utils.js';
@@ -162,7 +162,7 @@ class PermissionsSummary extends Component {
 					<ul>{summary}</ul>
 				</CardBody>
 			</Card>
-		)
+		);
 	}
 }
 
@@ -401,13 +401,13 @@ class IdentityRequest extends Component {
 	saveKey = async () => {
 		let resp;
 		let identityUrl = buildUrl('authorizeIdentity');
-		resp = await ajax({url:identityUrl, type:'POST', withSession:true})
+		resp = await ajax({url:identityUrl, type:'POST', withSession:true});
 
 		scrollToTop();
 		if(!resp.ok){
 			log.error('Error processing request');
 		}
-		let data = await resp.json()
+		let data = await resp.json();
 		let {success, verifier, redirect} = data;
 		if(success){
 			this.setState({notification: {type:'success', message:'Permission granted'}});
@@ -420,21 +420,6 @@ class IdentityRequest extends Component {
 				return;
 			}
 
-			let queryVars = parseQuery(querystring(window.document.location.href));
-
-			//check for redirect used in private feed url flow and forward if present
-			if(queryVars['redirect']){
-				let target = queryVars['redirect'];
-				if(target.includes('?')){
-					target = target + `&key=${updatedKey.key}`;
-				} else {
-					target = target + `?key=${updatedKey.key}`;
-				}
-				log.debug(`redirect to ${target}`);
-				window.location.href = target;
-				return;
-			}
-			
 			//if there is a verifier, display it for user to pass on to the oauth app
 			if(verifier){
 				this.setState({verifier});
@@ -450,7 +435,7 @@ class IdentityRequest extends Component {
 		let {notification, verifier} = this.state;
 
 		if(verifier){
-			return <OAuthVerify verifier={verifier} applicationName={oauthClientName} />
+			return <OAuthVerify verifier={verifier} applicationName={oauthClientName} />;
 		}
 
 		return (
@@ -565,7 +550,7 @@ class ApiKeyEditor extends Component {
 		if(!resp.ok){
 			log.error('Error saving key');
 		}
-		let data = await resp.json()
+		let data = await resp.json();
 		let {success, verifier, redirect, updatedKey} = data;
 		if(success){
 			this.setState({notification: {type:'success', message:'Key Saved'}});
@@ -618,7 +603,7 @@ class ApiKeyEditor extends Component {
 		if(!resp.ok){
 			log.error('Error deleting key');
 		}
-		let data = await resp.json()
+		let data = await resp.json();
 		if(data.success){
 			this.setState({notification: {type:'success', message:'Key Revoked'}});
 		} else {
@@ -644,11 +629,11 @@ class ApiKeyEditor extends Component {
 		}
 
 		if(loading){
-			return <Spinner />
+			return <Spinner />;
 		}
 
 		if(verifier){
-			return <OAuthVerify verifier={verifier} applicationName={oauthClientName} />
+			return <OAuthVerify verifier={verifier} applicationName={oauthClientName} />;
 		}
 
 		if(createdKey){
@@ -675,7 +660,7 @@ class ApiKeyEditor extends Component {
 
 		let accessSection;
 		if(defaultsPending){
-			accessSection = <AcceptDefaults saveKey={this.saveKey} editPermissions={()=>{this.setState({defaultsPending:false})}} />;
+			accessSection = <AcceptDefaults saveKey={this.saveKey} editPermissions={()=>{this.setState({defaultsPending:false});}} />;
 		} else {
 			accessSection = (
 				<Fragment>

@@ -1,5 +1,7 @@
 'use strict';
 
+/* globals Popper */
+
 let activateFootnotes = function() {
 	const footnoteTriggers = document.querySelectorAll('sup[data-footnote]');
 	const footnoteListEl = document.querySelector('#footnotes');
@@ -28,7 +30,7 @@ let activateFootnotes = function() {
 				}
 			}
 		});
-	}
+	};
 
 	portalEl.addEventListener('click', ev => {
 		if(currentPopover && ev.target.closest('.popover') == null) {
@@ -44,7 +46,7 @@ let activateFootnotes = function() {
 	});
 
 	portalEl.addEventListener('keyup', ev => {
-		if(currentPopover && (ev.key === "Escape" || ev.key === "Tab")) {
+		if(currentPopover && (ev.key === 'Escape' || ev.key === 'Tab')) {
 			currentPopover.destroy();
 			currentPopover = null;
 		}
@@ -66,7 +68,7 @@ let activateFootnotes = function() {
 			ev.stopPropagation();
 		});
 		triggerEl.addEventListener('keyup', ev => {
-			if(ev.key === "Enter" || ev.key === " ") {
+			if(ev.key === 'Enter' || ev.key === ' ') {
 				if(currentPopover && currentPopover.reference == triggerEl) {
 					currentPopover.destroy();
 					currentPopover = null;

@@ -1,8 +1,7 @@
-/* global Zotero:false */
 'use strict';
 
-import {log as logger} from '../Log.js';
-let log = logger.Logger('groups.jsx');
+// import {log as logger} from '../Log.js';
+// let log = logger.Logger('groups.jsx');
 
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -21,7 +20,7 @@ let groupMemberCount = function(group){
 		count += group.data.admins.length;
 	}
 	return count;
-}
+};
 
 class Groups extends React.Component {
 	constructor(props) {

@@ -4,26 +4,22 @@ import {log as logger} from './Log.js';
 let log = logger.Logger('ProfileImageForm');
 
 import {postFormData, ajax} from './ajax.js';
-import {getCurrentUser} from './Utils.js';
 import {buildUrl} from './wwwroutes.js';
 import {Notifier} from './Notifier.js';
 
 let React = require('react');
 
-const currentUser = getCurrentUser();
-const config = window.zoteroConfig;
-
 class EmptyImage extends React.Component{
 	render(){
 		let style = {
-			 'backgroundColor':'#CCC',
-			 'width': this.props.width,
-			 'height': this.props.height,
+			'backgroundColor':'#CCC',
+			'width': this.props.width,
+			'height': this.props.height,
 		};
 		return (
 			<div className='profile-image-placeholder' style={style}>
 			</div>
-		)
+		);
 	}
 }
 EmptyImage.defaultProps = {
@@ -37,10 +33,12 @@ class ProfileImage extends React.Component{
 	}
 	render(){
 		let {type, hasImage, purpose, entityID, width, height, usePlaceholder} = this.props;
+		/*
 		let style = {
 			'width': this.props.width,
 			'height': this.props.height,
 		};
+		*/
 		let imgSrc = null;
 		if(!hasImage){
 			if(usePlaceholder){
@@ -54,7 +52,7 @@ class ProfileImage extends React.Component{
 		} else if(type == 'group'){
 			imgSrc = hasImage ? buildUrl('groupImage', {groupID: entityID, 'purpose': purpose}) : '';
 		}
-		return <img src={imgSrc} />
+		return <img src={imgSrc} />;
 	}
 }
 ProfileImage.defaultProps = {
@@ -104,6 +102,7 @@ class ProfileImageForm extends React.Component{
 				}
 			});
 		}).catch((response)=>{
+			log.error(response);
 			this.setState({
 				changeSuccessful:false,
 				formError:'There was an error updating your image'
@@ -127,6 +126,7 @@ class ProfileImageForm extends React.Component{
 				}
 			});
 		}).catch((response)=>{
+			log.error(response);
 			this.setState({
 				changeSuccessful:false,
 				formError:'There was an error deleting your image'
@@ -148,7 +148,7 @@ class ProfileImageForm extends React.Component{
 			notifier = <Notifier type='error' message={formError} />;
 		}
 
-		let image = <ProfileImage hasImage={hasImage} type={type} entityID={entityID} />
+		let image = <ProfileImage hasImage={hasImage} type={type} entityID={entityID} />;
 
 		let updateButton = <button className='btn btn-secondary' onClick={this.chooseFile}>Choose Image</button>;
 		return (
@@ -168,6 +168,6 @@ class ProfileImageForm extends React.Component{
 ProfileImageForm.defaultProps = {
 	hasImage: 0,
 	type:'user'
-}
+};
 
 export {ProfileImageForm, ProfileImage};

@@ -1,4 +1,4 @@
-/* global CKEDITOR:false */
+/* global tinymce */
 'use strict';
 
 import {log as logger} from '../Log.js';
@@ -41,9 +41,11 @@ class EditableRich extends React.Component {
 				menubar:false,
 				statusbar:true,
 				auto_focus:this.props.id,
+				/*
 				setup:(ed)=>{
 					//ed.on('blur', this.blurSave);
 				}
+				*/
 			});
 		});
 	}
@@ -51,7 +53,7 @@ class EditableRich extends React.Component {
 	save = async () => {
 		let {value} = this.state;
 
-		let {id, field} = this.props;
+		let {id} = this.props;
 		let tinyInstance = tinymce.get(id);
 		if(tinyInstance != null) {
 			value = tinyInstance.getContent();

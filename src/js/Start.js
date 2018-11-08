@@ -15,7 +15,7 @@ const imagePath = config.imagePath;
 const connectorButtonImagePath = imagePath + '/start/zotero-button.svg';
 const iconSpinImagePath = imagePath + '/spin-white.svg';
 
-import {ajax, postFormData} from './ajax.js';
+import {postFormData} from './ajax.js';
 import {slugify, getCurrentUser} from './Utils.js';
 import {buildUrl} from './wwwroutes.js';
 import {Notifier} from './Notifier.js';
@@ -25,11 +25,11 @@ import {Collapse} from 'reactstrap';
 import cn from 'classnames';
 
 const currentUser = getCurrentUser();
-
+/*
 let validateRegisterForm = function(data) {
 	return {valid:true};
 };
-
+*/
 class RegisterForm extends Component{
 	constructor(props){
 		super(props);
@@ -70,14 +70,15 @@ class RegisterForm extends Component{
 			});
 		}
 	}
-	togglePasswordVisible(ev){
+	togglePasswordVisible(){
 		let {passwordVisible} = this.state;
 		this.setState({passwordVisible:(!passwordVisible)});
 	}
 	async register(){
 		let {formData} = this.state;
 		//validate form
-		let validated = validateRegisterForm(formData);
+		//let validated = validateRegisterForm(formData);
+		let validated = {valid:true};
 		if(!validated.valid){
 			//show error
 			let formErrors = {};
@@ -126,7 +127,7 @@ class RegisterForm extends Component{
 	}
 	render(){
 		const {formData, usernameChecked, usernameValid, loading, registrationSuccessful, formError, formErrors,
-			usernameMessage, passwordVisible, wasValidated} = this.state;
+			usernameMessage, passwordVisible} = this.state;
 
 		let slug = '<username>';
 		if(formData.username) {
@@ -209,7 +210,7 @@ class RegisterForm extends Component{
 					</div>
 					<div className='form-group'>
 						<button type='button' className='btn btn-lg btn-block btn-secondary btn-register' onClick={this.register} disabled={loading}>
-							<span className={cn("inline-feedback", {active:loading})}>
+							<span className={cn('inline-feedback', {active:loading})}>
 								<span className="default-text">Register</span>
 								<span className="shorter feedback">
 									<img className="icon icon-spin" src={iconSpinImagePath} width="16" height="16" />

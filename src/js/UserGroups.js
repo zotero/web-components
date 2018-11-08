@@ -254,7 +254,7 @@ class UserGroups extends Component{
 		if(ownedOnly){
 			groups = groups.filter((group)=>{
 				return userID == group.data.owner;
-			})
+			});
 		}
 		//Nugget entry for each group
 		var groupNuggets = groups.map(function(group){

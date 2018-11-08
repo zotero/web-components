@@ -85,7 +85,7 @@ class EditableTimeline extends React.Component {
 
 	render() {
 		const {entryClass, title, editable} = this.props;
-		const {processing, editing, value, editLast} = this.state;
+		const {processing, value, editLast} = this.state;
 		let edit = null;
 		let cssClasses = 'profile-editable-items profile-editable-editing ' + (value.length ? '' : 'profile-editable-items-empty');
 

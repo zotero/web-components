@@ -4,8 +4,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {eventSystem} from '../EventSystem.js';
-import {PencilIcon, TrashIcon, CheckIcon, XIcon, PlusIcon} from '../Icons.js';
-import {postFormData, ajax} from '../ajax.js';
+import {PencilIcon, CheckIcon, XIcon} from '../Icons.js';
+import {postFormData} from '../ajax.js';
 import {buildUrl} from '../wwwroutes.js';
 
 let updateUrl = buildUrl('updateProfileImage');
@@ -58,7 +58,7 @@ class EditableAvatar extends React.Component {
 			});
 			eventSystem.trigger('alert', {
 				level: 'danger',
-				message: error.responseJSON ? error.responseJSON.message : 'Image too large. Must be less than 512KB'
+				message: 'Image too large. Must be less than 512KB'
 			});
 			return;
 		}

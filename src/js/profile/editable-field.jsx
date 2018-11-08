@@ -1,13 +1,12 @@
 'use strict';
 
-import {log as logger} from '../Log.js';
-let log = logger.Logger('editable-field');
+// import {log as logger} from '../Log.js';
+// let log = logger.Logger('editable-field');
 
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {eventSystem} from '../EventSystem.js';
-import { PencilIcon, XIcon, CheckIcon } from '../Icons';
+import { PencilIcon } from '../Icons';
 import {Spinner} from '../LoadingSpinner.js';
 import {Form, Input, Button} from 'reactstrap';
 import cn from 'classnames';

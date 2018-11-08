@@ -1,7 +1,7 @@
 'use strict';
 
-import {log as logger} from '../Log.js';
-let log = logger.Logger('MessageUserButton');
+// import {log as logger} from '../Log.js';
+// let log = logger.Logger('MessageUserButton');
 
 const React = require('react');
 const {Component} = React;

@@ -1,12 +1,12 @@
 'use strict';
 
-import {log as logger} from './Log.js';
-let log = logger.Logger('Search.jsx');
+// import {log as logger} from './Log.js';
+// let log = logger.Logger('Search.jsx');
 
 const React = require('react');
 const {Component} = React;
 
-import {Row, Col, Form, Input, FormGroup, InputGroup, Button, Nav, NavItem, NavLink, InputGroupAddon, Pagination, PaginationItem, PaginationLink} from 'reactstrap';
+import {Form, Input, InputGroup, Button, Nav, NavItem, NavLink, InputGroupAddon, Pagination, PaginationItem, PaginationLink} from 'reactstrap';
 import {postFormData} from './ajax.js';
 import {LargeUser} from './components/UserList.jsx';
 import {GroupNugget} from './UserGroups.js';
@@ -50,7 +50,7 @@ class Search extends Component{
 			totalResults:null,
 			results:[],
 			page:1
-		}
+		};
 		this.ls.parseVars();
 		if(this.ls.getVar('type')){
 			this.state.type = this.ls.getVar('type');
@@ -97,13 +97,13 @@ class Search extends Component{
 			});
 		} else if(type == 'group') {
 			resultNodes = results.map((group)=>{
-				return <GroupNugget key={group.apiObj.id} group={group.apiObj} />
+				return <GroupNugget key={group.apiObj.id} group={group.apiObj} />;
 			});
 		}
 
 		let pagination = null;
 		if(totalResults > 10) {
-			pagination = <SearchPagination locationState={this.ls} totalResults={totalResults} page={page} />
+			pagination = <SearchPagination locationState={this.ls} totalResults={totalResults} page={page} />;
 		}
 		
 		return (

@@ -163,6 +163,6 @@ let profileImageSrc = function(userID, purpose){
 	}
 
 	return `${staticPath}/${profileImagePath}${filename}`;
-}
+};
 
 export {buildUrl};

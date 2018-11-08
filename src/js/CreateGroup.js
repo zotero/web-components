@@ -95,7 +95,7 @@ class CreateGroup extends React.Component{
 					<div className="row">
 						<div className='card-deck'>
 							<div
-								className={cn("card", {selected:(selectedType == 'PublicOpen')})}
+								className={cn('card', {selected:(selectedType == 'PublicOpen')})}
 								onClick={this.changeType}
 								data-grouptype='PublicOpen'
 								>
@@ -111,7 +111,7 @@ class CreateGroup extends React.Component{
 								</div>
 							</div>
 							<div
-								className={cn("card", {selected:(selectedType == 'PublicClosed')})}
+								className={cn('card', {selected:(selectedType == 'PublicClosed')})}
 								onClick={this.changeType}
 								data-grouptype='PublicClosed'
 								>
@@ -127,7 +127,7 @@ class CreateGroup extends React.Component{
 								</div>
 							</div>
 							<div
-								className={cn("card", {selected:(selectedType == 'Private')})}
+								className={cn('card', {selected:(selectedType == 'Private')})}
 								onClick={this.changeType}
 								data-grouptype='Private'
 								>

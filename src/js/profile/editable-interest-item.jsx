@@ -1,7 +1,7 @@
 'use strict';
 
-import {log as logger} from '../Log.js';
-let log = logger.Logger('editable-interest-item');
+// import {log as logger} from '../Log.js';
+// let log = logger.Logger('editable-interest-item');
 
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -104,7 +104,7 @@ class EditableInterests extends React.Component {
 							<h2>{title}</h2> {editNode}
 							<p>{emptyText}</p>
 						</div>
-					)
+					);
 				} else {
 					return null;
 				}

@@ -1,7 +1,7 @@
 'use strict';
 
-import {log as logger} from './Log.js';
-let log = logger.Logger('GroupInvitations');
+// import {log as logger} from './Log.js';
+// let log = logger.Logger('GroupInvitations');
 
 import {ajax, postFormData} from './ajax.js';
 import {getCurrentUser} from './Utils.js';

@@ -40,7 +40,7 @@ let parseSlashed = function(slashString=''){
 	}
 
 	return slashVars;
-}
+};
 
 //LocationState manages the location using the History API, maintaining easy access to
 //variables represented in path/query/fragment
@@ -360,6 +360,7 @@ class LocationState {
 
 	stateChanged = (prevHref, curHref) => {
 		let changedVars = this.diffState(prevHref, curHref);
+		return changedVars;
 	}
 
 	diffState = (prevHref, curHref) => {
@@ -372,7 +373,7 @@ class LocationState {
 		
 		return changedProperties(flatPrev, flatCur);
 	}
-};
+}
 
 let changedProperties = function(a, b){
 	let presentKeys = [].concat(Object.keys(a), Object.keys(b));

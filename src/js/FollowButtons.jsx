@@ -1,10 +1,10 @@
 'use strict';
 
-import {log as logger} from './Log.js';
-let log = logger.Logger('FollowButtons');
+// import {log as logger} from './Log.js';
+// let log = logger.Logger('FollowButtons');
 
 const React = require('react');
-const {Component, PureComponent, Fragment} = React;
+const {Component} = React;
 import {PropTypes} from 'prop-types';
 import {getCurrentUser} from './Utils.js';
 import { postFormData } from './ajax.js';
@@ -44,15 +44,15 @@ class FollowButtons extends Component{
 			return null;
 		}
 		if(following){
-			return <Button id='unfollow-button' onClick={this.unfollow}>Unfollow</Button>
+			return <Button id='unfollow-button' onClick={this.unfollow}>Unfollow</Button>;
 		} else {
-			return <Button id='follow-button' onClick={this.follow}>Follow</Button>
+			return <Button id='follow-button' onClick={this.follow}>Follow</Button>;
 		}
 	}
 }
 FollowButtons.propTypes = {
 	profileUserID: PropTypes.number.isRequired
-}
+};
 
 class FollowSection extends Component {
 	render(){

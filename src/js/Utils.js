@@ -63,47 +63,47 @@ let querystring = function(href) {
 //parse the string from a search box to pull out variables for things other than a basic phrase search
 let parseSearchString = function(search) {
 	let params = {};
-	let matches = search.match(/doi\:(\S+)/);
+	let matches = search.match(/doi:(\S+)/);
 	if(matches){
 		params.doi = matches[1];
 	}
 
-	matches = search.match(/isbn\:(\S+)/);
+	matches = search.match(/isbn:(\S+)/);
 	if(matches){
 		params.isbn = matches[1];
 	}
 
-	matches = search.match(/pmid\:(\S+)/);
+	matches = search.match(/pmid:(\S+)/);
 	if(matches){
 		params.pmid = matches[1];
 	}
 
-	matches = search.match(/pmcid\:(\S+)/);
+	matches = search.match(/pmcid:(\S+)/);
 	if(matches){
 		params.pmcid = matches[1];
 	}
 
-	matches = search.match(/url\:(\S+)/);
+	matches = search.match(/url:(\S+)/);
 	if(matches){
 		params.url = matches[1];
 	}
 
-	matches = search.match(/urlbase\:(\S+)/);
+	matches = search.match(/urlbase:(\S+)/);
 	if(matches){
 		params.urlbase = matches[1];
 	}
 
-	matches = search.match(/title\:(\S+)/);
+	matches = search.match(/title:(\S+)/);
 	if(matches){
 		params.title = matches[1];
 	}
 
-	matches = search.match(/creators\:(\S+)/);
+	matches = search.match(/creators:(\S+)/);
 	if(matches){
 		params.creators = matches[1];
 	}
 
-	matches = search.match(/itemType\:(\S+)/);
+	matches = search.match(/itemType:(\S+)/);
 	if(matches){
 		params.itemType = matches[1];
 	}

@@ -11,7 +11,7 @@ const apiKey = zoteroConfig.apiKey;
 
 //perform a network request defined by config, and return a promise for a Response
 //resolve with a successful status (200-300) reject, but with the same Response object otherwise
-let ajax = function(config){
+let ajax = async function(config){
 	config = Object.assign({type:'GET', credentials:'include'}, config);
 
 	//get headers from config, or blank, and optionally add auth header for session postback
@@ -33,21 +33,22 @@ let ajax = function(config){
 		credentials:config.credentials,
 		body:config.data
 	});
-
-	return fetch(request).then(function(response){
+	try{
+		let response = await fetch(request);
 		if (response.status >= 200 && response.status < 300) {
 			log.debug('200-300 response: resolving Net.ajax promise', 3);
 			// Performs the function "resolve" when this.status is equal to 2xx
 			return response;
 		} else {
-			log.debug('not 200-300 response: rejecting Net.ajax promise', 3);
+			log.error('not 200-300 response: rejecting Net.ajax promise', 3);
 			// Performs the function "reject" when this.status is different than 2xx
 			throw response;
 		}
-	}, function(err){
+	} catch(err) {
+		log.error('error caught fetching: ' + config.url);
 		log.error(err);
 		throw(err);
-	});
+	}
 };
 
 let postFormData = function(url, data, config={}){
@@ -80,7 +81,7 @@ let loadAllUserGroups = async function(userID, start=0) {
 		let resp = await ajax({url: userGroupsUrl, credentials:'omit'});
 		if(!resp.ok){
 			log.error(resp.statusText);
-			throw "Error fetching groups";
+			throw 'Error fetching groups';
 		}
 		let batch = await resp.json();
 		userGroups = userGroups.concat(batch);
@@ -92,6 +93,6 @@ let loadAllUserGroups = async function(userID, start=0) {
 		}
 	}
 	return userGroups;
-}
+};
 
 export {ajax, postFormData, loadAllUserGroups};

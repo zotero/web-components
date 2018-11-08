@@ -3,11 +3,9 @@
 //import {log as logger} from './Log.js';
 //let log = logger.Logger('Theme');
 
-import {pageReady} from './Utils.js';
-
 let init = function(){
 	if(document){
-		document.addEventListener("DOMContentLoaded", function() {
+		document.addEventListener('DOMContentLoaded', function() {
 			//add type of user to html element on input events
 			document.addEventListener('click', function(){
 				document.documentElement.classList.add('mouse-user');

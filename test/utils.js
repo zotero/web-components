@@ -1,5 +1,5 @@
-const {Builder, By, Key, until, Capabilities} = require('selenium-webdriver');
-const {Channel, Options} = require('selenium-webdriver/firefox');
+const {Builder, By, Capabilities} = require('selenium-webdriver');
+const {Options} = require('selenium-webdriver/firefox');
 const chrome = require('selenium-webdriver/chrome');
 
 //TODO: implement headless
@@ -48,18 +48,22 @@ let initDriver = async function(browser, headless=true){
 
 let getLinks = async function(driver){
 	let linkEls = await driver.findElements(By.tagName('a'));
+	let hrefs = [];
 
 	for(let i=0; i<linkEls.length; i++){
 		let href = await linkEls[i].getAttribute('href');
-		console.log(href);
+		hrefs.push(href);
+		//console.log(href);
 	}
+	return hrefs;
 };
 
 let getLogs = async function(driver){
 	//let availTypes = await driver.manage().logs().getAvailableLogTypes();
 	//console.log(availTypes);
 	let browserLogs = await driver.manage().logs().get('browser');
-	console.log(browserLogs);
+	//console.log(browserLogs);
+	return browserLogs;
 };
 
 let getCookies = async function(driver){
@@ -113,7 +117,7 @@ class LinkAggregator {
 				}
 			}
 			this.hrefs[url.href] = url;
-			console.log(url.href);
+			//console.log(url.href);
 		}
 	}
 }
@@ -133,4 +137,4 @@ class Auditor {
 	}
 }
 
-export {LinkAggregator, LogCollector, Auditor, initDriver, getCookies};
+export {LinkAggregator, LogCollector, Auditor, initDriver, getCookies, getLinks, getLogs};

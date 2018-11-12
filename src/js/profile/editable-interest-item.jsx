@@ -34,6 +34,18 @@ class EditableInterests extends React.Component {
 		if(addValue == ''){
 			return;
 		}
+		//skip if dupe
+		let dupe = false;
+		value.forEach((entry)=>{
+			if(entry.interest == addValue){
+				dupe = true;
+			}
+		});
+		if(dupe){
+			this.setState({addValue:''});
+			return;
+		}
+
 		let entry = {
 			interest: addValue
 		};

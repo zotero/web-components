@@ -11,11 +11,11 @@ import {ajax} from '../ajax.js';
 import {Row, Col, Button} from 'reactstrap';
 import {PencilIcon} from '../Icons.js';
 
-const config = window.zoteroConfig;
-const orcidClientID = config.orcidClientID;
-const orcidRedirectUrl = config.orcidRedirectUrl;
+//const config = window.zoteroConfig;
+//const orcidClientID = config.orcidClientID;
+//const orcidRedirectUrl = config.orcidRedirectUrl;
 
-class FuzzyDate extends Component{
+class FuzzyDate extends PureComponent{
 	render(){
 		const {date} = this.props;
 		if(date === null){
@@ -33,9 +33,10 @@ class FuzzyDate extends Component{
 	}
 }
 
-class TimeSpan extends Component{
+class TimeSpan extends PureComponent{
 	getDuration = () => {
 		const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+		//don't just grab props because they will be references
 		let startDate = Object.assign({}, this.props.startDate);
 		let endDate = Object.assign({}, this.props.endDate);
 
@@ -89,7 +90,7 @@ class TimeSpan extends Component{
 		try {
 			duration = this.getDuration();
 		} catch(e){
-			log.error("failed to calculate duration:" + e);
+			log.error('failed to calculate duration:' + e);
 		}
 		return (
 			<span className='time-span'>
@@ -100,16 +101,21 @@ class TimeSpan extends Component{
 		);
 	}
 }
-class Organization extends Component{
+class Organization extends PureComponent{
 	render(){
 		const {name, address} = this.props.organization;
 		let locNode = null;
 		if(address.city || address.region || address.country){
+			let locStr = address.city ? `${address.city}, ` : '';
+			locStr += address.region ? `${address.region}, ` : '';
+			locStr += address.country ? address.country : '';
+			locStr = locStr.trim();
+			if(locStr.endsWith(',')){
+				locStr = locStr.substring(0, locStr.length - 1);
+			}
 			locNode = (
 				<span className='organization-location'>
-					: {address.city ? `${address.city}, ` : ''}
-					{address.region ? `${address.region}, ` : ''}
-					{address.country ? address.country : ''}
+					: {locStr}
 				</span>
 			);
 		}
@@ -120,7 +126,7 @@ class Organization extends Component{
 		);
 	}
 }
-class OrganizationEntry extends Component{
+class OrganizationEntry extends PureComponent{
 	render(){
 		const {entry, editable} = this.props;
 		return (
@@ -150,7 +156,7 @@ OrganizationEntry.defaultProps = {
 	edit: function(){}
 };
 
-class Name extends Component{
+class Name extends PureComponent{
 	render(){
 		return (
 			<h2>{this.props.person.name['given-names'].value} {this.props.person.name['family-name'].value}</h2>
@@ -158,13 +164,13 @@ class Name extends Component{
 	}
 }
 
-class Biography extends Component{
+class Biography extends PureComponent{
 	render(){
 		let bio = this.props.biography.content;
 		if(!bio){
 			return null;
 		}
-		let bioEntries = bio.split("\n");
+		let bioEntries = bio.split('\n');
 		bioEntries = bioEntries.map((entry, i)=>{
 			return <Fragment key={i}>{entry}<br /></Fragment>;
 		});
@@ -176,7 +182,7 @@ class Biography extends Component{
 	}
 }
 
-class Educations extends Component{
+class Educations extends PureComponent{
 	render(){
 		if(!this.props.educations.length){
 			return null;
@@ -194,7 +200,7 @@ class Educations extends Component{
 	}
 }
 
-class Employments extends Component{
+class Employments extends PureComponent{
 	render(){
 		if(!this.props.employments.length){
 			return null;
@@ -213,7 +219,7 @@ class Employments extends Component{
 }
 
 
-class ResearcherUrls extends Component{
+class ResearcherUrls extends PureComponent{
 	render(){
 		if(!this.props.urls.length){
 			return null;
@@ -229,7 +235,7 @@ class ResearcherUrls extends Component{
 	}
 }
 
-class Work extends Component{
+class Work extends PureComponent{
 	render(){
 		let workSummary = this.props.work['work-summary'];
 		let type = workSummary[0].type;
@@ -247,7 +253,7 @@ class Work extends Component{
 	}
 }
 
-class Works extends Component{
+class Works extends PureComponent{
 	render(){
 		if(!this.props.works.length){
 			return null;
@@ -266,7 +272,7 @@ class Works extends Component{
 }
 
 
-class Funding extends Component{
+class Funding extends PureComponent{
 	render(){
 		let f = this.props.funding['funding-summary'][0];
 		let type = f.type.toLowerCase();
@@ -283,7 +289,7 @@ class Funding extends Component{
 	}
 }
 
-class Fundings extends Component{
+class Fundings extends PureComponent{
 	render(){
 		if(!this.props.fundings.length){
 			return null;
@@ -301,7 +307,7 @@ class Fundings extends Component{
 	}
 }
 
-class Keywords extends Component{
+class Keywords extends PureComponent{
 	render(){
 		if(!this.props.keywords.length){
 			return null;
@@ -319,7 +325,7 @@ class Keywords extends Component{
 	}
 }
 
-class OrcidProfile extends Component{
+class OrcidProfile extends PureComponent{
 	/*
 	loadOrcid = async (orcid) => {
 		log.debug('loadOrcid');
@@ -416,8 +422,8 @@ class OrcidProfileControl extends Component{
 		if(orcidProfile){
 			let fullProfile = null;
 			if(this.props.showFull){
-				fullProfile = <OrcidProfile orcidProfile={orcidProfile} />
-			};
+				fullProfile = <OrcidProfile orcidProfile={orcidProfile} />;
+			}
 			return (
 				<div className='orcid-profile-control'>
 					<Notifier {...notification} />
@@ -425,7 +431,7 @@ class OrcidProfileControl extends Component{
 					<p><a href='https://orcid.org/my-orcid'>Edit ORCID profile</a> | <a href='#' onClick={this.refreshOrcid}>Refresh ORCID profile</a> | <a onClick={this.unlinkOrcid} href='#'>Unlink Orcid iD</a></p>
 					{fullProfile}
 				</div>
-			)
+			);
 		} else {
 			return (
 				<div className='orcid-profile-control'>
@@ -433,13 +439,13 @@ class OrcidProfileControl extends Component{
 					<OrcidIcon /> <a href='/settings/linkorcid'>Use data from your ORCID iD profile</a>
 					<p>ORCID is an independent non-profit effort to provide an open registry of unique researcher identifiers and open services to link research activities and organizations to these identifiers. Learn more at <a href='https://orcid.org'>orcid.org</a>.</p>
 				</div>
-			)
+			);
 		}
 	}
 }
 OrcidProfileControl.defaultProps = {
 	showFull:true
-}
+};
 
 let orcidizeTimelineEntry = function(d){
 	return {
@@ -470,6 +476,6 @@ let orcidizeTimelineEntry = function(d){
 			}
 		},
 	};
-}
+};
 
 export {OrcidProfile, OrcidProfileControl, Name, Biography, Educations, Employments, Fundings, Works, ResearcherUrls, Keywords, OrganizationEntry, TimeSpan, Organization, orcidizeTimelineEntry};

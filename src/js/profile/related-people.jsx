@@ -6,8 +6,6 @@ let log = logger.Logger('related-people');
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {eventSystem} from '../EventSystem.js';
-import {ProfileDataSource} from './profile-data-source.js';
 import {Row, Col, Button} from 'reactstrap';
 import {Spinner} from '../LoadingSpinner.js';
 
@@ -24,7 +22,7 @@ class RelatedPeople extends React.Component {
 		}
 
 		if(this.props.more) {
-			viewAllButton = <span className="profile-side-panel-header-link"><a onClick={this.viewMoreHandler} href="">View All</a></span>;
+			viewAllButton = <span className="profile-side-panel-header-link float-right"><a onClick={this.viewMoreHandler} href="">View All</a></span>;
 		}
 		return <div className="profile-side-panel" id={`${this.props.id}-side-panel`}>
 			<h3>{this.props.title}</h3>
@@ -53,56 +51,41 @@ class RelatedPeopleDetailed extends React.Component {
 		super(props);
 		this.state = {
 			loading: false,
-			all: !this.props.more,
-			people: this.props.people
+			people: props.people
 		};
 	}
 
-	showAllHandler() {
-		this.setState({
-			loading: true
-		});
-
-		this.props.dataSource.getData(
-			this.props.title.toLowerCase(),
-			'all'
-		).done(response => {
-			this.setState({
-				people: response.data,
-				loading: false,
-				all: true
-			});
-		}).fail(error => {
-			eventSystem.trigger('alert', {
-				level: 'danger',
-				message: error.responseJSON ? error.responseJSON.message : 'Failed to update items people'
-			});
-			this.setState({
-				loading: false
-			});
-		});
+	showMore = () => {
+		this.props.loadRelatedUsers(this.props.type);
 	}
-
 	render() {
-		var footer;
+		log.debug('RelatedPeopleDetailed render');
+		let footer;
+		let {loading} = this.state;
+		let {title, people, total} = this.props;
+		let all = !(people.length < total);
+		
+		if(!loading && people.length == 0){
+			return null;
+		}
 
-		if(this.state.loading) {
+		if(loading) {
 			footer = <div className="profile-related-people-detailed-action">
 				<Spinner color='blue' />
 			</div>;
-		} else if(!this.state.all) {
+		} else if(!all) {
 			footer = <div className="profile-related-people-detailed-action">
-				<Button color='secondary' onClick={ ev => this.showAllHandler(ev) }>
-					Show All
+				<Button color='secondary' onClick={this.showMore}>
+					More
 				</Button>
 			</div>;
 		}
 
 		return <div className="profile-related-people-detailed">
-			<h2>{ this.props.title }</h2>
+			<h2>{ title }</h2>
 			<Row>
-				{ this.state.people.map(person => {
-					var academic, affiliation;
+				{ people.map(person => {
+					let academic, affiliation;
 					
 					if(person.meta.profile.academic) {
 						academic = <div className="profile-related-people-detailed-academic">
@@ -124,7 +107,7 @@ class RelatedPeopleDetailed extends React.Component {
 								</div>
 								<div className="profile-related-people-detailed-details-username">
 									<span>
-										<a href={ '/' + person.slug } className="profile-related-people-detailed-details">
+										<a href={ '/' + person.slug }>
 											{ person.displayName || person.username }
 										</a>
 									</span>
@@ -156,7 +139,6 @@ RelatedPeopleDetailed.propTypes = {
 	})).isRequired,
 	more: PropTypes.bool,
 	title: PropTypes.string.isRequired,
-	dataSource: PropTypes.instanceOf(ProfileDataSource).isRequired
 };
 
 export {RelatedPeople, RelatedPeopleDetailed};

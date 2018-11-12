@@ -10,15 +10,14 @@ import {ajax, postFormData} from '../ajax.js';
 import {apiRequestString} from '../ApiRouter.js';
 import {eventSystem} from '../EventSystem.js';
 import {EditableAvatar} from './editable-avatar.jsx';
-import {EditableEducationItem, OrcidEditableEducationItem} from './editable-education-item.jsx';
-import {EditableExperienceItem, OrcidEditableExperienceItem} from './editable-experience-item.jsx';
+import {OrcidEditableEducationItem} from './editable-education-item.jsx';
+import {OrcidEditableExperienceItem} from './editable-experience-item.jsx';
 import {EditableField} from './editable-field.jsx';
 import {EditableInterests} from './editable-interest-item.jsx';
 import {EditableTimeline} from './editable-timeline.jsx';
 import {EditableSocial} from './editable-social-item.jsx';
 import {EditableRich} from './editable-rich.jsx';
 import {Groups, GroupsDetailed} from './groups.jsx';
-import {ProfileDataSource} from './profile-data-source.js';
 import {Publications} from './publications.jsx';
 import {RelatedPeople, RelatedPeopleDetailed} from './related-people.jsx';
 import {FollowButtons} from '../FollowButtons.jsx';
@@ -26,7 +25,7 @@ import {InviteToGroups} from '../InviteToGroups.js';
 import {MessageUserButton} from './message-user-button.jsx';
 import {Alert, Container, Row, Col, Nav, NavItem, NavLink, TabPane, TabContent, Card, CardBody} from 'reactstrap';
 import {OrcidProfile, OrcidProfileControl} from '../components/OrcidProfile.jsx';
-import {Coalesce} from '../components/Coalesce.jsx';
+//import {Coalesce} from '../components/Coalesce.jsx';
 import cn from 'classnames';
 
 const PROFILE_DATA_HANDLER_URL = '/settings/profiledata';
@@ -49,7 +48,6 @@ class Profile extends React.Component {
 		if(['#About', '#Network', '#Groups'].indexOf(window.location.hash) != -1){
 			this.state.active = window.location.hash.substring(1);
 		}
-		this.profileDataSource = new ProfileDataSource(this.props.profile.userslug);
 		eventSystem.addListener('alert', this.onAlert);
 	}
 
@@ -143,7 +141,47 @@ class Profile extends React.Component {
 				extended
 			});
 		} else {
-			log.error("no userID in loadUserGroups");
+			log.error('no userID in loadUserGroups');
+		}
+	}
+
+	loadRelatedUsers = async (type) => {
+		this.setState({loadingRelated: true});
+		let {profile} = this.state;
+		let start = 0;
+		let limit = 10;
+		switch(type){
+			case 'followers':
+				start = profile.followers.length;
+				break;
+			case 'following':
+				start = profile.following.length;
+				break;
+			default:
+				throw 'Unrecognized related user type';
+		}
+
+		let slug = this.props.profile.userslug;
+		let url = `/${slug}/data/${type}?start=${start}&limit=${limit}`;
+		try{
+			let resp = await ajax({url: url, credentials:'omit'});
+			let data = await resp.json();
+			let followUsers = data['users'];
+			let newRelated = profile[type].concat(followUsers);
+			switch(type){
+				case 'followers':
+					profile.followers = newRelated;
+					this.setState({profile});
+					return;
+				case 'following':
+					profile.following = newRelated;
+					this.setState({profile});
+					return;
+				default:
+					throw 'Unrecognized related user type';
+			}
+		} catch (err){
+			log.error(err);
 		}
 	}
 
@@ -198,8 +236,8 @@ class Profile extends React.Component {
 		if(extended) {
 			networkTab = (
 				<TabPane tabId='Network'>
-					<RelatedPeopleDetailed people={ profile.followers } title="Followers" more={ profile.followersMore } dataSource={ this.profileDataSource } />
-					<RelatedPeopleDetailed people={ profile.following } title="Following" more={ profile.followingMore } dataSource={ this.profileDataSource } />
+					<RelatedPeopleDetailed type='followers' people={ profile.followers } title="Followers" total={ profile.followersTotal } loadRelatedUsers={this.loadRelatedUsers} />
+					<RelatedPeopleDetailed type='following' people={ profile.following } title="Following" total={ profile.followingTotal } loadRelatedUsers={this.loadRelatedUsers} />
 				</TabPane>
 			);
 
@@ -253,14 +291,14 @@ class Profile extends React.Component {
 						<RelatedPeople
 							people={ profile.followers.slice(0, 3) }
 							title="Followers"
-							more={ profile.followers.length > 3 || profile.followersMore }
+							more={ profile.followers.length > 3 || profile.followersTotal > 3 }
 							onViewMore={ () => this.makeActive('Network') }
 							id='followers'
 						/>
 						<RelatedPeople
 							people={ profile.following.slice(0, 3) }
 							title="Following"
-							more={ profile.following.length > 3 || profile.followingMore }
+							more={ profile.following.length > 3 || profile.followingTotal > 3 }
 							onViewMore={ () => this.makeActive('Network') }
 							id='following'
 						/>
@@ -317,14 +355,14 @@ class Profile extends React.Component {
 						<RelatedPeople
 							people={ profile.followers.slice(0, 3) }
 							title="Followers"
-							more={ profile.followers.length > 3 || profile.followersMore }
+							more={ profile.followers.length > 3 || profile.followersTotal > 3 }
 							onViewMore={ () => this.makeActive('Network') }
 							id='followers'
 						/>
 						<RelatedPeople
 							people={ profile.following.slice(0, 3) }
 							title="Following"
-							more={ profile.following.length > 3 || profile.followingMore }
+							more={ profile.following.length > 3 || profile.followingTotal > 3 }
 							onViewMore={ () => this.makeActive('Network') }
 							id='following'
 						/>

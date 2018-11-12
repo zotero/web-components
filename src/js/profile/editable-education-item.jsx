@@ -1,7 +1,7 @@
 'use strict';
 
-import {log as logger} from '../Log.js';
-let log = logger.Logger('editable-education-item');
+// import {log as logger} from '../Log.js';
+// let log = logger.Logger('editable-education-item');
 
 import React from 'react';
 
@@ -9,7 +9,7 @@ import {Form, FormGroup, Row, Col, CustomInput, Input, Label, Button} from 'reac
 import {OrganizationEntry, orcidizeTimelineEntry} from '../components/OrcidProfile.jsx';
 
 let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
+/*
 class EditableEducationItem extends React.Component {
 	constructor(props) {
 		super(props);
@@ -122,10 +122,43 @@ EditableEducationItem.defaultProps = {
 		present: false
 	}
 };
-
-class OrcidEditableEducationItem extends EditableEducationItem {
-	constructor(props){
-		super(props)
+*/
+class OrcidEditableEducationItem extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			value:props.value,
+			editing:props.editing
+		};
+	}
+	updateEvt = (evt) => {
+		let stateValue = this.state.value;
+		let newValue = Object.assign({}, stateValue);
+		let el = evt.target;
+		let name = el.getAttribute('name');
+		if(el.type == 'checkbox'){
+			newValue[name] = el.checked;
+		} else {
+			newValue[name] = el.value;
+		}
+		this.setState({value:newValue});
+	}
+	edit = () => {
+		this.setState({editing:true});
+	}
+	save = () => {
+		let {value} = this.state;
+		this.props.onUpdate(this.props.index, value);
+		this.setState({editing:false});
+	}
+	remove = () => {
+		this.props.remove(this.props.index);
+	}
+	cancel = () => {
+		this.setState({
+			value:this.props.value,
+			editing:false
+		});
 	}
 	render() {
 		const {editable} = this.props;
@@ -216,4 +249,4 @@ OrcidEditableEducationItem.defaultProps = {
 	}
 };
 
-export {EditableEducationItem, OrcidEditableEducationItem};
+export {OrcidEditableEducationItem};

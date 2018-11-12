@@ -31,6 +31,9 @@ class EditableInterests extends React.Component {
 	addInterest = (evt) => {
 		evt.preventDefault();
 		let {addValue, value} = this.state;
+		if(addValue == ''){
+			return;
+		}
 		let entry = {
 			interest: addValue
 		};
@@ -49,6 +52,10 @@ class EditableInterests extends React.Component {
 		let {value} = this.state;
 		await this.props.saveField(this.props.field, JSON.stringify(value));
 		this.setState({editing:false});
+	}
+	cancel = async () => {
+		let value = JSON.parse(this.props.value);
+		this.setState({editing:false, value});
 	}
 	render() {
 		const {editable, title, emptyText} = this.props;

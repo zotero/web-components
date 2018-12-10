@@ -16,7 +16,7 @@ import {Delay} from './Utils.js';
 const config = window.zoteroConfig;
 const installData = config.installData;
 
-const {firefoxHash, firefoxVersion} = installData;
+const {firefoxHash, firefoxVersion} = installData || {firefoxHash:'', firefoxVersion:''};
 const chromeDownload = 'https://chrome.google.com/webstore/detail/ekhagklcjbdpajgpjgmbionohlpdbjgc';
 const firefoxDownload = `https://www.zotero.org/download/connector/dl?browser=firefox&version=${firefoxVersion}`;
 const safariDownload = 'https://www.zotero.org/download/connector/dl?browser=safari';

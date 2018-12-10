@@ -448,6 +448,15 @@ class Storage extends Component {
 			});
 		});
 	}
+	stripeBlocked() {
+		this.setState({
+			operationPending:false,
+			notification: {
+				type: 'error',
+				message: 'It appears that something is blocking our payment processor\'s scripts from running. This may be caused by your network operator, or by your browser or extensions blocking scripts. Please make sure scripts from stripe.com are allowed to run, then try again.'
+			}
+		});
+	}
 	chargeSubscription(storageLevel=false) {
 		if(storageLevel === false) {
 			throw 'no storageLevel set for updateSubscription';
@@ -509,8 +518,12 @@ class Storage extends Component {
 				operationPending:false
 			});
 		};
-
-		window.stripeHandler(descriptions[storageLevel], tokenHandler, closedHandler);
+		
+		if(!window.StripeCheckout){
+			this.stripeBlocked();
+		} else {
+			window.stripeHandler(descriptions[storageLevel], tokenHandler, closedHandler);
+		}
 	}
 	updatePayment() {
 		let userSubscription = this.state.userSubscription;
@@ -565,7 +578,11 @@ class Storage extends Component {
 			});
 		};
 
-		window.stripeHandler('', tokenHandler, closedHandler);
+		if(!window.StripeCheckout){
+			this.stripeBlocked();
+		} else {
+			window.stripeHandler('', tokenHandler, closedHandler);
+		}
 	}
 	cancelRecur(){
 		this.setState({operationPending:true});

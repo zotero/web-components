@@ -2,8 +2,6 @@
 // Asset URLs
 //
 
-$staticPath: '../assets';
-
 @function asset-url($type, $path) {
   @return url($staticPath + unquote("/#{$type}/#{$path}"));
 }

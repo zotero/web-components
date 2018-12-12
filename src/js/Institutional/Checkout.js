@@ -54,39 +54,48 @@ class InstitutionCheckout extends Component{
 	constructor(props){
 		super(props);
 		this.state = {
-			fte:this.props.fte,
-			contact:this.props.contact,
-			domain:this.props.domain,
-			name:this.props.name,
+			fte:props.fte,
+			contact:props.contact,
+			domain:props.domain,
+			name:props.name,
 			formErrors:{}
 		};
-		
-		this.requestInvoice = this.requestInvoice.bind(this);
-		this.validateForm = this.validateForm.bind(this);
 	}
-	validateForm(state){
-		if(state.fte == ''){
+	handleFTEChange = (evt) => {
+		let nv = evt.target.value;
+		nv = nv.replace(/\D/g,'');
+		if(nv != ''){
+			nv = parseInt(nv);
+			if(isNaN(nv)){
+				nv = 15;
+			}
+		}
+		this.setState({fte:nv});
+	}
+	validateForm = (state) => {
+		let {fte, contact, name, domain} = state;
+		if(fte == '' || isNaN(parseInt(fte))){
 			return {
 				valid:false,
 				field:'fte',
 				reason:'Please specify a number of full time equivalents at your institution.'
 			};
 		}
-		if(state.contact == '') {
+		if(contact == '') {
 			return {
 				valid:false,
 				field:'contact',
 				reason:'Please specify an email address to contact you with.'
 			};
 		}
-		if(state.name == '') {
+		if(name == '') {
 			return {
 				valid:false,
 				field:'name',
 				reason:'Please specify the name of your institution.'
 			};
 		}
-		if(state.domain == '') {
+		if(domain == '') {
 			return {
 				valid:false,
 				field:'domain',
@@ -95,7 +104,7 @@ class InstitutionCheckout extends Component{
 		}
 		return {valid:true};
 	}
-	async requestInvoice(){
+	requestInvoice = async () => {
 		let resp;
 		let {fte, contact, domain, name} = this.state;
 		let validated = this.validateForm(this.state);
@@ -152,7 +161,7 @@ class InstitutionCheckout extends Component{
 				</p>
 				<div className='form-line'>
 					<label htmlFor='institution_fte'>FTE:</label>
-					<input type='text' className='institution_fte form-control' value={fte} onChange={(evt)=>{this.setState({fte:evt.target.value});}} />
+					<input type='text' className='institution_fte form-control' value={fte} onChange={this.handleFTEChange} />
 					<FormFieldErrorMessage message={formErrors['fte']} />
 				</div>
 				<div className='form-line'>

@@ -59,9 +59,8 @@ class InstitutionData extends Component{
 		this.state = {
 			name:props.name
 		};
-		this.saveInstitutionName = this.saveInstitutionName.bind(this);
 	}
-	async saveInstitutionName(name){
+	saveInstitutionName = async (name) => {
 		let updateUrl = buildUrl('manageInstitution', {institutionID:this.props.institutionID});
 		let resp;
 		try{
@@ -135,9 +134,8 @@ class Manage extends Component{
 		this.state = {
 			emails:props.userEmails
 		};
-		this.updateEmailList = this.updateEmailList.bind(this);
 	}
-	async updateEmailList(){
+	updateEmailList = async () => {
 		const {emails} = this.state;
 		let updateUrl = buildUrl('institutionemaillist', {institutionID:this.props.institutionID});
 		let resp;

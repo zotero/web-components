@@ -90,6 +90,8 @@ let buildUrl = function(name, params){
 			return '/user/login';
 		case 'register':
 			return '/user/register';
+		case 'addviaemail':
+			return '/settings/updateviaemail';
 	}
 	throw new Error('Unknown route in buildUrl');
 };
@@ -148,6 +150,6 @@ let profileImageSrc = function(userID, purpose){
 	}
 
 	return `${staticPath}/${profileImagePath}${filename}`;
-}
+};
 
 export {buildUrl};

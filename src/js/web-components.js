@@ -36,6 +36,7 @@ import {Combined} from './GlobalSearch/Combined.js';
 import Profile from './profile/profile.jsx';
 import {ChangeUsername} from './ChangeUsername.js';
 import {ManageEmails} from './ManageEmails.js';
+import {AddViaEmail} from './AddViaEmail';
 import * as Institutional from './Institutional/Institutional.js';
 import {ProfileImageForm} from './ProfileImageForm.js';
 import {GroupLibrarySettings} from './GroupLibrarySettings.js';
@@ -64,6 +65,7 @@ let ZoteroWebComponents = {
 	Profile,
 	ChangeUsername,
 	ManageEmails,
+	AddViaEmail,
 	Institutional,
 	ProfileImageForm,
 	GroupLibrarySettings,

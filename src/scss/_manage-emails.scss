@@ -1,5 +1,6 @@
 #manage-emails {
 	.btn {
+		margin-top:3px;
 		color: $white;
 		background: $link-color;
 
@@ -8,6 +9,7 @@
 			text-decoration: none;
 			color: $white;
 			background: darken($link-color, 5%);
+			border-color: darken($link-color, 15%);
 		}
 	}
 	.form-control {

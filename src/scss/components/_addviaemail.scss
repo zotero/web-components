@@ -1,0 +1,21 @@
+#add-via-email {
+  p.current-email {
+    display: inline-block;
+    margin-right:1.5rem;
+  }
+  p.hint{
+    display:block;
+    clear:both;
+  }
+  .viaemail-link {
+    display:inline-block;
+    //margin:4px;
+    color:$link-color;
+    text-decoration:none;
+  }
+  a:not(:last-of-type):after {
+    content: ' · ';
+    color: rgba(0,0,0,0.5);
+    padding: 0 0.2em;
+  }
+}

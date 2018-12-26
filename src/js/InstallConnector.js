@@ -224,12 +224,6 @@ class InstallConnectorPrompt extends Component{
 							the Safari connector from this page.
 						</p>
 					);
-				} else {
-					versionNote = (
-						<p className='version-note'>
-							<a href="https://www.zotero.org/support/kb/safari_connector_installation">Need help installing the Connector?</a>
-						</p>
-					);
 				}
 				break;
 			default:

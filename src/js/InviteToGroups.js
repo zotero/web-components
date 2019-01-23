@@ -4,7 +4,7 @@ import {log as logger} from './Log.js';
 let log = logger.Logger('InviteToGroups');
 
 import {ajax, postFormData} from './ajax.js';
-import {apiRequestString} from './ApiRouter.js';
+import { loadUserGroups } from './ajaxHelpers.js';
 import {LoadingSpinner} from './LoadingSpinner.js';
 import {buildUrl} from './wwwroutes.js';
 import {VerticalExpandable} from './VerticalExpandable.js';
@@ -46,13 +46,7 @@ class InviteToGroups extends React.Component{
 		}
 
 		//load groups of user
-		let userGroupsUrl = apiRequestString({
-			'target':'userGroups',
-			'libraryType':'user',
-			'libraryID': userID,
-			'order':'title'
-		});
-		let userGroupsPromise = ajax({url: userGroupsUrl, credentials:'omit'}).then((resp)=>{
+		let userGroupsPromise = loadUserGroups(userID).then((resp)=>{
 			return resp.json().then((data) => {
 				this.setState({
 					userGroups:data,

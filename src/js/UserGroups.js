@@ -61,7 +61,7 @@ let groupIsWritable = function(group, userID) {
 class IntroVideo extends Component{
 	render(){
 		return (
-			<video id='group-intro-screencast' src="/static/videos/group_intro.m4v" controls='true' height='450px' poster='/static/images/group/playvideo.jpg'>
+			<video id='group-intro-screencast' src="/static/videos/group_intro.m4v" controls={true} height='450px' poster='/static/images/group/playvideo.jpg'>
 				Sorry, your browser doesn't support embedded videos.
 			</video>
 		);

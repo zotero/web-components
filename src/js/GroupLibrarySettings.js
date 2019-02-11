@@ -1,7 +1,7 @@
 'use strict';
 
-import {log as logger} from './Log.js';
-let log = logger.Logger('GroupLibrarySettings');
+//import {log as logger} from './Log.js';
+//let log = logger.Logger('GroupLibrarySettings');
 
 let React = require('react');
 const {Component} = React;

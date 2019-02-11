@@ -10,3 +10,9 @@
     margin-top:1.5rem;
   }
 }
+
+div.batchDelete {
+  padding:1rem;
+  background-color: $notification-error-color;
+  border-color: $notification-error-border-color;
+}

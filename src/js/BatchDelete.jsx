@@ -12,7 +12,6 @@ let React = require('react');
 
 class Progress extends React.PureComponent {
 	render() {
-		log.debug(this.props);
 		let {message, progress, max} = this.props;
 		let meter = null;
 		if(progress != null){

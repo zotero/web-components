@@ -105,6 +105,8 @@ let buildUrl = function(name, params){
 			return '/settings/updatecv';
 		case 'followUser':
 			return '/user/follow';
+		case 'addviaemail':
+			return '/settings/updateviaemail';
 	}
 	throw new Error('Unknown route in buildUrl');
 };

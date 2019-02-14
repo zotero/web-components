@@ -7,7 +7,12 @@ let React = require('react');
 const {Component} = React;
 
 import {RadioGroup, Radio} from './react-radio-group.js';
+import {BatchDelete} from './BatchDelete.jsx';
+import { postFormData } from './ajax.js';
+import {loadAttachmentItems} from './ajaxHelpers.js';
+import { Notifier } from './Notifier.js';
 
+//Deletion of attachments is required if group type is PublicOpen or if fileEditing is set to 'none'
 class GroupLibrarySettings extends Component{
 	constructor(props){
 		super(props);
@@ -17,18 +22,18 @@ class GroupLibrarySettings extends Component{
 				libraryReading:this.props.libraryReading,
 				libraryEditing:this.props.libraryEditing,
 				fileEditing:this.props.fileEditing
-			}
+			},
+			deletionRequired:false,
+			fileSettingsChanged:false
 		};
-		this.changeType = this.changeType.bind(this);
-		this.changeReading = this.changeReading.bind(this);
-		this.changeEditing = this.changeEditing.bind(this);
-		this.changeFileEditing = this.changeFileEditing.bind(this);
 	}
-	changeType(type){
+	changeType = (type) => {
 		let {librarySettings} = this.state;
 		if(type == 'PublicOpen'){
-			if(!confirm("Changing a group to 'Public Open' will remove all files from Zotero Storage")){
+			if(!confirm("Changing a group to 'Public Open' will disallow storing of files for the group. Before settings can be applied, all file attachments for the gorup will be deleted")){
 				return;
+			} else {
+				librarySettings['fileEditing'] = 'none';
 			}
 		}
 		if(type == 'Private'){
@@ -41,65 +46,102 @@ class GroupLibrarySettings extends Component{
 			}
 		}
 		librarySettings['type'] = type;
-		this.setState({librarySettings});
+		this.setState({librarySettings, fileSettingsChanged:true});
 	}
-	changeReading(value){
+	changeReading = (value) => {
 		let {librarySettings} = this.state;
 		librarySettings['libraryReading'] = value;
 		this.setState({librarySettings});
 	}
-	changeEditing(value){
+	changeEditing = (value) => {
 		let {librarySettings} = this.state;
 		librarySettings['libraryEditing'] = value;
 		this.setState({librarySettings});
 	}
-	changeFileEditing(value){
+	changeFileEditing = (value) => {
 		let {librarySettings} = this.state;
 		librarySettings['fileEditing'] = value;
-		this.setState({librarySettings});
+		this.setState({librarySettings, fileSettingsChanged:true});
+	}
+	submitForm = async () => {
+		//after verifying, if deletion is required, that there are no attachments, submit the form
+		let {librarySettings} = this.state;
+		let {groupID} = this.props;
+
+		let resp = await loadAttachmentItems(groupID, 0);
+		let totalResults = parseInt(resp.headers.get('Total-Results'));
+		if(totalResults == 0){
+			try{
+				let settingsResp = await postFormData(`/group/updatesettings?groupID=${groupID}&settingsType=library`, librarySettings, {withSession:true});
+				if(settingsResp.ok){
+					let data = await settingsResp.json();
+					if(data.success){
+						this.setState({notification:{type:'success', message:'Settings saved'}});
+						window.location.reload();
+						return;
+					} else {
+						if(data.message){
+							this.setState({notification:{type:'error', message:data.message}});
+							return;
+						}
+					}
+				}
+				this.setState({notification:{type:'error', message:'Error saving settings'}});
+			} catch(e){
+				this.setState({notification:{type:'error', message:'Error saving settings'}});
+			}
+		} else {
+			this.setState({notification:{type:'error', message:'Error saving settings. Not all attachments have been deleted.'}});
+		}
 	}
 	render(){
-		const {librarySettings} = this.state;
+		const {librarySettings, fileSettingsChanged, notification} = this.state;
 		const {type, libraryReading, libraryEditing, fileEditing} = librarySettings;
-		
-		let radioName = 'type';
+		const {groupID} = this.props;
+		const originalFileEditing = this.props.fileEditing;
+
+		let batchDelete = null;
+		let deletionRequired = (originalFileEditing != 'none') && ((type == 'PublicOpen') || (fileEditing == 'none'));
+		if(fileSettingsChanged && deletionRequired){
+			batchDelete = <BatchDelete groupID={groupID} save={this.submitForm} />;
+		}
+
+		let notifier = <Notifier {...notification} />;
+
 		let groupTypeRadioNode = (
 			<div className="group-type-radio">
 				<legend>Group Type</legend>
-				<label htmlFor={radioName}>All Groups
-					<RadioGroup name={radioName} selectedValue={type} onChange={this.changeType}>
-						<label htmlFor={radioName+'-Private'}>
-							<Radio value="Private" id={radioName+'-Private'} className="radio" />
-							Private
-						</label>
-						<br />
-						<label htmlFor={radioName+'-PublicClosed'}>
-							<Radio value="PublicClosed" id={radioName+'-PublicClosed'} className="radio" />
-							Public Closed
-						</label>
-						<br />
-						<label htmlFor={radioName+'-Public'}>
-							<Radio value="PublicOpen" id={radioName+'-Public'} className="radio" />
-							Public Open
-						</label>
-					</RadioGroup>
-				</label>
+				<RadioGroup name='type' selectedValue={type} onChange={this.changeType}>
+					<label>
+						<Radio value="Private" className="radio" />
+						Private
+					</label>
+					<br />
+					<label>
+						<Radio value="PublicClosed" className="radio" />
+						Public Closed
+					</label>
+					<br />
+					<label>
+						<Radio value="PublicOpen" className="radio" />
+						Public Open
+					</label>
+				</RadioGroup>
 				<p className="hint">Controls who can see and join your group</p>
 			</div>
 		);
 
-		radioName = 'libraryReading';
 		let readingRadioNode = (
 			<div className="library-reading-radio">
 				<legend>Library Reading</legend>
-				<RadioGroup name={radioName} selectedValue={libraryReading} onChange={this.changeReading}>
-					<label htmlFor={radioName+'-all'}>
-						<Radio value="all" id={radioName+'-all'} className="radio" disabled={type=='Private' ? 'disabled' : ''} />
+				<RadioGroup name='libraryReading' selectedValue={libraryReading} onChange={this.changeReading}>
+					<label>
+						<Radio value="all" className="radio" disabled={type=='Private' ? 'disabled' : ''} />
 						Anyone on the internet
 					</label>
 					<br />
-					<label htmlFor={radioName+'-members'}>
-						<Radio value="members" id={radioName+'-members'} className="radio" />
+					<label>
+						<Radio value="members" className="radio" />
 						Any group member
 					</label>
 				</RadioGroup>
@@ -107,18 +149,17 @@ class GroupLibrarySettings extends Component{
 			</div>
 		);
 
-		radioName = 'libraryEditing';
 		let libraryEditingRadioNode = (
 			<div className="library-editing-radio">
 				<legend>Library Editing</legend>
-				<RadioGroup name={radioName} selectedValue={libraryEditing} onChange={this.changeEditing}>
-					<label htmlFor={radioName+'-members'}>
-						<Radio value="members" id={radioName+'-members'} className="radio" />
+				<RadioGroup name='libraryEditing' selectedValue={libraryEditing} onChange={this.changeEditing}>
+					<label>
+						<Radio value="members" className="radio" />
 						Any group members
 					</label>
 					<br />
-					<label htmlFor={radioName+'-admins'}>
-						<Radio value="admins" id={radioName+'-admins'} className="radio" />
+					<label>
+						<Radio value="admins" className="radio" />
 						Only group admins
 					</label>
 				</RadioGroup>
@@ -126,23 +167,22 @@ class GroupLibrarySettings extends Component{
 			</div>
 		);
 
-		radioName = 'fileEditing';
 		let fileEditingRadioNode = (
 			<div className="file-editing-radio">
 				<legend>File Editing</legend>
-				<RadioGroup name={radioName} selectedValue={fileEditing} onChange={this.changeFileEditing}>
-					<label htmlFor={radioName+'-members'}>
-						<Radio value="members" id={radioName+'-members'} className="radio" />
+				<RadioGroup name='fileEditing' selectedValue={fileEditing} onChange={this.changeFileEditing}>
+					<label>
+						<Radio value="members" className="radio" disabled={type == 'PublicOpen'} />
 						Any group members
 					</label>
 					<br />
-					<label htmlFor={radioName+'-admins'}>
-						<Radio value="admins" id={radioName+'-admins'} className="radio" />
+					<label>
+						<Radio value="admins" className="radio" disabled={type == 'PublicOpen'} />
 						Only group admins
 					</label>
 					<br />
-					<label htmlFor={radioName+'-none'}>
-						<Radio value="none" id={radioName+'-none'} className="radio" />
+					<label>
+						<Radio value="none" className="radio" disabled={type == 'PublicOpen'} />
 						No group file storage
 					</label>
 				</RadioGroup>
@@ -152,13 +192,14 @@ class GroupLibrarySettings extends Component{
 
 		return (
 			<div>
-				<form method='POST'>
+				{notifier}
+				<div className='group-type'>
 					{groupTypeRadioNode}
-					{readingRadioNode}
-					{libraryEditingRadioNode}
-					{fileEditingRadioNode}
-					<button className='btn btn-secondary' type='submit'>Save Settings</button>
-				</form>
+				</div>
+				{readingRadioNode}
+				{libraryEditingRadioNode}
+				{fileEditingRadioNode}
+				{(deletionRequired && fileSettingsChanged) ? batchDelete : <button onClick={this.submitForm}>Save Settings</button>}
 			</div>
 		);
 	}

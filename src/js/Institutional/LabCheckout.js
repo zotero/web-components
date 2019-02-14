@@ -1,7 +1,7 @@
 'use strict';
 
-//import {log as logger} from '../Log.js';
-//let log = logger.Logger('LabCheckout');
+// import {log as logger} from '../Log.js';
+// let log = logger.Logger('LabCheckout');
 
 const React = require('react');
 const {Component} = React;
@@ -19,9 +19,20 @@ class LabCheckout extends Component{
 	constructor(props){
 		super(props);
 		this.state = {
-			fte:this.props.fte,
-			name:this.props.name
+			fte:props.fte,
+			name:props.name
 		};
+	}
+	handleFTEChange = (evt) => {
+		let nv = evt.target.value;
+		nv = nv.replace(/\D/g,'');
+		if(nv != ''){
+			nv = parseInt(nv);
+			if(isNaN(nv)){
+				nv = 15;
+			}
+		}
+		this.setState({fte:nv});
 	}
 	render(){
 		const {fte, name, notification} = this.state;
@@ -60,7 +71,7 @@ class LabCheckout extends Component{
 				</p>
 				<div className='form-line'>
 					<label htmlFor='lab_fte'>Users:</label>
-					<input type='text' name='lab_fte' className='lab_fte form-control' value={fte} onChange={(evt)=>{this.setState({fte:evt.target.value});}} />
+					<input type='text' name='lab_fte' min="15" className='lab_fte form-control' value={fte} onChange={this.handleFTEChange} />
 				</div>
 				<div className='form-line'>
 					<label>Price</label>

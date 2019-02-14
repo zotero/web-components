@@ -4,8 +4,7 @@
 //let log = logger.Logger('RecentItems');
 
 import {ItemMaps} from './maps/ItemMaps.js';
-import {ajax} from './ajax.js';
-import {apiRequestString} from './ApiRouter.js';
+import {loadRecentGroupItems} from './ajaxHelpers.js';
 import {formatItemField, getCurrentUser} from './Utils.js';
 import {buildUrl} from './wwwroutes.js';
 import {LoadingSpinner} from './LoadingSpinner.js';
@@ -52,18 +51,6 @@ RecentItemRow.defaultProps = {
 	item: {}
 };
 
-let loadRecentItems = function(group){
-	let url = apiRequestString({
-		target:'items',
-		targetModifier:'top',
-		libraryType:'group',
-		libraryID:group.id,
-		limit:10,
-		order:'dateModified'
-	});
-	
-	return ajax({url:url, credentials:'omit'});
-};
 
 class RecentItems extends React.Component{
 	constructor(props){
@@ -75,7 +62,7 @@ class RecentItems extends React.Component{
 			totalResults:parseInt(this.props.totalResults, 10)
 		};
 	}
-	componentWillMount() {
+	componentWillMount = async () => {
 		let group = this.props.group;
 		//load items iff we have access
 		let userID = null;
@@ -85,15 +72,15 @@ class RecentItems extends React.Component{
 
 		if(groupIsReadable(group, userID) && this.state.items.length == 0){
 			this.setState({loading:true});
-			loadRecentItems(this.props.group).then((resp)=>{
-				resp.json().then((data) => {
-					let totalResults = parseInt(resp.headers.get('Total-Results'));
-					this.setState({loading:false, items:data, totalResults:totalResults});
-				});
-			}).catch(()=>{
+			try{
+				let resp = await loadRecentGroupItems(this.props.group);
+				let data = await resp.json();
+				let totalResults = parseInt(resp.headers.get('Total-Results'));
+				this.setState({loading:false, items:data, totalResults:totalResults});
+			} catch(e) {
 				this.setState({loading:false});
 				jsError('There was an error loading the group library. Please try again in a few minutes');
-			});
+			}
 		} else {
 			this.setState({notReadable:true});
 		}

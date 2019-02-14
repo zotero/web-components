@@ -4,10 +4,9 @@
 //let log = logger.Logger('GroupInfo');
 
 import {Notifier} from './Notifier.js';
-import {ajax, postFormData} from './ajax.js';
-//import {LoadingSpinner} from './LoadingSpinner.js';
+import {postFormData} from './ajax.js';
+import {loadGroupInfo} from './ajaxHelpers.js';
 import {buildUrl} from './wwwroutes.js';
-import {apiRequestString} from './ApiRouter.js';
 import {jsError, jsSuccess, getCurrentUser} from './Utils.js';
 import classnames from 'classnames';
 import striptags from 'striptags';
@@ -228,19 +227,16 @@ class GroupInfo extends React.Component{
 		};
 		this.refreshGroup = this.refreshGroup.bind(this);
 	}
-	refreshGroup(){
+	refreshGroup = async () => {
 		//log.debug('GroupInfo refreshGroup');
 		let groupID = this.props.group.id;
-		let groupUrl = apiRequestString({target:'group', libraryType:'group', libraryID:groupID});
-		ajax({url:groupUrl, credentials:'omit'}).then((resp)=>{
-			//log.debug(resp);
-			resp.json().then((data)=>{
-				this.setState({group:data});
-			});
-		}).catch(()=>{
+		try{
+			let resp = await loadGroupInfo(groupID);
+			let data = await resp.json();
+			this.setState({group:data});
+		} catch (e) {
 			jsError('There was an error loading the updated group information');
-			//log.debug('error refreshing group');
-		});
+		}
 	}
 	render(){
 		let group = this.state.group;

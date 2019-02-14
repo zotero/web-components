@@ -58,6 +58,7 @@ import {Combined} from './GlobalSearch/Combined.js';
 import {Profile} from './profile/profile.jsx';
 import {ChangeUsername} from './ChangeUsername.js';
 import {ManageEmails} from './ManageEmails.js';
+import {AddViaEmail} from './AddViaEmail';
 import * as Institutional from './Institutional/Institutional.js';
 import {collect} from './animations/collect.js';
 import {organize} from './animations/organize.js';
@@ -72,6 +73,7 @@ import {OrcidProfile, OrcidProfileControl} from './components/OrcidProfile.jsx';
 import {CVEditor} from './CV/cv.js';
 import {FollowButtons, FollowSection} from './FollowButtons.jsx';
 import {Search} from './Search.jsx';
+import {PurchaseWorkshop} from './PurchaseWorkshop.jsx';
 
 let ZoteroWebComponents = {
 	Storage,
@@ -96,6 +98,8 @@ let ZoteroWebComponents = {
 	Profile,
 	ChangeUsername,
 	animations,
+	ManageEmails,
+	AddViaEmail,
 	Institutional,
 	ManageEmails,
 	ProfileImageForm,
@@ -105,7 +109,8 @@ let ZoteroWebComponents = {
 	CVEditor,
 	FollowButtons, FollowSection,
 	activateFootnotes,
-	Search
+	Search,
+	PurchaseWorkshop
 };
 
 globalScope.ZoteroWebComponents = ZoteroWebComponents;

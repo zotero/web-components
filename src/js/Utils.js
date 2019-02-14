@@ -380,4 +380,13 @@ let randomString = function(len, chars) {
 	return randomstring;
 };
 
-export {slugify, parseQuery, buildQuery, querystring, parseSearchString, readCookie, loadInitialState, pageReady, jsError, jsSuccess, Delay, formatItemField, formatCurrency, getCurrentUser, randomString};
+//split an array of objects into chunks to write over multiple api requests
+let chunkArray = function(ar, chunkSize=50){
+	var chunks = [];
+	for(var i = 0; i < ar.length; i = i + chunkSize){
+		chunks.push(ar.slice(i, i+chunkSize));
+	}
+	return chunks;
+};
+
+export {slugify, parseQuery, buildQuery, querystring, parseSearchString, readCookie, loadInitialState, pageReady, jsError, jsSuccess, Delay, formatItemField, formatCurrency, getCurrentUser, randomString, chunkArray};

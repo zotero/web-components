@@ -21,9 +21,8 @@ class LabPurchase extends Component{
 		this.state = {
 			notification:null
 		};
-		this.purchase = this.purchase.bind(this);
 	}
-	async purchase(){
+	purchase = async () => {
 		const {fte, name, institutionID} = this.props;
 
 		this.setState({operationPending:true});

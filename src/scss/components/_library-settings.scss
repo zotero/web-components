@@ -1,0 +1,18 @@
+#react-librarysettings {
+  margin-bottom:1.5rem;
+
+  div.group-type {
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #DDD;
+  }
+  legend {
+    margin-top:1.5rem;
+  }
+}
+
+div.batchDelete {
+  padding:1rem;
+  background-color: $notification-error-color;
+  border-color: $notification-error-border-color;
+}

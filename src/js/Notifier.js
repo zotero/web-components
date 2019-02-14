@@ -7,9 +7,10 @@ const React = require('react');
 
 class Notifier extends React.Component {
 	render() {
-		let type = this.props.type;
-		if(type == 'error') type = 'danger';
-		let className = `alert alert-${type}`;
+		if(!this.props.message){
+			return null;
+		}
+		let className = `notifier ${this.props.type}`;
 		return (
 			<div className={className} role='alert'>{this.props.message}</div>
 		);

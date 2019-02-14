@@ -19,7 +19,9 @@ const installData = config.installData;
 const {firefoxHash, firefoxVersion} = installData;
 const chromeDownload = 'https://chrome.google.com/webstore/detail/ekhagklcjbdpajgpjgmbionohlpdbjgc';
 const firefoxDownload = `https://www.zotero.org/download/connector/dl?browser=firefox&version=${firefoxVersion}`;
-const safariDownload = 'https://safari-extensions.apple.com/details/?id=org.zotero.zoteroconnectorforsafari-8LAYR367YV';
+const safariDownload = installData.oldSafari
+	? 'https://www.zotero.org/download/connector/dl?browser=safari'
+	: 'https://safari-extensions.apple.com/details/?id=org.zotero.zoteroconnectorforsafari-8LAYR367YV';
 
 class InstallFirefoxButton extends Component{
 	installFirefox(evt){
@@ -63,23 +65,12 @@ InstallFirefoxButton.defaultProps = {
 };
 
 class InstallChromeButton extends Component{
-	installChrome(evt){
-		if(typeof window.chrome !== 'undefined'){
-			evt.preventDefault();
-			window.chrome.webstore.install(undefined, ()=>{
-				//success
-			}, ()=>{
-				//failure: forward to chrome webstore
-				window.location = chromeDownload;
-			});
-		}
-	}
 	render(){
 		if(this.props.type == 'button') {
-			return <a href={chromeDownload} onClick={this.installChrome} id="chrome-connector-download-button" className="btn btn-lg btn-secondary">{this.props.label}</a>;
+			return <a href={chromeDownload} id="chrome-connector-download-button" className="btn download-link">{this.props.label}</a>;
 		} else if(this.props.type == 'image') {
 			return (
-				<a href={chromeDownload} onClick={this.installChrome}><BrowserIcon browser="chrome" /></a>
+				<a href={chromeDownload}><BrowserIcon browser="chrome" /></a>
 			);
 		} else if(this.props.type == 'full') {
 			return (

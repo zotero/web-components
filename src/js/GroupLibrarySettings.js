@@ -6,6 +6,7 @@
 let React = require('react');
 const {Component} = React;
 
+import {Button} from 'reactstrap';
 import {RadioGroup, Radio} from './react-radio-group.js';
 import {BatchDelete} from './BatchDelete.jsx';
 import { postFormData } from './ajax.js';
@@ -199,7 +200,7 @@ class GroupLibrarySettings extends Component{
 				{readingRadioNode}
 				{libraryEditingRadioNode}
 				{fileEditingRadioNode}
-				{(deletionRequired && fileSettingsChanged) ? batchDelete : <button onClick={this.submitForm}>Save Settings</button>}
+				{(deletionRequired && fileSettingsChanged) ? batchDelete : <Button onClick={this.submitForm}>Save Settings</Button>}
 			</div>
 		);
 	}

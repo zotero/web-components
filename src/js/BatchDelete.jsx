@@ -7,26 +7,29 @@ import {chunkArray} from './Utils.js';
 import {LoadingSpinner} from './LoadingSpinner.js';
 import {loadAttachmentItems, deleteSlice} from './ajaxHelpers.js';
 import { Notifier } from './Notifier.js';
+import {Button, Card, CardBody, Progress} from 'reactstrap';
 
 let React = require('react');
 
-class Progress extends React.PureComponent {
+class ProgressCard extends React.PureComponent {
 	render() {
 		let {message, progress, max} = this.props;
 		let meter = null;
 		if(progress != null){
-			meter = (<meter min="0" max={max} value={progress}>{progress}/{max}</meter>);
+			meter = <Progress color='info' value={progress} max={max} />;
 		}
 		return (
-			<div className='progress'>
-				<span className='message'>{message}</span>
-				{meter}
-				<LoadingSpinner loading={true} />
-			</div>
+			<Card className='progressCard'>
+				<CardBody>
+					<div className="text-center">{message}</div>
+					{meter}
+					<div className="text-center"><LoadingSpinner loading={true} /></div>
+				</CardBody>
+			</Card>
 		);
 	}
 }
-Progress.defaultProps = {
+ProgressCard.defaultProps = {
 	progress:0,
 	max:100
 };
@@ -68,7 +71,7 @@ class BatchDelete extends React.Component {
 			this.setState({
 				progress:{
 					message:'Checking all attachments',
-					max: totalAttachments,
+					max: parseInt(totalAttachments),
 					progress:attachments.length
 				}
 			});
@@ -118,7 +121,7 @@ class BatchDelete extends React.Component {
 			notification = <Notifier message={error} type='error' />;
 		}
 		if(progress) {
-			progressNode = <Progress {...progress} />;
+			progressNode = <ProgressCard {...progress} />;
 		}
 		if(totalAttachments !== null) {
 			attachmentSummary = <p>This library has {totalAttachments} total attachments.</p>;
@@ -127,14 +130,14 @@ class BatchDelete extends React.Component {
 					relAttachmentSummary = (
 						<div>
 							<p>No attachments need to be deleted</p>
-							<button onClick={this.props.save}>Save Settings</button>
+							<Button onClick={this.props.save}>Save Settings</Button>
 						</div>
 					);
 				} else {
 					relAttachmentSummary = (
 						<div>
 							<p>{relevantAttachments.length} attachments will be deleted.</p>
-							<button onClick={this.deleteAttachments}>Delete Attachments</button>
+							<Button onClick={this.deleteAttachments}>Delete Attachments</Button>
 						</div>
 					);
 				}

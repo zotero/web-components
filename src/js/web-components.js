@@ -68,12 +68,12 @@ let animations = {
 	organize
 };
 import {ProfileImageForm} from './ProfileImageForm.js';
-import {GroupLibrarySettings} from './GroupLibrarySettings.js';
 import {OrcidProfile, OrcidProfileControl} from './components/OrcidProfile.jsx';
 import {CVEditor} from './CV/cv.js';
 import {FollowButtons, FollowSection} from './FollowButtons.jsx';
 import {Search} from './Search.jsx';
 import {PurchaseWorkshop} from './PurchaseWorkshop.jsx';
+import {GroupLibrarySettings, TransferOwnership} from './components/GroupSettings/GroupSettings.js';
 
 let ZoteroWebComponents = {
 	Storage,
@@ -101,9 +101,9 @@ let ZoteroWebComponents = {
 	ManageEmails,
 	AddViaEmail,
 	Institutional,
-	ManageEmails,
 	ProfileImageForm,
 	GroupLibrarySettings,
+	TransferOwnership,
 	OrcidProfile,
 	OrcidProfileControl,
 	CVEditor,

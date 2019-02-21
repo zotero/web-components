@@ -7,11 +7,11 @@ let React = require('react');
 const {Component} = React;
 
 import {Button} from 'reactstrap';
-import {RadioGroup, Radio} from './react-radio-group.js';
+import {RadioGroup, Radio} from '../../react-radio-group.js';
 import {BatchDelete} from './BatchDelete.jsx';
-import { postFormData } from './ajax.js';
-import {loadAttachmentItems} from './ajaxHelpers.js';
-import { Notifier } from './Notifier.js';
+import { postFormData } from '../../ajax.js';
+import {loadAttachmentItems} from '../../ajaxHelpers.js';
+import { Notifier } from '../../Notifier.js';
 
 //Deletion of attachments is required if group type is PublicOpen or if fileEditing is set to 'none'
 class GroupLibrarySettings extends Component{

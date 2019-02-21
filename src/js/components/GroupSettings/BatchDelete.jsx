@@ -1,12 +1,12 @@
 'use strict';
 
-import {log as logger} from './Log.js';
+import {log as logger} from '../../Log.js';
 let log = logger.Logger('BatchDelete');
 
-import {chunkArray} from './Utils.js';
-import {LoadingSpinner} from './LoadingSpinner.js';
-import {loadAttachmentItems, deleteSlice} from './ajaxHelpers.js';
-import { Notifier } from './Notifier.js';
+import {chunkArray} from '../../Utils.js';
+import {LoadingSpinner} from '../../LoadingSpinner.js';
+import {loadAttachmentItems, deleteSlice} from '../../ajaxHelpers.js';
+import { Notifier } from '../../Notifier.js';
 import {Button, Card, CardBody, Progress} from 'reactstrap';
 
 let React = require('react');

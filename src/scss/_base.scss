@@ -26,6 +26,10 @@ main {
   flex: 1 1 auto; // Sticky footer
 }
 
+main > .section-md {
+  padding:1rem;
+}
+
 svg {
   vertical-align: middle;
   // Do not set height: auto on all SVGs, it sets the height of inline SVGs to

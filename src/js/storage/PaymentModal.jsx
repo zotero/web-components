@@ -4,11 +4,12 @@ import {log as logger} from '../Log.js';
 var log = logger.Logger('PaymentModal');
 
 // CheckoutForm.js
-import {Component, Fragment} from 'react';
-import {Elements, injectStripe, CardElement, AddressElement, IbanElement, PaymentRequestButtonElement} from 'react-stripe-elements';
-import {Card, CardHeader, CardBody, TabContent, TabPane, Nav, NavItem, NavLink, Row, Col, Input } from 'reactstrap';
+import {useState} from 'react';
+import {Elements, injectStripe, CardElement, IbanElement, PaymentRequestButtonElement} from 'react-stripe-elements';
+import {Button, Card, CardHeader, CardBody, TabContent, TabPane, Nav, NavItem, NavLink, Row, Col, Input, Form, FormGroup } from 'reactstrap';
 import PropTypes from 'prop-types';
 
+/*
 class AddressSection extends Component {
 	render() {
 		return (
@@ -18,64 +19,70 @@ class AddressSection extends Component {
 			</Fragment>
 		);
 	}
-};
+}
+*/
+function CardSection() {
+	return (
+		<CardElement />
+	);
+}
 
-class CardSection extends Component {
-	render() {
-		return (
-			<Fragment>
-				<CardElement />
-			</Fragment>
-		);
+function CardCheckoutForm(props){
+	if(typeof props.handleToken != 'function'){
+		log.error('props error in CardCheckoutForm: handleToken must be function');
 	}
-};
-
-class CardCheckoutForm extends Component {
-	handleSubmit = (ev) => {
-		const {name} = this.state;
-		// We don't want to let default form submission happen here, which would refresh the page.
+	const [name, setName] = useState('');
+	const handleSubmit = async (ev) => {
 		ev.preventDefault();
 
 		// Within the context of `Elements`, this call to createToken knows which Element to
 		// tokenize, since there's only one in this group.
-		this.props.stripe.createToken({name}).then(({token}) => {
-			console.log('Received Stripe token in CardCheckoutForm:', token);
-			this.props.handleToken(token);
-		});
+		let result = await props.stripe.createToken({name});
+		if(result.token){
+			log.debug('Received Stripe token in CardCheckoutForm:'+ result);
+			log.debug(result.token);
+			props.handleToken(result.token);
+		} else if(result.error){
+			log.error(result.error);
+			throw result.error;
+		}
+	};
+	const buttonLabel = props.buttonLabel || 'Confirm Order';
 
-		// However, this line of code will do the same thing:
-		// this.props.stripe.createToken({type: 'card', name: 'Jenny Rosen'});
-	}
-
-	render() {
-		return (
-			<form onSubmit={this.handleSubmit}>
-				<div className='form-group'>
-					<Input type='text' placeholder='Name'
-						onChange={(evt)=>{this.setState({name:evt.target.value});}}
-					/>
-				</div>
-				<div className='form-group'>
-					<CardSection />
-				</div>
-				<div className='form-group'>
-					<button className='btn btn-secondary'>Confirm order</button>
-				</div>
-			</form>
-		);
-	}
+	return (
+		<Form onSubmit={handleSubmit}>
+			<FormGroup>
+				<Input type='text' placeholder='Name' value={name}
+					onChange={(evt)=>{setName(evt.target.value);}}
+				/>
+			</FormGroup>
+			<FormGroup>
+				<CardSection />
+			</FormGroup>
+			<FormGroup>
+				<Button type='submit' color='secondary'>{buttonLabel}</Button>
+				<Button type='button' color='secondary' className='ml-2' onClick={props.onClose}>Cancel</Button>
+			</FormGroup>
+		</Form>
+	);
 }
 CardCheckoutForm.props = {
 	handleToken: PropTypes.func.isRequired
 };
 
-class IBANCheckoutForm extends Component {
-	handleSubmit = (ev) => {
+
+function IBANCheckoutForm(props) {
+	if(typeof props.handleToken != 'function'){
+		log.error('props error in CardCheckoutForm: handleToken must be function');
+	}
+	const [name, setName] = useState('');
+	const [email, setEmail] = useState('');
+	
+	let handleSubmit = async (ev) => {
 		// We don't want to let default form submission happen here, which would refresh the page.
 		ev.preventDefault();
 
-		const {name, email} = this.state;
-
+		/*
 		var sourceData = {
 			type: 'sepa_debit',
 			currency: 'eur',
@@ -89,178 +96,168 @@ class IBANCheckoutForm extends Component {
 				notification_method: 'email',
 			},
 		};
-		// Within the context of `Elements`, this call to createToken knows which Element to
-		// tokenize, since there's only one in this group.
-		this.props.stripe.createSource(sourceData).then((result) => {
-			console.log('Received result from createSource in IBANCheckoutForm:', result);
-			if(result.error) {
-				console.log('got an error.', result.error);
-			} else if(result.source){
-				console.log('got a source:', result.source);
-			}
-			//this.props.handleSource(payload);
-		});
+		*/
+		let result = await props.stripe.createToken({name});
+		if(result.token){
+			//log.debug('Received Stripe token in IBANCheckoutForm:'+ result);
+			//log.debug(result.token);
+			props.handleToken(result.token);
+		} else if(result.error){
+			log.error(result.error);
+			throw result.error;
+		}
+		return;
+	};
+	
+	const buttonLabel = props.label || 'Confirm Order';
 
-		// However, this line of code will do the same thing:
-		// this.props.stripe.createToken({type: 'card', name: 'Jenny Rosen'});
-	}
-
-	render() {
-		return (
-			<form onSubmit={this.handleSubmit}>
-				<div className='form-group'>
-					<Input type='text' placeholder='Name'
-						onChange={(evt)=>{this.setState({name:evt.target.value});}}
-					/>
-				</div>
-				<div className='form-group'>
-					<IbanElement
-						supportedCountries={['SEPA']}
-					/>
-					<p className='text-muted mt-3'>
-						By providing your IBAN and confirming this payment, you’re authorizing Zotero and Stripe, our payment provider, to send instructions to your bank to debit your account. You’re entitled to a refund under the terms and conditions of your agreement with your bank.
-					</p>
-				</div>
-				<div className='form-group'>
-					<button className='btn btn-secondary'>Confirm order</button>
-				</div>
-			</form>
-		);
-	}
+	return (
+		<Form onSubmit={handleSubmit}>
+			<FormGroup>
+				<Input type='text' placeholder='Name' value={name}
+					onChange={(evt)=>{setName(evt.target.value);}}
+				/>
+			</FormGroup>
+			<FormGroup>
+				<Input type='text' placeholder='Email' value={email}
+					onChange={(evt)=>{setEmail(evt.target.value);}}
+				/>
+			</FormGroup>
+			<FormGroup>
+				<IbanElement
+					supportedCountries={['SEPA']}
+				/>
+				<p className='text-muted mt-3'>
+					By providing your IBAN and confirming this payment, you’re authorizing Zotero and Stripe, our payment provider, to send instructions to your bank to debit your account. You’re entitled to a refund under the terms and conditions of your agreement with your bank.
+				</p>
+			</FormGroup>
+			<FormGroup>
+				<Button color='secondary'>{buttonLabel}</Button>
+				<Button type='button' color='secondary' className='ml-2' onClick={props.onClose}>Cancel</Button>
+			</FormGroup>
+		</Form>
+	);
 }
 
-class _PaymentRequestForm extends Component{
-	constructor(props) {
-		super(props);
+function _PaymentRequestForm(props){
+	const {stripe, paymentAmount, handleToken} = props;
+	const [canMakePayment, setCanMakePayment] = useState(false);
+	const [paymentRequest, setPaymentRequest] = useState(null);
 
-		const paymentRequest = props.stripe.paymentRequest({
+	if(paymentRequest == null){
+		const paymentRequest = stripe.paymentRequest({
 			country: 'US',
 			currency: 'usd',
 			total: {
 				label: 'Zotero Storage',
-				amount: props.paymentAmount,
+				amount: paymentAmount,
 			},
 		});
 
 		paymentRequest.on('token', ({complete, token, ...data}) => {
-			console.log('Received Stripe token in PaymentRequestForm: ', token);
-			console.log('Received customer information: ', data);
-			this.props.handleToken(token);
+			log.debug('Received Stripe token in PaymentRequestForm: ', token);
+			log.debug('Received customer information: ', data);
+			handleToken(token);
 			complete('success');
 		});
 
-		paymentRequest.canMakePayment().then((result) => {
-			this.setState({canMakePayment: !!result});
+		setPaymentRequest(paymentRequest);
+		paymentRequest.canMakePayment().then(({result})=>{
+			setCanMakePayment(!!result);
 		});
-
-		this.state = {
-			canMakePayment: false,
-			paymentRequest,
-		};
 	}
 
-	render() {
-		log.debug('PaymentRequest render');
-		log.debug(this.state);
-		return this.state.canMakePayment ? (
-			<PaymentRequestButtonElement
-				className="PaymentRequestButton"
-				onBlur={handleBlur}
-				onClick={handleClick}
-				onFocus={handleFocus}
-				onReady={handleReady}
-				paymentRequest={this.state.paymentRequest}
-				style={{
-					paymentRequestButton: {
-						theme: 'dark',
-						height: '64px',
-						type: 'donate',
-					},
-				}}
-			/>
-		) : null;
-	}
+	if (!canMakePayment) return null;
+
+	return (
+		<PaymentRequestButtonElement
+			className="PaymentRequestButton"
+			/*
+			onBlur={handleBlur}
+			onClick={handleClick}
+			onFocus={handleFocus}
+			onReady={handleReady}
+			*/
+			paymentRequest={this.state.paymentRequest}
+			style={{
+				paymentRequestButton: {
+					theme: 'dark',
+					height: '64px',
+					type: 'donate',
+				},
+			}}
+		/>
+	);
 }
-_PaymentRequestForm.propTypes = {
-	canMakePayments: PropTypes.bool,
-	paymentRequest: PropTypes.object
-};
 
 const InjectedPaymentRequestForm = injectStripe(_PaymentRequestForm);
-let InjectedCardCheckoutForm = injectStripe(CardCheckoutForm);
-let InjectedIBANCheckoutForm = injectStripe(IBANCheckoutForm);
+const InjectedCardCheckoutForm = injectStripe(CardCheckoutForm);
+const InjectedIBANCheckoutForm = injectStripe(IBANCheckoutForm);
 
-class PaymentModal extends Component {
-	constructor(props){
-		super(props);
-		this.state = {
-			selectedMethod:'card'
-		}
-	}
-	setPaymentChoice = (choice) => {
-		this.setState({selectedMethod:choice});
-	}
-	render(){
-		const {selectedMethod} = this.state;
-		const {handleToken, chargeAmount} = this.props;
+function PaymentModal(props){
+	const [selectedMethod, setMethod] = useState('card');
+	const {handleToken, chargeAmount, buttonLabel} = props;
+	log.debug(props);
 
-		let paymentRequest = null;
-		if(chargeAmount) {
-			paymentRequest = (
-				<Elements>
-					<InjectedPaymentRequestForm handleToken={handleToken} paymentAmount={chargeAmount} />
-				</Elements>
-			);
-		}
-		return (
-			<div className='payment-chooser'>
-				<Card>
-					<CardHeader>
-						{paymentRequest}
-						<Nav card tabs>
-							<NavItem>
-								<NavLink active={(selectedMethod == 'card')} onClick={()=>{this.setPaymentChoice('card')}} href='#'>
-									Card
-								</NavLink>
-							</NavItem>
-							<NavItem>
-								<NavLink active={(selectedMethod == 'sepa')} onClick={()=>{this.setPaymentChoice('sepa')}} href='#'>
-									SEPA Direct Debit
-								</NavLink>
-							</NavItem>
-						</Nav>
-					</CardHeader>
-					<CardBody>
-						<TabContent activeTab={selectedMethod}>
-							<TabPane tabId="card">
-								<Row>
-									<Col sm="12">
-										<Elements>
-											<InjectedCardCheckoutForm handleToken={handleToken} />
-										</Elements>
-									</Col>
-								</Row>
-							</TabPane>
-							<TabPane tabId="sepa">
-								<Row>
-									<Col sm="12">
-										<Elements>
-											<InjectedIBANCheckoutForm handleToken={handleToken} />
-										</Elements>
-									</Col>
-								</Row>
-							</TabPane>
-						</TabContent>
-					</CardBody>
-				</Card>
-			</div>
+	let paymentRequest = null;
+	if(chargeAmount) {
+		paymentRequest = (
+			<Elements>
+				<InjectedPaymentRequestForm handleToken={handleToken} paymentAmount={chargeAmount} onClose={props.onClose} />
+			</Elements>
 		);
 	}
+	return (
+		<div className='payment-chooser'>
+			<Card>
+				<CardHeader>
+					{paymentRequest}
+					<Nav card tabs>
+						<NavItem>
+							<NavLink active={(selectedMethod == 'card')} onClick={()=>{setMethod('card');}} href='#'>
+								Card
+							</NavLink>
+						</NavItem>
+						<NavItem>
+							<NavLink active={(selectedMethod == 'sepa')} onClick={()=>{setMethod('sepa');}} href='#'>
+								SEPA Direct Debit
+							</NavLink>
+						</NavItem>
+					</Nav>
+				</CardHeader>
+				<CardBody>
+					<TabContent activeTab={selectedMethod}>
+						<TabPane tabId="card">
+							<Row>
+								<Col sm="12">
+									<Elements>
+										<InjectedCardCheckoutForm handleToken={handleToken} buttonLabel={buttonLabel} onClose={props.onClose} />
+									</Elements>
+								</Col>
+							</Row>
+						</TabPane>
+						<TabPane tabId="sepa">
+							<Row>
+								<Col sm="12">
+									<Elements>
+										<InjectedIBANCheckoutForm handleToken={handleToken} buttonLabel={buttonLabel} onClose={props.onClose} />
+									</Elements>
+								</Col>
+							</Row>
+						</TabPane>
+					</TabContent>
+				</CardBody>
+			</Card>
+		</div>
+	);
 }
 PaymentModal.propTypes = {
 	tokenCallback:PropTypes.func,
 	amount:PropTypes.number,
 	immediateCharge:PropTypes.bool
-}
+};
+PaymentModal.defaultProps = {
+	buttonLabel:'Confirm'
+};
 
 export default PaymentModal;

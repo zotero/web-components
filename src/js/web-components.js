@@ -39,7 +39,7 @@ globalScope.TWEEN = TWEEN;
 const BezierEasing = require('bezier-easing');
 globalScope.BezierEasing = BezierEasing;
 
-import {Storage} from './Storage.js';
+import {Storage} from './storage/Storage.js';
 import {MakeEditable} from './MakeEditable.js';
 import {UserGroups} from './UserGroups.js';
 import {GroupInvitations} from './GroupInvitations.js';

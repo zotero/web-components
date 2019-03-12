@@ -5,6 +5,7 @@
 
 const React = require('react');
 const {Component, PureComponent} = React;
+import copy from 'copy-to-clipboard';
 import PropTypes from 'prop-types';
 
 import {postFormData} from './ajax.js';
@@ -24,7 +25,7 @@ class AddViaEmail extends Component{
 		let resp = await postFormData(buildUrl('addviaemail'), {ajax:true, emailAction:'create'}, {withSession:true});
 		let rdata = await resp.json();
 		if(rdata.success){
-			this.setState({working:false, currentEmail:rdata.email});
+			this.setState({working:false, copied:false, currentEmail:rdata.email});
 		} else {
 			this.setState({working:false, notification:{
 				type:'error', message:'Failed activating email address'
@@ -36,9 +37,9 @@ class AddViaEmail extends Component{
 		let resp = await postFormData(buildUrl('addviaemail'), {ajax:true, emailAction:'refresh'}, {withSession:true});
 		let rdata = await resp.json();
 		if(rdata.success){
-			this.setState({working:false, currentEmail:rdata.email});
+			this.setState({working:false, copied:false, currentEmail:rdata.email});
 		} else {
-			this.setState({working:false, notification:{
+			this.setState({working:false, copied:false, notification:{
 				type:'error', message:'Failed refreshing email address'
 			}});
 		}
@@ -48,18 +49,25 @@ class AddViaEmail extends Component{
 		let resp = await postFormData(buildUrl('addviaemail'), {ajax:true, emailAction:'delete'}, {withSession:true});
 		let rdata = await resp.json();
 		if(rdata.success){
-			this.setState({working:false, currentEmail:null});
+			this.setState({working:false, copied:false, currentEmail:null});
 		} else {
-			this.setState({working:false, notification:{
+			this.setState({working:false, copied:false, notification:{
 				type:'error', message:'Failed disabling email address'
 			}});
 		}
 	}
+	copyEmail = async () => {
+		const {currentEmail} = this.state;
+		if(copy(currentEmail)){
+			this.setState({copied:true});
+		}
+	}
 	render(){
-		const {currentEmail, notification} = this.state;
+		const {currentEmail, notification, copied} = this.state;
 		
 		let actions = [];
 		if(currentEmail){
+			actions.push(<a className='viaemail-link' key='copy' onClick={this.copyEmail}>Copy</a>);
 			actions.push(<a className='viaemail-link' key='disable' onClick={this.deleteEmail}>Disable</a>);
 			actions.push(<a className='viaemail-link' key='cycle' onClick={this.resetEmail}>Reset</a>);
 		} else {
@@ -69,7 +77,7 @@ class AddViaEmail extends Component{
 			<div id='add-via-email'>
 				<Notifier {...notification} />
 				<p>You can add items to your library by sending an email with a url to a designated Zotero email address.</p>
-				<CurrentEmail currentEmail={currentEmail} actions={actions} />
+				<CurrentEmail currentEmail={currentEmail} actions={actions} copied={copied} />
 			</div>
 		);
 	}
@@ -81,7 +89,7 @@ AddViaEmail.propTypes = {
 
 class CurrentEmail extends PureComponent {
 	render(){
-		const {currentEmail, actions} = this.props;
+		const {currentEmail, actions, copied} = this.props;
 		if(!currentEmail) {
 			return (
 				<div className='current-email'>
@@ -96,6 +104,7 @@ class CurrentEmail extends PureComponent {
 						<b>Zotero email: </b> {currentEmail}
 					</p>
 					{actions}
+					{copied ? <span className='label primary'>Copied</span> : null}
 					<p className='hint'>
 						Email URLs or identifiers (DOIs, PMIDs, ISBNs, arXiv IDs) to this address to add them to your Zotero library.
 						Items will go directly into your personal library.

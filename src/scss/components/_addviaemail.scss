@@ -18,4 +18,19 @@
     color: rgba(0,0,0,0.5);
     padding: 0 0.2em;
   }
+  
+  span.label {
+    border:1px solid #999;
+    border-radius: 4px;
+    margin-left:5px;
+    margin-right:5px;
+    padding:3px;
+  }
+  span.label {
+    background-color:#EEE;
+  }
+  span.label.primary {
+    color:#FFF;
+    background-color:green;
+  }
 }

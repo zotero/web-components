@@ -16,7 +16,7 @@ class Spinner extends Component {
 			case 'white':
 				iconPath = whiteSpinImagePath;
 		}
-		return <img className="icon icon-spin" src={iconPath} width={width} height={height} />;
+		return <img className={this.props.className + ' icon icon-spin'} src={iconPath} width={width} height={height} />;
 	}
 }
 Spinner.defaultProps = {

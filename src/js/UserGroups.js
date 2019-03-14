@@ -276,7 +276,7 @@ class UserGroups extends Component{
 		return (
 			<div id="user-groups-div" className="user-groups">
 				{groupNuggets}
-				<LoadingSpinner loading={this.state.loading} />
+				<div className='text-center'><LoadingSpinner className='m-auto' loading={this.state.loading} /></div>
 				{moreLink}
 			</div>
 		);

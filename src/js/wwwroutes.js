@@ -42,6 +42,8 @@ let buildUrl = function(name, params){
 			return `/groups/${params.group.data.id}/settings/members`;
 		case 'groupLibrarySettings':
 			return `/groups/${params.group.data.id}/settings/library`;
+		case 'groupDiscussion':
+			return `/message/viewdiscussion/${params.messageID}`;
 		case 'transferGroup':
 			return `/groups/${params.group.data.id}/settings/transfer`;
 		case 'saveKey':

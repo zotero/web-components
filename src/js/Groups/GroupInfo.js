@@ -3,11 +3,11 @@
 //import {log as logger} from './Log.js';
 //let log = logger.Logger('GroupInfo');
 
-import {Notifier} from './Notifier.js';
-import {postFormData} from './ajax.js';
-import {loadGroupInfo} from './ajaxHelpers.js';
-import {buildUrl} from './wwwroutes.js';
-import {jsError, jsSuccess, getCurrentUser} from './Utils.js';
+import {Notifier} from '../Notifier.js';
+import {postFormData} from '../ajax.js';
+import {loadGroupInfo} from '../ajaxHelpers.js';
+import {buildUrl} from '../wwwroutes.js';
+import {jsError, jsSuccess, getCurrentUser} from '../Utils.js';
 import classnames from 'classnames';
 import striptags from 'striptags';
 
@@ -328,7 +328,7 @@ class GroupInfo extends React.Component{
 	}
 }
 GroupInfo.propTypes = {
-	displayNames: PropTypes.array.isRequired,
+	displayNames: PropTypes.object.isRequired,
 	pending: PropTypes.bool.isRequired
 };
 

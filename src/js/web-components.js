@@ -41,15 +41,14 @@ globalScope.BezierEasing = BezierEasing;
 
 import {Storage} from './storage/Storage.js';
 import {MakeEditable} from './MakeEditable.js';
-import {UserGroups} from './UserGroups.js';
-import {GroupInvitations} from './GroupInvitations.js';
-import {NewGroupDiscussions} from './NewGroupDiscussions.js';
+import {GroupInvitations} from './Groups/GroupInvitations.js';
+import {NewGroupDiscussions} from './Groups/NewGroupDiscussions.js';
 import {InviteToGroups} from './InviteToGroups.js';
 import {Start, RegisterForm} from './Start.js';
 import {Downloads} from './Downloads.js';
 import {ExtensionsPicker} from './ExtensionsPicker.js';
 import {CreateGroup} from './CreateGroup.js';
-import {GroupInfo} from './GroupInfo.js';
+import {GroupInfo} from './Groups/GroupInfo.js';
 import {RecentItems} from './RecentItems.js';
 import {ApiKeyEditor} from './ApiKeyEditor.js';
 import {pageReady, jsError} from './Utils.js';
@@ -74,11 +73,12 @@ import {FollowButtons, FollowSection} from './FollowButtons.jsx';
 import {Search} from './Search.jsx';
 import {PurchaseWorkshop} from './PurchaseWorkshop.jsx';
 import {GroupLibrarySettings, TransferOwnership} from './components/GroupSettings/GroupSettings.js';
+import {GroupsPageContainer} from './Groups/GroupsPageContainer.jsx';
+import {GroupsContainer} from './Groups/GroupsContainer.jsx';
 
 let ZoteroWebComponents = {
 	Storage,
 	MakeEditable,
-	UserGroups,
 	GroupInvitations,
 	NewGroupDiscussions,
 	InviteToGroups,
@@ -110,7 +110,9 @@ let ZoteroWebComponents = {
 	FollowButtons, FollowSection,
 	activateFootnotes,
 	Search,
-	PurchaseWorkshop
+	PurchaseWorkshop,
+	GroupsPageContainer,
+	GroupsContainer
 };
 
 globalScope.ZoteroWebComponents = ZoteroWebComponents;

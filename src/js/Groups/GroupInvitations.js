@@ -3,15 +3,15 @@
 // import {log as logger} from './Log.js';
 // let log = logger.Logger('GroupInvitations');
 
-import {ajax, postFormData} from './ajax.js';
-import {getCurrentUser} from './Utils.js';
+import {ajax, postFormData} from '../ajax.js';
+import {getCurrentUser} from '../Utils.js';
 import {Button, Card, CardHeader, CardBody, Row, Col} from 'reactstrap';
 
 const currentUser = getCurrentUser();
 
 import {Component, Fragment} from 'react';
 
-import {buildUrl} from './wwwroutes.js';
+import {buildUrl} from '../wwwroutes.js';
 
 class GroupInvitation extends Component{
 	constructor(props){

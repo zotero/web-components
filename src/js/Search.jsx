@@ -9,7 +9,7 @@ const {Component} = React;
 import {Form, Input, InputGroup, Button, Nav, NavItem, NavLink, InputGroupAddon, Pagination, PaginationItem, PaginationLink} from 'reactstrap';
 import {postFormData} from './ajax.js';
 import {LargeUser} from './components/UserList.jsx';
-import {GroupNugget} from './UserGroups.js';
+import {GroupNugget} from './Groups/UserGroups.js';
 import {LocationState} from './LocationState.js';
 
 class SearchPagination extends Component{

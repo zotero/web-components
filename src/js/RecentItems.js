@@ -8,7 +8,7 @@ import {loadRecentGroupItems} from './ajaxHelpers.js';
 import {formatItemField, getCurrentUser} from './Utils.js';
 import {buildUrl} from './wwwroutes.js';
 import {LoadingSpinner} from './LoadingSpinner.js';
-import {groupIsReadable} from './GroupInfo.js';
+import {groupIsReadable} from './Groups/GroupInfo.js';
 import {jsError} from './Utils.js';
 
 const currentUser = getCurrentUser();

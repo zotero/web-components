@@ -1,0 +1,8 @@
+.paginator .paginator-link {
+  color:$link-color !important;
+  padding:0.5rem;
+}
+
+.paginator .paginator-link.current {
+  color:inherit !important;
+}

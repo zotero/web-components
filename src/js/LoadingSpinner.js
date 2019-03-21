@@ -22,7 +22,8 @@ class Spinner extends Component {
 Spinner.defaultProps = {
 	width: 24,
 	height: 24,
-	color: 'blue'
+	color: 'blue',
+	className: ''
 };
 
 class LoadingSpinner extends Component{

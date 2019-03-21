@@ -72,7 +72,7 @@ function GroupsPageContainer(){
 			<div className="col-md-4">
 				<nav className="nav nav-pills justify-content-center mb-4">
 					<a className="nav-link active" href="/groups/new">Create a New Group</a>
-					<a className="nav-link" href="<?=$this->url(array('type'=>'group'), 'search')?>">Search for Groups</a>
+					<a className="nav-link" href="/search/type/group">Search for Groups</a>
 				</nav>
 				
 				<div id="group-alerts" className="alerts">

@@ -75,6 +75,7 @@ import {PurchaseWorkshop} from './PurchaseWorkshop.jsx';
 import {GroupLibrarySettings, TransferOwnership} from './components/GroupSettings/GroupSettings.js';
 import {GroupsPageContainer} from './Groups/GroupsPageContainer.jsx';
 import {GroupsContainer} from './Groups/GroupsContainer.jsx';
+import {MemberSettingsContainer} from './Groups/MemberSettingsContainer.jsx';
 
 let ZoteroWebComponents = {
 	Storage,
@@ -112,7 +113,8 @@ let ZoteroWebComponents = {
 	Search,
 	PurchaseWorkshop,
 	GroupsPageContainer,
-	GroupsContainer
+	GroupsContainer,
+	MemberSettingsContainer
 };
 
 globalScope.ZoteroWebComponents = ZoteroWebComponents;

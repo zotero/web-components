@@ -42,6 +42,14 @@ let buildUrl = function(name, params){
 			return `/groups/${params.group.data.id}/settings/members`;
 		case 'groupLibrarySettings':
 			return `/groups/${params.group.data.id}/settings/library`;
+		case 'groupUpdateRole':
+			return `/groups/${params.group.data.id}/settings/members/update`;
+		case 'groupRevokeInvitation':
+			return `/groups/${params.group.data.id}/revokeinvite/${params.token}`;
+		case 'groupApproveApplication':
+			return `/groups/${params.group.data.id}/approve/${params.userID}`;
+		case 'groupDenyApplication':
+			return `/groups/${params.group.data.id}/deny/${params.userID}`;
 		case 'groupDiscussion':
 			return `/message/viewdiscussion/${params.messageID}`;
 		case 'transferGroup':

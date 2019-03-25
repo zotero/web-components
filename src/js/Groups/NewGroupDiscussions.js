@@ -25,9 +25,13 @@ async function fetchUserGroupDiscussions(page, pageSize=10){
 	return data;
 }
 
+function NewDiscussionLink(props){
+	const {group} = props;
+	return <a href={buildUrl('newGroupDiscussion', {group})}>New Discussion</a>;
+}
 
 function GroupDiscussionMessageSummary(props){
-	let {messageID, title, sender, displayNames, lastActivity, rsender, group, showFields, narrow} = props;
+	const {messageID, title, sender, displayNames, lastActivity, rsender, group, showFields, narrow} = props;
 	let lastActive = parseInt(lastActivity);
 	let slug = displayNames['slug'][sender];
 	let senderName = displayNames['displayName'][sender];
@@ -87,15 +91,19 @@ GroupDiscussionMessageSummary.defaultProps = {
 };
 
 function NewGroupDiscussions(props) {
-	//log.debug(props);
 	const [discussions, setDiscussions] = useState(null);
 	const [displayNames, setDisplayNames] = useState({});
 	const [total, setTotal] = useState(0);
 	const [page, setPage] = useState(1);
+	const [loaded, setLoaded] = useState(false);
+	
 	const {group, pageSize, allGroups, showFields, narrow} = props;
 	
 	useEffect(() => {
 		const ld = async ()=>{
+			if(!currentUser){
+				return;
+			}
 			let data;
 			if(allGroups){
 				data = await fetchUserGroupDiscussions(page, pageSize);
@@ -108,26 +116,36 @@ function NewGroupDiscussions(props) {
 			setDisplayNames(data.displayNames);
 			setDiscussions(data.discussions);
 			setTotal(parseInt(data.count));
+			setLoaded(true);
 		};
 		ld();
 	}, [group, page, allGroups]);
 	
-	if(!currentUser){
+	if(!currentUser || !loaded){
 		return null;
 	}
 	let discussionsNodes = discussions ? discussions.map((discussion)=>{
 		return <GroupDiscussionMessageSummary key={discussion.messageID} {...discussion} {...{displayNames, group, showFields, narrow}} />;
 	}) : null;
+	let recentMessagesBody = allGroups ? <p>You do not have any active discussions</p> : <p>This group does not have any active discussions</p>;
+	if(discussions){
+		recentMessagesBody = (
+			<>
+				<Table id='recent-group-message'>
+					<tbody>
+					{discussionsNodes}
+					</tbody>
+				</Table>
+				<Paginator page={page} setPage={setPage} total={total}  />
+			</>
+		);
+	}
 	return (
 		<div className='new-group-discussions card'>
 			<div className='card-header'>Recent Group Discussions</div>
 			<div className='card-body'>
-				<Table id='recent-group-message'>
-					<tbody>
-						{discussionsNodes}
-					</tbody>
-				</Table>
-				<Paginator page={page} setPage={setPage} total={total}  />
+				{recentMessagesBody}
+				{allGroups ? null : <NewDiscussionLink group={group} />}
 			</div>
 		</div>
 	);

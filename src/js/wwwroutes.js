@@ -52,6 +52,8 @@ let buildUrl = function(name, params){
 			return `/groups/${params.group.data.id}/deny/${params.userID}`;
 		case 'groupDiscussion':
 			return `/message/viewdiscussion/${params.messageID}`;
+		case 'newGroupDiscussion':
+			return `/message/groupcompose?groupid=${params.group.id}`;
 		case 'transferGroup':
 			return `/groups/${params.group.data.id}/settings/transfer`;
 		case 'saveKey':

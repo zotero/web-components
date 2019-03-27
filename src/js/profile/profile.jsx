@@ -43,7 +43,8 @@ class Profile extends React.Component {
 				loading:false,
 				loaded:false
 			},
-			profile:props.profile
+			profile:props.profileUser,
+			related:props.related
 		};
 		if(['#About', '#Network', '#Groups'].indexOf(window.location.hash) != -1){
 			this.state.active = window.location.hash.substring(1);
@@ -83,12 +84,12 @@ class Profile extends React.Component {
 	}
 
 	checkIfExtendedViewNeeded = () => {
-		const {profile} = this.props;
-		if(profile.followers && profile.followers.length > 3) {
+		const {related} = this.props;
+		if(related.followersTotal > 3) {
 			return true;
 		}
 
-		if(profile.following && profile.following.length > 3) {
+		if(related.followingTotal > 3) {
 			return true;
 		}
 
@@ -96,8 +97,8 @@ class Profile extends React.Component {
 	}
 
 	checkIfEmpty = () => {
-		const {profile} = this.props;
-		const profileMeta = profile.meta.profile;
+		const {profileUser} = this.props;
+		const profileMeta = profileUser.meta.profile;
 
 		let emptyMeta = true;
 		Object.keys(profileMeta).map((key)=>{
@@ -147,15 +148,15 @@ class Profile extends React.Component {
 
 	loadRelatedUsers = async (type) => {
 		this.setState({loadingRelated: true});
-		let {profile} = this.state;
+		let {related} = this.state;
 		let start = 0;
 		let limit = 10;
 		switch(type){
 			case 'followers':
-				start = profile.followers.length;
+				start = related.followers.length;
 				break;
 			case 'following':
-				start = profile.following.length;
+				start = related.following.length;
 				break;
 			default:
 				throw 'Unrecognized related user type';
@@ -167,15 +168,15 @@ class Profile extends React.Component {
 			let resp = await ajax({url: url, credentials:'omit'});
 			let data = await resp.json();
 			let followUsers = data['users'];
-			let newRelated = profile[type].concat(followUsers);
+			let newRelated = related[type].concat(followUsers);
 			switch(type){
 				case 'followers':
-					profile.followers = newRelated;
-					this.setState({profile});
+					related.followers = newRelated;
+					this.setState({related});
 					return;
 				case 'following':
-					profile.following = newRelated;
-					this.setState({profile});
+					related.following = newRelated;
+					this.setState({related});
 					return;
 				default:
 					throw 'Unrecognized related user type';
@@ -212,7 +213,7 @@ class Profile extends React.Component {
 	render() {
 		var networkTab, groupsTab, alertNode;
 		const {userID, editable, isFollowing} = this.props;
-		const {profile, active, extended, alert, hasContent, groups} = this.state;
+		const {profile, related, active, extended, alert, hasContent, groups} = this.state;
 		const profileMeta = profile.meta.profile;
 
 		if(alert.level){
@@ -236,8 +237,8 @@ class Profile extends React.Component {
 		if(extended) {
 			networkTab = (
 				<TabPane tabId='Network'>
-					<RelatedPeopleDetailed type='followers' people={ profile.followers } title="Followers" total={ profile.followersTotal } loadRelatedUsers={this.loadRelatedUsers} />
-					<RelatedPeopleDetailed type='following' people={ profile.following } title="Following" total={ profile.followingTotal } loadRelatedUsers={this.loadRelatedUsers} />
+					<RelatedPeopleDetailed type='followers' people={ related.followers } title="Followers" total={ related.followersTotal } loadRelatedUsers={this.loadRelatedUsers} />
+					<RelatedPeopleDetailed type='following' people={ related.following } title="Following" total={ related.followingTotal } loadRelatedUsers={this.loadRelatedUsers} />
 				</TabPane>
 			);
 
@@ -259,7 +260,7 @@ class Profile extends React.Component {
 						About
 					</NavLink>
 				</NavItem>
-				<NavItem className={cn({'d-none': (profile.followers.length == 0 && profile.following.length == 0)})}>
+				<NavItem className={cn({'d-none': (related.followers.length == 0 && related.following.length == 0)})}>
 					<NavLink className={ cn({active:(active == 'Network')}) } onClick={ () => this.makeActive('Network') }>
 						Network
 					</NavLink>
@@ -289,16 +290,16 @@ class Profile extends React.Component {
 					<Col xs={12} md={4}>
 						<Groups {...groups} onExtended={()=>{this.setState({extended:true});}} onViewMore={ () => this.makeActive('Groups')} />
 						<RelatedPeople
-							people={ profile.followers.slice(0, 3) }
+							people={ related.followers.slice(0, 3) }
 							title="Followers"
-							more={ profile.followers.length > 3 || profile.followersTotal > 3 }
+							more={ related.followers.length > 3 || related.followersTotal > 3 }
 							onViewMore={ () => this.makeActive('Network') }
 							id='followers'
 						/>
 						<RelatedPeople
-							people={ profile.following.slice(0, 3) }
+							people={ related.following.slice(0, 3) }
 							title="Following"
-							more={ profile.following.length > 3 || profile.followingTotal > 3 }
+							more={ related.following.length > 3 || related.followingTotal > 3 }
 							onViewMore={ () => this.makeActive('Network') }
 							id='following'
 						/>
@@ -353,16 +354,16 @@ class Profile extends React.Component {
 					<Col xs={12} md={4}>
 						<Groups {...groups} onExtended={()=>{this.setState({extended:true});}} onViewMore={ () => this.makeActive('Groups')} />
 						<RelatedPeople
-							people={ profile.followers.slice(0, 3) }
+							people={ related.followers.slice(0, 3) }
 							title="Followers"
-							more={ profile.followers.length > 3 || profile.followersTotal > 3 }
+							more={ related.followers.length > 3 || related.followersTotal > 3 }
 							onViewMore={ () => this.makeActive('Network') }
 							id='followers'
 						/>
 						<RelatedPeople
-							people={ profile.following.slice(0, 3) }
+							people={ related.following.slice(0, 3) }
 							title="Following"
-							more={ profile.following.length > 3 || profile.followingTotal > 3 }
+							more={ related.following.length > 3 || related.followingTotal > 3 }
 							onViewMore={ () => this.makeActive('Network') }
 							id='following'
 						/>
@@ -483,7 +484,7 @@ class Profile extends React.Component {
 }
 
 Profile.propTypes = {
-	profile: PropTypes.object.isRequired,
+	profileUser: PropTypes.object.isRequired,
 	userID: PropTypes.number.isRequired,
 	editable: PropTypes.bool.isRequired,
 	isFollowing: PropTypes.bool.isRequired,

@@ -1,7 +1,7 @@
 'use strict';
 
 /* eslint no-console: "off" */
-const {initDriver, LogCollector} = require('../utils.js');
+const {initDriver, LogCollector, getLogs} = require('../utils.js');
 
 const {By, Key, until} = require('selenium-webdriver');
 const {assert} = require('chai');
@@ -10,6 +10,8 @@ const testBrowser = process.env.TEST_BROWSER || 'chrome';
 
 const baseUrl = 'https://dockerzotero.test:8081';
 
+//if wait is true, test will sleep for 500 ms after loading to allow for loading
+//of more resources/requests/JS execution
 const newLayoutUrls = [
 	{url:'https://dockerzotero.test:8081/', wait:false},
 	{url:'https://dockerzotero.test:8081/downloads', wait:false},
@@ -235,7 +237,10 @@ describe('Zotero Pages', async function(){
 			//log in to testUser2
 			await loginUser(driver2, 'testUser2', 'password');
 			await driver2.navigate().to(`${baseUrl}/groups`);
-			let emptyInvitesEls = await driver2.wait(until.elementsLocated(By.css('#react-group-invitations span.group-invitations.d-none')));
+			let pageLogs = await getLogs(driver2);
+			console.log(pageLogs);
+			assert.isEmpty(pageLogs);
+			let emptyInvitesEls = await driver2.wait(until.elementsLocated(By.css('#group-alerts span.group-invitations.d-none')));
 			assert.lengthOf(emptyInvitesEls, 1, 'found the empty invites placeholder');
 			return true;
 		});
@@ -252,7 +257,7 @@ describe('Zotero Pages', async function(){
 		
 		it("should detect the invitation from testUser2's groups page, then decline", async function(){
 			await driver2.navigate().to(`${baseUrl}/groups`);
-			let groupInviteTitles = await driver2.wait(until.elementsLocated(By.css('#react-group-invitations .group-title')), 5000);
+			let groupInviteTitles = await driver2.wait(until.elementsLocated(By.css('#group-alerts .group-invitations .group-title')), 5000);
 			assert.lengthOf(groupInviteTitles, 1, 'found one group invitation');
 
 			await driver2.wait(until.elementLocated(By.css('button.ignore-invitation')), 5000);
@@ -261,9 +266,9 @@ describe('Zotero Pages', async function(){
 			await driver2.wait(until.stalenessOf(ignoreButton));
 
 			await driver2.navigate().refresh();
-			let emptyInvitesEls = await driver2.wait(until.elementsLocated(By.css('#react-group-invitations span.group-invitations.d-none')), 5000);
+			let emptyInvitesEls = await driver2.wait(until.elementsLocated(By.css('#group-alerts span.group-invitations.d-none')), 5000);
 			//console.log(emptyInvitesEls);
-			//emptyInvitesEls = await driver2.findElements(By.css('#react-group-invitations span.group-invitations.d-none'));
+			//emptyInvitesEls = await driver2.findElements(By.css('#group-alerts span.group-invitations.d-none'));
 			assert.lengthOf(emptyInvitesEls, 1, 'found the empty invites placeholder');
 			return true;
 		});

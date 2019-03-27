@@ -67,7 +67,7 @@ InstallFirefoxButton.defaultProps = {
 class InstallChromeButton extends Component{
 	render(){
 		if(this.props.type == 'button') {
-			return <a href={chromeDownload} id="chrome-connector-download-button" className="btn download-link">{this.props.label}</a>;
+			return <a href={chromeDownload} id="chrome-connector-download-button" className="btn btn-lg btn-secondary">{this.props.label}</a>;
 		} else if(this.props.type == 'image') {
 			return (
 				<a href={chromeDownload}><BrowserIcon browser="chrome" /></a>

@@ -189,7 +189,7 @@ class Manage extends Component{
 						<button className='btn update-list-button' onClick={this.updateEmailList}>Update List</button>
 					</div>
 					<div className='current-storage flex-section'>
-						<InstitutionData ref='institutionData' {...this.props} />
+						<InstitutionData {...this.props} />
 					</div>
 				</div>
 			</div>

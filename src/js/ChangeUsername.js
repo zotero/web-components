@@ -206,7 +206,7 @@ class ChangeUsername extends Component{
 		if(activated){
 			return (
 				<div className='change-username react'>
-					<UsernameForm username={username} forumUsername={forumUsername} ref='usernameForm' />
+					<UsernameForm username={username} forumUsername={forumUsername} />
 				</div>
 			);
 		} else {

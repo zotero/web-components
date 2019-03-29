@@ -228,7 +228,7 @@ class Profile extends React.Component {
 			<div id='empty-profile-text' className='mt-6'>
 				<Card>
 					<CardBody>
-						<p>{profile.displayName} hasn't filled out their profile yet.</p>
+						<p>{profile.displayName} hasn&apos;t filled out their profile yet.</p>
 					</CardBody>
 				</Card>
 			</div>
@@ -250,7 +250,7 @@ class Profile extends React.Component {
 		}
 
 		let userLibraryLink = profile.meta.privacy.publishLibrary == '1' ? (
-			<a href={`/${profile.slug}/items`}>{profile.displayName}'s public library</a>
+			<a href={`/${profile.slug}/items`}>{profile.displayName}&apos;s public library</a>
 		) : null;
 
 		let navbar = (

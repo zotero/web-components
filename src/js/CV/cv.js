@@ -1,5 +1,6 @@
 'use strict';
 
+/* global tinymce */
 //TODO:
 //fix collection preview behaviour
 //decide what to do with editable select
@@ -188,7 +189,7 @@ class CVEditor extends Component{
 		this.setState({entryOrder:entryOrder, entryMap:CVEntryMap}, this.activateEditors);
 	}
 	removeEntry = (index) => {
-		let {entryOrder, entryMap} = this.state;
+		let {entryOrder} = this.state;
 		let removed = entryOrder.splice(index, 1);
 		let removedId = removed[0];
 
@@ -251,11 +252,11 @@ class CVEditor extends Component{
 			let resp = await postFormData(buildUrl('updateCv'), {json_cv:savestr}, {withSession:true});
 			let respData = await resp.json();
 			if(respData.success){
-				console.log('saved');
+				log.debug('saved');
 			}
 		} catch (e) {
-			console.log('error saving');
-			console.log(e);
+			log.error('error saving');
+			log.error(e);
 		}
 	}
 	render(){

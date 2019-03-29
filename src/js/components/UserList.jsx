@@ -4,12 +4,11 @@ import {log as logger} from '../Log.js';
 let log = logger.Logger('UserList');
 
 const React = require('react');
-const {Component, PureComponent, Fragment} = React;
+const {Component} = React;
 import {PropTypes} from 'prop-types';
-import {getCurrentUser} from '../Utils.js';
 import { buildUrl } from '../wwwroutes.js';
 
-import {Button, CardGroup} from 'reactstrap';
+import {CardGroup} from 'reactstrap';
 import { ProfileImage } from '../ProfileImageForm.js';
 
 class SmallUser extends Component {
@@ -17,7 +16,7 @@ class SmallUser extends Component {
 	render() {
 		const {user} = this.props;
 		const profileUrl = buildUrl('profileUrl', {slug:user.slug});
-		const profileImageSrc = buildUrl('profileImage', {userID:user.userID, purpose:'thumb'});
+		//const profileImageSrc = buildUrl('profileImage', {userID:user.userID, purpose:'thumb'});
 		return (
 			<div className="nugget-user-small card border-0">
 				<div className='card-body border-top'>
@@ -110,7 +109,9 @@ UserList.defaultProps = {
 	perRow:3,
 };
 UserList.propTypes = {
-	
+	users: PropTypes.arrayOf(PropTypes.object),
+	title: PropTypes.string,
+	perRow: PropTypes.number
 };
 
 export {UserList, SmallUser, LargeUser};

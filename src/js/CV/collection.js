@@ -1,12 +1,12 @@
 'use strict';
 
-import {log as logger} from '../Log.js';
-let log = logger.Logger('Collection');
+// import {log as logger} from '../Log.js';
+// let log = logger.Logger('Collection');
 
 const React = require('react');
 const {Component} = React;
 
-import {Input, CustomInput} from 'reactstrap';
+import {CustomInput} from 'reactstrap';
 
 class Collection extends Component {
 	constructor(props) {

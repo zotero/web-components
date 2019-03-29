@@ -21,19 +21,19 @@ var librarySearchUrl = function(type, entityID, query){
 	return `${baseSearchUrl}/${type}/${entityID}/items?q=${query}`;
 };
 
-var LibraryElasticSearch = React.createClass({
-	componentDidMount: function(){
+class LibraryElasticSearch extends React.Component {
+	componentDidMount(){
 		if(this.state.search != ''){
 			this.search();
 		}
 		this.loadSavedSearches();
-	},
-	getDefaultProps: function() {
+	}
+	getDefaultProps() {
 		return {
 			item:null
 		};
-	},
-	getInitialState: function() {
+	}
+	getInitialState() {
 		let query = locationState.getVar('libq');
 		if(!query){
 			query = '';
@@ -50,20 +50,20 @@ var LibraryElasticSearch = React.createClass({
 			savedSearches:[],
 			results: []
 		};
-	},
-	handleSearchChange: function(evt){
+	}
+	handleSearchChange = (evt) => {
 		this.setState({search:evt.target.value});
-	},
-	handleSearchKeyChange: function(evt){
+	}
+	handleSearchKeyChange = (evt) => {
 		this.setState({searchkey:evt.target.value}, ()=>{this.search();});
-	},
-	handleTypeChange: function(evt){
+	}
+	handleTypeChange = (evt) => {
 		this.setState({libraryType:evt.target.value});
-	},
-	handleEntityChange: function(evt){
+	}
+	handleEntityChange = (evt) => {
 		this.setState({entityID:evt.target.value});
-	},
-	loadSavedSearches: function(){
+	}
+	loadSavedSearches = () => {
 		let type = this.state.libraryType;
 		let entityID = this.state.entityID;
 		let url = `${baseApiUrl}/${type}/${entityID}/searches`;
@@ -72,8 +72,8 @@ var LibraryElasticSearch = React.createClass({
 				this.setState({savedSearches:data});
 			});
 		});
-	},
-	search: function(evt=false){
+	}
+	search = (evt=false) => {
 		if(evt){
 			evt.preventDefault();
 		}
@@ -139,8 +139,8 @@ var LibraryElasticSearch = React.createClass({
 				});
 			});
 		}
-	},
-	render: function() {
+	}
+	render() {
 		var reactInstance = this;
 		var resultNodes = reactInstance.state.results.map(function(resultItem){
 			return (
@@ -203,6 +203,6 @@ var LibraryElasticSearch = React.createClass({
 			</div>
 		);
 	}
-});
+}
 
 export {LibraryElasticSearch};

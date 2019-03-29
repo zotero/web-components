@@ -39,10 +39,10 @@ class Checkout extends Component{
 						<Tab>Institution</Tab>
 					</TabList>
 					<TabPanel>
-						<LabCheckout ref='labcheckout' />
+						<LabCheckout />
 					</TabPanel>
 					<TabPanel>
-						<InstitutionCheckout ref='institutioncheckout' />
+						<InstitutionCheckout />
 					</TabPanel>
 				</Tabs>
 			</div>
@@ -134,7 +134,7 @@ class InstitutionCheckout extends Component{
 			this.setState({
 				notification: {
 					type: 'success',
-					message: (<p>We'll contact you shortly about your Zotero Institution subscription</p>)
+					message: (<p>We&apos;ll contact you shortly about your Zotero Institution subscription</p>)
 				}
 			});
 
@@ -183,7 +183,7 @@ class InstitutionCheckout extends Component{
 				<div className='form-line'>
 					<label htmlFor='institution_domain'>Domain(s):</label>
 					<input type='text' name='institution_domain' className='form-control' value={domain} onChange={(evt)=>{this.setState({domain:evt.target.value});}} placeholder='@my-institution.edu' />
-					<p className='hint'>The domain(s) you use for your institution's email addresses. This is how we'll identify your users.</p>
+					<p className='hint'>The domain(s) you use for your institution&apos;s email addresses. This is how we&apos;ll identify your users.</p>
 					<FormFieldErrorMessage message={formErrors['domain']} />
 				</div>
 				

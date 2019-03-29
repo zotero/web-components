@@ -53,7 +53,6 @@ import {RecentItems} from './RecentItems.js';
 import {ApiKeyEditor} from './ApiKeyEditor.js';
 import {pageReady, jsError} from './Utils.js';
 import {cycleTestCases, cycleTestFuncs} from './TestUtils.js';
-import {Combined} from './GlobalSearch/Combined.js';
 import {Profile} from './profile/profile.jsx';
 import {ChangeUsername} from './ChangeUsername.js';
 import {ManageEmails} from './ManageEmails.js';
@@ -95,7 +94,6 @@ let ZoteroWebComponents = {
 	jsError,
 	cycleTestCases,
 	cycleTestFuncs,
-	Combined,
 	Profile,
 	ChangeUsername,
 	animations,

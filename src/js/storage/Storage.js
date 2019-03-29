@@ -519,7 +519,7 @@ function Storage(props){
 		} else {
 			expirationDate = (<td>
 				{dateString}
-				<p>Your Zotero storage subscription will expire {d.toLocaleDateString('en-US', numDateFormatOptions)} if you don't renew before then.</p>
+				<p>Your Zotero storage subscription will expire {d.toLocaleDateString('en-US', numDateFormatOptions)} if you don&apos;t renew before then.</p>
 			</td>);
 		}
 	}

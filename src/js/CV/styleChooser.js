@@ -26,8 +26,7 @@ class StyleChooser extends Component {
 			'nature': 'Nature Journal',
 			'vancouver': 'Vancouver'
 		};
-		let def = this.props.style;
-
+		
 		let options = Object.keys(styleOptions).map((key)=>{
 			let label = styleOptions[key];
 			return <option key={key} value={key} label={label}>{label}</option>;

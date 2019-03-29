@@ -47,7 +47,7 @@ class LabCheckout extends Component{
 						<p className='hint'>This name will appear as the provider of storage for your users.</p>
 					</div>
 					<div className='form-line'>
-						<p>You're currently logged in as '{currentUser.username}'. This will be the account used to manage the user list for your subscription. If you'd like to use a different account to manage your subscription, please log in with that account before completing the purchase.</p>
+						<p>You&apos;re currently logged in as &quot;{currentUser.username}&quot;. This will be the account used to manage the user list for your subscription. If you&apos;d like to use a different account to manage your subscription, please log in with that account before completing the purchase.</p>
 					</div>
 					<div className='form-line purchase-line'>
 						<LabPurchase {...this.state} />
@@ -57,7 +57,7 @@ class LabCheckout extends Component{
 		} else {
 			completeAction = (
 				<div className='form-line'>
-					<p>You are not currently logged in. To purchase a Zotero Lab subscription, please log in to the account that will be used to manage the user list for the subscription. You'll need to use that account to make changes to your subscription in the future.</p>
+					<p>You are not currently logged in. To purchase a Zotero Lab subscription, please log in to the account that will be used to manage the user list for the subscription. You&apos;ll need to use that account to make changes to your subscription in the future.</p>
 				</div>
 			);
 		}

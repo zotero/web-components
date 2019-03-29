@@ -209,7 +209,7 @@ function SubscriptionHandler(props){
 	}
 	if(type == 'individualChange' || type == 'individualRenew'){
 		if(overQuota(storageLevel, userSubscription)){
-			error = <Alert color='error'>Current usage exceeds the chosen plan's quota. You'll need to choose a larger storage plan, or delete some files from your Zotero storage.</Alert>;
+			error = <Alert color='error'>Current usage exceeds the chosen plan&apos;s quota. You&apos;ll need to choose a larger storage plan, or delete some files from your Zotero storage.</Alert>;
 		}
 	}
 	

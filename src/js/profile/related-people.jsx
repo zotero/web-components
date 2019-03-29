@@ -1,7 +1,7 @@
 'use strict';
 
-import {log as logger} from '../Log.js';
-let log = logger.Logger('related-people');
+// import {log as logger} from '../Log.js';
+// let log = logger.Logger('related-people');
 
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -59,7 +59,6 @@ class RelatedPeopleDetailed extends React.Component {
 		this.props.loadRelatedUsers(this.props.type);
 	}
 	render() {
-		log.debug('RelatedPeopleDetailed render');
 		let footer;
 		let {loading} = this.state;
 		let {title, people, total} = this.props;

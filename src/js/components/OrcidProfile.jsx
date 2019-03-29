@@ -3,8 +3,8 @@
 import {log as logger} from '../Log.js';
 let log = logger.Logger('OrcidProfile');
 
-const React = require('react');
-const {Component, PureComponent, Fragment} = React;
+import {useState} from 'react';
+import PropTypes from 'prop-types';
 import {OrcidIcon} from '../Icons.js';
 import {Notifier} from '../Notifier.js';
 import {ajax} from '../ajax.js';
@@ -15,30 +15,91 @@ import {PencilIcon} from '../Icons.js';
 //const orcidClientID = config.orcidClientID;
 //const orcidRedirectUrl = config.orcidRedirectUrl;
 
-class FuzzyDate extends PureComponent{
-	render(){
-		const {date} = this.props;
-		if(date === null){
-			return 'present';
-		}
+const orcidStringValue = PropTypes.shape({
+	value:PropTypes.string
+});
+const dateShape = PropTypes.shape({
+	year: PropTypes.object.isRequired,
+	month: PropTypes.object,
+	day: PropTypes.object
+});
 
-		let s = date.year.value;
-		if(date.month != null){
-			s += '-' + date.month.value;
-		}
-		if(date.day != null){
-			s += '-' + date.day.value;
-		}
-		return s;
+const timespanShape = {
+	startDate: dateShape,
+	endDate: dateShape
+};
+
+const organizationShape = PropTypes.shape({
+	name: PropTypes.string,
+	address: PropTypes.shape({
+		city: PropTypes.string,
+		region: PropTypes.string,
+		country: PropTypes.string,
+	})
+});
+
+const nameShape = {
+	person: PropTypes.shape({
+		name: PropTypes.shape({
+			'given-names': orcidStringValue,
+			'family-name': orcidStringValue
+		})
+	})
+};
+
+const organizationEntryShape = PropTypes.shape({
+	startDate:dateShape,
+	endDate:dateShape,
+	organization:PropTypes.object
+});
+
+const workShape = PropTypes.shape({
+	'work-summary': PropTypes.arrayOf(PropTypes.shape({
+		type:PropTypes.string,
+		title:PropTypes.shape({
+			title: orcidStringValue,
+			subtitle: orcidStringValue
+		}),
+		'publication-date': dateShape
+	}))
+});
+
+const fundingShape = PropTypes.shape({
+	'funding-summary': PropTypes.arrayOf(PropTypes.shape({
+		type:PropTypes.string,
+		title:PropTypes.shape({
+			title: orcidStringValue
+		}),
+		organization: organizationShape,
+		'start-date': dateShape,
+		'end-date': dateShape
+	}))
+});
+
+function FuzzyDate(props){
+	const {date} = props;
+	if(date === null){
+		return 'present';
 	}
-}
 
-class TimeSpan extends PureComponent{
-	getDuration = () => {
+	let s = date.year.value;
+	if(date.month != null){
+		s += '-' + date.month.value;
+	}
+	if(date.day != null){
+		s += '-' + date.day.value;
+	}
+	return s;
+}
+FuzzyDate.propTypes = {
+	date:dateShape
+};
+function TimeSpan(props){
+	const getDuration = () => {
 		const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 		//don't just grab props because they will be references
-		let startDate = Object.assign({}, this.props.startDate);
-		let endDate = Object.assign({}, this.props.endDate);
+		let startDate = Object.assign({}, props.startDate);
+		let endDate = Object.assign({}, props.endDate);
 
 		if(!startDate.month){
 			startDate.month = {value:'January'};
@@ -81,292 +142,304 @@ class TimeSpan extends PureComponent{
 		}
 
 		return `(${retVal})`;
+	};
+	
+	if(!props.startDate.year.value){
+		return null;
 	}
-	render(){
-		if(!this.props.startDate.year.value){
-			return null;
+	let duration = null;
+	try {
+		duration = getDuration();
+	} catch(e){
+		log.error('failed to calculate duration:' + e);
+	}
+	return (
+		<span className='time-span'>
+			<FuzzyDate date={props.startDate} /> to <FuzzyDate date={props.endDate} />
+			<br />
+			{duration}
+		</span>
+	);
+}
+TimeSpan.propTypes = timespanShape;
+
+function Organization(props) {
+	const {name, address} = props.organization;
+	let locNode = null;
+	if(address.city || address.region || address.country){
+		let locStr = address.city ? `${address.city}, ` : '';
+		locStr += address.region ? `${address.region}, ` : '';
+		locStr += address.country ? address.country : '';
+		locStr = locStr.trim();
+		if(locStr.endsWith(',')){
+			locStr = locStr.substring(0, locStr.length - 1);
 		}
-		let duration = null;
-		try {
-			duration = this.getDuration();
-		} catch(e){
-			log.error('failed to calculate duration:' + e);
-		}
-		return (
-			<span className='time-span'>
-				<FuzzyDate date={this.props.startDate} /> to <FuzzyDate date={this.props.endDate} />
-				<br />
-				{duration}
+		locNode = (
+			<span className='organization-location'>
+				: {locStr}
 			</span>
 		);
 	}
+	return (
+		<span className='organization'>
+			<b>{name}</b>{locNode}
+		</span>
+	);
 }
-class Organization extends PureComponent{
-	render(){
-		const {name, address} = this.props.organization;
-		let locNode = null;
-		if(address.city || address.region || address.country){
-			let locStr = address.city ? `${address.city}, ` : '';
-			locStr += address.region ? `${address.region}, ` : '';
-			locStr += address.country ? address.country : '';
-			locStr = locStr.trim();
-			if(locStr.endsWith(',')){
-				locStr = locStr.substring(0, locStr.length - 1);
-			}
-			locNode = (
-				<span className='organization-location'>
-					: {locStr}
-				</span>
-			);
-		}
-		return (
-			<span className='organization'>
-				<b>{name}</b>{locNode}
-			</span>
-		);
-	}
-}
-class OrganizationEntry extends PureComponent{
-	render(){
-		const {entry, editable} = this.props;
-		return (
-			<div className='organization-entry profile-timeline-wrapper'>
-				<Row>
-					<Col sm={4} className='d-none d-sm-block'>
+Organization.propTypes = {
+	organization: organizationShape
+};
+function OrganizationEntry(props){
+	const {entry, editable, edit} = props;
+	return (
+		<div className='organization-entry profile-timeline-wrapper'>
+			<Row>
+				<Col sm={4} className='d-none d-sm-block'>
+					<TimeSpan startDate={entry['start-date']} endDate={entry['end-date']} />
+				</Col>
+				<Col sm={7} className='profile-timeline'>
+					<div className="profile-timeline-point" />
+					<Organization organization={entry.organization} />
+					<br />
+					{entry['role-title']} {entry['department-name'] ? `(${entry['department-name']})` : null}
+					<div className='d-block d-sm-none'>
 						<TimeSpan startDate={entry['start-date']} endDate={entry['end-date']} />
-					</Col>
-					<Col sm={7} className='profile-timeline'>
-						<div className="profile-timeline-point" />
-						<Organization organization={entry.organization} />
-						<br />
-						{entry['role-title']} {entry['department-name'] ? `(${entry['department-name']})` : null}
-						<div className='d-block d-sm-none'>
-							<TimeSpan startDate={entry['start-date']} endDate={entry['end-date']} />
-						</div>
-					</Col>
-					<Col xs={1}>
-						{editable ? <Button outline size='sm' onClick={this.props.edit} ><PencilIcon /></Button> : null}
-					</Col>
-				</Row>
-			</div>
-		);
-	}
+					</div>
+				</Col>
+				<Col xs={1}>
+					{editable ? <Button outline size='sm' onClick={edit} ><PencilIcon /></Button> : null}
+				</Col>
+			</Row>
+		</div>
+	);
 }
 OrganizationEntry.defaultProps = {
 	edit: function(){}
 };
+OrganizationEntry.propTypes = {
+	editable: PropTypes.bool,
+	edit: PropTypes.func,
+	entry: organizationEntryShape
+};
 
-class Name extends PureComponent{
-	render(){
-		return (
-			<h2>{this.props.person.name['given-names'].value} {this.props.person.name['family-name'].value}</h2>
-		);
-	}
+function Name(props){
+	return (
+		<h2>{props.person.name['given-names'].value} {props.person.name['family-name'].value}</h2>
+	);
 }
+Name.propTypes = nameShape;
 
-class Biography extends PureComponent{
-	render(){
-		let bio = this.props.biography.content;
-		if(!bio){
-			return null;
-		}
-		let bioEntries = bio.split('\n');
-		bioEntries = bioEntries.map((entry, i)=>{
-			return <Fragment key={i}>{entry}<br /></Fragment>;
-		});
-		return (
-			<div className='biography'>
-				{bioEntries}
-			</div>
-		);
+function Biography(props){
+	let bio = props.biography.content;
+	if(!bio){
+		return null;
 	}
-}
-
-class Educations extends PureComponent{
-	render(){
-		if(!this.props.educations.length){
-			return null;
-		}
-		return (
-		<div className='orcid-educations'>
-			<h2>Education</h2>
-			{this.props.educations.map(
-				(edu)=>{
-					return <OrganizationEntry key={edu.path} entry={edu} />;
-				}
-			)}
+	let bioEntries = bio.split('\n');
+	bioEntries = bioEntries.map((entry)=>{
+		return <>{entry}<br /></>;
+	});
+	return (
+		<div className='biography'>
+			{bioEntries}
 		</div>
-		);
-	}
+	);
 }
+Biography.propTypes = {
+	biography:PropTypes.shape({
+		content:PropTypes.string
+	})
+};
 
-class Employments extends PureComponent{
-	render(){
-		if(!this.props.employments.length){
-			return null;
-		}
-		return (
-		<div className='orcid-employments'>
-			<h2>Employment</h2>
-			{this.props.employments.map(
-				(emp)=>{
-					return <OrganizationEntry key={emp.path} entry={emp} />;
-				}
-			)}
+function Educations(props){
+	if(!props.educations.length){
+		return null;
+	}
+	return (
+	<div className='orcid-educations'>
+		<h2>Education</h2>
+		{props.educations.map(
+			(edu)=>{
+				return <OrganizationEntry key={edu.path} entry={edu} />;
+			}
+		)}
+	</div>
+	);
+}
+Educations.propTypes = {
+	educations: PropTypes.arrayOf(organizationEntryShape)
+};
+
+function Employments(props){
+	if(!props.employments.length){
+		return null;
+	}
+	return (
+	<div className='orcid-employments'>
+		<h2>Employment</h2>
+		{props.employments.map(
+			(emp)=>{
+				return <OrganizationEntry key={emp.path} entry={emp} />;
+			}
+		)}
+	</div>
+	);
+}
+Employments.propTypes = {
+	employments: PropTypes.arrayOf(organizationEntryShape)
+};
+
+
+function ResearcherUrls(props){
+	if(!props.urls.length){
+		return null;
+	}
+	return (
+	<div className='researcher-urls'>
+		<h4>Researcher Websites</h4>
+		{props.urls.map((website)=>{
+			return <a key={website.url.value} className='orcid-researcher-url' href={website.url.value} rel='nofollow'>{website.url.value}</a>;
+		})}
+	</div>
+	);
+}
+ResearcherUrls.propTypes = {
+	urls: PropTypes.arrayOf(PropTypes.shape({
+		url:PropTypes.shape({
+			value:PropTypes.string
+		})
+	}))
+};
+
+function Work(props){
+	let workSummary = props.work['work-summary'];
+	let type = workSummary[0].type;
+	type = type.replace('-', ' ').replace('_', ' ').toLowerCase();
+	let typeStyle = {textTransform:'capitalize'};
+
+	return (
+		<div className='orcid-work'>
+			<span className='title'>{workSummary[0].title.title.value}</span>
+			{workSummary[0].title.subtitle ? <span className='subtitle'>{workSummary[0].title.subtitle.value}</span> : null}
+			<br />
+			<FuzzyDate date={workSummary[0]['publication-date']} /> | <span style={typeStyle}>{type}</span>
 		</div>
-		);
-	}
+	);
 }
+Work.propTypes = {
+	work:workShape
+};
+function Works(props){
+	if(!props.works.length){
+		return null;
+	}
+	return (
+	<div className='orcid-works'>
+		<h2>Works</h2>
+		{props.works.map(
+			(work)=>{
+				return <Work key={work['work-summary'][0].path} work={work} />;
+			}
+		)}
+	</div>
+	);
+}
+Works.propTypes = {
+	works: PropTypes.arrayOf(workShape)
+};
 
+function Funding(props){
+	let f = props.funding['funding-summary'][0];
+	let type = f.type.toLowerCase();
+	let typeStyle = {textTransform:'capitalize'};
+	return (
+		<div className='orcid-funding'>
+			<span className='title'>{f.title.title.value}</span>
+			<br />
+			<span className='funder'><Organization organization={f.organization} /></span>
+			<br />
+			<TimeSpan startDate={f['start-date']} endDate={f['end-date']} /> | <span style={typeStyle}>{type}</span>
+		</div>
+	);
+}
+Funding.propTypes = {
+	funding: fundingShape
+};
 
-class ResearcherUrls extends PureComponent{
-	render(){
-		if(!this.props.urls.length){
-			return null;
-		}
-		return (
-		<div className='researcher-urls'>
-			<h4>Researcher Websites</h4>
-			{this.props.urls.map((website)=>{
-				return <a key={website.url.value} className='orcid-researcher-url' href={website.url.value} rel='nofollow'>{website.url.value}</a>;
+function Fundings(props){
+	if(!props.fundings.length){
+		return null;
+	}
+	return (
+	<div className='orcid-fundings'>
+		<h2>Fundings</h2>
+		{props.fundings.map(
+			(funding)=>{
+				return <Funding key={funding['funding-summary'][0].path} funding={funding} />;
+			}
+		)}
+	</div>
+	);
+}
+Fundings.propTypes = {
+	fundings: PropTypes.arrayOf(fundingShape)
+};
+
+function Keywords(props){
+	if(!props.keywords.length){
+		return null;
+	}
+	return (
+	<div className='orcid-keywords'>
+		<h4>Keywords</h4>
+		<ul className='researcher-keywords'>
+			{props.keywords.map((keyword)=>{
+				return <li key={keyword.content}>{keyword.content}</li>;
 			})}
+		</ul>
+	</div>
+	);
+}
+Keywords.propTypes = {
+	keywords: PropTypes.arrayOf(PropTypes.shape({
+		content: PropTypes.string
+	}))
+};
+
+function OrcidProfile(props){
+	let {orcidProfile} = props;
+	let orcidHref = `https://orcid.org/${orcidProfile.orcid}`;
+
+	let person = orcidProfile.profile['person'];
+	let urls = person['researcher-urls']['researcher-url'];
+	let biography = person['biography'];
+	let keywords = person.keywords.keyword;
+
+	let acts = orcidProfile.profile['activities-summary'];
+	let edus = acts['educations']['education-summary'];
+	let emps = acts['employments']['employment-summary'];
+	let works = acts['works']['group'];
+	let fundings = acts['fundings']['group'];
+
+	return (
+		<div className='orcid-profile'>
+			<Name person={person} />
+			<p><OrcidIcon /> <a href={orcidHref}>{orcidHref}</a></p>
+			<Biography biography={biography} />
+			<Educations educations={edus} />
+			<Employments employments={emps} />
+			<Fundings fundings={fundings} />
+			<Works works={works} />
+			<ResearcherUrls urls={urls} />
+			<Keywords keywords={keywords} />
 		</div>
-		);
-	}
+	);
 }
+OrcidProfile.propTypes = {
+	orcidProfile: PropTypes.object.isRequired
+};
 
-class Work extends PureComponent{
-	render(){
-		let workSummary = this.props.work['work-summary'];
-		let type = workSummary[0].type;
-		type = type.replace('-', ' ').replace('_', ' ').toLowerCase();
-		let typeStyle = {textTransform:'capitalize'};
-
-		return (
-			<div className='orcid-work'>
-				<span className='title'>{workSummary[0].title.title.value}</span>
-				{workSummary[0].title.subtitle ? <span className='subtitle'>{workSummary[0].title.subtitle.value}</span> : null}
-				<br />
-				<FuzzyDate date={workSummary[0]['publication-date']} /> | <span style={typeStyle}>{type}</span>
-			</div>
-		);
-	}
-}
-
-class Works extends PureComponent{
-	render(){
-		if(!this.props.works.length){
-			return null;
-		}
-		return (
-		<div className='orcid-works'>
-			<h2>Works</h2>
-			{this.props.works.map(
-				(work)=>{
-					return <Work key={work['work-summary'][0].path} work={work} />;
-				}
-			)}
-		</div>
-		);
-	}
-}
-
-
-class Funding extends PureComponent{
-	render(){
-		let f = this.props.funding['funding-summary'][0];
-		let type = f.type.toLowerCase();
-		let typeStyle = {textTransform:'capitalize'};
-		return (
-			<div className='orcid-funding'>
-				<span className='title'>{f.title.title.value}</span>
-				<br />
-				<span className='funder'><Organization organization={f.organization} /></span>
-				<br />
-				<TimeSpan startDate={f['start-date']} endDate={f['end-date']} /> | <span style={typeStyle}>{type}</span>
-			</div>
-		);
-	}
-}
-
-class Fundings extends PureComponent{
-	render(){
-		if(!this.props.fundings.length){
-			return null;
-		}
-		return (
-		<div className='orcid-fundings'>
-			<h2>Fundings</h2>
-			{this.props.fundings.map(
-				(funding)=>{
-					return <Funding key={funding['funding-summary'][0].path} funding={funding} />;
-				}
-			)}
-		</div>
-		);
-	}
-}
-
-class Keywords extends PureComponent{
-	render(){
-		if(!this.props.keywords.length){
-			return null;
-		}
-		return (
-		<div className='orcid-keywords'>
-			<h4>Keywords</h4>
-			<ul className='researcher-keywords'>
-				{this.props.keywords.map((keyword)=>{
-					return <li key={keyword.content}>{keyword.content}</li>;
-				})}
-			</ul>
-		</div>
-		);
-	}
-}
-
-class OrcidProfile extends PureComponent{
+function OrcidProfileControl(props){
 	/*
-	loadOrcid = async (orcid) => {
-		log.debug('loadOrcid');
-		let resp = await fetch(`https://api.orcid.org/v2.1/${orcid}`);
-		let data = await resp.json();
-		console.log(data);
-		this.setState({data});
-	}
-	*/
-	render(){
-		let {orcidProfile} = this.props;
-		let orcidHref = `https://orcid.org/${orcidProfile.orcid}`;
-
-		let person = orcidProfile.profile['person'];
-		let urls = person['researcher-urls']['researcher-url'];
-		let biography = person['biography'];
-		let keywords = person.keywords.keyword;
-
-		let acts = orcidProfile.profile['activities-summary'];
-		let edus = acts['educations']['education-summary'];
-		let emps = acts['employments']['employment-summary'];
-		let works = acts['works']['group'];
-		let fundings = acts['fundings']['group'];
-
-		return (
-			<div className='orcid-profile'>
-				<Name person={person} />
-				<p><OrcidIcon /> <a href={orcidHref}>{orcidHref}</a></p>
-				<Biography biography={biography} />
-				<Educations educations={edus} />
-				<Employments employments={emps} />
-				<Fundings fundings={fundings} />
-				<Works works={works} />
-				<ResearcherUrls urls={urls} />
-				<Keywords keywords={keywords} />
-			</div>
-		);
-	}
-}
-
-class OrcidProfileControl extends Component{
 	constructor(props){
 		super(props);
 		this.state = {
@@ -374,73 +447,73 @@ class OrcidProfileControl extends Component{
 			orcidProfile:props.orcidProfile
 		};
 	}
+	*/
 	/*
 	linkOrcid = () => {
 		let oauthWindow = window.open(`https://orcid.org/oauth/authorize?client_id=${orcidClientID}&response_type=code&scope=/authenticate&show_login=false&redirect_uri=${orcidRedirectUrl}`, "_blank", "toolbar=no, scrollbars=yes, width=500, height=600, top=500, left=500");
 	}
 	*/
-	unlinkOrcid = async (evt) => {
+	const unlinkOrcid = async (evt) => {
 		evt.preventDefault();
 		let resp = await ajax({url:`/settings/unlinkorcid`});
 		let data = await resp.json();
 		if(!data.success){
-			this.setState({notification:{
+			setNotification({
 				type: 'error',
 				message: 'We encountered an error unlinking your Orcid ID. Please try again in a few minutes.'
-			}});
+			});
 		} else {
 			window.location.reload();
 		}
-	}
-	refreshOrcid = async (evt) => {
+	};
+	const refreshOrcid = async (evt) => {
 		evt.preventDefault();
 		let resp = await ajax({url:`/settings/refreshorcid`});
 		//let resp = await fetch(`https://zotero.live/settings/refreshorcid`, {credentials: 'same-origin'});
 		let data = await resp.json();
 		if(!data.success){
-			this.setState({notification:{
+			setNotification({
 				type: 'error',
 				message: 'We encountered an error refreshing your Orcid profile. Please try again in a few minutes.'
-			}});
+			});
 		} else {
 			let psummary = data.profileSummary;
 			let orcid = this.props.orcidProfile.orcid;
-			this.setState({
-				notification:{
-					type: 'success',
-					message: 'Orcid profile updated'
-				},
-				orcidProfile:{
-					orcid,
-					profile:psummary
-				}
+			setNotification({
+				type: 'success',
+				message: 'Orcid profile updated'
+			});
+			setOrcidProfile({
+				orcid,
+				profile:psummary
 			});
 		}
-	}
-	render(){
-		let {orcidProfile, notification} = this.state;
-		if(orcidProfile){
-			let fullProfile = null;
-			if(this.props.showFull){
-				fullProfile = <OrcidProfile orcidProfile={orcidProfile} />;
-			}
-			return (
-				<div className='orcid-profile-control'>
-					<Notifier {...notification} />
-					<p>Your Zotero profile is currently linked to an ORCID iD.</p>
-					<p><a href='https://orcid.org/my-orcid'>Edit ORCID profile</a> | <a href='#' onClick={this.refreshOrcid}>Refresh ORCID profile</a> | <a onClick={this.unlinkOrcid} href='#'>Unlink Orcid iD</a></p>
-					{fullProfile}
-				</div>
-			);
-		} else {
-			return (
-				<div className='orcid-profile-control'>
-					<Notifier {...this.state.notification} />
-					<OrcidIcon /> <a href='/settings/linkorcid'>Use data from your ORCID iD profile</a>
-					<p>ORCID is an independent non-profit effort to provide an open registry of unique researcher identifiers and open services to link research activities and organizations to these identifiers. Learn more at <a href='https://orcid.org'>orcid.org</a>.</p>
-				</div>
-			);
+	};
+	
+	const [orcidProfile, setOrcidProfile] = useState(props.orcidProfile);
+	const [notification, setNotification] = useState(null);
+	//let {orcidProfile, notification} = this.state;
+	if(orcidProfile){
+		let fullProfile = null;
+		if(this.props.showFull){
+			fullProfile = <OrcidProfile orcidProfile={orcidProfile} />;
 		}
+		return (
+			<div className='orcid-profile-control'>
+				<Notifier {...notification} />
+				<p>Your Zotero profile is currently linked to an ORCID iD.</p>
+				<p><a href='https://orcid.org/my-orcid'>Edit ORCID profile</a> | <a href='#' onClick={refreshOrcid}>Refresh ORCID profile</a> | <a onClick={unlinkOrcid} href='#'>Unlink Orcid iD</a></p>
+				{fullProfile}
+			</div>
+		);
+	} else {
+		return (
+			<div className='orcid-profile-control'>
+				<Notifier {...notification} />
+				<OrcidIcon /> <a href='/settings/linkorcid'>Use data from your ORCID iD profile</a>
+				<p>ORCID is an independent non-profit effort to provide an open registry of unique researcher identifiers and open services to link research activities and organizations to these identifiers. Learn more at <a href='https://orcid.org'>orcid.org</a>.</p>
+			</div>
+		);
 	}
 }
 OrcidProfileControl.defaultProps = {

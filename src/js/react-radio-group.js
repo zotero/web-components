@@ -43,7 +43,7 @@ export class RadioGroup extends React.Component{
   }
   
   render() {
-    const {Component, name, selectedValue, onChange, children, ...rest} = this.props;
+    const {Component, name, selectedValue, onChange, children, ...rest} = this.props; // eslint-disable-line no-unused-vars
     return <Component {...rest}>{children}</Component>;
   }
 }
@@ -66,7 +66,7 @@ RadioGroup.propTypes = {
 };
 
 RadioGroup.defaultProps = {
-  Component: "div"
+  Component: 'div'
 };
 
 RadioGroup.childContextTypes = {

@@ -1,4 +1,4 @@
-
+/* global BezierEasing TWEEN */
 let collect = function(){
 	let cursor = document.querySelector('#cursor');
 	let url = document.querySelector('#url');
@@ -22,11 +22,11 @@ let collect = function(){
 
 	let originX = function(element) {
 		return element.getBBox().x + element.getBBox().width / 2;
-	}
+	};
 
 	let originY = function(element) {
 		return element.getBBox().y + element.getBBox().height / 2;
-	}
+	};
 
 	// Loop
 
@@ -64,7 +64,7 @@ let collect = function(){
 					${originX(magnifier) - magnifierGrowCoords.s * originX(magnifier)},
 					${originY(magnifier) - magnifierGrowCoords.s * originY(magnifier)})`);
 			})
-			.delay(500)
+			.delay(500);
 
 		let magnifierShrinkCoords = { r: 100, s: 1 };
 		let magnifierShrinkDuration = 250;
@@ -78,7 +78,7 @@ let collect = function(){
 					${originX(magnifier) - magnifierShrinkCoords.s * originX(magnifier)},
 					${originY(magnifier) - magnifierShrinkCoords.s * originY(magnifier)})`);
 			})
-			.delay(1300) // 250 after moveToZotero
+			.delay(1300); // 250 after moveToZotero
 
 		magnifierGrow.chain(magnifierShrink);
 
@@ -100,7 +100,7 @@ let collect = function(){
 						${Math.floor(connectorButtonLgMouseInCoords.b)})
 					`);
 			})
-			.delay(645)
+			.delay(645);
 
 		let connectorButtonLgMouseOutCoords = { o: 1, r: 255, g: 255, b: 255 };
 		let connectorButtonLgMouseOutDuration = 150;
@@ -118,7 +118,7 @@ let collect = function(){
 						${Math.floor(connectorButtonLgMouseOutCoords.b)})
 					`);
 			})
-			.delay(1085)
+			.delay(1085);
 
 		connectorButtonLgMouseIn.chain(connectorButtonLgMouseOut);
 
@@ -133,7 +133,7 @@ let collect = function(){
 				cursor.setAttribute('transform',
 					`translate(${moveToAddressBarCoords.tx},
 					${moveToAddressBarCoords.ty})`);
-			})
+			});
 
 		let clickAddressBarCoords = { s: 0.8 };
 		let clickAddressBarDuration = 50;
@@ -149,7 +149,7 @@ let collect = function(){
 					`translate(${moveToAddressBarCoords.tx}, ${moveToAddressBarCoords.ty})
 					scale(1)`);
 			})
-			.delay(125)
+			.delay(125);
 
 		let hideCursorCoords = { o: 1 };
 		let hideCursorDuration = 0;
@@ -158,7 +158,7 @@ let collect = function(){
 			.onUpdate(function() {
 				cursor.setAttribute('opacity', hideCursorCoords.o);
 			})
-			.delay(50)
+			.delay(50);
 
 		let typeUrlCoords = { w: 0 };
 		let typeUrlDuration = 500;
@@ -172,7 +172,7 @@ let collect = function(){
 			.onUpdate(function() {
 				url.setAttribute('width', typeUrlCoords.w);
 			})
-			.delay(62.5)
+			.delay(62.5);
 
 		let spinCoords = { r: 0 };
 		let spinDuration = 500;
@@ -193,9 +193,9 @@ let collect = function(){
 				magnifierGrow.start();
 				connectorButtonLgMouseIn.start();
 			})
-			.delay(62.5)
+			.delay(62.5);
 
-		let moveToConnectorCoords = { tx: 200}
+		let moveToConnectorCoords = { tx: 200};
 		let moveToConnectorDuration = 500;
 		let moveToConnector = new TWEEN.Tween(moveToConnectorCoords, groupA)
 			.to({ tx: 348 }, moveToConnectorDuration)
@@ -209,9 +209,9 @@ let collect = function(){
 					${moveToAddressBarCoords.ty})`);
 			})
 			.onComplete(function() {
-				tooltip.setAttribute('opacity', 1)
+				tooltip.setAttribute('opacity', 1);
 			})
-			.delay(250)
+			.delay(250);
 
 		let clickConnectorCoords = { s: 0.8 };
 		let clickConnectorDuration = 50;
@@ -231,7 +231,7 @@ let collect = function(){
 					`translate(${moveToConnectorCoords.tx},
 					${moveToAddressBarCoords.ty}) scale(1)`);
 			})
-			.delay(500)
+			.delay(500);
 
 		let moveToZoteroCoords = { tx: 348, ty: 109 };
 		let moveToZoteroDuration = 500;
@@ -242,7 +242,7 @@ let collect = function(){
 				cursor.setAttribute('transform',
 					`translate(${moveToZoteroCoords.tx}, ${moveToZoteroCoords.ty})`);
 			})
-			.delay(500)
+			.delay(500);
 
 		let clickZoteroCoords = { s: 1 };
 		let clickZoteroDuration = 50;
@@ -258,7 +258,7 @@ let collect = function(){
 					`translate(${moveToZoteroCoords.tx},
 					${moveToZoteroCoords.ty}) scale(1)`);
 			})
-			.delay(250)
+			.delay(250);
 
 		let focusZoteroCoords = {};
 		let focusZotero = new TWEEN.Tween({}, groupA)
@@ -268,7 +268,7 @@ let collect = function(){
 				zoteroFront.setAttribute('opacity', 1);
 				zoteroToolbar.setAttribute('fill', '#e6e6e6');
 				chromeToolbar.setAttribute('fill', '#f6f6f6');
-			})
+			});
 
 		let showItemCoords = { o: 0, tx: 0, ty: -18 };
 		let showItemDuration = 150;
@@ -280,7 +280,7 @@ let collect = function(){
 				newItem.setAttribute('transform', `translate(${showItemCoords.tx},
 					${showItemCoords.ty})`);
 			})
-			.delay(500)
+			.delay(500);
 
 		let moveToCloseButtonCoords = { tx: 245 , ty: 384 };
 		let moveToCloseButtonDuration = 750;
@@ -292,7 +292,7 @@ let collect = function(){
 					`translate(${moveToCloseButtonCoords.tx},
 					${moveToCloseButtonCoords.ty})`);
 			})
-			.delay(500)
+			.delay(500);
 
 		let clickCloseButtonCoords = { s: 0.8 };
 		let clickCloseButtonDuration = 50;
@@ -307,9 +307,9 @@ let collect = function(){
 					`translate(${moveToCloseButtonCoords.tx},
 					${moveToCloseButtonCoords.ty}) scale(1)`);
 		})
-		.delay(250)
+		.delay(250);
 
-		let closeChromeCoords = { o: 1, s: 1, tx: 0, ty: 0 }
+		let closeChromeCoords = { o: 1, s: 1, tx: 0, ty: 0 };
 		let closeChromeDuration = 250;
 		let closeChrome = new TWEEN.Tween(closeChromeCoords, groupA)
 			.to({ o: 0, s: 0.5, tx: 0, ty: 48 }, closeChromeDuration)
@@ -329,7 +329,7 @@ let collect = function(){
 				zIcon.setAttribute('opacity', 1);
 				zoteroBack.setAttribute('opacity', 1);
 				zoteroFront.setAttribute('opacity', 0);
-			})
+			});
 
 		let moveToStartCoords = { tx: 17, ty: 83 };
 		let moveToStartDuration = 500;
@@ -340,7 +340,7 @@ let collect = function(){
 				cursor.setAttribute('transform',
 					`translate(${moveToStartCoords.tx}, ${moveToStartCoords.ty})`);
 			})
-			.delay(250)
+			.delay(250);
 
 		let openChromeCoords = { o: 0, s: 0.5};
 		let openChromeDuration = 250;
@@ -364,8 +364,8 @@ let collect = function(){
 
 				setTimeout(function() {
 					loop();
-				}, 500)
-			})
+				}, 500);
+			});
 
 		moveToAddressBar.chain(clickAddressBar);
 		clickAddressBar.chain(hideCursor);
@@ -384,7 +384,7 @@ let collect = function(){
 		moveToStart.chain(openChrome);
 
 		moveToAddressBar.start();
-	}
+	};
 
 	loop();
 };

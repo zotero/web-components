@@ -144,9 +144,9 @@ class PermissionsSummary extends Component {
 				let groupAccess = access.groups[id];
 				let groupName = userGroupsByKey[id].name;
 				if(groupAccess == 'write'){
-					summary.push(<li key={`group_${id}_write`}>Access to read and modify library for group '{groupName}'</li>);
+					summary.push(<li key={`group_${id}_write`}>Access to read and modify library for group &quot;{groupName}&quot;</li>);
 				} else if(groupAccess == 'read'){
-					summary.push(<li key={`group_${id}_read`}>Access to read library for group '{groupName}'</li>);
+					summary.push(<li key={`group_${id}_read`}>Access to read library for group &quot;{groupName}&quot;</li>);
 				}
 			}
 		}
@@ -445,7 +445,7 @@ class IdentityRequest extends Component {
 					<Notifier {...notification} />
 					<Alert color='secondary' className='my-3'>
 						<h2>An application would like to connect to your account</h2>
-						<p>The application '{oauthClientName}' would like to access your account.</p>
+						<p>The application &quot;{oauthClientName}&quot; would like to access your account.</p>
 					</Alert>
 
 					<Alert color='secondary'>
@@ -654,7 +654,7 @@ class ApiKeyEditor extends Component {
 			requesterNode = (
 			<Alert color='secondary' className='my-3'>
 				<h2>An application would like to connect to your account</h2>
-				<p>The application '{oauthClientName}' would like to access your account.</p>
+				<p>The application &quot;{oauthClientName}&quot; would like to access your account.</p>
 			</Alert>);
 		}
 

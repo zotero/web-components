@@ -329,8 +329,8 @@ class Downloads extends Component{
 						: ''}
 					
 					<div className='row loose jumbotron'>
-						<DownloadStandalone featuredOS={featuredOS} arch={arch} ref='downloadStandalone' oldMac={oldMac} standaloneVersions={this.props.standaloneVersions} />
-						<DownloadConnector featuredBrowser={featuredBrowser} ref='downloadConnector' />
+						<DownloadStandalone featuredOS={featuredOS} arch={arch} oldMac={oldMac} standaloneVersions={this.props.standaloneVersions} />
+						<DownloadConnector featuredBrowser={featuredBrowser} />
 					</div>
 					<DownloadPlugins />
 				</div>

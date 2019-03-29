@@ -6,6 +6,7 @@
 const React = require('react');
 const {Component} = React;
 
+import PropTypes from 'prop-types';
 import {buildUrl} from './wwwroutes.js';
 import {BrowserDetect} from './browserdetect.js';
 import {Collapse} from 'reactstrap';
@@ -63,6 +64,10 @@ InstallFirefoxButton.defaultProps = {
 	type:'button',
 	label:'Install'
 };
+InstallFirefoxButton.propTypes = {
+	type:PropTypes.oneOf(['button', 'image', 'full']),
+	label:PropTypes.string
+};
 
 class InstallChromeButton extends Component{
 	render(){
@@ -86,6 +91,10 @@ class InstallChromeButton extends Component{
 InstallChromeButton.defaultProps = {
 	type:'button',
 	label:'Install'
+};
+InstallChromeButton.propTypes = {
+	type:PropTypes.oneOf(['button', 'image', 'full']),
+	label:PropTypes.string
 };
 
 class InstallSafariButton extends Component{
@@ -115,6 +124,10 @@ InstallSafariButton.defaultProps = {
 	type:'button',
 	label:'Install'
 };
+InstallSafariButton.propTypes = {
+	type:PropTypes.oneOf(['button', 'image', 'full']),
+	label:PropTypes.string
+};
 
 class InstallButton extends Component{
 	render(){
@@ -135,6 +148,10 @@ class InstallButton extends Component{
 }
 InstallButton.defaultProps = {
 	label:'Install'
+};
+InstallButton.propTypes = {
+	label:PropTypes.string,
+	browser:PropTypes.string
 };
 
 class AllExtensionsSection extends Component{
@@ -165,6 +182,11 @@ class AllExtensionsSection extends Component{
 }
 AllExtensionsSection.defaultProps = {
 	type:'full'
+};
+AllExtensionsSection.propTypes = {
+	type:PropTypes.oneOf(['button', 'image', 'full']),
+	label:PropTypes.string,
+	except:PropTypes.string
 };
 
 class InstallConnectorPrompt extends Component{
@@ -295,6 +317,10 @@ class InstallConnectorPrompt extends Component{
 InstallConnectorPrompt.defaultProps = {
 	numbered:false,
 	showStandalone:false
+};
+InstallConnectorPrompt.propTypes = {
+	numbered: PropTypes.bool,
+	showStandalone: PropTypes.bool
 };
 
 export {InstallConnectorPrompt, AllExtensionsSection, InstallButton};

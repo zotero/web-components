@@ -185,8 +185,8 @@ class InviteToGroups extends Component{
 				);
 			} else if(alreadyInvited.length == 0) {
 				inviteSection = (
-					<DropdownItem>You don't currently have any groups to invite {invitee.displayName} to.
-					If you haven't previously invited them to your group, make sure you are an admin for
+					<DropdownItem>You don&apos;t currently have any groups to invite {invitee.displayName} to.
+					If you haven&apos;t previously invited them to your group, make sure you are an admin for
 					the group, or <a href={buildUrl('groupCreate')}>create a new group</a> to collaborate with other users.</DropdownItem>
 				);
 			}

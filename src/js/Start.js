@@ -311,10 +311,10 @@ class Start extends Component{
 			<div className='start react'>
 				<p className="install-success">Success! You installed Zotero!</p>
 				<section className="section section-md section-extensions">
-					<InstallConnectorPrompt ref='installConnectorPrompt' numbered={true} />
+					<InstallConnectorPrompt numbered={true} />
 				</section>
-				<RegisterForm ref='registerForm' />
-				<PostRegisterGuide ref='postRegisterGuide' />
+				<RegisterForm />
+				<PostRegisterGuide />
 			</div>
 		);
 	}

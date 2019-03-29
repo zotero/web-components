@@ -1,4 +1,5 @@
 'use strict';
+/* global tinymce */
 
 import {log as logger} from '../Log.js';
 let log = logger.Logger('EditableTextInput');

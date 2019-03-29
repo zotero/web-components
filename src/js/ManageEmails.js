@@ -63,13 +63,13 @@ function SecondaryEmailPrompt(props){
 		if(validated[0].email.includes('.edu') || validated[0].email.includes('.ac.uk')){
 			return (
 				<div className='secondary-email-prompt'>
-					<p className='text-muted'>It looks like your only verified email is an institutional address. You may want to add another verified address so you won't lose access to your Zotero account if your email address is disabled. Password reset emails can only be sent to verified addresses.</p>
+					<p className='text-muted'>It looks like your only verified email is an institutional address. You may want to add another verified address so you won&apos;t lose access to your Zotero account if your email address is disabled. Password reset emails can only be sent to verified addresses.</p>
 				</div>
 			);
 		} else {
 			return (
 				<div className='secondary-email-prompt'>
-					<p className='text-muted'>You only have one verified email address associated with your account. If there's a risk you'll lose access to this account in the future, you may want to add a backup so you can always regain access to your Zotero account. Password reset emails can only be sent to verified addresses.</p>
+					<p className='text-muted'>You only have one verified email address associated with your account. If there&apos;s a risk you&apos;ll lose access to this account in the future, you may want to add a backup so you can always regain access to your Zotero account. Password reset emails can only be sent to verified addresses.</p>
 				</div>
 			);
 		}

@@ -146,7 +146,7 @@ class GroupLibrarySettings extends Component{
 						Any group member
 					</label>
 				</RadioGroup>
-				<p className="hint">Who can see items in this group's library?</p>
+				<p className="hint">Who can see items in this group&apos;s library?</p>
 			</div>
 		);
 
@@ -164,7 +164,7 @@ class GroupLibrarySettings extends Component{
 						Only group admins
 					</label>
 				</RadioGroup>
-				<p className="hint">Who can add, edit, and remove items from this group's library?</p>
+				<p className="hint">Who can add, edit, and remove items from this group&apos;s library?</p>
 			</div>
 		);
 

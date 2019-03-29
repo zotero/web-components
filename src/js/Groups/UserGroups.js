@@ -39,7 +39,7 @@ function IntroVideo(){
 	let style = {'margin':'auto'};
 	return (
 		<video id='group-intro-screencast' src="/static/videos/group_intro.m4v" controls={true} height='450px' poster='/static/images/group/playvideo.jpg' style={style}>
-			Sorry, your browser doesn't support embedded videos.
+			Sorry, your browser doesn&apos;t support embedded videos.
 		</video>
 	);
 }

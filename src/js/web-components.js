@@ -39,7 +39,7 @@ globalScope.TWEEN = TWEEN;
 const BezierEasing = require('bezier-easing');
 globalScope.BezierEasing = BezierEasing;
 
-import {Storage} from './storage/Storage.js';
+import {Storage, StorageSummary} from './storage/Storage.js';
 import {MakeEditable} from './MakeEditable.js';
 import {GroupInvitations} from './Groups/GroupInvitations.js';
 import {NewGroupDiscussions} from './Groups/NewGroupDiscussions.js';
@@ -78,6 +78,7 @@ import {MemberSettingsContainer} from './Groups/MemberSettingsContainer.jsx';
 
 let ZoteroWebComponents = {
 	Storage,
+	StorageSummary,
 	MakeEditable,
 	GroupInvitations,
 	NewGroupDiscussions,

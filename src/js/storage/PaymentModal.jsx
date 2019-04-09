@@ -2,25 +2,16 @@
 
 import {log as logger} from '../Log.js';
 var log = logger.Logger('PaymentModal');
+log.setLevel(1);
 
 // CheckoutForm.js
-import {useState} from 'react';
+import {useState, useContext} from 'react';
 import {Elements, injectStripe, CardElement, IbanElement, PaymentRequestButtonElement} from 'react-stripe-elements';
 import {Button, Card, CardHeader, CardBody, TabContent, TabPane, Nav, NavItem, NavLink, Row, Col, Input, Form, FormGroup } from 'reactstrap';
 import PropTypes from 'prop-types';
+import { StorageDispatch } from './Storage.js';
+import {cancelNewSubscription} from './actions.js';
 
-/*
-class AddressSection extends Component {
-	render() {
-		return (
-			<Fragment>
-				<label>Address</label>
-				<AddressElement style={{base: {fontSize: '18px'}}} />
-			</Fragment>
-		);
-	}
-}
-*/
 function CardSection() {
 	return (
 		<CardElement />
@@ -39,8 +30,6 @@ function CardCheckoutForm(props){
 		// tokenize, since there's only one in this group.
 		let result = await props.stripe.createToken({name});
 		if(result.token){
-			log.debug('Received Stripe token in CardCheckoutForm:'+ result);
-			log.debug(result.token);
 			props.handleToken(result.token);
 		} else if(result.error){
 			log.error(result.error);
@@ -66,8 +55,11 @@ function CardCheckoutForm(props){
 		</Form>
 	);
 }
-CardCheckoutForm.props = {
-	handleToken: PropTypes.func.isRequired
+CardCheckoutForm.propTypes = {
+	handleToken: PropTypes.func.isRequired,
+	stripe: PropTypes.object.isRequired,
+	buttonLabel: PropTypes.string,
+	onClose: PropTypes.func.isRequired
 };
 
 
@@ -82,8 +74,7 @@ function IBANCheckoutForm(props) {
 		// We don't want to let default form submission happen here, which would refresh the page.
 		ev.preventDefault();
 
-		/*
-		var sourceData = {
+		let sourceData = {
 			type: 'sepa_debit',
 			currency: 'eur',
 			owner: {
@@ -96,11 +87,8 @@ function IBANCheckoutForm(props) {
 				notification_method: 'email',
 			},
 		};
-		*/
-		let result = await props.stripe.createToken({name});
+		let result = await props.stripe.createToken(sourceData);
 		if(result.token){
-			//log.debug('Received Stripe token in IBANCheckoutForm:'+ result);
-			//log.debug(result.token);
 			props.handleToken(result.token);
 		} else if(result.error){
 			log.error(result.error);
@@ -138,6 +126,12 @@ function IBANCheckoutForm(props) {
 		</Form>
 	);
 }
+IBANCheckoutForm.propTypes = {
+	handleToken: PropTypes.func.isRequired,
+	stripe: PropTypes.object.isRequired,
+	label: PropTypes.string,
+	onClose: PropTypes.func.isRequired
+};
 
 function _PaymentRequestForm(props){
 	const {stripe, paymentAmount, handleToken} = props;
@@ -151,6 +145,8 @@ function _PaymentRequestForm(props){
 			total: {
 				label: 'Zotero Storage',
 				amount: paymentAmount,
+				requestPayerName: true,
+				requestPayerEmail: true,
 			},
 		});
 
@@ -162,8 +158,12 @@ function _PaymentRequestForm(props){
 		});
 
 		setPaymentRequest(paymentRequest);
-		paymentRequest.canMakePayment().then(({result})=>{
+		log.debug(paymentRequest);
+		paymentRequest.canMakePayment().then((result)=>{
+			log.debug('paymentRequest canMakePayment:');
+			log.debug(result);
 			setCanMakePayment(!!result);
+			log.debug(paymentRequest);
 		});
 	}
 
@@ -172,38 +172,42 @@ function _PaymentRequestForm(props){
 	return (
 		<PaymentRequestButtonElement
 			className="PaymentRequestButton"
-			/*
-			onBlur={handleBlur}
-			onClick={handleClick}
-			onFocus={handleFocus}
-			onReady={handleReady}
-			*/
-			paymentRequest={this.state.paymentRequest}
+			paymentRequest={paymentRequest}
 			style={{
 				paymentRequestButton: {
-					theme: 'dark',
+					theme: 'light',
 					height: '64px',
-					type: 'donate',
+					type: 'buy',
 				},
 			}}
 		/>
 	);
 }
+_PaymentRequestForm.propTypes = {
+	paymentAmount: PropTypes.number.isRequired,
+	handleToken: PropTypes.func.isRequired,
+	stripe: PropTypes.object.isRequired,
+	label: PropTypes.string,
+	onClose: PropTypes.func.isRequired
+};
 
 const InjectedPaymentRequestForm = injectStripe(_PaymentRequestForm);
 const InjectedCardCheckoutForm = injectStripe(CardCheckoutForm);
 const InjectedIBANCheckoutForm = injectStripe(IBANCheckoutForm);
 
-function PaymentModal(props){
+function MultiPaymentModal(props){
 	const [selectedMethod, setMethod] = useState('card');
 	const {handleToken, chargeAmount, buttonLabel} = props;
-	log.debug(props);
+	const {dispatch} = useContext(StorageDispatch);
+	const handleClose = () => {
+		dispatch(cancelNewSubscription());
+	};
 
 	let paymentRequest = null;
 	if(chargeAmount) {
 		paymentRequest = (
 			<Elements>
-				<InjectedPaymentRequestForm handleToken={handleToken} paymentAmount={chargeAmount} onClose={props.onClose} />
+				<InjectedPaymentRequestForm handleToken={handleToken} paymentAmount={chargeAmount} onClose={handleClose} />
 			</Elements>
 		);
 	}
@@ -231,7 +235,7 @@ function PaymentModal(props){
 							<Row>
 								<Col sm="12">
 									<Elements>
-										<InjectedCardCheckoutForm handleToken={handleToken} buttonLabel={buttonLabel} onClose={props.onClose} />
+										<InjectedCardCheckoutForm handleToken={handleToken} buttonLabel={buttonLabel} onClose={handleClose} />
 									</Elements>
 								</Col>
 							</Row>
@@ -240,7 +244,7 @@ function PaymentModal(props){
 							<Row>
 								<Col sm="12">
 									<Elements>
-										<InjectedIBANCheckoutForm handleToken={handleToken} buttonLabel={buttonLabel} onClose={props.onClose} />
+										<InjectedIBANCheckoutForm handleToken={handleToken} buttonLabel={buttonLabel} onClose={handleClose} />
 									</Elements>
 								</Col>
 							</Row>
@@ -251,13 +255,56 @@ function PaymentModal(props){
 		</div>
 	);
 }
-PaymentModal.propTypes = {
+MultiPaymentModal.propTypes = {
+	handleToken: PropTypes.func.isRequired,
+	chargeAmount: PropTypes.number.isRequired,
+	buttonLabel: PropTypes.string,
 	tokenCallback:PropTypes.func,
 	amount:PropTypes.number,
 	immediateCharge:PropTypes.bool
 };
-PaymentModal.defaultProps = {
+MultiPaymentModal.defaultProps = {
 	buttonLabel:'Confirm'
 };
 
-export default PaymentModal;
+function CardPaymentModal(props){
+	const {handleToken, chargeAmount, buttonLabel} = props;
+	const {dispatch} = useContext(StorageDispatch);
+	const handleClose = () => {
+		dispatch(cancelNewSubscription());
+	};
+
+	let paymentRequest = null;
+	if(chargeAmount) {
+		paymentRequest = (
+			<Elements>
+				<InjectedPaymentRequestForm handleToken={handleToken} paymentAmount={chargeAmount} onClose={handleClose} />
+			</Elements>
+		);
+	}
+	return (
+		<div className='payment-chooser'>
+			<Card>
+				<CardBody>
+					{paymentRequest}
+					<Elements>
+						<InjectedCardCheckoutForm handleToken={handleToken} buttonLabel={buttonLabel} onClose={handleClose} />
+					</Elements>
+				</CardBody>
+			</Card>
+		</div>
+	);
+}
+CardPaymentModal.propTypes = {
+	handleToken: PropTypes.func.isRequired,
+	chargeAmount: PropTypes.number.isRequired,
+	buttonLabel: PropTypes.string,
+	tokenCallback:PropTypes.func,
+	amount:PropTypes.number,
+	immediateCharge:PropTypes.bool
+};
+CardPaymentModal.defaultProps = {
+	buttonLabel:'Confirm'
+};
+
+export {MultiPaymentModal, CardPaymentModal};

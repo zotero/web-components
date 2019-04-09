@@ -4,6 +4,7 @@ import {log as logger} from '../Log.js';
 var log = logger.Logger('PaymentSource');
 
 import {Row, Col} from 'reactstrap';
+import PropTypes from 'prop-types';
 
 function Card(props){
 	const {card} = props;
@@ -23,6 +24,9 @@ function Card(props){
 		</div>
 	);
 }
+Card.propTypes = {
+	card: PropTypes.object.isRequired
+};
 
 function Iban(props) {
 	const {iban} = props;
@@ -43,6 +47,9 @@ function Iban(props) {
 		</div>
 	);
 }
+Iban.propTypes = {
+	iban: PropTypes.object.isRequired
+};
 
 function PaymentSource(props){
 	const {source} = props;
@@ -61,5 +68,8 @@ function PaymentSource(props){
 			return null;
 	}
 }
+PaymentSource.propTypes = {
+	source: PropTypes.object.isRequired
+};
 
 export {PaymentSource};

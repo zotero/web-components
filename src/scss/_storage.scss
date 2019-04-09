@@ -62,6 +62,12 @@ div.payment-modal {
     -webkit-transition: box-shadow 150ms ease;
     transition: box-shadow 150ms ease;
   }
+  
+  .PaymentRequestButton.StripeElement {
+    height: inherit;
+    padding: 0;
+    margin:5px;
+  }
 
   .StripeElement--focus,input.form-control:focus {
     box-shadow: 0 1px 3px 0 #cfd7df;

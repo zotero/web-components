@@ -1,16 +1,14 @@
 'use strict';
 
 import {log as logger} from '../Log.js';
-var log = logger.Logger('PaymentModal');
-log.setLevel(1);
+var log = logger.Logger('PaymentModal', 1);
 
 // CheckoutForm.js
 import {useState, useContext} from 'react';
 import {Elements, injectStripe, CardElement, IbanElement, PaymentRequestButtonElement} from 'react-stripe-elements';
 import {Button, Card, CardHeader, CardBody, TabContent, TabPane, Nav, NavItem, NavLink, Row, Col, Input, Form, FormGroup } from 'reactstrap';
 import PropTypes from 'prop-types';
-import { StorageDispatch } from './Storage.js';
-import {cancelNewSubscription} from './actions.js';
+import { PaymentContext, cancelPurchase } from './actions.js';
 
 function CardSection() {
 	return (
@@ -198,9 +196,9 @@ const InjectedIBANCheckoutForm = injectStripe(IBANCheckoutForm);
 function MultiPaymentModal(props){
 	const [selectedMethod, setMethod] = useState('card');
 	const {handleToken, chargeAmount, buttonLabel} = props;
-	const {dispatch} = useContext(StorageDispatch);
+	const {paymentDispatch} = useContext(PaymentContext);
 	const handleClose = () => {
-		dispatch(cancelNewSubscription());
+		paymentDispatch(cancelPurchase());
 	};
 
 	let paymentRequest = null;
@@ -269,9 +267,9 @@ MultiPaymentModal.defaultProps = {
 
 function CardPaymentModal(props){
 	const {handleToken, chargeAmount, buttonLabel} = props;
-	const {dispatch} = useContext(StorageDispatch);
+	const {paymentDispatch} = useContext(PaymentContext);
 	const handleClose = () => {
-		dispatch(cancelNewSubscription());
+		paymentDispatch(cancelPurchase());
 	};
 
 	let paymentRequest = null;

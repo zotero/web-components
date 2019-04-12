@@ -34,6 +34,8 @@ const calculateNewExpiration = function(oldExpiration, oldStorageLevel, newStora
 	
 	if(typeof oldExpiration == 'string'){
 		oldExpiration = new Date(parseInt(oldExpiration)*1000);
+	} else if(oldExpiration < new Date(2000, 0)) {
+		oldExpiration = new Date(oldExpiration * 1000);
 	}
 
 	if(oldExpiration < Date.now()){
@@ -55,4 +57,12 @@ const calculateNewExpiration = function(oldExpiration, oldStorageLevel, newStora
 	return newExpiration;
 };
 
-export {calculateRemainingValue, calculateNewExpiration, imminentExpiration, priceCents};
+const labPrice = function(fte=0){
+	return (Math.max(15, fte) * 3000);
+};
+
+const labUserPrice = function(fte=0){
+	return (fte * 3000);
+};
+
+export {calculateRemainingValue, calculateNewExpiration, imminentExpiration, priceCents, labPrice, labUserPrice};

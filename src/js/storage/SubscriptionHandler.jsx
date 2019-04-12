@@ -16,16 +16,15 @@ Flows:
 */
 
 import {log as logger} from '../Log.js';
-var log = logger.Logger('SubscriptionHandler');
-log.setLevel(1);
+var log = logger.Logger('SubscriptionHandler', 1);
 
 import {useState, useContext} from 'react';
 import PropTypes from 'prop-types';
 import {StripeProvider} from 'react-stripe-elements';
 import { Alert, Card, CardHeader, CardBody, FormGroup, Input, Modal, ModalBody, ModalHeader, Label, Row, Col, Button, Container } from 'reactstrap';
 
-import {StorageDispatch} from './Storage.js';
-import {refresh, cancelNewSubscription} from './actions.js';
+import {StorageContext, PaymentContext, NotifierContext} from './actions.js';
+import {refresh, cancelPurchase, notify} from './actions.js';
 import {imminentExpiration, calculateNewExpiration, priceCents} from './calculations.js';
 import {CardPaymentModal} from './PaymentModal.jsx';
 import {PaymentSource} from './PaymentSource.jsx';
@@ -33,6 +32,7 @@ import {PaymentSource} from './PaymentSource.jsx';
 import {postFormData} from '../ajax.js';
 import {LoadingSpinner} from '../LoadingSpinner.js';
 
+const stripePublishableKey = window.zoteroData && window.zoteroData.stripePublishableKey ? window.zoteroData.stripePublishableKey : '';
 const dateFormatOptions = {year: 'numeric', month: 'long', day: 'numeric'};
 
 const storageLevelDescriptions = {
@@ -134,21 +134,30 @@ async function chargeSubscription(storageLevel=false, token=false){
 //component that handles a request for payment, presenting the PaymentModal and processing
 //the payment or saving the customer for future use as necessary
 
-//subscriptionChange describes the subscription the user is purchasing or switching to
+//purchase describes the subscription the user is purchasing or switching to
 //it must contain a type field
-//type is one of: individualChange, individualUpdate, individualRenew, lab, institution
+//type is one of: individualChange, individualUpdate, individualRenew
 
 function SubscriptionHandler(props){
-	const {subscriptionChange, renew} = props;
-	const {type, storageLevel} = subscriptionChange;
-	const {dispatch, userSubscription, stripeCustomer, storageNotify} = useContext(StorageDispatch);
+	const {purchase, renew} = props;
+	const {type, storageLevel} = purchase;
+	const {storageDispatch, storageState} = useContext(StorageContext);
+	const {notifyDispatch} = useContext(NotifierContext);
+	const {paymentDispatch, paymentState} = useContext(PaymentContext);
 	
+	const {userSubscription} = storageState;
+	const {stripeCustomer} = paymentState;
+	log.debug(stripeCustomer);
+	//clear the new subscription closing the Handler, because it is either complete, or canceled
 	const cancel = () => {
 		setOperationPending(false);
-		dispatch(cancelNewSubscription());
+		paymentDispatch(cancelPurchase());
+	};
+	const dnotify = (type, message) => {
+		notifyDispatch(notify(type, message));
 	};
 	let description = [];
-	let chargeAmount = false;
+	let chargeAmount = 0;
 	let error = null;
 	//let paymentInfoRequired = false;
 	let immediateChargeRequired = imminentExpiration(userSubscription.expirationDate);
@@ -185,14 +194,8 @@ function SubscriptionHandler(props){
 			chargeAmount = priceCents[storageLevel];
 			immediateChargeRequired = true;
 			break;
-		case 'lab':
-			//TODO
-			break;
-		case 'institution':
-			//TODO
-			break;
 		default:
-			throw 'Unknown subscriptionChange type';
+			throw 'Unknown purchase type';
 	}
 	if(type == 'individualChange' || type == 'individualRenew'){
 		if(overQuota(storageLevel, userSubscription)){
@@ -200,7 +203,7 @@ function SubscriptionHandler(props){
 		}
 	}
 	
-	if(immediateChargeRequired && !stripeCustomer && !editPayment){
+	if(immediateChargeRequired && (!stripeCustomer || stripeCustomer.deleted == true) && !editPayment){
 		setEditPayment(true);
 	}
 	
@@ -221,13 +224,13 @@ function SubscriptionHandler(props){
 						throw 'Required token not passed';
 					}
 					result = await chargeSubscription(storageLevel, token);
-					refresh(dispatch);
+					refresh(storageDispatch, paymentDispatch);
 				} else {
 					//update without charge
 					result = await updateSubscription(storageLevel);
-					refresh(dispatch);
+					refresh(storageDispatch, paymentDispatch);
 				}
-				storageNotify(result.type, result.message);
+				dnotify(result.type, result.message);
 				cancel();
 				break;
 			case 'individualPaymentUpdate':
@@ -235,8 +238,8 @@ function SubscriptionHandler(props){
 					throw 'Required token not passed';
 				}
 				result = await updatePayment(token);
-				refresh(dispatch);
-				storageNotify(result.type, result.message);
+				refresh(storageDispatch, paymentDispatch);
+				dnotify(result.type, result.message);
 				cancel();
 				break;
 			case 'individualRenew':
@@ -244,18 +247,12 @@ function SubscriptionHandler(props){
 				log.debug('individualRenew, chargeSubscription');
 				log.debug(token);
 				result = await chargeSubscription(storageLevel, token);
-				refresh(dispatch);
-				storageNotify(result.type, result.message);
+				refresh(storageDispatch, paymentDispatch);
+				dnotify(result.type, result.message);
 				cancel();
 				break;
-			case 'lab':
-				
-				break;
-			case 'institution':
-				
-				break;
 			default:
-				throw 'Unknown subscriptionChange type';
+				throw 'Unknown purchase type';
 		}
 	};
 	
@@ -264,7 +261,7 @@ function SubscriptionHandler(props){
 	let paymentSection = null;
 	if(editPayment){
 		paymentSection = (
-			<StripeProvider apiKey={'pk_test_u8WpYkXuG2X155p0rC4YqkvO'}>
+			<StripeProvider apiKey={stripePublishableKey}>
 				<CardPaymentModal handleToken={handleConfirm} chargeAmount={chargeAmount} buttonLabel={blabel} />
 			</StripeProvider>
 		);
@@ -341,7 +338,7 @@ function SubscriptionHandler(props){
 }
 
 SubscriptionHandler.propTypes = {
-	subscriptionChange: PropTypes.shape({
+	purchase: PropTypes.shape({
 		type: PropTypes.string.isRequired,
 		storageLevel: PropTypes.number
 	}).isRequired,
@@ -350,4 +347,4 @@ SubscriptionHandler.propTypes = {
 	labUsers: PropTypes.number
 };
 
-export default SubscriptionHandler;
+export {SubscriptionHandler};

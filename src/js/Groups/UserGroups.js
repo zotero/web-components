@@ -7,11 +7,21 @@ import {LoadingSpinner} from '../LoadingSpinner.js';
 import {buildUrl} from '../wwwroutes.js';
 import {getCurrentUser} from '../Utils.js';
 import {accessMap, typeMap} from '../maps/groupMaps.js';
+import classNames from 'classnames';
 
 const currentUser = getCurrentUser();
 
 let React = require('react');
 import PropTypes from 'prop-types';
+
+const groupShape = PropTypes.shape({
+	id: PropTypes.number.isRequired,
+	data: PropTypes.shape({
+		id: PropTypes.number.isRequired,
+		name: PropTypes.string.isRequired,
+		type: PropTypes.string.isRequired
+	})
+});
 
 /*
 let groupIsWritable = function(group, userID) {
@@ -58,7 +68,7 @@ function GroupNugget(props){
 	
 	if(titleOnly){
 		return (
-			<div key={group.id}>
+			<div key={group.id} className={classNames(props.className)}>
 				<div className="nugget-name">
 					<a href={buildUrl('groupView', {group})}>{group.data.name} ({memberCount})</a>
 				</div>
@@ -113,7 +123,7 @@ function GroupNugget(props){
 	}
 
 	return (
-		<div className="card nugget-full">
+		<div className={classNames('card', 'nugget-full', props.className)}>
 			<div className="card-header">
 				{groupImage}
 				<div className="nugget-name">
@@ -147,14 +157,10 @@ function GroupNugget(props){
 }
 GroupNugget.defaultProps = {titleOnly:false};
 GroupNugget.propTypes = {
-	group: PropTypes.shape({
-		id: PropTypes.number.isRequired,
-		data: PropTypes.shape({
-			id: PropTypes.number.isRequired,
-			name: PropTypes.string.isRequired,
-			type: PropTypes.string.isRequired
-		}).isRequired
-	}).isRequired
+	userID: PropTypes.number,
+	titleOnly: PropTypes.bool,
+	className: PropTypes.string,
+	group: groupShape.isRequired
 };
 
 
@@ -220,13 +226,23 @@ function UserGroups(props){
 		</div>
 	);
 }
-UserGroups.defaultProps =  {
+UserGroups.defaultProps = {
 	titleOnly:false,
 	userID:false,
 	ownedOnly: false,
 	groups: [],
 	loading:false,
 	groupsLoaded:false
+};
+UserGroups.propTypes = {
+	titleOnly:PropTypes.bool,
+	userID:PropTypes.number,
+	ownedOnly: PropTypes.bool,
+	groups: PropTypes.arrayOf(groupShape),
+	loading:PropTypes.bool,
+	groupsLoaded:PropTypes.bool,
+	totalResults: PropTypes.number,
+	loadMore: PropTypes.func
 };
 
 export {UserGroups, GroupNugget};

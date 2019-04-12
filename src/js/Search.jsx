@@ -97,7 +97,7 @@ class Search extends Component{
 			});
 		} else if(type == 'group') {
 			resultNodes = results.map((group)=>{
-				return <GroupNugget key={group.apiObj.id} group={group.apiObj} />;
+				return <GroupNugget key={group.apiObj.id} group={group.apiObj} className='m-2' />;
 			});
 		}
 

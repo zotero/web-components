@@ -19,6 +19,8 @@ import {LoadingSpinner} from '../LoadingSpinner.js';
 import {PaymentContext, NotifierContext, notify} from './actions.js';
 import {cancelPurchase} from './actions.js';
 
+import { formatCurrency } from '../Utils.js';
+
 const stripePublishableKey = window.zoteroData && window.zoteroData.stripePublishableKey ? window.zoteroData.stripePublishableKey : '';
 //const dateFormatOptions = {year: 'numeric', month: 'long', day: 'numeric'};
 
@@ -45,11 +47,81 @@ async function chargeLabSubscription(token=false, fte=false, name='', institutio
 		}
 		let respData = await resp.json();
 		log.debug(respData);
-		let manageUrl = buildUrl('manageInstitution', {institutionID:respData.institutionID});
-		return {
-			type: 'success',
-			message: (<p>Success. You can now <a href={manageUrl}>manage your Zotero Lab subscription</a></p>)
+		if(respData.success){
+			if(institutionID){
+				//existing institution, no need to direct to management interface
+				return {
+					type:'success',
+					message: <p>Success. Your Zotero Lab subscription has been updated</p>
+				};
+			} else {
+				let manageUrl = buildUrl('manageInstitution', {institutionID:respData.institutionID});
+				return {
+					type: 'success',
+					message: (<p>Success. You can now <a href={manageUrl}>manage your Zotero Lab subscription</a></p>)
+				};
+			}
+		} else {
+			return {
+				type: 'error',
+				message: <p>There was an error updating your Zotero Lab subscription</p>
+			};
+		}
+	} catch(resp) {
+		log.debug(resp);
+		let respData = await resp.json();
+		if(respData.stripeMessage){
+			return {type:'error', 'message':`There was an error processing your payment: ${respData.stripeMessage}`};
+		} else {
+			return {
+				type: 'error',
+				message: 'There was an error updating your subscription. Please try again in a few minutes. If you continue to experience problems, email storage@zotero.org for assistance.'
+			};
+		}
+	}
+}
+
+async function chargeLabAdditionalUsers(token=false, additionalFTE=false, name='', institutionID=false){
+	log.debug(`charging stripe lab additional users. additionalFTE:${additionalFTE} - token.id:${token.id}`);
+	let resp;
+	try{
+		if(!institutionID){
+			throw 'InstitutionID is required in chargeLabAdditionalUsers';
+		}
+		
+		let args = {
+			subscriptionType:'addLabUsers',
+			stripeToken:token.id,
+			userCount:additionalFTE,
+			name,
+			institutionID:institutionID
 		};
+		resp = await postFormData('/storage/stripechargelabajax', args);
+
+		if(!resp.ok){
+			throw resp;
+		}
+		let respData = await resp.json();
+		if(respData.success){
+			if(institutionID){
+				//existing institution, no need to direct to management interface
+				return {
+					type:'success',
+					message: <p>Success. Your Zotero Lab subscription has been updated</p>
+				};
+			} else {
+				let manageUrl = buildUrl('manageInstitution', {institutionID:respData.institutionID});
+				return {
+					type: 'success',
+					message: (<p>Success. You can now <a href={manageUrl}>manage your Zotero Lab subscription</a></p>)
+				};
+			}
+		} else {
+			return {
+				type: 'error',
+				message: <p>There was an error updating your Zotero Lab subscription</p>
+			};
+		}
 	} catch(resp) {
 		log.debug(resp);
 		let respData = await resp.json();
@@ -65,8 +137,8 @@ async function chargeLabSubscription(token=false, fte=false, name='', institutio
 }
 
 function InstitutionHandler(props){
-	const {purchase, renew} = props;
-	const {type, fte, name} = purchase;
+	const {purchase, renew, institutionID} = props;
+	const {type, fte, name, additionalFTE} = purchase;
 	const {paymentDispatch, paymentState} = useContext(PaymentContext);
 	const {notifyDispatch} = useContext(NotifierContext);
 	
@@ -88,17 +160,15 @@ function InstitutionHandler(props){
 	const [operationPending, setOperationPending] = useState(false);
 	
 	switch (type) {
-		/*
 		case 'paymentUpdate':
 			description.push(`Update your saved payment details for your next renewal. There will be no charge made until your expiration date.`);
 			break;
 		case 'labRenew':
-			description.push(`Renew your current ${storageLevelDescriptions[storageLevel]} subscription.`);
+			description.push(`Renew your current subscription. Zotero Lab for ${fte} users.`);
 			description.push(`Your card or bank account will be charged immediately after confirming.`);
-			chargeAmount = priceCents[storageLevel];
+			chargeAmount = labPrice(fte);
 			immediateChargeRequired = true;
 			break;
-		*/
 		case 'lab':
 			description.push(`Purchase 1 year of Zotero Lab for ${fte} users.`);
 			description.push(`Lab Name: ${name}`);
@@ -106,8 +176,9 @@ function InstitutionHandler(props){
 			immediateChargeRequired = true;
 			break;
 		case 'addLabUsers':
-			description.push(`Purchase ${fte} additional Lab users for '${name}'`);
-			chargeAmount = labUserPrice(fte);
+			description.push(`Add ${additionalFTE} users to your current subscription.`);
+			description.push(`Your card or bank account will be charged immediately after confirming.`);
+			chargeAmount = labUserPrice(additionalFTE);
 			immediateChargeRequired = true;
 			break;
 		case 'institution':
@@ -138,11 +209,19 @@ function InstitutionHandler(props){
 				notify(result.type, result.message);
 				cancel();
 				break;
-			case 'labRenew':
-				break;
 			*/
+			case 'labRenew':
+				result = await chargeLabSubscription(token, fte, name, institutionID);
+				notifyDispatch(notify(result.type, result.message));
+				cancel();
+				break;
 			case 'lab':
 				result = await chargeLabSubscription(token, fte, name, false);
+				notifyDispatch(notify(result.type, result.message));
+				cancel();
+				break;
+			case 'addLabUsers':
+				result = await chargeLabAdditionalUsers(token, additionalFTE, name, institutionID);
 				notifyDispatch(notify(result.type, result.message));
 				cancel();
 				break;
@@ -154,7 +233,7 @@ function InstitutionHandler(props){
 		}
 	};
 	
-	let blabel = immediateChargeRequired ? 'Purchase' : 'Confirm';
+	let blabel = immediateChargeRequired ? `Pay ${formatCurrency(chargeAmount)}` : 'Confirm';
 	
 	let paymentSection = null;
 	if(editPayment){
@@ -236,6 +315,7 @@ function InstitutionHandler(props){
 }
 
 InstitutionHandler.propTypes = {
+	institutionID: PropTypes.number,
 	purchase: PropTypes.shape({
 		type: PropTypes.string.isRequired,
 		fte: PropTypes.number

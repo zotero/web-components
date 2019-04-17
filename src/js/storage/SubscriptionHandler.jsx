@@ -31,6 +31,7 @@ import {PaymentSource} from './PaymentSource.jsx';
 
 import {postFormData} from '../ajax.js';
 import {LoadingSpinner} from '../LoadingSpinner.js';
+import { formatCurrency } from '../Utils.js';
 
 const stripePublishableKey = window.zoteroData && window.zoteroData.stripePublishableKey ? window.zoteroData.stripePublishableKey : '';
 const dateFormatOptions = {year: 'numeric', month: 'long', day: 'numeric'};
@@ -256,7 +257,7 @@ function SubscriptionHandler(props){
 		}
 	};
 	
-	let blabel = immediateChargeRequired ? 'Purchase' : 'Confirm';
+	let blabel = immediateChargeRequired ? `Pay ${formatCurrency(chargeAmount)}` : 'Confirm';
 	
 	let paymentSection = null;
 	if(editPayment){

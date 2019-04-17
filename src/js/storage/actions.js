@@ -176,6 +176,7 @@ export {
 	UPDATE_PURCHASE,
 	UPDATE_NAME,
 	SET_FTE,
+	SET_EMAILS,
 	refresh,
 	getUserCustomer,
 	getSubscription,

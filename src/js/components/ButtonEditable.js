@@ -3,40 +3,40 @@
 //import {log as logger} from '../Log.js';
 //let log = logger.Logger('ButtonEditable');
 
-const React = require('react');
-const {Component} = React;
+import {useState} from 'react';
+import {Form, Button, Input, InputGroup, InputGroupAddon} from 'reactstrap';
 
-class ButtonEditable extends Component{
-	constructor(props){
-		super(props);
-		this.state = {
-			editing:false,
-			editValue:props.value
-		};
-	}
-	render(){
-		const {save, value} = this.props;
-		const {editing, editValue} = this.state;
-
-		if(!editing){
-			return (
-				<div className='button-editable'>
-					<div className='button-editable-flex'>
-						<span className='button-editable-value'>{value}</span>
-						<button className='button-editable-edit btn' onClick={()=>{this.setState({'editing':true});}}>Edit</button>
-					</div>
-				</div>				
-			);
-		} else {
-			return (
-				<div className='button-editable'>
-					<div className='button-editable-flex'>
-						<input className='button-editable-input form-control' defaultValue={value} onChange={(evt)=>{this.setState({editValue:evt.target.value});}} />
-						<button className='button-editable-save btn' onClick={()=>{save(editValue); this.setState({editing:false});}}>Save</button>
-					</div>
-				</div>
-			);
-		}
+function ButtonEditable(props){
+	const [editing, setEditing] = useState(false);
+	const [editValue, setEditValue] = useState(props.value);
+	
+	const {save, value} = props;
+	const submit = (evt) => {
+		evt.preventDefault();
+		save(editValue); setEditing(false);
+	};
+	if(!editing){
+		return (
+			<InputGroup>
+				<Input className='button-editable-input' disabled value={value} />
+				<InputGroupAddon addonType="append">
+					<Button type='button' size='sm' onClick={()=>{setEditing(true);}}>Edit</Button>
+				</InputGroupAddon>
+			</InputGroup>
+		);
+	} else {
+		return (
+			<div className='button-editable'>
+				<Form onSubmit={submit}>
+					<InputGroup>
+						<Input className='button-editable-input' defaultValue={value} autoFocus onChange={(evt)=>{setEditValue(evt.target.value);}} />
+						<InputGroupAddon addonType="append">
+							<Button type='button' size='sm' onClick={submit}>Save</Button>
+						</InputGroupAddon>
+					</InputGroup>
+				</Form>
+			</div>
+		);
 	}
 }
 

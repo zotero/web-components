@@ -9,6 +9,7 @@ import {Notifier} from './Notifier.js';
 import {useState, createRef} from 'react';
 import {PropTypes} from 'prop-types';
 import {Button} from 'reactstrap';
+import { randomString } from './Utils.js';
 
 function EmptyImage(props){
 	const {width, height} = props;
@@ -30,7 +31,7 @@ EmptyImage.propTypes = {
 
 
 function ProfileImage(props){
-	const {type, hasImage, purpose, entityID, width, height, usePlaceholder} = props;
+	const {type, hasImage, purpose, entityID, width, height, usePlaceholder, cacheBuster} = props;
 	const style = {
 		width,
 		height
@@ -49,6 +50,9 @@ function ProfileImage(props){
 	} else if(type == 'group'){
 		imgSrc = hasImage ? buildUrl('groupImage', {groupID: entityID, 'purpose': purpose}) : '';
 	}
+	if(cacheBuster){
+		imgSrc += `?r=${randomString(10)}`;
+	}
 	return <img src={imgSrc} style={style} />;
 }
 ProfileImage.defaultProps = {
@@ -63,7 +67,8 @@ ProfileImage.propTypes = {
 	entityID: PropTypes.number,
 	width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 	height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-	usePlaceholder: PropTypes.bool
+	usePlaceholder: PropTypes.bool,
+	cacheBuster: PropTypes.bool
 };
 
 function ProfileImageForm(props){
@@ -78,9 +83,9 @@ function ProfileImageForm(props){
 	
 	const updateImage = async (evt) => {
 		let imageFile = evt.target.files[0];
-		if(imageFile.size > 524288) {
+		if(imageFile.size > 1048576) {
 			setChangeSuccessful(false);
-			setFormError('Image too large. Must be less than 512KB');
+			setFormError('Image too large. Must be less than 1 MB');
 			return;
 		}
 
@@ -127,7 +132,7 @@ function ProfileImageForm(props){
 		notifier = <Notifier type='error' message={formError} />;
 	}
 
-	let image = <ProfileImage hasImage={hasImage} type={type} entityID={entityID} />;
+	let image = <ProfileImage hasImage={hasImage} type={type} entityID={entityID} cacheBuster={changeSuccessful} />;
 
 	return (
 		<div className='profile-image-form'>

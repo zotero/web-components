@@ -131,6 +131,27 @@ async function chargeSubscription(storageLevel=false, token=false){
 		
 	}
 }
+async function createInvoice(storageLevel=false){
+	if(storageLevel === false) {
+		throw 'no storageLevel set for createInvoice';
+	}
+	
+	let resp;
+	try {
+		resp = await postFormData('/settings/storage/createinvoice', {type:'individual', storageLevel:storageLevel}, {withSession:true});
+		log.debug(resp);
+		if(resp.ok){
+			const respData = await resp.json();
+			const {invoiceID} = respData;
+			return {type:'success', 'message':<span>Invoice created. <a href={`/storage/invoice/${invoiceID}`}>View Invoice</a></span>};
+		} else {
+			throw resp;
+		}
+	} catch(e) {
+		log.error(e);
+		return {type:'error', 'message':'Error creating invoice. Please try again in a few minutes.'};
+	}
+}
 
 //component that handles a request for payment, presenting the PaymentModal and processing
 //the payment or saving the customer for future use as necessary
@@ -257,6 +278,13 @@ function SubscriptionHandler(props){
 		}
 	};
 	
+	const handleInvoiceRequest = async () => {
+		setOperationPending(true);
+		let result = await createInvoice(storageLevel);
+		dnotify(result.type, result.message);
+		cancel();
+	};
+	
 	let blabel = immediateChargeRequired ? `Pay ${formatCurrency(chargeAmount)}` : 'Confirm';
 	
 	let paymentSection = null;
@@ -317,6 +345,14 @@ function SubscriptionHandler(props){
 			</Card>
 		);
 	}
+	
+	let invoiceSection = (
+		<Container>
+			<Row>
+				<Col className='text-center'><Button className='m-auto' onClick={handleInvoiceRequest}>Request Invoice</Button></Col>
+			</Row>
+		</Container>
+	);
 
 	return (
 		<div className='subscription-handler'>
@@ -331,6 +367,7 @@ function SubscriptionHandler(props){
 						</CardBody>
 					</Card>
 					{paymentSection}
+					{invoiceSection}
 					{renewSection}
 				</ModalBody>
 			</Modal>

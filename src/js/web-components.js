@@ -75,6 +75,9 @@ import {GroupLibrarySettings, TransferOwnership} from './components/GroupSetting
 import {GroupsPageContainer} from './Groups/GroupsPageContainer.jsx';
 import {GroupsContainer} from './Groups/GroupsContainer.jsx';
 import {MemberSettingsContainer} from './Groups/MemberSettingsContainer.jsx';
+import {ManageContribution} from './contribute/Contribute.jsx';
+import {PayInvoice} from './storage/PayInvoice.jsx';
+import {SuggestableInput} from './components/SuggestableInput.jsx';
 
 let ZoteroWebComponents = {
 	Storage,
@@ -113,7 +116,10 @@ let ZoteroWebComponents = {
 	PurchaseWorkshop,
 	GroupsPageContainer,
 	GroupsContainer,
-	MemberSettingsContainer
+	MemberSettingsContainer,
+	ManageContribution,
+	PayInvoice,
+	SuggestableInput
 };
 
 globalScope.ZoteroWebComponents = ZoteroWebComponents;

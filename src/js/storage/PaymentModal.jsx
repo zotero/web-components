@@ -21,6 +21,8 @@ function CardCheckoutForm(props){
 		log.error('props error in CardCheckoutForm: handleToken must be function');
 	}
 	const [name, setName] = useState('');
+	const [email, setEmail] = useState('');
+	
 	const handleSubmit = async (ev) => {
 		ev.preventDefault();
 
@@ -35,9 +37,21 @@ function CardCheckoutForm(props){
 		}
 	};
 	const buttonLabel = props.buttonLabel || 'Confirm Order';
+	
+	let emailSection = null;
+	if(props.useEmail){
+		emailSection = (
+			<FormGroup>
+				<Input type='email' placeholder='Email' value={email}
+					onChange={(evt)=>{setEmail(evt.target.value);}}
+				/>
+			</FormGroup>
+		);
+	}
 
 	return (
 		<Form onSubmit={handleSubmit}>
+			{emailSection}
 			<FormGroup>
 				<Input type='text' placeholder='Name' value={name}
 					onChange={(evt)=>{setName(evt.target.value);}}
@@ -57,7 +71,11 @@ CardCheckoutForm.propTypes = {
 	handleToken: PropTypes.func.isRequired,
 	stripe: PropTypes.object.isRequired,
 	buttonLabel: PropTypes.string,
-	onClose: PropTypes.func.isRequired
+	onClose: PropTypes.func.isRequired,
+	useEmail: PropTypes.bool
+};
+CardCheckoutForm.defaultProps = {
+	useEmail:false
 };
 
 
@@ -195,7 +213,7 @@ const InjectedIBANCheckoutForm = injectStripe(IBANCheckoutForm);
 
 function MultiPaymentModal(props){
 	const [selectedMethod, setMethod] = useState('card');
-	const {handleToken, chargeAmount, buttonLabel} = props;
+	const {handleToken, chargeAmount, buttonLabel, useEmail} = props;
 	const {paymentDispatch} = useContext(PaymentContext);
 	const handleClose = () => {
 		paymentDispatch(cancelPurchase());
@@ -233,7 +251,7 @@ function MultiPaymentModal(props){
 							<Row>
 								<Col sm="12">
 									<Elements>
-										<InjectedCardCheckoutForm handleToken={handleToken} buttonLabel={buttonLabel} onClose={handleClose} />
+										<InjectedCardCheckoutForm handleToken={handleToken} buttonLabel={buttonLabel} onClose={handleClose} useEmail={useEmail} />
 									</Elements>
 								</Col>
 							</Row>
@@ -266,7 +284,7 @@ MultiPaymentModal.defaultProps = {
 };
 
 function CardPaymentModal(props){
-	const {handleToken, chargeAmount, buttonLabel} = props;
+	const {handleToken, chargeAmount, buttonLabel, useEmail} = props;
 	const {paymentDispatch} = useContext(PaymentContext);
 	const handleClose = () => {
 		paymentDispatch(cancelPurchase());
@@ -276,7 +294,7 @@ function CardPaymentModal(props){
 	if(chargeAmount) {
 		paymentRequest = (
 			<Elements>
-				<InjectedPaymentRequestForm handleToken={handleToken} paymentAmount={chargeAmount} onClose={handleClose} />
+				<InjectedPaymentRequestForm handleToken={handleToken} paymentAmount={chargeAmount} onClose={handleClose} useEmail={useEmail} />
 			</Elements>
 		);
 	}
@@ -286,7 +304,7 @@ function CardPaymentModal(props){
 				<CardBody>
 					{paymentRequest}
 					<Elements>
-						<InjectedCardCheckoutForm handleToken={handleToken} buttonLabel={buttonLabel} onClose={handleClose} />
+						<InjectedCardCheckoutForm handleToken={handleToken} buttonLabel={buttonLabel} onClose={handleClose} useEmail={useEmail} />
 					</Elements>
 				</CardBody>
 			</Card>

@@ -139,7 +139,6 @@ async function createInvoice(storageLevel=false){
 	let resp;
 	try {
 		resp = await postFormData('/settings/storage/createinvoice', {type:'individual', storageLevel:storageLevel}, {withSession:true});
-		log.debug(resp);
 		if(resp.ok){
 			const respData = await resp.json();
 			const {invoiceID} = respData;
@@ -278,7 +277,8 @@ function SubscriptionHandler(props){
 		}
 	};
 	
-	const handleInvoiceRequest = async () => {
+	const handleInvoiceRequest = async (evt) => {
+		evt.preventDefault();
 		setOperationPending(true);
 		let result = await createInvoice(storageLevel);
 		dnotify(result.type, result.message);
@@ -347,13 +347,15 @@ function SubscriptionHandler(props){
 	}
 	
 	let invoiceSection = (
-		<Container>
+		<Container className='mt-4'>
 			<Row>
-				<Col className='text-center'><Button className='m-auto' onClick={handleInvoiceRequest}>Request Invoice</Button></Col>
+				<Col className='text-center'>
+					<p><a href='#' onClick={handleInvoiceRequest}>Create invoice payable by third party</a></p>
+				</Col>
 			</Row>
 		</Container>
 	);
-
+	
 	return (
 		<div className='subscription-handler'>
 			<Modal isOpen={true} toggle={cancel} className='payment-modal'>

@@ -30,9 +30,11 @@ import {useReducer, useEffect, useContext} from 'react';
 import PropTypes from 'prop-types';
 import { Row, Col, Progress, Button } from 'reactstrap';
 
+import {ErrorWrapper} from '../components/ErrorWrapper.jsx';
 import {Notifier} from '../Notifier.js';
 import {SubscriptionHandler} from './SubscriptionHandler.jsx';
 import {PaymentSource} from './PaymentSource.jsx';
+import {PendingInvoices} from './PendingInvoices.jsx';
 
 import {StorageContext, PaymentContext, NotifierContext, getUserCustomer, getSubscription, updatePayment, renewNow, selectPlan, START_OPERATION, STOP_OPERATION, notify} from './actions.js';
 import {storageReducer, notifyReducer, paymentReducer} from './actions.js';
@@ -453,6 +455,7 @@ function Storage(props){
 	}
 
 	return (
+		<ErrorWrapper>
 		<StorageContext.Provider value={{storageDispatch, storageState}}>
 		<PaymentContext.Provider value={{paymentDispatch, paymentState}}>
 		<NotifierContext.Provider value={{notifyDispatch, notifyState}}>
@@ -464,6 +467,11 @@ function Storage(props){
 			}
 			<Notifier {...notification} />
 			<div className='user-storage'>
+				<Row className='my-3'>
+					<Col md='12'>
+						<PendingInvoices userInvoices={props.userInvoices} type='individual' />
+					</Col>
+				</Row>
 				<Row>
 					<Col md='6'>
 						<div className='current-storage'>
@@ -507,12 +515,14 @@ function Storage(props){
 		</NotifierContext.Provider>
 		</PaymentContext.Provider>
 		</StorageContext.Provider>
+		</ErrorWrapper>
 	);
 }
 Storage.propTypes = {
 	userSubscription: PropTypes.object,
 	stripeCustomer: PropTypes.object,
-	summary: PropTypes.bool
+	summary: PropTypes.bool,
+	userInvoices: PropTypes.array,
 };
 
 function StorageSummary(props){

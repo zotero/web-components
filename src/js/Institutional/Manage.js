@@ -19,6 +19,8 @@ import {postFormData} from '../ajax.js';
 import {buildUrl} from '../wwwroutes.js';
 import { InstitutionHandler } from '../storage/InstitutionHandler.jsx';
 import {LabContext, labReducer, PaymentContext, paymentReducer, NotifierContext, notifyReducer, notify, setEmails, UPDATE_NAME, UPDATE_PURCHASE} from '../storage/actions.js';
+import {PendingInvoices} from '../storage/PendingInvoices.jsx';
+
 
 function LabRenew(_props){
 	const {labState} = useContext(LabContext);
@@ -191,7 +193,6 @@ function Manage(props){
 	
 	const {notification} = notifyState;
 	const {name, emails, fte} = labState;
-	log.debug(emails);
 	//update email list form
 	const handleEmailChange = (evt) => {
 		labDispatch(setEmails(evt.target.value.split('\n')));
@@ -247,6 +248,11 @@ function Manage(props){
 		<NotifierContext.Provider value={{notifyDispatch, notifyState}}>
 		<div className='manage-institution'>
 			<Notifier {...notification} />
+			<Row className='my-3'>
+				<Col md='12'>
+					<PendingInvoices invoices={props.labInvoices} />
+				</Col>
+			</Row>
 			<Row>
 				<Col md='6'>
 					<div className='email-list'>
@@ -286,7 +292,8 @@ Manage.propTypes = {
 	fte: PropTypes.number,
 	name: PropTypes.string,
 	expirationDate: PropTypes.number,
-	stripeCustomer: PropTypes.object
+	stripeCustomer: PropTypes.object,
+	labInvoices: PropTypes.arrayOf(PropTypes.object)
 };
 Manage.defaultProps = {
 	userEmails:[]

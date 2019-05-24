@@ -136,6 +136,49 @@ async function chargeLabAdditionalUsers(token=false, additionalFTE=false, name='
 	}
 }
 
+async function createInvoice(type, fte, additionalFTE, name, institutionID){
+	try{
+		let resp;
+		switch (type) {
+			case 'labRenew':
+				if (!fte) throw new Error('no fte set');
+				if (!institutionID) throw new Error('no institutionID set');
+				
+				resp = await postFormData('/settings/storage/createinvoice', {type:'labRenew', numUsers:fte, institutionID}, {withSession:true});
+				break;
+			case 'lab':
+				if (!fte) throw new Error('no fte set');
+				
+				let params = {type:'lab', numUsers:fte};
+				if (institutionID) params.institutionID = institutionID;
+				resp = await postFormData('/settings/storage/createinvoice', params, {withSession:true});
+				break;
+			case 'addLabUsers':
+				if (!institutionID) throw new Error('no institutionID set');
+				if (!additionalFTE) throw new Error('no additionalFTE set');
+				
+				resp = await postFormData('/settings/storage/createinvoice', {type:'addLabUsers', numUsers:additionalFTE, institutionID}, {withSession:true});
+				break;
+			case 'institution':
+				//TODO
+				throw new Error('unimplemented invoice type');
+			default:
+				throw new Error('unrecognized type');
+		}
+		
+		if(resp.ok){
+			const respData = await resp.json();
+			const {invoiceID} = respData;
+			return {type:'success', 'message':<span>Invoice created. <a href={`/storage/invoice/${invoiceID}`}>View Invoice</a></span>};
+		} else {
+			throw resp;
+		}
+	} catch(e) {
+		log.error(e);
+		return {type:'error', 'message':'Error creating invoice. Please try again in a few minutes.'};
+	}
+}
+
 function InstitutionHandler(props){
 	const {purchase, renew, institutionID} = props;
 	const {type, fte, name, additionalFTE} = purchase;
@@ -233,6 +276,13 @@ function InstitutionHandler(props){
 		}
 	};
 	
+	const handleInvoiceRequest = async () => {
+		setOperationPending(true);
+		let result = await createInvoice(type, fte, additionalFTE, name, institutionID);
+		notifyDispatch(notify(result.type, result.message));
+		cancel();
+	};
+	
 	let blabel = immediateChargeRequired ? `Pay ${formatCurrency(chargeAmount)}` : 'Confirm';
 	
 	let paymentSection = null;
@@ -293,6 +343,16 @@ function InstitutionHandler(props){
 			</Card>
 		);
 	}
+	
+	let invoiceSection = (
+		<Container className='mt-4'>
+			<Row>
+				<Col className='text-center'>
+					<p><a href='#' onClick={handleInvoiceRequest}>Create invoice payable by third party</a></p>
+				</Col>
+			</Row>
+		</Container>
+	);
 
 	return (
 		<div className='subscription-handler'>
@@ -307,6 +367,7 @@ function InstitutionHandler(props){
 						</CardBody>
 					</Card>
 					{paymentSection}
+					{invoiceSection}
 					{renewSection}
 				</ModalBody>
 			</Modal>

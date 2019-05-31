@@ -192,6 +192,7 @@ function StorageMeter() {
 
 function GroupUsage(props) {
 	const {group, usage} = props;
+	if (!group) { return null; }
 	return (
 		<p>{group.title} - {usage} MB</p>
 	);
@@ -353,7 +354,7 @@ function StoragePlansSection(){
 function Storage(props){
 	const [storageState, storageDispatch] = useReducer(storageReducer, {
 		userSubscription:props.userSubscription,
-		storageGroups:[],
+		storageGroups:props.storageGroups,
 		planQuotas:{},
 	});
 	const [paymentState, paymentDispatch] = useReducer(paymentReducer, {
@@ -455,7 +456,6 @@ function Storage(props){
 	}
 
 	return (
-		<ErrorWrapper>
 		<StorageContext.Provider value={{storageDispatch, storageState}}>
 		<PaymentContext.Provider value={{paymentDispatch, paymentState}}>
 		<NotifierContext.Provider value={{notifyDispatch, notifyState}}>
@@ -515,12 +515,12 @@ function Storage(props){
 		</NotifierContext.Provider>
 		</PaymentContext.Provider>
 		</StorageContext.Provider>
-		</ErrorWrapper>
 	);
 }
 Storage.propTypes = {
 	userSubscription: PropTypes.object,
 	stripeCustomer: PropTypes.object,
+	storageGroups: PropTypes.array,
 	summary: PropTypes.bool,
 	userInvoices: PropTypes.array,
 };

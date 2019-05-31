@@ -19,6 +19,7 @@ const newLayoutUrls = [
 	// {url:'https://dockerzotero.test:8081/blog', wait:false},
 	{url:'https://dockerzotero.test:8081/getinvolved', wait:false},
 	{url:'https://dockerzotero.test:8081/jobs', wait:false},
+	{url:'https://dockerzotero.test:8081/storage', wait:false},
 	{url:'https://dockerzotero.test:8081/storage/institutions', wait:false},
 	{url:'https://dockerzotero.test:8081/user/login', wait:false},
 	{url:'https://dockerzotero.test:8081/user/register', wait:false},
@@ -44,6 +45,15 @@ const loggedInUrls = [
 const loginUrl = 'https://dockerzotero.test:8081/user/login';
 const logoutUrl = 'https://dockerzotero.test:8081/user/logout';
 const groupsUrl = 'https://dockerzotero.test:8081/groups';
+
+// use a script to click a provided element, because for some reason selenium's click is sometimes broken
+// for radio buttons and maybe other times
+let scriptClick = async function(driver, element) {
+	return await driver.executeScript(function(){
+		arguments[0].click();
+		return;
+	}, element);
+};
 
 let getCurrentUser = async function(driver){
 	let currentUser = await driver.executeScript(function(){
@@ -175,7 +185,7 @@ describe('Zotero Pages', async function(){
 			assert.isEmpty(pageLogs);
 			await driver.wait(until.elementLocated(By.css('.card.nugget-full')));
 			let groupNuggetEls = await driver.findElements(By.css('.card.nugget-full'));
-			assert.isAtLeast(groupNuggetEls.length, 1, 'at least 1 gropu nugget card');
+			assert.isAtLeast(groupNuggetEls.length, 1, 'at least 1 group nugget card');
 			let nameEl = await driver.findElement(By.css('div.nugget-name a'));
 			let nameText = await nameEl.getText();
 			assert.isNotEmpty(nameText);
@@ -215,7 +225,7 @@ describe('Zotero Pages', async function(){
 		it('should redirect /mylibrary to the user library url', async function(){
 			await driver.navigate().to(`${baseUrl}/mylibrary`);
 			let curUrl = await driver.getCurrentUrl();
-			assert.equal(curUrl, `${baseUrl}/testuser1/items`);
+			assert.oneOf(curUrl, [`${baseUrl}/testuser1/items`, `${baseUrl}/testuser1/library`]);
 			return true;
 		});
 	});
@@ -393,9 +403,105 @@ describe('Zotero Pages', async function(){
 	});
 	
 	describe('test creating keys', async function(){
-		it('should create a key', async function(){
+		it('should edit key permissions', async function(){
 			await loginUser(driver, 'testUser1', 'password');
-			await driver.get(`${baseUrl}/settings/keys`);
+			await driver.get(`${baseUrl}/settings/keys/new`);
+			let permissionsNode = await driver.wait(until.elementLocated(By.css('#key-permissions-summary')));
+			assert.isNotEmpty(permissionsNode);
+			let permListNodes = await driver.wait(until.elementsLocated(By.css('#key-permissions-summary li')));
+			assert.lengthOf(permListNodes, 1, 'should start with read permission');
+			let text = await permListNodes[0].getText();
+			assert.equal(text, 'Access to read your personal library');
+			
+			//add notes permission and check summary
+			let notesCheck = await driver.findElement(By.css('input#notes'));
+			notesCheck.click();
+			permListNodes = await driver.wait(until.elementsLocated(By.css('#key-permissions-summary li:nth-child(2)')));
+			text = await permListNodes[0].getText();
+			assert.equal(text, 'Access to read notes in your personal library');
+			
+			//add write permission and check summary
+			let writeCheck = await driver.findElement(By.css('input#write'));
+			writeCheck.click();
+			permListNodes = await driver.wait(until.elementsLocated(By.css('#key-permissions-summary li:nth-child(3)')));
+			text = await permListNodes[0].getText();
+			assert.equal(text, 'Access to modify your personal library');
+			
+			console.log('adding group read permissions');
+			try{
+				//add group read permission and check summary
+				let groupReadCheck = await driver.findElement(By.css('input#all_groupsread'));
+				assert.isNotEmpty(groupReadCheck);
+				let displayed = await groupReadCheck.isDisplayed();
+				let enabled = await groupReadCheck.isEnabled();
+				assert.isTrue(displayed);
+				assert.isTrue(enabled);
+				console.log('clicking groupReadCheck');
+				//await groupReadCheck.click();
+				/*
+				console.log('checking permissions');
+				permListNodes = await driver.wait(until.elementsLocated(By.css('#key-permissions-summary li:nth-child(4)')));
+				console.log('got 4th child permssions node');
+				text = await permListNodes[0].getText();
+				assert.equal(text, 'Access to read any of your group libraries');
+				*/
+			} catch (e) {
+				console.log(e);
+				assert.fail('exception when adding group read permission');
+			}
+		});
+		it.only('should edit group permissions', async function() {
+			try {
+				await loginUser(driver, 'testUser1', 'password');
+				await driver.get(`${baseUrl}/settings/keys/new`);
+				let permissionsNode = await driver.wait(until.elementLocated(By.css('#key-permissions-summary')));
+				assert.isNotEmpty(permissionsNode);
+				let permListNodes = await driver.wait(until.elementsLocated(By.css('#key-permissions-summary li')));
+				assert.lengthOf(permListNodes, 1, 'should start with read permission');
+				let text = await permListNodes[0].getText();
+				assert.equal(text, 'Access to read your personal library');
+				
+				//add group read permission and check summary
+				let groupReadCheck = await driver.findElement(By.css('input#all_groupsread'));
+				assert.isNotEmpty(groupReadCheck);
+				let displayed = await groupReadCheck.isDisplayed();
+				let enabled = await groupReadCheck.isEnabled();
+				assert.isTrue(displayed);
+				assert.isTrue(enabled);
+				await scriptClick(driver, groupReadCheck);
+				groupReadCheck = await driver.findElement(By.css('input#all_groupsread'));
+				let checked = await groupReadCheck.getAttribute('checked');
+				assert.equal('true', checked);
+				permListNodes = await driver.wait(until.elementsLocated(By.css('#key-permissions-summary li')));
+				assert.lengthOf(permListNodes, 2);
+				text = await permListNodes[1].getText();
+				assert.equal(text, 'Access to read any of your group libraries');
+			
+				console.log('adding individual group permissions');
+				//add individual group permissions
+				let individualGroupCheck = await driver.findElement(By.css('input#individual_groups'));
+				assert.isNotEmpty(individualGroupCheck);
+				await scriptClick(driver, individualGroupCheck);
+				//individualGroupCheck.click();
+				console.log('clicked individualGroupCheck');
+				let goatsWriteCheck = await driver.wait(until.elementLocated(By.css('input#groups_326_write')));
+				assert.isNotEmpty(goatsWriteCheck);
+				displayed = await goatsWriteCheck.isDisplayed();
+				enabled = await goatsWriteCheck.isEnabled();
+				assert.isTrue(displayed);
+				assert.isTrue(enabled);
+				await scriptClick(driver, goatsWriteCheck);
+				//goatsWriteCheck.click();
+				permListNodes = await driver.wait(until.elementsLocated(By.css('#key-permissions-summary li')));
+				assert.lengthOf(permListNodes, 3);
+				text = await permListNodes[2].getText();
+				assert.equal(text, 'Access to read and modify library for group "Goats"');
+			} catch (e) {
+				console.log(e);
+				assert.fail('exception when editing group permissions');
+			}
+		});
+		it('should create a group key', async function() {
 			
 		});
 	});

@@ -26,9 +26,10 @@ const deleteInvoice = async (invoiceID) => {
 
 function PendingInvoices(props) {
 	let {invoices, type} = props;
-	log.debug(invoices);
 	const {notifyDispatch} = useContext(NotifierContext);
-	
+	if (!invoices) {
+		return null;
+	}
 	const handleDelete = async (invoiceID) => {
 		let result = await deleteInvoice(invoiceID);
 		notifyDispatch(notify(result.type, result.message));

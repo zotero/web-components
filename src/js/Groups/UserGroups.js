@@ -228,7 +228,7 @@ function UserGroups(props){
 }
 UserGroups.defaultProps = {
 	titleOnly:false,
-	userID:false,
+	userID:null,
 	ownedOnly: false,
 	groups: [],
 	loading:false,

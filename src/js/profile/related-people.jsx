@@ -130,7 +130,7 @@ class RelatedPeopleDetailed extends React.Component {
 RelatedPeopleDetailed.propTypes = {
 	people: PropTypes.arrayOf(PropTypes.shape({
 		username: PropTypes.string.isRequired,
-		userID: PropTypes.string.isRequired,
+		userID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
 		realname: PropTypes.string,
 		affiliation: PropTypes.string,
 		academic: PropTypes.string,

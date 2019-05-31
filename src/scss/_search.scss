@@ -1,0 +1,21 @@
+/* search widget style in Zotero People page */
+#zotero-people {
+	#react-search {
+		/*
+		.col.search-form {
+			display: flex;
+			justify-content: center;
+		}
+		*/
+	}
+}
+
+/* search widget style on /search page */
+#search-page {
+	#react-search {
+		.col.search-form {
+			display: flex;
+			justify-content: center;
+		}
+	}
+}

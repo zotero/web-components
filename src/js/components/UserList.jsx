@@ -4,104 +4,121 @@ import {log as logger} from '../Log.js';
 let log = logger.Logger('UserList');
 
 const React = require('react');
-const {Component} = React;
 import {PropTypes} from 'prop-types';
 import { buildUrl } from '../wwwroutes.js';
 
 import {CardGroup} from 'reactstrap';
 import { ProfileImage } from '../ProfileImageForm.js';
 
-class SmallUser extends Component {
+const userShape = PropTypes.shape({
+	username: PropTypes.string.isRequired,
+	slug: PropTypes.string.isRequired,
+	userID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+	displayName: PropTypes.string.isRequired,
+	meta: PropTypes.object,
+});
+
+function SmallUser (props) {
+	const {user} = props;
+	const {slug, hasImage, userID, displayName} = user;
+	const {affiliation, location, title} = user.meta.profile;
+	const profileUrl = buildUrl('profileUrl', {slug});
 	
-	render() {
-		const {user} = this.props;
-		const profileUrl = buildUrl('profileUrl', {slug:user.slug});
-		//const profileImageSrc = buildUrl('profileImage', {userID:user.userID, purpose:'thumb'});
-		return (
-			<div className="nugget-user-small card border-0">
-				<div className='card-body border-top'>
-					<a href={profileUrl}>
-						<ProfileImage hasImage={user.hasImage} type='user' entityID={user.userID} width='100px' height='100px' />
-						{/*<img className="small-profile-image float-left mr-3" src={profileImageSrc} alt={user.slug} title={user.slug} />*/}
+	return (
+		<div className="nugget-user-small card border-0">
+			<div className='row no-gutters border-top align-items-center'>
+				<div className='col-md-3'>
+					<a className='my-auto' href={profileUrl}>
+						<ProfileImage hasImage={hasImage} type='user' entityID={userID} width='64px' height='64px' usePlaceholder={true} />
 					</a>
-					<div className="nugget-name card-title">
-						<a href={profileUrl}>{user.displayName}</a>
+				</div>
+				<div className='col-md-9'>
+					<div className='card-body'>
+						<div className="nugget-name card-title">
+							<a href={profileUrl}>{displayName}</a>
+						</div>
+						{title ?
+							<div className="nugget-title card-subtitle text-muted">{title}</div> :
+							null}
+						{affiliation ? 
+							<div className="nugget-affiliation card-subtitle text-muted">{user.affiliation}</div> :
+							null}
+						{location ?
+							<div className="nugget-location card-subtitle text-muted">{location}</div> :
+							null}
 					</div>
-					{user.hasOwnProperty('affiliation') ?
-						<div className="nugget-affiliation card-subtitle text-muted">{user.affiliation}</div> :
-						null}
 				</div>
 			</div>
-		);
-	}
+		</div>
+	);
 }
+SmallUser.propTypes = {
+	user: userShape
+};
 
-class LargeUser extends Component {
-	render() {
-		log.debug('LargeUser');
-		const {user} = this.props;
-		const {profile} = user.meta;
-
-		const profileUrl = buildUrl('profileUrl', {slug:user.slug});
-		//const profileImageSrc = buildUrl('profileImage', {userID:user.userID, purpose:'thumb'});
-		return (
-			<div className="nugget-user-small card border-0">
-				<div className='card-body border-top'>
-					<a href={profileUrl}>
-						<ProfileImage hasImage={user.hasImage} type='user' entityID={user.userID} width='100px' height='100px' usePlaceholder={false} />
-						{/*<img className="small-profile-image float-left mr-3" src={profileImageSrc} alt={user.slug} title={user.slug} />*/}
-					</a>
-					<div className="nugget-name card-title">
-						<a href={profileUrl}>{user.displayName}</a>
-					</div>
-					{profile.hasOwnProperty('affiliation') ?
-						<div className="nugget-affiliation card-subtitle text-muted">{profile.affiliation}</div> :
-						null}
-					{profile.hasOwnProperty('location') ?
-						<div className="nugget-location card-subtitle text-muted">{profile.location}</div> :
-						null}
+function LargeUser (props) {
+	const {user} = props;
+	const {slug, hasImage, userID, displayName} = user;
+	const {affiliation, location, title} = user.meta.profile;
+	const profileUrl = buildUrl('profileUrl', {slug});
+	
+	return (
+		<div className="nugget-user-small card border-0">
+			<div className='card-body border-top'>
+				<a href={profileUrl}>
+					<ProfileImage hasImage={hasImage} type='user' entityID={userID} width='100px' height='100px' usePlaceholder={false} />
+				</a>
+				<div className="nugget-name card-title">
+					<a href={profileUrl}>{displayName}</a>
 				</div>
+				{title ?
+					<div className="nugget-title card-subtitle text-muted">{title}</div> :
+					null}
+				{affiliation ? 
+					<div className="nugget-affiliation card-subtitle text-muted">{user.affiliation}</div> :
+					null}
+				{location ?
+					<div className="nugget-location card-subtitle text-muted">{location}</div> :
+					null}
 			</div>
-		);
-	}
+		</div>
+	);
 }
+LargeUser.propTypes = {
+	user: userShape
+};
 
-class UserList extends Component{
-	constructor(props){
-		super(props);
+function UserList (props) {
+	const {users, title, perRow} = props;
+	log.debug(users);
+	if(!users.length){
+		return null;
 	}
-	render() {
-		const {users, title, perRow} = this.props;
-		log.debug(users);
-		if(!users.length){
-			return null;
+
+	let userNodes = users.map((user)=>{
+		return <SmallUser key={user.userID} user={user} />;
+	});
+
+	let rowGroups = [];
+	let children = [];
+	for(let i=0; i<userNodes.length; i++){
+		children.push(userNodes[i]);
+		if((children.length == perRow) || (i == userNodes.length-1)){
+			rowGroups.push(
+				<CardGroup key={children[0].key}>
+					{children}
+				</CardGroup>
+			);
+			children = [];
 		}
-
-		let userNodes = users.map((user)=>{
-			return <SmallUser key={user.userID} user={user} />;
-		});
-
-		let rowGroups = [];
-		let children = [];
-		for(let i=0; i<userNodes.length; i++){
-			children.push(userNodes[i]);
-			if((children.length == perRow) || (i == userNodes.length-1)){
-				rowGroups.push(
-					<CardGroup key={children[0].key}>
-						{children}
-					</CardGroup>
-				);
-				children = [];
-			}
-		}
-
-		return (
-			<div className='userlist'>
-				{title ? <h3>{title}</h3> : null}
-				{rowGroups}
-			</div>
-		);
 	}
+
+	return (
+		<div className='userlist'>
+			{title ? <h3>{title}</h3> : null}
+			{rowGroups}
+		</div>
+	);
 }
 UserList.defaultProps = {
 	users: [],
@@ -109,7 +126,7 @@ UserList.defaultProps = {
 	perRow:3,
 };
 UserList.propTypes = {
-	users: PropTypes.arrayOf(PropTypes.object),
+	users: PropTypes.arrayOf(userShape),
 	title: PropTypes.string,
 	perRow: PropTypes.number
 };

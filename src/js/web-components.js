@@ -78,6 +78,7 @@ import {MemberSettingsContainer} from './Groups/MemberSettingsContainer.jsx';
 import {ManageContribution} from './contribute/Contribute.jsx';
 import {PayInvoice} from './storage/PayInvoice.jsx';
 import {SuggestableInput} from './components/SuggestableInput.jsx';
+import {RelatedContainer} from './profile/relatedContainer.jsx';
 
 let ZoteroWebComponents = {
 	Storage,
@@ -119,7 +120,8 @@ let ZoteroWebComponents = {
 	MemberSettingsContainer,
 	ManageContribution,
 	PayInvoice,
-	SuggestableInput
+	SuggestableInput,
+	RelatedContainer,
 };
 
 globalScope.ZoteroWebComponents = ZoteroWebComponents;

@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 
 import {ajax, postFormData} from './ajax.js';
 import {Notifier} from './Notifier.js';
+import {LoadingSpinner} from './LoadingSpinner.js';
 
 let priceCents = {'1':0,'2':2000,'3':6000,'4':10000,'5':24000,'6':12000};
 let plans = [
@@ -73,7 +74,7 @@ var calculateNewExpiration = function(oldExpiration, oldStorageLevel, newStorage
 	let remainingValue = calculateRemainingValue(oldExpiration, oldStorageLevel);
 	let extraSecondsAtNewLevel = (remainingValue / priceCents[newStorageLevel]) * secondsPerYear;
 
-	let newExpiration = new Date(Date.now() + (secondsPerYear * 1000) + (extraSecondsAtNewLevel * 1000)); //new Date takes milliseconds
+	let newExpiration = new Date(Date.now() + (extraSecondsAtNewLevel * 1000)); //new Date takes milliseconds
 
 	return newExpiration;
 };
@@ -198,13 +199,17 @@ class GroupUsage extends Component {
 
 class PaymentRow extends Component {
 	render() {
-		if(!this.props.defaultSource || !this.props.userSubscription.recur){
-			let paymentButton = <button className="btn" onClick={this.props.updateCardHandler}>Enable Automatic Renewal</button>;
-
-			let expiration = new Date(this.props.userSubscription.expirationDate * 1000);
-			if(expiration < (Date.now() + (1000*60*60*24*15))) {
-				//expiration less than 2 weeks away, charge card now
-				paymentButton = <button className="btn" onClick={this.props.renewHandler}>Renew Now</button>;
+		const {defaultSource, userSubscription, renewHandler, updateCardHandler, cancelRecur, institutionCovered} = this.props;
+		if(!defaultSource || !userSubscription.recur){
+			let paymentButton = <button className="btn" onClick={updateCardHandler}>Enable Automatic Renewal</button>;
+			if (institutionCovered) {
+				paymentButton = 'Your personal Zotero storage subscription will not be renewed while you are eligible for unlimited storage from your institution.';
+			} else {
+				let expiration = new Date(userSubscription.expirationDate * 1000);
+				if(expiration < (Date.now() + (1000*60*60*24*15))) {
+					//expiration less than 2 weeks away, charge card now
+					paymentButton = <button className="btn" onClick={renewHandler}>Renew Now</button>;
+				}
 			}
 			return (
 				<tr>
@@ -215,7 +220,7 @@ class PaymentRow extends Component {
 				</tr>
 			);
 		}
-		let card = this.props.defaultSource;
+		const card = defaultSource;
 		return (
 			<tr>
 				<th>Payment Card</th>
@@ -223,7 +228,10 @@ class PaymentRow extends Component {
 					<p><b>{card.brand} ****-****-****-{card.last4}</b></p>
 					<p>
 						Exp: <b>{card.exp_year}-{card.exp_month}</b>
-						<button className="btn right" onClick={this.props.updateCardHandler}>Update Card</button>
+						{institutionCovered ? 
+							<button className="btn right" onClick={cancelRecur}>Remove Card</button> :
+							<button className="btn right" onClick={updateCardHandler}>Update Card</button>
+						}
 					</p>
 				</td>
 			</tr>
@@ -233,7 +241,10 @@ class PaymentRow extends Component {
 
 class NextPaymentRow extends Component {
 	render() {
-		let userSubscription = this.props.userSubscription;
+		const {userSubscription, cancelRecur, institutionCovered} = this.props;
+		if (institutionCovered) {
+			return null;
+		}
 		let dateFormatOptions = {year: 'numeric', month: 'long', day: 'numeric'};
 		let d = new Date(parseInt(userSubscription.expirationDate)*1000);
 		let formattedExpirationDate = d.toLocaleDateString('en-US', dateFormatOptions);
@@ -245,7 +256,7 @@ class NextPaymentRow extends Component {
 					<td>
 						<p>
 							{formattedExpirationDate}
-							<button className="btn right" onClick={this.props.cancelRecur}>Disable Autorenew</button>
+							<button className="btn right" onClick={cancelRecur}>{institutionCovered ? 'Remove Payment Details' : 'Disable Autorenew'}</button>
 						</p>
 					</td>
 				</tr>
@@ -614,16 +625,23 @@ class Storage extends Component {
 		window.StorageComponent = this;
 		let reactInstance = this;
 		if(this.state.userSubscription === null){
-			return null;
+			return <LoadingSpinner loading={true} />;
 		}
 		let userSubscription = this.state.userSubscription;
 		let groups = this.state.storageGroups;
 		let dateFormatOptions = {year: 'numeric', month: 'long', day: 'numeric'};
 
 		if(userSubscription === null){
-			return null;
+			return <LoadingSpinner loading={true} />;
 		}
 
+		let institutionCovered = false;
+		userSubscription.institutions.forEach((institution) => {
+			if (institution.validated == '1' && institution.storageQuota == 1000000) {
+				institutionCovered = true;
+			}
+		});
+		
 		let expirationDate = <td>Never</td>;
 		if(userSubscription.expirationDate && (userSubscription.expirationDate != '0')) {
 			let d = new Date(parseInt(userSubscription.expirationDate)*1000);
@@ -635,6 +653,11 @@ class Storage extends Component {
 					{dateString}
 					<p>Your previous Zotero storage subscription has expired.</p>
 				</td>);
+			} else if (institutionCovered) {
+				expirationDate = (<td><p>
+					Your current Zotero storage subscription will expire {d.toLocaleDateString('en-US', numDateFormatOptions)}.
+					You are currently eligible for unlimited storage from your institution so your subscription does not need to be renewed.
+				</p></td>);
 			} else if(userSubscription.recur){
 				expirationDate = (<td>
 					{dateString}
@@ -681,11 +704,13 @@ class Storage extends Component {
 				userSubscription={userSubscription}
 				updateCardHandler={this.updatePayment}
 				renewHandler={this.renewNow}
+				cancelRecur={this.cancelRecur}
+				institutionCovered={institutionCovered}
 			/>);
 		}
 
 		let nextPaymentRow = null;
-		nextPaymentRow = <NextPaymentRow cancelRecur={this.cancelRecur} userSubscription={userSubscription} />;
+		nextPaymentRow = <NextPaymentRow cancelRecur={this.cancelRecur} userSubscription={userSubscription} institutionCovered={institutionCovered} />;
 		
 		let modalSpinner = null;
 		if(this.state.operationPending){

@@ -309,7 +309,7 @@ class Downloads extends Component{
 		return (
 			<div className={classnames('downloads', this.state.mobile?'mobile':'')}>
 				<div className="container">
-					{featuredBrowser == 'Firefox'
+					{featuredBrowser == 'none'
 						? <p style={{
 								width: '90%',
 								marginLeft: 'auto',

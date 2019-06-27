@@ -30,7 +30,7 @@ class GroupLibrarySettings extends Component{
 	changeType = (type) => {
 		let {librarySettings} = this.state;
 		if(type == 'PublicOpen'){
-			if(!confirm("Changing a group to 'Public Open' will disallow storing of files for the group. Before settings can be applied, all file attachments for the gorup will be deleted")){
+			if(!confirm("Changing a group to 'Public Open' will disallow storing of files for the group. Before settings can be applied, all file attachments for the group will be deleted")){
 				return;
 			} else {
 				librarySettings['fileEditing'] = 'none';
@@ -67,31 +67,35 @@ class GroupLibrarySettings extends Component{
 		//after verifying, if deletion is required, that there are no attachments, submit the form
 		let {librarySettings} = this.state;
 		let {groupID} = this.props;
-
+		
+		//TODO: if deleted attachments, re-verify that they are all gone
+		/*
 		let resp = await loadAttachmentItems(groupID, 0);
 		let totalResults = parseInt(resp.headers.get('Total-Results'));
 		if(totalResults == 0){
-			try{
-				let settingsResp = await postFormData(`/group/updatesettings?groupID=${groupID}&settingsType=library`, librarySettings, {withSession:true});
-				if(settingsResp.ok){
-					let data = await settingsResp.json();
-					if(data.success){
-						this.setState({notification:{type:'success', message:'Settings saved'}});
-						window.location.reload();
-						return;
-					} else {
-						if(data.message){
-							this.setState({notification:{type:'error', message:data.message}});
-							return;
-						}
-					}
-				}
-				this.setState({notification:{type:'error', message:'Error saving settings'}});
-			} catch(e){
-				this.setState({notification:{type:'error', message:'Error saving settings'}});
-			}
+			
 		} else {
 			this.setState({notification:{type:'error', message:'Error saving settings. Not all attachments have been deleted.'}});
+		}
+		*/
+		try{
+			let settingsResp = await postFormData(`/group/updatesettings?groupID=${groupID}&settingsType=library`, librarySettings, {withSession:true});
+			if(settingsResp.ok){
+				let data = await settingsResp.json();
+				if(data.success){
+					this.setState({notification:{type:'success', message:'Settings saved'}});
+					window.location.reload();
+					return;
+				} else {
+					if(data.message){
+						this.setState({notification:{type:'error', message:data.message}});
+						return;
+					}
+				}
+			}
+			this.setState({notification:{type:'error', message:'Error saving settings'}});
+		} catch(e){
+			this.setState({notification:{type:'error', message:'Error saving settings'}});
 		}
 	}
 	render(){

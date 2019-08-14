@@ -94,11 +94,11 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 46px; // 64px
+    margin-top: 28px; // 46px; // 64px
 
-    @include media-breakpoint-up("md") {
+    /*@include media-breakpoint-up("md") {
       margin-top: 78px; // 96px
-    }
+    }*/
 
     @include media-breakpoint-only("xl") {
       flex-direction: row;
@@ -122,20 +122,12 @@
     margin: $spacer-xl 0 0;
     max-width: 100%; // IE10 fix
 
-    @include media-breakpoint-between("md", "lg") {
+    @include media-breakpoint-up("md") {
       width: 80%;
       margin: {
         left: auto;
         right: auto;
       }
-    }
-
-    @include media-breakpoint-up("xl") {
-      flex: 0 0 50%;
-      margin: (-$spacer) 0;
-      text-align: right;
-      position: relative;
-      bottom: 2px;
     }
 
     a {

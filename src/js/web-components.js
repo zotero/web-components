@@ -42,6 +42,7 @@ import {ProfileImageForm} from './ProfileImageForm.js';
 import {GroupLibrarySettings} from './GroupLibrarySettings.js';
 import {OrcidProfile, OrcidProfileControl} from './components/OrcidProfile.jsx';
 import {PurchaseWorkshop} from './PurchaseWorkshop.jsx';
+import {LastSync} from './LastSync.jsx';
 
 let ZoteroWebComponents = {
 	Storage,
@@ -72,7 +73,8 @@ let ZoteroWebComponents = {
 	GroupLibrarySettings,
 	OrcidProfile,
 	OrcidProfileControl,
-	PurchaseWorkshop
+	PurchaseWorkshop,
+	LastSync,
 };
 
 globalScope.ZoteroWebComponents = ZoteroWebComponents;

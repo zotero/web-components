@@ -63,30 +63,19 @@ InstallFirefoxButton.defaultProps = {
 };
 
 class InstallChromeButton extends Component{
-	installChrome(evt){
-		if(typeof window.chrome !== 'undefined'){
-			evt.preventDefault();
-			window.chrome.webstore.install(undefined, ()=>{
-				//success
-			}, ()=>{
-				//failure: forward to chrome webstore
-				window.location = chromeDownload;
-			});
-		}
-	}
 	render(){
 		if(this.props.type == 'button') {
-			return <a href={chromeDownload} onClick={this.installChrome} id="chrome-connector-download-button" className="btn btn-lg btn-secondary">{this.props.label}</a>;
+			return <a href={chromeDownload} id="chrome-connector-download-button" className="btn btn-lg btn-secondary">{this.props.label}</a>;
 		} else if(this.props.type == 'image') {
 			return (
-				<a href={chromeDownload} onClick={this.installChrome}><BrowserIcon browser="chrome" /></a>
+				<a href={chromeDownload}><BrowserIcon browser="chrome" /></a>
 			);
 		} else if(this.props.type == 'full') {
 			return (
 				<div className='download-full'>
 					<div className='browser-image'><BrowserIcon browser="chrome" /></div>
-					<h3>Chrome Connector</h3>
-					<div className='install-button'><a href={chromeDownload} id="chrome-connector-download-button" className="btn btn-sm btn-secondary">{this.props.label}</a></div>
+					<h3>Chrome connector</h3>
+					<div className='install-button'><a href={chromeDownload} id="chrome-connector-download-button" className="btn btn-sm btn-secondary download-link">{this.props.label}</a></div>
 				</div>
 			);
 		}

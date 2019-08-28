@@ -3,7 +3,7 @@
 import {log as logger} from './Log.js';
 var log = logger.Logger('ApiKeyEditor');
 
-import {Fragment, useState, useEffect} from 'react';
+import {Fragment, useState, useEffect, useContext, createContext} from 'react';
 import PropTypes from 'prop-types';
 
 import {RadioGroup, Radio} from './react-radio-group.js';
@@ -17,6 +17,7 @@ import {getCurrentUser} from './Utils.js';
 import { Spinner } from './LoadingSpinner.js';
 
 const currentUser = getCurrentUser();
+const accessContext = createContext(null);
 
 const scrollToTop = function() {
 	window.scrollBy(0, -5000);
@@ -52,7 +53,10 @@ const accessShape = PropTypes.shape({
 		notes: PropTypes.bool,
 		write: PropTypes.bool,
 	}),
-	groups: PropTypes.object
+	groups: PropTypes.shape({
+		library: PropTypes.bool,
+		write: PropTypes.bool,
+	}),
 });
 
 const defaultValue = function(v, def){
@@ -109,7 +113,8 @@ OAuthVerify.propTypes = {
 
 //human readable summary of currently selected permissions
 const PermissionsSummary = function(props) {
-	const {access, userGroups} = props;
+	const {access} = useContext(accessContext);
+	const {userGroups} = props;
 	let userGroupsByKey = {};
 	for(let group of userGroups){
 		userGroupsByKey[group.id] = group;
@@ -137,9 +142,9 @@ const PermissionsSummary = function(props) {
 	
 		//all groups library settings
 		if(access.groups.all){
-			if(access.groups.all == 'write'){
+			if(access.groups.all.write){
 				summary.push(<li key='all_groups_write'>Access to read and modify any of your group libraries</li>);
-			} else if(access.groups.all == 'read'){
+			} else if(access.groups.all.library){
 				summary.push(<li key='all_groups_read'>Access to read any of your group libraries</li>);
 			}
 		}
@@ -147,9 +152,9 @@ const PermissionsSummary = function(props) {
 		for(let id of individualGroups){
 			const groupAccess = access.groups[id];
 			const groupName = userGroupsByKey[id].name;
-			if(groupAccess == 'write'){
+			if(groupAccess.write){
 				summary.push(<li key={`group_${id}_write`}>Access to read and modify library for group &quot;{groupName}&quot;</li>);
-			} else if(groupAccess == 'read'){
+			} else if(groupAccess.library){
 				summary.push(<li key={`group_${id}_read`}>Access to read library for group &quot;{groupName}&quot;</li>);
 			}
 		}
@@ -174,9 +179,10 @@ PermissionsSummary.propTypes = {
 	userGroups: PropTypes.array
 };
 
-const PersonalLibraryPermissions = function(props) {
-	const {access, updateAccess} = props;
+const PersonalLibraryPermissions = function() {
+	const {access, updateAccess} = useContext(accessContext);
 	const handleChange = (evt) => {
+		let newAccess = Object.assign({}, access);
 		if(!updateAccess){
 			log.Error('updateAccess not set on PersonalLibraryPermissions');
 			return;
@@ -187,16 +193,16 @@ const PersonalLibraryPermissions = function(props) {
 			case 'notes':
 			case 'write':
 				if(evt.target.checked) {
-					access.user[evt.target.name] = true;
+					newAccess.user[evt.target.name] = true;
 				} else {
-					access.user[evt.target.name] = false;
+					newAccess.user[evt.target.name] = false;
 				}
 				
 				break;
 			default:
 				log.error('Unexpected target for PersonalLibraryPermissions');
 		}
-		updateAccess(access);
+		updateAccess(newAccess);
 	};
 
 	return (
@@ -230,39 +236,38 @@ const PersonalLibraryPermissions = function(props) {
 		</div>
 	);
 };
-PersonalLibraryPermissions.propTypes = {
-	access: accessShape.isRequired,
-	updateAccess: PropTypes.func.isRequired
-};
 
-const AllGroupsPermissions = function(props) {
-	const {access, updateAccess} = props;
+const AllGroupsPermissions = function() {
+	const {access, updateAccess} = useContext(accessContext);
 	
 	const handleChange = (newAllValue) => {
+		let newAccess = Object.assign({}, access);
 		switch(newAllValue){
 			case 'none':
-				access['groups']['all'] = {};
+				newAccess.groups.all = {};
 				break;
 			case 'read':
-				access['groups']['all'] = {'library':true};
+				newAccess.groups.all = {'library':true};
 				break;
 			case 'write':
-				access['groups']['all'] = {library:true, write:true};
+				newAccess.groups.all = {library:true, write:true};
 				break;
 			default:
 				log.error(`Unexpected value for AllGroupsPermissions: ${newAllValue}`);
 		}
-		updateAccess(access);
+		updateAccess(newAccess);
 	};
 
 	const radioName = 'all_groups';
 	let selectedValue = 'none';
-	if (access.groups.all.write) {
-		selectedValue = 'write';
-	} else if (access.groups.all.library) {
-		selectedValue = 'read';
+	if (access.groups.all) {
+		if (access.groups.all.write) {
+			selectedValue = 'write';
+		} else if (access.groups.all.library) {
+			selectedValue = 'read';
+		}
 	}
-	
+
 	return (
 		<div className="all-groups-permissions">
 			<Form>
@@ -298,35 +303,38 @@ AllGroupsPermissions.propTypes = {
 };
 
 const IndividualGroupPermissions = function(props) {
-	const {access} = props;
-	const {group, updateAccess} = props;
+	const {access, updateAccess} = useContext(accessContext);
+	const {group} = props;
 	const groupID = group.id;
 	
 	const handleChange = (newGroupValue) => {
+		let newAccess = Object.assign({}, access);
 		switch(newGroupValue){
 			case 'none':
-				access['groups'][groupID] = {};
+				newAccess.groups[groupID] = {};
 				break;
 			case 'read':
-				access['groups'][groupID] = {library:true};
+				newAccess.groups[groupID] = {library:true};
 				break;
 			case 'write':
-				access['groups'][groupID] = {library:true, write:true};
+				newAccess.groups[groupID] = {library:true, write:true};
 				break;
 			default:
 				log.error(`Unexpected value for IndividualGroupPermissions: ${newGroupValue}`);
 		}
-		updateAccess(access);
+		updateAccess(newAccess);
 	};
 
 	const groupName = group.name;
 	const radioName = `group_${groupID}`;
 	
 	let selectedValue = 'none';
-	if (access.groups.all.write) {
-		selectedValue = 'write';
-	} else if (access.groups.all.library) {
-		selectedValue = 'read';
+	if (access.groups[groupID]) {
+		if (access.groups[groupID].write) {
+			selectedValue = 'write';
+		} else if (access.groups[groupID].library) {
+			selectedValue = 'read';
+		}
 	}
 
 	return (
@@ -354,8 +362,6 @@ const IndividualGroupPermissions = function(props) {
 	);
 };
 IndividualGroupPermissions.propTypes = {
-	access: accessShape.isRequired,
-	updateAccess: PropTypes.func.isRequired,
 	group: PropTypes.object.isRequired
 };
 
@@ -375,20 +381,20 @@ AcceptDefaults.propTypes = {
 };
 
 const KeyAccessEditor = function(props) {
-	const {perGroup, access, userGroups, updateAccess, changePerGroup} = props;
+	const {perGroup, userGroups, changePerGroup} = props;
 
 	let individualGroupNodes = null;
 	if(perGroup){
 		individualGroupNodes = userGroups.map((group) => {
 			const groupID = group.id;
-			return <IndividualGroupPermissions key={groupID} group={group} access={access} updateAccess={updateAccess} />;
+			return <IndividualGroupPermissions key={groupID} group={group} />;
 		});
 	}
 
 	return (
 		<div>
-			<PersonalLibraryPermissions access={access} updateAccess={updateAccess} />
-			<AllGroupsPermissions access={access} updateAccess={updateAccess} />
+			<PersonalLibraryPermissions />
+			<AllGroupsPermissions />
 			<FormGroup tag="fieldset">
 				<legend>Specific Groups</legend>
 				<FormGroup>
@@ -405,9 +411,7 @@ const KeyAccessEditor = function(props) {
 };
 KeyAccessEditor.propTypes = {
 	perGroup: PropTypes.bool,
-	access: accessShape.isRequired,
 	userGroups: PropTypes.array.isRequired,
-	updateAccess: PropTypes.func.isRequired,
 	changePerGroup: PropTypes.func
 };
 
@@ -432,7 +436,7 @@ const IdentityRequest = function(props) {
 			//redirect if savekey response indicates one
 			//this would be an oauth app redirect, otherwise the redirect will in in our own url parsed below
 			if(redirect){
-				log.debug(`redirect to ${redirect}`);
+				log.debug(`redirect to ${redirect}`, 4);
 				window.location.href = redirect;
 				return;
 			}
@@ -445,6 +449,12 @@ const IdentityRequest = function(props) {
 		} else {
 			setNotification({type:'error', message:'Error processing request'});
 		}
+		scrollToTop();
+	};
+	const cancel = async () => {
+		log.debug(`redirect to /settings/keys`, 4);
+		window.location.href = '/settings/keys';
+		return;
 	};
 
 	if(verifier){
@@ -465,7 +475,7 @@ const IdentityRequest = function(props) {
 					Share identity information with this application?
 				</Alert>
 				<Button onClick={saveKey}>Allow Access</Button>{' '}
-				<Button onClick={revokeKey}>Cancel</Button>
+				<Button onClick={cancel}>Cancel</Button>
 			</div>
 		</ErrorWrapper>
 	);
@@ -488,7 +498,6 @@ const ApiKeyEditor = function(props) {
 
 	useEffect(() => {
 		const initializeRequested = async () => {
-			log.debug('initializeRequested');
 			//load usergroups if they weren't passed in as props
 			if(!props.userGroups) {
 				let userGroups = await loadAllUserGroups(currentUser.userID);
@@ -496,15 +505,15 @@ const ApiKeyEditor = function(props) {
 				setUserGroups(userGroups);
 			}
 
-			let access;
+			let initAccess;
 			if(editKey){
 				//set up initial state for an existing key
-				access = boolAccess(editKey.access);
+				initAccess = boolAccess(editKey.access);
 				setName(editKey.name);
 			} else {
 				//set up initial state for new key, including checking for permissions requested
 				//in query params
-				access = requestedPermissions(userGroups);
+				initAccess = requestedPermissions(userGroups);
 				const queryVars = parseQuery(querystring(window.document.location.href));
 				if(queryVars['name']){
 					setName(queryVars['name']);
@@ -512,9 +521,9 @@ const ApiKeyEditor = function(props) {
 					setName(oauthClientName);
 				}
 			}
-			setAccess(access);
+			setAccess(initAccess);
 
-			const accessGroupIDs = Object.keys(access['groups']);
+			const accessGroupIDs = Object.keys(initAccess.groups);
 			for(let groupID of accessGroupIDs){
 				if(groupID != 'all'){
 					setPerGroup(true);
@@ -529,6 +538,8 @@ const ApiKeyEditor = function(props) {
 	}, []);
 
 	const updateAccess = (updatedAccess) => {
+		log.debug('updateAccess', 4);
+		log.debug(updatedAccess, 4);
 		setAccess(updatedAccess);
 	};
 	const changeName = (evt) => {
@@ -556,10 +567,10 @@ const ApiKeyEditor = function(props) {
 		const saveUrl = buildUrl('saveKey', {key:key, oauth:oauthRequest});
 		const resp = await ajax({url:saveUrl, type:'POST', withSession:true, data:JSON.stringify(keyObject)});
 	
-		scrollToTop();
 		if(!resp.ok){
 			log.error('Error saving key');
 			setNotification({type:'error', message:'Error saving key'});
+			scrollToTop();
 			return;
 		}
 		const data = await resp.json();
@@ -570,7 +581,7 @@ const ApiKeyEditor = function(props) {
 			//redirect if savekey response indicates one
 			//this would be an oauth app redirect, otherwise the redirect will in in our own url parsed below
 			if(redirect){
-				log.debug(`redirect to ${redirect}`);
+				log.debug(`redirect to ${redirect}`, 4);
 				window.location.href = redirect;
 				return;
 			}
@@ -585,7 +596,7 @@ const ApiKeyEditor = function(props) {
 				} else {
 					target = target + `?key=${updatedKey.key}`;
 				}
-				log.debug(`redirect to ${target}`);
+				log.debug(`redirect to ${target}`, 4);
 				window.location.href = target;
 				return;
 			}
@@ -593,6 +604,7 @@ const ApiKeyEditor = function(props) {
 			//if there is a verifier, display it for user to pass on to the oauth app
 			if(verifier){
 				setVerifier(verifier);
+				scrollToTop();
 				return;
 			}
 			//if no previously existing key and no verifier this is a new key:
@@ -603,13 +615,14 @@ const ApiKeyEditor = function(props) {
 		} else {
 			setNotification({type:'error', message:'Error saving key'});
 		}
+		scrollToTop();
 	};
 	
 	const revokeKey = async () => {
 		const key = editKey.key;
 		
 		const revokeUrl = buildUrl('revokeKey', {key});
-		const resp = await postFormData(revokeUrl, {revoke:'1', key:key});
+		const resp = await postFormData(revokeUrl, {revoke:'1', key:key}, {withSession:true});
 		scrollToTop();
 		if(!resp.ok){
 			log.error('Error deleting key');
@@ -621,6 +634,7 @@ const ApiKeyEditor = function(props) {
 		} else {
 			setNotification({type:'error', message:'Error deleting key'});
 		}
+		scrollToTop();
 	};
 
 	const changePerGroup = (evt) => {
@@ -666,7 +680,7 @@ const ApiKeyEditor = function(props) {
 		</Alert>);
 	}
 
-	let accessSection;
+	let accessSection = null;
 	if(defaultsPending){
 		accessSection = <AcceptDefaults saveKey={saveKey} editPermissions={()=>{setDefaultsPending(false);}} />;
 	} else {
@@ -687,6 +701,7 @@ const ApiKeyEditor = function(props) {
 	
 	return (
 		<ErrorWrapper>
+			<accessContext.Provider value={{access, updateAccess}}>
 			<div className='key-editor'>
 				{title}
 				<Notifier {...notification} />
@@ -695,10 +710,11 @@ const ApiKeyEditor = function(props) {
 					<Input type='text' placeholder='Key Name' name='name' id='name' onChange={changeName} value={name} />
 				</Label>
 
-				<PermissionsSummary access={access} userGroups={userGroups} />
+				<PermissionsSummary userGroups={userGroups} />
 
 				{accessSection}
 			</div>
+			</accessContext.Provider>
 		</ErrorWrapper>
 	);
 };

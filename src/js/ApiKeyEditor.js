@@ -73,7 +73,7 @@ const requestedPermissions = function(userGroups = []) {
 	const href = window.document.location.href;
 	const qs = querystring(href);
 	const queryVars = parseQuery(qs);
-	const access = {
+	let access = {
 		user: {
 			library: stringToBool(defaultValue(queryVars['library_access'], 1)),
 			files: stringToBool(defaultValue(queryVars['file_access'], 0)),
@@ -85,6 +85,18 @@ const requestedPermissions = function(userGroups = []) {
 		}
 	};
 
+	switch (access.groups.all) {
+		case 'none':
+			access.groups.all = {};
+			break;
+		case 'read':
+			access.groups.all = {library:true};
+			break;
+		case 'write':
+			access.groups.all = {library:true, write:true};
+			break;
+	}
+	
 	for(let key in userGroups) {
 		const group = userGroups[key];
 		const varname = `group_${group.id}`;
@@ -244,10 +256,10 @@ const AllGroupsPermissions = function() {
 		let newAccess = Object.assign({}, access);
 		switch(newAllValue){
 			case 'none':
-				newAccess.groups.all = {};
+				delete newAccess.groups.all;
 				break;
 			case 'read':
-				newAccess.groups.all = {'library':true};
+				newAccess.groups.all = {library:true, write:false};
 				break;
 			case 'write':
 				newAccess.groups.all = {library:true, write:true};
@@ -311,10 +323,10 @@ const IndividualGroupPermissions = function(props) {
 		let newAccess = Object.assign({}, access);
 		switch(newGroupValue){
 			case 'none':
-				newAccess.groups[groupID] = {};
+				delete newAccess.groups[groupID];
 				break;
 			case 'read':
-				newAccess.groups[groupID] = {library:true};
+				newAccess.groups[groupID] = {library:true, write:false};
 				break;
 			case 'write':
 				newAccess.groups[groupID] = {library:true, write:true};

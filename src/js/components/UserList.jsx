@@ -75,7 +75,7 @@ function LargeUser (props) {
 					<div className="nugget-title card-subtitle text-muted">{title}</div> :
 					null}
 				{affiliation ? 
-					<div className="nugget-affiliation card-subtitle text-muted">{user.affiliation}</div> :
+					<div className="nugget-affiliation card-subtitle text-muted">{affiliation}</div> :
 					null}
 				{location ?
 					<div className="nugget-location card-subtitle text-muted">{location}</div> :

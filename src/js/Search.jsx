@@ -3,8 +3,7 @@
 // import {log as logger} from './Log.js';
 // let log = logger.Logger('Search.jsx');
 
-const React = require('react');
-const {Component} = React;
+import {useState, useEffect} from 'react';
 
 import {PropTypes} from 'prop-types';
 import {Row, Col, Form, Input, InputGroup, Button, Nav, NavItem, NavLink, InputGroupAddon, Pagination, PaginationItem, PaginationLink} from 'reactstrap';
@@ -14,16 +13,22 @@ import {GroupNugget} from './Groups/UserGroups.js';
 import {LocationState} from './LocationState.js';
 
 function SearchPagination (props) {
-	let {locationState, totalResults, page, resultsPerPage, pageVar} = props;
+	let {locationState, totalResults, page, resultsPerPage, pageVar, changePage} = props;
 	let numPages = Math.min(Math.ceil(totalResults / resultsPerPage), 10);
 	let pageLinks = [];
 	for(let i=1; i<numPages+1; i++){
-		locationState.setQueryVar(pageVar, i);
-		let url = locationState.buildUrl({}, locationState.vars.q);
+		if(changePage) {
+			pageLinks.push(<PaginationItem active={i == page}>
+				<PaginationLink href='#' onClick={()=>{changePage(i);}}>{i}</PaginationLink>
+			</PaginationItem>);
+		} else {
+			locationState.setQueryVar(pageVar, i);
+			let url = locationState.buildUrl({}, locationState.vars.q);
 
-		pageLinks.push(<PaginationItem active={i == page}>
-			<PaginationLink href={url}>{i}</PaginationLink>
-		</PaginationItem>);
+			pageLinks.push(<PaginationItem active={i == page}>
+				<PaginationLink href={url}>{i}</PaginationLink>
+			</PaginationItem>);
+		}
 	}
 	return (
 		<Pagination>
@@ -43,59 +48,78 @@ SearchPagination.propTypes = {
 	page: PropTypes.number,
 	resultsPerPage: PropTypes.number,
 	pageVar: PropTypes.string,
+	changePage: PropTypes.function,
 };
 
-class Search extends Component{
-	constructor(props){
-		super(props);
-		this.ls = new LocationState(props.basePath);
-		this.state = {
-			type:props.defaultType,
-			query:'',
-			totalResults:null,
-			results:[],
-			page:1
-		};
-		this.ls.parseVars();
-		if(this.ls.getVar('type')){
-			this.state.type = this.ls.getVar('type');
-		}
-		if(this.ls.getVar('p')){
-			this.state.page = parseInt(this.ls.getVar('p'), 10);
-		}
-		if(this.ls.getVar('q')){
-			this.state.query = this.ls.getVar('q');
-			this.search();
-		}
-	}
-	changeType = (evt) => {
-		evt.preventDefault();
-		let type = evt.target.getAttribute('data-type');
-		this.setState({type, results:[], totalResults:null});
-		this.ls.setQueryVar('type', type);
-		this.ls.pushState();
-	}
-	handleQueryChange = (evt) => {
-		this.setState({query:evt.target.value});
-	}
-	search = async(evt) => {
-		if(evt){
+function Search(props) {
+	const {basePath, searchTypes, defaultType} = props;
+	const ls = new LocationState(basePath);
+	ls.parseVars();
+	const [type, setType] = useState(ls.getVar('type') ?? defaultType);
+	const [query, setQuery] = useState(ls.getVar('q') ?? '');
+	const [totalResults, setTotalResults] = useState(null);
+	const [results, setResults] = useState([]);
+	const [page, setPage] = useState(ls.getVar('p') ?? 1);
+	const [searchPerformed, setSearchPerformed] = useState(false);
+	const [searchSubmitted, setSearchSubmitted] = useState(true);
+
+	const search = async (evt) => {
+		if(evt) {
 			evt.preventDefault();
 		}
-		const {query, type, page} = this.state;
-
-		//change url
-		this.ls.setQueryVar('q', query);
-		this.ls.pushState();
+		setSearchSubmitted(true);
+	};
+	const changeType = (evt) => {
+		evt.preventDefault();
+		let newType = evt.target.getAttribute('data-type');
+		setResults([]);
+		setTotalResults(null);
+		setSearchPerformed(false);
+		setType(newType);
 		
-		//perform query
-		let resp = await postFormData('/searchresults', {type, query, page});
-		let results = await resp.json();
-		this.setState({totalResults:results.total, results:results.results});
-	}
-	render() {
-		const {type, results, query, totalResults, page} = this.state;
-		let resultNodes = null;
+		ls.setQueryVar('type', newType);
+		ls.pushState();
+		search();
+	};
+	const handleQueryChange = (evt) => {
+		setQuery(evt.target.value);
+	};
+	const changePage = (newPage) => {
+		setPage(newPage);
+		ls.setQueryVar('p', newPage);
+		ls.pushState();
+	};
+	
+	//perform search when searchType changes or query is submitted
+	useEffect(() => {
+		const performSearch = async () => {
+			if (query && searchSubmitted) {
+				//change url
+				ls.setQueryVar('q', query);
+				ls.pushState();
+				
+				//perform query
+				let resp = await postFormData('/searchresults', {type, query, page});
+				let results = await resp.json();
+				setTotalResults(results.total);
+				setResults(results.results);
+				setSearchPerformed(true);
+			}
+			setSearchSubmitted(false);
+		};
+		performSearch();
+	}, [type, searchSubmitted]);
+
+	let resultNodes = null;
+	if(searchPerformed && results.length === 0) {
+		resultNodes = (
+			<div className="card border-0">
+				<div className='card-body border-top'>
+					No results
+				</div>
+			</div>
+		);
+	} else if (searchPerformed) {
 		if(type == 'people'){
 			resultNodes = results.map((user)=>{
 				return <LargeUser key={user.userID} user={user} />;
@@ -105,51 +129,57 @@ class Search extends Component{
 				return <GroupNugget key={group.apiObj.id} group={group.apiObj} className='m-2' />;
 			});
 		}
-
-		let pagination = null;
-		if(totalResults > 10) {
-			pagination = <SearchPagination locationState={this.ls} totalResults={totalResults} page={page} />;
+	} else {
+		if (type == 'people') {
+			resultNodes = <p className='my-6 text-center'>Use &quot;double quotes&quot; to search for exact phrases. Otherwise we will search for users with any of the search terms.</p>;
+		} else {
+			resultNodes = null;
 		}
-		
-		let typeNavRow = (
+	}
+
+	let pagination = null;
+	if(totalResults > 10) {
+		pagination = <SearchPagination locationState={ls} totalResults={totalResults} page={page} changePage={changePage} />;
+	}
+	
+	let typeNavRow = (
+		<Row>
+			<Col className='search-form'>
+				<Nav tabs>
+					<NavItem>
+						<NavLink active={type=='people'} data-type='people' onClick={changeType} href='#'>People</NavLink>
+					</NavItem>
+					<NavItem>
+						<NavLink active={type=='group'} data-type='group' onClick={changeType} href='#'>Groups</NavLink>
+					</NavItem>
+				</Nav>
+			</Col>
+		</Row>
+	);
+	
+	return (
+		<div className='search'>
+			{searchTypes.length > 1 ? typeNavRow : null}
 			<Row>
 				<Col className='search-form'>
-					<Nav tabs>
-						<NavItem>
-							<NavLink active={type=='people'} data-type='people' onClick={this.changeType} href='#'>People</NavLink>
-						</NavItem>
-						<NavItem>
-							<NavLink active={type=='group'} data-type='group' onClick={this.changeType} href='#'>Groups</NavLink>
-						</NavItem>
-					</Nav>
+					<Form onSubmit={search} className='my-3'>
+						<InputGroup>
+							<Input type='text' name='q' onChange={handleQueryChange} defaultValue={query} />
+							<InputGroupAddon addonType="append"><Button onClick={search}>Search</Button></InputGroupAddon>
+						</InputGroup>
+					</Form>
 				</Col>
 			</Row>
-		);
-		
-		return (
-			<div className='search'>
-				{this.props.searchTypes.length > 1 ? typeNavRow : null}
-				<Row>
-					<Col className='search-form'>
-						<Form onSubmit={this.search} className='my-3'>
-							<InputGroup>
-								<Input type='text' name='query' onChange={this.handleQueryChange} defaultValue={query} />
-								<InputGroupAddon addonType="append"><Button onClick={this.search}>Search</Button></InputGroupAddon>
-							</InputGroup>
-						</Form>
-					</Col>
-				</Row>
-				<Row>
-					<Col>
-						<div id='search-results'>
-							{resultNodes}
-						</div>
-						{pagination}
-					</Col>
-				</Row>
-			</div>
-		);
-	}
+			<Row>
+				<Col>
+					<div id='search-results'>
+						{resultNodes}
+					</div>
+					{pagination}
+				</Col>
+			</Row>
+		</div>
+	);
 }
 
 Search.defaultProps = {

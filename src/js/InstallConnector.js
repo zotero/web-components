@@ -19,7 +19,9 @@ const installData = config.installData;
 const {firefoxHash, firefoxVersion} = installData || {firefoxHash:'', firefoxVersion:''};
 const chromeDownload = 'https://chrome.google.com/webstore/detail/ekhagklcjbdpajgpjgmbionohlpdbjgc';
 const firefoxDownload = `https://www.zotero.org/download/connector/dl?browser=firefox&version=${firefoxVersion}`;
-const safariDownload = 'https://www.zotero.org/download/connector/dl?browser=safari';
+const safariDownload = installData.oldSafari
+	? 'https://www.zotero.org/download/connector/dl?browser=safari'
+	: 'https://www.zotero.org/support/kb/safari_12_connector';
 
 class InstallFirefoxButton extends Component{
 	installFirefox(evt){

@@ -22,7 +22,7 @@ const chromeDownload = 'https://chrome.google.com/webstore/detail/ekhagklcjbdpaj
 const firefoxDownload = `https://www.zotero.org/download/connector/dl?browser=firefox&version=${firefoxVersion}`;
 const safariDownload = installData.oldSafari
 	? 'https://www.zotero.org/download/connector/dl?browser=safari'
-	: 'https://safari-extensions.apple.com/details/?id=org.zotero.zoteroconnectorforsafari-8LAYR367YV';
+	: 'https://www.zotero.org/support/kb/safari_12_connector';
 
 class InstallFirefoxButton extends Component{
 	installFirefox(evt){

@@ -3,6 +3,9 @@
 //import {log as logger} from './Log.js';
 //let log = logger.Logger('RecentItems');
 
+import {PureComponent, useEffect, useState} from 'react';
+import {PropTypes} from 'prop-types';
+
 import {ItemMaps} from './ItemMaps.js';
 import {loadRecentGroupItems} from './ajaxHelpers.js';
 import {formatItemField, getCurrentUser} from './Utils.js';
@@ -13,100 +16,119 @@ import {jsError} from './Utils.js';
 
 const currentUser = getCurrentUser();
 
-let React = require('react');
-
-class ItemTypeIcon extends React.PureComponent{
+class ItemTypeIcon extends PureComponent{
 	render(){
 		let c = `sprite-icon sprite-treeitem-${this.props.itemType} left`;
 		return (<span className={c}></span>);
 	}
 }
+ItemTypeIcon.propTypes = {
+	itemType: PropTypes.string
+};
 
-class RecentItemRow extends React.Component{
-	render() {
-		let item = this.props.item;
-		let itemHref = buildUrl('itemUrl', {item:item});
-		let fields = this.props.displayFields.map((field)=>{
-			let icon = null;
-			if(field == 'title'){
-				icon = <ItemTypeIcon itemType={item.data.itemType} />;
-			}
-			return (
-				<td key={field} className={field} data-itemkey={item.key}>
-					<a data-itemkey={item.key} href={itemHref}>
-						{icon}
-						{formatItemField(field, item, true)}
-					</a>
-				</td>
-			);
-		});
+function RecentItemRow(props) {
+	const {item, displayFields} = props;
+	const itemHref = buildUrl('itemUrl', {item});
+	let fields = displayFields.map((field)=>{
+		let icon = null;
+		if(field == 'title'){
+			icon = <ItemTypeIcon itemType={item.data.itemType} />;
+		}
 		return (
-			<tr>
-				{fields}
-			</tr>
+			<td key={field} className={field} data-itemkey={item.key}>
+				<a data-itemkey={item.key} href={itemHref}>
+					{icon}
+					{formatItemField(field, item, true)}
+				</a>
+			</td>
 		);
-	}
+	});
+	return (
+		<tr>
+			{fields}
+		</tr>
+	);
 }
 RecentItemRow.defaultProps = {
 	item: {}
 };
+RecentItemRow.propTypes = {
+	item: PropTypes.shape({
+		key: PropTypes.string,
+		data: PropTypes.object,
+	}),
+	displayFields: PropTypes.arrayOf(PropTypes.string),
+};
 
 
-class RecentItems extends React.Component{
-	constructor(props){
-		super(props);
+function RecentItems(props) {
+	const {group, displayFields} = props;
+	const [items, setItems] = useState(props.items);
+	const [loading, setLoading] = useState(false);
+	const [totalResults, setTotalResults] = useState(props.totalResults);
+	const [notReadable, setNotReadable] = useState(false);
 
-		this.state = {
-			loading:false,
-			items:this.props.items,
-			totalResults:parseInt(this.props.totalResults, 10)
-		};
-	}
-	componentWillMount = async () => {
-		let group = this.props.group;
-		//load items iff we have access
-		let userID = null;
-		if(currentUser){
-			userID = currentUser.userID;
-		}
-
-		if(groupIsReadable(group, userID) && this.state.items.length == 0){
-			this.setState({loading:true});
-			try{
-				let resp = await loadRecentGroupItems(this.props.group);
-				let data = await resp.json();
-				let totalResults = parseInt(resp.headers.get('Total-Results'));
-				this.setState({loading:false, items:data, totalResults:totalResults});
-			} catch(e) {
-				this.setState({loading:false});
-				jsError('There was an error loading the group library. Please try again in a few minutes');
+	useEffect(() => {
+		let loadItems = async () => {
+			let userID = null;
+			if(currentUser){
+				userID = currentUser.userID;
 			}
-		} else {
-			this.setState({notReadable:true});
-		}
+
+			if(groupIsReadable(group, userID) && items.length == 0){
+				setLoading(true);
+				try{
+					const resp = await loadRecentGroupItems(group);
+					const data = await resp.json();
+					const totalResults = parseInt(resp.headers.get('Total-Results'));
+					setLoading(false);
+					setItems(data);
+					setTotalResults(totalResults);
+				} catch(e) {
+					setLoading(false);
+					jsError('There was an error loading the group library. Please try again in a few minutes');
+				}
+			} else {
+				setNotReadable(true);
+			}
+		};
+		loadItems();
+	}, []);
+
+	//short-circuit if user doesn't have access
+	if(notReadable === true){
+		return (
+			<p>Library will be viewable after joining this group.</p>
+		);
 	}
-	render() {
-		if(this.state.notReadable === true){
+	
+	let table = null;
+	let totalResultsNode = null;
+	if(totalResults === 0){
+		totalResultsNode = <p>There are not yet any items in this collection</p>;
+	} else if(totalResults){
+		totalResultsNode = (
+			<p>
+				See all {totalResults} items for this group in the <a href={buildUrl('groupLibrary', {group})}>Group Library</a>.
+			</p>
+		);
+
+		let itemRows = items.map((item)=>{
 			return (
-				<p>Library will be viewable after joining this group.</p>
-			);
-		}
-		let itemRows = this.state.items.map((item)=>{
-			return (
-				<RecentItemRow key={item.key} displayFields={this.props.displayFields} item={item} />
+				<RecentItemRow key={item.key} displayFields={displayFields} item={item} />
 			);
 		});
-
-		let headers = this.props.displayFields.map((header)=>{
+	
+		let headers = displayFields.map((header)=>{
 			return (
 				<th key={header} className="field-table-header">
 					{ItemMaps.fieldMap[header] ? ItemMaps.fieldMap[header] : header}
 				</th>
 			);
 		});
-
-		let table = (
-			<table id='field-table' ref="itemsTable" className='wide-items-table table table-striped'>
+	
+		table = (
+			<table id='field-table' className='wide-items-table table table-striped'>
 				<thead>
 					<tr>
 						{headers}
@@ -117,31 +139,26 @@ class RecentItems extends React.Component{
 				</tbody>
 			</table>
 		);
-
-		let totalResults = null;
-		if(this.state.totalResults === 0){
-			table = null;
-			totalResults = <p>There are not yet any items in this collection</p>;
-		} else if(this.state.totalResults){
-			totalResults = (
-				<p>See all {this.state.totalResults} items for this group in the <a href={buildUrl('groupLibrary', {group:this.props.group})}>Group Library</a>.
-				</p>
-			);
-		}
-
-		return (
-			<div>
-				{table}
-				{totalResults}
-				<LoadingSpinner loading={this.state.loading} />
-			</div>
-		);
 	}
+
+	return (
+		<div>
+			{table}
+			{totalResultsNode}
+			<LoadingSpinner loading={loading} />
+		</div>
+	);
 }
 RecentItems.defaultProps = {
 	displayFields: ['title', 'addedBy', 'dateModified'],
 	items: [],
 	totalResults:null
+};
+RecentItems.propTypes = {
+	group: PropTypes.object,
+	displayFields:PropTypes.arrayOf(PropTypes.string),
+	items:PropTypes.arrayOf(PropTypes.object),
+	totalResults:PropTypes.number,
 };
 
 export {RecentItems};

@@ -18,14 +18,14 @@ function SearchPagination (props) {
 	let pageLinks = [];
 	for(let i=1; i<numPages+1; i++){
 		if(changePage) {
-			pageLinks.push(<PaginationItem active={i == page}>
+			pageLinks.push(<PaginationItem key={i} active={i == page}>
 				<PaginationLink href='#' onClick={()=>{changePage(i);}}>{i}</PaginationLink>
 			</PaginationItem>);
 		} else {
 			locationState.setQueryVar(pageVar, i);
 			let url = locationState.buildUrl({}, locationState.vars.q);
 
-			pageLinks.push(<PaginationItem active={i == page}>
+			pageLinks.push(<PaginationItem key={url} active={i == page}>
 				<PaginationLink href={url}>{i}</PaginationLink>
 			</PaginationItem>);
 		}
@@ -43,23 +43,23 @@ SearchPagination.defaultProps = {
 	resultsPerPage:10,
 };
 SearchPagination.propTypes = {
-	locationState: PropTypes.function,
+	locationState: PropTypes.object,
 	totalResults: PropTypes.number,
 	page: PropTypes.number,
 	resultsPerPage: PropTypes.number,
 	pageVar: PropTypes.string,
-	changePage: PropTypes.function,
+	changePage: PropTypes.func,
 };
 
 function Search(props) {
-	const {basePath, searchTypes, defaultType} = props;
+	const {basePath, searchTypes, defaultType, resultsPerPage} = props;
 	const ls = new LocationState(basePath);
 	ls.parseVars();
 	const [type, setType] = useState(ls.getVar('type') ?? defaultType);
 	const [query, setQuery] = useState(ls.getVar('q') ?? '');
 	const [totalResults, setTotalResults] = useState(null);
 	const [results, setResults] = useState([]);
-	const [page, setPage] = useState(ls.getVar('p') ?? 1);
+	const [page, setPage] = useState(parseInt(ls.getVar('p')) ?? 1);
 	const [searchPerformed, setSearchPerformed] = useState(false);
 	const [searchSubmitted, setSearchSubmitted] = useState(true);
 
@@ -88,6 +88,7 @@ function Search(props) {
 		setPage(newPage);
 		ls.setQueryVar('p', newPage);
 		ls.pushState();
+		search();
 	};
 	
 	//perform search when searchType changes or query is submitted
@@ -138,8 +139,8 @@ function Search(props) {
 	}
 
 	let pagination = null;
-	if(totalResults > 10) {
-		pagination = <SearchPagination locationState={ls} totalResults={totalResults} page={page} changePage={changePage} />;
+	if(totalResults > resultsPerPage) {
+		pagination = <SearchPagination locationState={ls} totalResults={totalResults} page={page} changePage={changePage} resultsPerPage={resultsPerPage} />;
 	}
 	
 	let typeNavRow = (
@@ -185,12 +186,14 @@ function Search(props) {
 Search.defaultProps = {
 	basePath: '/search',
 	searchTypes: ['people', 'groups'],
-	defaultType: 'people'
+	defaultType: 'people',
+	resultsPerPage: 10,
 };
 Search.propTypes = {
 	basePath: PropTypes.string,
 	searchTypes: PropTypes.arrayOf(PropTypes.string),
-	defaultType: PropTypes.oneOf(['people', 'group'])
+	defaultType: PropTypes.oneOf(['people', 'group']),
+	resultsPerPage: PropTypes.number,
 };
 
 export {Search};

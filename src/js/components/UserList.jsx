@@ -63,22 +63,22 @@ function LargeUser (props) {
 	const profileUrl = buildUrl('profileUrl', {slug});
 	
 	return (
-		<div className="nugget-user-small card border-0">
-			<div className='card-body border-top'>
-				<a href={profileUrl}>
-					<ProfileImage hasImage={hasImage} type='user' entityID={userID} width='100px' height='100px' usePlaceholder={false} />
-				</a>
-				<div className="nugget-name card-title">
+		<div className="nugget-user-small media border-top p-4">
+			<a href={profileUrl}>
+				<ProfileImage hasImage={hasImage} type='user' entityID={userID} width='100px' height='100px' usePlaceholder={true} />
+			</a>
+			<div className='media-body mx-4'>
+				<h5 className="nugget-name">
 					<a href={profileUrl}>{displayName}</a>
-				</div>
+				</h5>
 				{title ?
-					<div className="nugget-title card-subtitle text-muted">{title}</div> :
+					<div className="nugget-title text-muted">{title}</div> :
 					null}
 				{affiliation ? 
-					<div className="nugget-affiliation card-subtitle text-muted">{affiliation}</div> :
+					<div className="nugget-affiliation text-muted">{affiliation}</div> :
 					null}
 				{location ?
-					<div className="nugget-location card-subtitle text-muted">{location}</div> :
+					<div className="nugget-location text-muted">{location}</div> :
 					null}
 			</div>
 		</div>

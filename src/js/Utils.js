@@ -366,4 +366,29 @@ let chunkArray = function(ar, chunkSize=50){
 	return chunks;
 };
 
-export {slugify, parseQuery, buildQuery, querystring, parseSearchString, readCookie, loadInitialState, pageReady, jsError, jsSuccess, Delay, formatItemField, formatCurrency, getCurrentUser, chunkArray};
+let relativeTime = function(timestampSeconds){
+	let curTimestamp = Date.now();
+	let curTimestampSeconds = curTimestamp / 1000;
+	
+	let difference = curTimestampSeconds - timestampSeconds;
+	
+	let periods = ['sec', 'min', 'hour', 'day', 'week', 'month', 'year', 'decade'];
+	let lengths = ['60','60','24','7','4.35','12','10'];
+	
+	let ending = '';
+	if (difference > 0) { // this was in the past
+			ending = 'ago';
+	} else { // this was in the future
+			difference = -difference;
+			ending = 'to go';
+	}
+	
+	let j;
+	for(j = 0; difference >= lengths[j]; j++)
+			difference /= lengths[j];
+	difference = Math.round(difference);
+	if(difference != 1) periods[j] += 's';
+	return `${difference} ${periods[j]} ${ending}`;
+};
+
+export {slugify, parseQuery, buildQuery, querystring, parseSearchString, readCookie, loadInitialState, pageReady, jsError, jsSuccess, Delay, formatItemField, formatCurrency, getCurrentUser, chunkArray, relativeTime};

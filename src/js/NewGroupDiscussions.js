@@ -1,7 +1,7 @@
 'use strict';
 
-// import {log as logger} from '../Log.js';
-// let log = logger.Logger('NewGroupDiscussions');
+import {log as logger} from './Log.js';
+let log = logger.Logger('NewGroupDiscussions');
 
 import {useEffect, useState} from 'react';
 import {PropTypes} from 'prop-types';
@@ -37,7 +37,6 @@ function GroupDiscussionMessageSummary(props){
 	let slug = displayNames['slug'][sender];
 	let senderName = displayNames['displayName'][sender];
 	let rSenderSlug = displayNames['slug'][rsender];
-	
 	if(narrow){
 		let lastPosterNode = null;
 		if(rsender){
@@ -73,7 +72,7 @@ function GroupDiscussionMessageSummary(props){
 	return (
 		<tr className='group-discussion'>
 			<td>
-				<a href={buildUrl('groupDiscussion', {messageID})}>{title}</a>
+				<a href={buildUrl('groupDiscussion', {messageID})}>{title ? title : '[Untitled]'}</a>
 			</td>
 			{starterNode}
 			{lastActiveNode}
@@ -83,11 +82,11 @@ function GroupDiscussionMessageSummary(props){
 	);
 }
 GroupDiscussionMessageSummary.propTypes = {
-	messageID: PropTypes.number,
+	messageID: PropTypes.string,
 	title: PropTypes.string,
-	sender: PropTypes.number,
-	displayNames: PropTypes.arrayOf(PropTypes.string),
-	lastActivity:PropTypes.number,
+	sender: PropTypes.string,
+	displayNames: PropTypes.object,
+	lastActivity:PropTypes.string,
 	rsender:PropTypes.number,
 	group:PropTypes.object,
 	showFields:PropTypes.object,

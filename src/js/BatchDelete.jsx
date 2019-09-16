@@ -1,20 +1,25 @@
-'use strict';
-
+/* eslint-disable jsx-quotes */
+/* eslint-disable lines-between-class-members */
+/* eslint-disable space-before-blocks */
+/* eslint-disable keyword-spacing */
+/* eslint-disable spaced-comment */
 import {log as logger} from './Log.js';
 let log = logger.Logger('BatchDelete');
+
+//let React = require('react');
+import {Component, PureComponent} from 'react';
+import {PropTypes} from 'prop-types';
 
 import {chunkArray} from './Utils.js';
 import {LoadingSpinner} from './LoadingSpinner.js';
 import {loadAttachmentItems, deleteSlice} from './ajaxHelpers.js';
 import { Notifier } from './Notifier.js';
 
-let React = require('react');
-
-class Progress extends React.PureComponent {
+class Progress extends PureComponent {
 	render() {
 		let {message, progress, max} = this.props;
 		let meter = null;
-		if(progress != null){
+		if(progress !== null){
 			meter = (<meter min="0" max={max} value={progress}>{progress}/{max}</meter>);
 		}
 		return (
@@ -27,19 +32,24 @@ class Progress extends React.PureComponent {
 	}
 }
 Progress.defaultProps = {
-	progress:0,
-	max:100
+	progress: 0,
+	max: 100
+};
+Progress.propTypes = {
+	message: PropTypes.string,
+	progress: PropTypes.number,
+	max: PropTypes.number,
 };
 
-class BatchDelete extends React.Component {
+class BatchDelete extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			error:null,
-			loading:false,
-			totalAttachments:null,
-			relevantAttachments:null,
-			deleteFinished:false
+			error: null,
+			loading: false,
+			totalAttachments: null,
+			relevantAttachments: null,
+			deleteFinished: false
 		};
 	}
 	componentDidMount = () => {
@@ -50,36 +60,36 @@ class BatchDelete extends React.Component {
 		let {totalAttachments} = this.state;
 		let attachments = [];
 		this.setState({
-			loading:true,
-			progress:{
-				message:'Checking all attachments'
+			loading: true,
+			progress: {
+				message: 'Checking all attachments'
 			}
 		});
-		this.setState({loading:true});
+		this.setState({loading: true});
 		do {
 			let start = attachments.length;
 			let response = await loadAttachmentItems(groupID, start);
 			if(!totalAttachments){
-				totalAttachments = response.headers.get('total-results');
+				totalAttachments = parseInt(response.headers.get('total-results'));
 				this.setState({totalAttachments});
 			}
 			let data = await response.json();
 			attachments = attachments.concat(data);
 			this.setState({
-				progress:{
-					message:'Checking all attachments',
+				progress: {
+					message: 'Checking all attachments',
 					max: totalAttachments,
-					progress:attachments.length
+					progress: attachments.length
 				}
 			});
 		} while (attachments.length < totalAttachments);
 		
-		log.debug('got all attachments, finding relevant ones');
+		log.debug('got all attachments, finding relevant ones', 4);
 		let relevantAttachments = attachments.filter((item) => {
 			return (item.data.linkMode == 'imported_url' || item.data.linkMode == 'imported_file');
 		});
-		log.debug(relevantAttachments);
-		this.setState({relevantAttachments, loading:false, progress:null});
+		log.debug(relevantAttachments, 4);
+		this.setState({relevantAttachments, loading: false, progress: null});
 	}
 	deleteAttachments = async () => {
 		let {groupID} = this.props;
@@ -88,24 +98,24 @@ class BatchDelete extends React.Component {
 			return item.key;
 		});
 		let itemKeySlices = chunkArray(itemKeys, 10);
-		for(let i=0; i < itemKeySlices.length; i++){
+		for(let i = 0; i < itemKeySlices.length; i++){
 			this.setState({
-				progress:{
+				progress: {
 					message: 'Deleting attachments',
-					progress:i,
-					max:itemKeySlices.length
+					progress: i,
+					max: itemKeySlices.length
 				}
 			});
 			let resp = await deleteSlice(groupID, itemKeySlices[i]);
 			if(!resp.ok){
-				log.debug('There was an error deleting attachment items. Please try again in a few minutes.');
-				this.setState({error:'There was an error deleting attachment items. Please try again in a few minutes.'});
+				log.error('There was an error deleting attachment items. Please try again in a few minutes.');
+				this.setState({error: 'There was an error deleting attachment items. Please try again in a few minutes.'});
 				return;
 			}
 		}
 		this.setState({
-			progress:null,
-			deleteFinished:true
+			progress: null,
+			deleteFinished: true
 		});
 	}
 	render() {
@@ -151,5 +161,9 @@ class BatchDelete extends React.Component {
 		);
 	}
 }
+BatchDelete.propTypes = {
+	groupID: PropTypes.number,
+	save: PropTypes.func,
+};
 
 export {BatchDelete};

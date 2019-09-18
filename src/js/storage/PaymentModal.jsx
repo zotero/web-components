@@ -1,5 +1,3 @@
-'use strict';
-
 import {log as logger} from '../Log.js';
 var log = logger.Logger('PaymentModal', 1);
 
@@ -16,8 +14,8 @@ function CardSection() {
 	);
 }
 
-function CardCheckoutForm(props){
-	if(typeof props.handleToken != 'function'){
+function CardCheckoutForm(props) {
+	if (typeof props.handleToken != 'function') {
 		log.error('props error in CardCheckoutForm: handleToken must be function');
 	}
 	const [name, setName] = useState('');
@@ -29,9 +27,9 @@ function CardCheckoutForm(props){
 		// Within the context of `Elements`, this call to createToken knows which Element to
 		// tokenize, since there's only one in this group.
 		let result = await props.stripe.createToken({name});
-		if(result.token){
+		if (result.token) {
 			props.handleToken(result.token);
-		} else if(result.error){
+		} else if (result.error) {
 			log.error(result.error);
 			throw result.error;
 		}
@@ -39,11 +37,11 @@ function CardCheckoutForm(props){
 	const buttonLabel = props.buttonLabel || 'Confirm Order';
 	
 	let emailSection = null;
-	if(props.useEmail){
+	if (props.useEmail) {
 		emailSection = (
 			<FormGroup>
 				<Input type='email' placeholder='Email' value={email}
-					onChange={(evt)=>{setEmail(evt.target.value);}}
+					onChange={(evt) => { setEmail(evt.target.value); }}
 				/>
 			</FormGroup>
 		);
@@ -54,7 +52,7 @@ function CardCheckoutForm(props){
 			{emailSection}
 			<FormGroup>
 				<Input type='text' placeholder='Name' value={name}
-					onChange={(evt)=>{setName(evt.target.value);}}
+					onChange={(evt) => { setName(evt.target.value); }}
 				/>
 			</FormGroup>
 			<FormGroup>
@@ -75,12 +73,12 @@ CardCheckoutForm.propTypes = {
 	useEmail: PropTypes.bool
 };
 CardCheckoutForm.defaultProps = {
-	useEmail:false
+	useEmail: false
 };
 
 
 function IBANCheckoutForm(props) {
-	if(typeof props.handleToken != 'function'){
+	if (typeof props.handleToken != 'function') {
 		log.error('props error in CardCheckoutForm: handleToken must be function');
 	}
 	const [name, setName] = useState('');
@@ -104,13 +102,12 @@ function IBANCheckoutForm(props) {
 			},
 		};
 		let result = await props.stripe.createToken(sourceData);
-		if(result.token){
+		if (result.token) {
 			props.handleToken(result.token);
-		} else if(result.error){
+		} else if (result.error) {
 			log.error(result.error);
 			throw result.error;
 		}
-		return;
 	};
 	
 	const buttonLabel = props.label || 'Confirm Order';
@@ -119,12 +116,12 @@ function IBANCheckoutForm(props) {
 		<Form onSubmit={handleSubmit}>
 			<FormGroup>
 				<Input type='text' placeholder='Name' value={name}
-					onChange={(evt)=>{setName(evt.target.value);}}
+					onChange={(evt) => { setName(evt.target.value); }}
 				/>
 			</FormGroup>
 			<FormGroup>
 				<Input type='text' placeholder='Email' value={email}
-					onChange={(evt)=>{setEmail(evt.target.value);}}
+					onChange={(evt) => { setEmail(evt.target.value); }}
 				/>
 			</FormGroup>
 			<FormGroup>
@@ -149,12 +146,12 @@ IBANCheckoutForm.propTypes = {
 	onClose: PropTypes.func.isRequired
 };
 
-function _PaymentRequestForm(props){
+function _PaymentRequestForm(props) {
 	const {stripe, paymentAmount, handleToken} = props;
 	const [canMakePayment, setCanMakePayment] = useState(false);
 	const [paymentRequest, setPaymentRequest] = useState(null);
 
-	if(paymentRequest == null){
+	if (paymentRequest === null) {
 		const paymentRequest = stripe.paymentRequest({
 			country: 'US',
 			currency: 'usd',
@@ -175,7 +172,7 @@ function _PaymentRequestForm(props){
 
 		setPaymentRequest(paymentRequest);
 		log.debug(paymentRequest);
-		paymentRequest.canMakePayment().then((result)=>{
+		paymentRequest.canMakePayment().then((result) => {
 			log.debug('paymentRequest canMakePayment:');
 			log.debug(result);
 			setCanMakePayment(!!result);
@@ -211,7 +208,7 @@ const InjectedPaymentRequestForm = injectStripe(_PaymentRequestForm);
 const InjectedCardCheckoutForm = injectStripe(CardCheckoutForm);
 const InjectedIBANCheckoutForm = injectStripe(IBANCheckoutForm);
 
-function MultiPaymentModal(props){
+function MultiPaymentModal(props) {
 	const [selectedMethod, setMethod] = useState('card');
 	const {handleToken, chargeAmount, buttonLabel, useEmail} = props;
 	const {paymentDispatch} = useContext(PaymentContext);
@@ -220,7 +217,7 @@ function MultiPaymentModal(props){
 	};
 
 	let paymentRequest = null;
-	if(chargeAmount) {
+	if (chargeAmount) {
 		paymentRequest = (
 			<Elements>
 				<InjectedPaymentRequestForm handleToken={handleToken} paymentAmount={chargeAmount} onClose={handleClose} />
@@ -234,12 +231,12 @@ function MultiPaymentModal(props){
 					{paymentRequest}
 					<Nav card tabs>
 						<NavItem>
-							<NavLink active={(selectedMethod == 'card')} onClick={()=>{setMethod('card');}} href='#'>
+							<NavLink active={(selectedMethod == 'card')} onClick={() => { setMethod('card'); }} href='#'>
 								Card
 							</NavLink>
 						</NavItem>
 						<NavItem>
-							<NavLink active={(selectedMethod == 'sepa')} onClick={()=>{setMethod('sepa');}} href='#'>
+							<NavLink active={(selectedMethod == 'sepa')} onClick={() => { setMethod('sepa'); }} href='#'>
 								SEPA Direct Debit
 							</NavLink>
 						</NavItem>
@@ -275,15 +272,15 @@ MultiPaymentModal.propTypes = {
 	handleToken: PropTypes.func.isRequired,
 	chargeAmount: PropTypes.number.isRequired,
 	buttonLabel: PropTypes.string,
-	tokenCallback:PropTypes.func,
-	amount:PropTypes.number,
-	immediateCharge:PropTypes.bool
+	tokenCallback: PropTypes.func,
+	amount: PropTypes.number,
+	immediateCharge: PropTypes.bool
 };
 MultiPaymentModal.defaultProps = {
-	buttonLabel:'Confirm'
+	buttonLabel: 'Confirm'
 };
 
-function CardPaymentModal(props){
+function CardPaymentModal(props) {
 	const {handleToken, chargeAmount, buttonLabel, useEmail} = props;
 	const {paymentDispatch} = useContext(PaymentContext);
 	const handleClose = () => {
@@ -291,7 +288,7 @@ function CardPaymentModal(props){
 	};
 
 	let paymentRequest = null;
-	if(chargeAmount) {
+	if (chargeAmount) {
 		paymentRequest = (
 			<Elements>
 				<InjectedPaymentRequestForm handleToken={handleToken} paymentAmount={chargeAmount} onClose={handleClose} useEmail={useEmail} />
@@ -315,12 +312,13 @@ CardPaymentModal.propTypes = {
 	handleToken: PropTypes.func.isRequired,
 	chargeAmount: PropTypes.number.isRequired,
 	buttonLabel: PropTypes.string,
-	tokenCallback:PropTypes.func,
-	amount:PropTypes.number,
-	immediateCharge:PropTypes.bool
+	tokenCallback: PropTypes.func,
+	amount: PropTypes.number,
+	immediateCharge: PropTypes.bool,
+	useEmail: PropTypes.bool,
 };
 CardPaymentModal.defaultProps = {
-	buttonLabel:'Confirm'
+	buttonLabel: 'Confirm'
 };
 
 export {MultiPaymentModal, CardPaymentModal};

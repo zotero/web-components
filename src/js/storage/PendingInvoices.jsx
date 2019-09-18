@@ -1,32 +1,30 @@
-'use strict';
-
-import {log as logger} from '../Log.js';
+import { log as logger } from '../Log.js';
 var log = logger.Logger('PendingInvoices.jsx', 3);
 
-import {useContext} from 'react';
+import { useContext } from 'react';
 import PropTypes from 'prop-types';
-import {Table} from 'reactstrap';
-import {postFormData} from '../ajax.js';
+import { Table } from 'reactstrap';
+import { postFormData } from '../ajax.js';
 
-import {NotifierContext, notify} from './actions.js';
+import { NotifierContext, notify } from './actions.js';
 
 
-const dateFormatOptions = {year: 'numeric', month: 'long', day: 'numeric'};
+const dateFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
 
 const deleteInvoice = async (invoiceID) => {
-	let data = {invoiceID};
-	let resp = await postFormData('/storage/deleteinvoice', data, {withSession:true});
+	let data = { invoiceID };
+	let resp = await postFormData('/storage/deleteinvoice', data, { withSession: true });
 	
-	if(resp.ok){
-		return {type:'success', 'message':<span>Invoice Deleted</span>};
+	if (resp.ok) {
+		return { type: 'success', message: <span>Invoice Deleted</span> };
 	} else {
 		throw resp;
 	}
 };
 
 function PendingInvoices(props) {
-	let {invoices, type} = props;
-	const {notifyDispatch} = useContext(NotifierContext);
+	let { invoices, type } = props;
+	const { notifyDispatch } = useContext(NotifierContext);
 	if (!invoices) {
 		return null;
 	}
@@ -42,7 +40,7 @@ function PendingInvoices(props) {
 	}
 	
 	const invoiceRows = invoices.map((invoice) => {
-		const {invoiceID, created, stripeCharge} = invoice;
+		const { invoiceID, created, stripeCharge } = invoice;
 		let invoiceUrl = `/storage/invoice/${invoiceID}`;
 		let createdDate = new Date(created);
 		return (
@@ -57,7 +55,7 @@ function PendingInvoices(props) {
 					{stripeCharge ? 'Paid' : 'Pending'}
 				</td>
 				<td>
-					<a href='#' onClick={()=>{handleDelete(invoiceID);}}>Delete</a>
+					<a href='#' onClick={() => { handleDelete(invoiceID); }}>Delete</a>
 				</td>
 			</tr>
 		);
@@ -78,4 +76,4 @@ PendingInvoices.propTypes = {
 	type: PropTypes.oneOf(['individual', 'lab', 'institution'])
 };
 
-export {PendingInvoices};
+export { PendingInvoices };

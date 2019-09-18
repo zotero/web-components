@@ -21,25 +21,25 @@ Flows:
  - allow payments for third parties
 */
 
-import {log as logger} from '../Log.js';
+import { log as logger } from '../Log.js';
 const log = logger.Logger('StorageComponent');
 
-import {useReducer, useEffect, useContext} from 'react';
+import { useReducer, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { Row, Col, Progress, Button } from 'reactstrap';
 
-import {ErrorWrapper} from '../components/ErrorWrapper.jsx';
-import {Notifier} from '../Notifier.js';
-import {SubscriptionHandler} from './SubscriptionHandler.jsx';
-import {PaymentSource} from './PaymentSource.jsx';
-import {PendingInvoices} from './PendingInvoices.jsx';
+import { ErrorWrapper } from '../components/ErrorWrapper.jsx';
+import { Notifier } from '../Notifier.js';
+import { SubscriptionHandler } from './SubscriptionHandler.jsx';
+import { PaymentSource } from './PaymentSource.jsx';
+import { PendingInvoices } from './PendingInvoices.jsx';
 
-import {StorageContext, PaymentContext, NotifierContext, getUserCustomer, getSubscription, updatePayment, renewNow, selectPlan, START_OPERATION, STOP_OPERATION, notify} from './actions.js';
-import {storageReducer, notifyReducer, paymentReducer} from './actions.js';
+import { StorageContext, PaymentContext, NotifierContext, getUserCustomer, getSubscription, updatePayment, renewNow, selectPlan, START_OPERATION, STOP_OPERATION, notify } from './actions.js';
+import { storageReducer, notifyReducer, paymentReducer } from './actions.js';
 
-import {postFormData} from '../ajax.js';
+import { postFormData } from '../ajax.js';
 
-const dateFormatOptions = {year: 'numeric', month: 'long', day: 'numeric'};
+const dateFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
 
 const plans = [
 	{
@@ -69,10 +69,10 @@ const plans = [
 ];
 
 function StoragePlanRow(props) {
-	const {plan} = props;
-	const {storageState} = useContext(StorageContext);
-	const {paymentDispatch} = useContext(PaymentContext);
-	const {userSubscription} = storageState;
+	const { plan } = props;
+	const { storageState } = useContext(StorageContext);
+	const { paymentDispatch } = useContext(PaymentContext);
+	const { userSubscription } = storageState;
 	const current = plan.storageLevel == userSubscription.storageLevel;
 	let button = (
 		<Button onClick={() => { paymentDispatch(selectPlan(plan)); }}>Select Plan</Button>
@@ -107,7 +107,7 @@ StoragePlanRow.propTypes = {
 };
 
 function InstitutionProvides(props) {
-	const {institution} = props;
+	const { institution } = props;
 	let quotaDescription = `${institution.storageQuota} MB of storage`;
 	if (institution.storageQuota == 1000000) {
 		quotaDescription = 'unlimited storage';
@@ -132,7 +132,7 @@ InstitutionProvides.propTypes = {
 };
 
 function InstitutionalRow(props) {
-	const {institutions} = props;
+	const { institutions } = props;
 	if (!institutions) {
 		return null;
 	}
@@ -154,8 +154,8 @@ InstitutionalRow.propTypes = {
 };
 
 function StorageMeter() {
-	const {storageState} = useContext(StorageContext);
-	const {userSubscription} = storageState;
+	const { storageState } = useContext(StorageContext);
+	const { userSubscription } = storageState;
 	
 	let quota = userSubscription.quota;
 	if (quota == 1000000) {
@@ -189,7 +189,7 @@ function StorageMeter() {
 }
 
 function GroupUsage(props) {
-	const {group, usage} = props;
+	const { group, usage } = props;
 	if (!group) {
 		return null;
 	}
@@ -205,10 +205,10 @@ GroupUsage.propTypes = {
 };
 
 function PaymentRow(props) {
-	const {defaultSource} = props;
-	const {storageState} = useContext(StorageContext);
-	const {paymentDispatch} = useContext(PaymentContext);
-	const {userSubscription} = storageState;
+	const { defaultSource } = props;
+	const { storageState } = useContext(StorageContext);
+	const { paymentDispatch } = useContext(PaymentContext);
+	const { userSubscription } = storageState;
 	
 	const updateCardHandler = () => {
 		paymentDispatch(updatePayment());
@@ -283,8 +283,8 @@ PaymentRow.propTypes = {
 };
 
 function NextPaymentRow(props) {
-	const {userSubscription, cancelRecur} = props;
-	const {institutionUnlimited} = userSubscription;
+	const { userSubscription, cancelRecur } = props;
+	const { institutionUnlimited } = userSubscription;
 	
 	let d = new Date(parseInt(userSubscription.expirationDate) * 1000);
 	let formattedExpirationDate = d.toLocaleDateString('en-US', dateFormatOptions);
@@ -365,9 +365,9 @@ function Storage(props) {
 		notification: null
 	});
 	
-	const {userSubscription, storageGroups} = storageState;
-	const {stripeCustomer, purchase} = paymentState;
-	const {operationPending, notification} = notifyState;
+	const { userSubscription, storageGroups } = storageState;
+	const { stripeCustomer, purchase } = paymentState;
+	const { operationPending, notification } = notifyState;
 	useEffect(
 		() => {
 			if (!props.userSubscription) {
@@ -381,17 +381,17 @@ function Storage(props) {
 	);
 	
 	const cancelRecur = async () => {
-		notifyDispatch({type: START_OPERATION});
+		notifyDispatch({ type: START_OPERATION });
 
 		try {
 			let resp = await postFormData('/storage/cancelautorenew');
 			log.debug(resp, 4);
 			notifyDispatch(notify('success', 'Automatic renewal disabled'));
-			notifyDispatch({type: STOP_OPERATION});
+			notifyDispatch({ type: STOP_OPERATION });
 		} catch (e) {
 			log.debug(e);
 			notifyDispatch(notify('error', 'Error updating payment method. Please try again in a few minutes.'));
-			notifyDispatch({type: STOP_OPERATION});
+			notifyDispatch({ type: STOP_OPERATION });
 		}
 
 		getUserCustomer(paymentDispatch);
@@ -406,7 +406,7 @@ function Storage(props) {
 	if (userSubscription.expirationDate && (userSubscription.expirationDate != '0')) {
 		let d = new Date(parseInt(userSubscription.expirationDate) * 1000);
 		let dateString = <p>{d.toLocaleDateString('en-US', dateFormatOptions)}</p>;
-		let numDateFormatOptions = {year: 'numeric', month: 'numeric', day: 'numeric'};
+		let numDateFormatOptions = { year: 'numeric', month: 'numeric', day: 'numeric' };
 		
 		if (d < Date.now()) {
 			expirationDate = (<td>
@@ -454,9 +454,9 @@ function Storage(props) {
 			purchase={purchase}
 		/>);
 	}
-
+	
 	return (
-		<StorageContext.Provider value={{storageDispatch, storageState}}><PaymentContext.Provider value={{paymentDispatch, paymentState}}><NotifierContext.Provider value={{notifyDispatch, notifyState}}>
+		<StorageContext.Provider value={{ storageDispatch, storageState }}><PaymentContext.Provider value={{ paymentDispatch, paymentState }}><NotifierContext.Provider value={{ notifyDispatch, notifyState }}>
 			<div className='storage-container'>
 				{Payment}
 				{operationPending
@@ -467,7 +467,7 @@ function Storage(props) {
 				<div className='user-storage'>
 					<Row className='my-3'>
 						<Col md='12'>
-							<PendingInvoices userInvoices={props.userInvoices} type='individual' />
+							<PendingInvoices invoices={props.userInvoices} type='individual' />
 						</Col>
 					</Row>
 					<Row>
@@ -525,4 +525,4 @@ function StorageSummary(props) {
 	return <Storage summary={true} {...props} />;
 }
 
-export {Storage, StorageContext, StorageSummary};
+export { Storage, StorageContext, StorageSummary };

@@ -1,5 +1,3 @@
-'use strict';
-
 import {log as logger} from '../Log.js';
 var log = logger.Logger('SubscriptionHandler', 1);
 
@@ -24,7 +22,7 @@ import { formatCurrency } from '../Utils.js';
 const stripePublishableKey = window.zoteroData && window.zoteroData.stripePublishableKey ? window.zoteroData.stripePublishableKey : '';
 //const dateFormatOptions = {year: 'numeric', month: 'long', day: 'numeric'};
 
-async function chargeLabSubscription(token=false, fte=false, name='', institutionID=false){
+async function chargeLabSubscription(token=false, fte=false, name='', institutionID=false) {
 	// You can access the token ID with `token.id`.
 	// Get the token ID to your server-side code for use.
 	log.debug(`charging stripe lab. FTE:${fte} - token.id:${token.id}`);

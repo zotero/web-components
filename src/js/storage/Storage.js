@@ -1,5 +1,3 @@
-'use strict';
-
 /*
 TODO:
  - clean up
@@ -77,15 +75,15 @@ function StoragePlanRow(props) {
 	const {userSubscription} = storageState;
 	const current = plan.storageLevel == userSubscription.storageLevel;
 	let button = (
-		<Button onClick={()=>{paymentDispatch(selectPlan(plan));}}>Select Plan</Button>
+		<Button onClick={() => { paymentDispatch(selectPlan(plan)); }}>Select Plan</Button>
 	);
 	
 	let rowClass = '';
-	if(current){
+	if (current) {
 		button = 'Current Plan';
 		rowClass = 'current-plan';
 	}
-	if(plan.storageLevel == 1) {
+	if (plan.storageLevel == 1) {
 		button = '';
 	}
 	return (
@@ -111,10 +109,10 @@ StoragePlanRow.propTypes = {
 function InstitutionProvides(props) {
 	const {institution} = props;
 	let quotaDescription = `${institution.storageQuota} MB of storage`;
-	if(institution.storageQuota == 1000000){
+	if (institution.storageQuota == 1000000) {
 		quotaDescription = 'unlimited storage';
 	}
-	if(!institution.validated){
+	if (!institution.validated) {
 		return (
 			<p>{institution.name} provides {quotaDescription} for {institution.email}. <a href='/settings/account#manage-emails'>Confirm your email address</a> to take advantage.</p>
 		);
@@ -135,11 +133,11 @@ InstitutionProvides.propTypes = {
 
 function InstitutionalRow(props) {
 	const {institutions} = props;
-	if(!institutions) {
+	if (!institutions) {
 		return null;
 	}
-	if(institutions.length > 0) {
-		let instNodes = institutions.map(function(institution){
+	if (institutions.length > 0) {
+		let instNodes = institutions.map(function (institution) {
 			return <InstitutionProvides key={institution.name} institution={institution} />;
 		});
 		return (
@@ -160,7 +158,7 @@ function StorageMeter() {
 	const {userSubscription} = storageState;
 	
 	let quota = userSubscription.quota;
-	if(quota == 1000000) {
+	if (quota == 1000000) {
 		return null;
 	}
 
@@ -168,23 +166,23 @@ function StorageMeter() {
 	quotaPercentage = quotaPercentage.toFixed(1);
 
 	let color;
-	switch(true){
-		case (quotaPercentage < 40):
-			color = 'success';
-			break;
-		case (quotaPercentage < 70):
-			color = 'warning';
-			break;
-		case (quotaPercentage >= 70):
-			color = 'danger';
-			break;
-		default:
-			color = 'success';
+	switch (true) {
+	case (quotaPercentage < 40):
+		color = 'success';
+		break;
+	case (quotaPercentage < 70):
+		color = 'warning';
+		break;
+	case (quotaPercentage >= 70):
+		color = 'danger';
+		break;
+	default:
+		color = 'success';
 	}
 
 	return (
 		<div>
-			<div className="text-center">{quotaPercentage}%</div>
+			<div className='text-center'>{quotaPercentage}%</div>
 			<Progress value={quotaPercentage} max='100' color={color} />
 		</div>
 	);
@@ -192,7 +190,9 @@ function StorageMeter() {
 
 function GroupUsage(props) {
 	const {group, usage} = props;
-	if (!group) { return null; }
+	if (!group) {
+		return null;
+	}
 	return (
 		<p>{group.title} - {usage} MB</p>
 	);
@@ -218,8 +218,8 @@ function PaymentRow(props) {
 	};
 	
 	const renewNowButton = <Button color='secondary' size='small' onClick={renewHandler}>Renew Now</Button>;
-	if(userSubscription.institutionUnlimited){
-		//don't allow renewal when institution provides unlimited
+	if (userSubscription.institutionUnlimited) {
+		// don't allow renewal when institution provides unlimited
 		return (
 			<tr>
 				<th>Payment Method</th>
@@ -234,13 +234,13 @@ function PaymentRow(props) {
 			</tr>
 		);
 	}
-	if(!defaultSource || !userSubscription.recur){
+	if (!defaultSource || !userSubscription.recur) {
 		let autoRenewButton = <Button color='secondary' onClick={updateCardHandler}>Enable Automatic Renewal</Button>;
 		let renewButton = null;
 		
 		let expiration = new Date(userSubscription.expirationDate * 1000);
-		if(expiration < (Date.now() + (1000*60*60*24*15))) {
-			//expiration less than 2 weeks away, charge card now
+		if (expiration < (Date.now() + (1000 * 60 * 60 * 24 * 15))) {
+			// expiration less than 2 weeks away, charge card now
 			autoRenewButton = renewNowButton;
 		} else {
 			renewButton = renewNowButton;
@@ -286,11 +286,11 @@ function NextPaymentRow(props) {
 	const {userSubscription, cancelRecur} = props;
 	const {institutionUnlimited} = userSubscription;
 	
-	let d = new Date(parseInt(userSubscription.expirationDate)*1000);
+	let d = new Date(parseInt(userSubscription.expirationDate) * 1000);
 	let formattedExpirationDate = d.toLocaleDateString('en-US', dateFormatOptions);
 	
-	if(userSubscription.recur && d > Date.now()){
-		//autorenew is enabled and set for sometime in the future
+	if (userSubscription.recur && d > Date.now()) {
+		// autorenew is enabled and set for sometime in the future
 		return (
 			<tr>
 				<th>Next Payment</th>
@@ -306,14 +306,14 @@ function NextPaymentRow(props) {
 				</td>
 			</tr>
 		);
-	} else if(d < Date.now()) {
-		//expiration has already passed without renewal
+	} else if (d < Date.now()) {
+		// expiration has already passed without renewal
 		return null;
-	} else if(institutionUnlimited) {
-		//covered by institution which prevents needing renewal
+	} else if (institutionUnlimited) {
+		// covered by institution which prevents needing renewal
 		return null;
 	} else {
-		//no automatic renewal. Must be done manually before expiration to avoid interruption.
+		// no automatic renewal. Must be done manually before expiration to avoid interruption.
 		return (
 			<tr>
 				<th>Next Payment</th>
@@ -325,8 +325,8 @@ function NextPaymentRow(props) {
 	}
 }
 
-function StoragePlansSection(){
-	let planRowNodes = plans.map((plan)=>{
+function StoragePlansSection() {
+	let planRowNodes = plans.map((plan) => {
 		return <StoragePlanRow key={plan.storageLevel} plan={plan} />;
 	});
 
@@ -336,7 +336,7 @@ function StoragePlansSection(){
 				<b>Change Plan</b>
 			</div>
 			<div className='section-body'>
-				<table className="table table-striped">
+				<table className='table table-striped'>
 					<tbody>
 						<tr>
 							<th>Storage Amount</th>
@@ -351,29 +351,29 @@ function StoragePlansSection(){
 	);
 }
 
-function Storage(props){
+function Storage(props) {
 	const [storageState, storageDispatch] = useReducer(storageReducer, {
-		userSubscription:props.userSubscription,
-		storageGroups:props.storageGroups,
-		planQuotas:{},
+		userSubscription: props.userSubscription,
+		storageGroups: props.storageGroups,
+		planQuotas: {},
 	});
 	const [paymentState, paymentDispatch] = useReducer(paymentReducer, {
-		stripeCustomer:props.stripeCustomer,
+		stripeCustomer: props.stripeCustomer,
 	});
 	const [notifyState, notifyDispatch] = useReducer(notifyReducer, {
-		operationPending:false,
-		notification:null
+		operationPending: false,
+		notification: null
 	});
 	
 	const {userSubscription, storageGroups} = storageState;
 	const {stripeCustomer, purchase} = paymentState;
 	const {operationPending, notification} = notifyState;
 	useEffect(
-		()=>{
-			if(!props.userSubscription){
+		() => {
+			if (!props.userSubscription) {
 				getSubscription(storageDispatch);
 			}
-			if(!props.stripeCustomer){
+			if (!props.stripeCustomer) {
 				getUserCustomer(paymentDispatch);
 			}
 		},
@@ -381,39 +381,39 @@ function Storage(props){
 	);
 	
 	const cancelRecur = async () => {
-		notifyDispatch({type:START_OPERATION});
+		notifyDispatch({type: START_OPERATION});
 
-		try{
+		try {
 			let resp = await postFormData('/storage/cancelautorenew');
 			log.debug(resp, 4);
 			notifyDispatch(notify('success', 'Automatic renewal disabled'));
-			notifyDispatch({type:STOP_OPERATION});
+			notifyDispatch({type: STOP_OPERATION});
 		} catch (e) {
 			log.debug(e);
 			notifyDispatch(notify('error', 'Error updating payment method. Please try again in a few minutes.'));
-			notifyDispatch({type:STOP_OPERATION});
+			notifyDispatch({type: STOP_OPERATION});
 		}
 
 		getUserCustomer(paymentDispatch);
 		getSubscription(storageDispatch);
 	};
 	
-	if(userSubscription === null){
+	if (userSubscription === null) {
 		return null;
 	}
 
 	let expirationDate = <td>Never</td>;
-	if(userSubscription.expirationDate && (userSubscription.expirationDate != '0')) {
-		let d = new Date(parseInt(userSubscription.expirationDate)*1000);
+	if (userSubscription.expirationDate && (userSubscription.expirationDate != '0')) {
+		let d = new Date(parseInt(userSubscription.expirationDate) * 1000);
 		let dateString = <p>{d.toLocaleDateString('en-US', dateFormatOptions)}</p>;
 		let numDateFormatOptions = {year: 'numeric', month: 'numeric', day: 'numeric'};
 		
-		if(d < Date.now()){
+		if (d < Date.now()) {
 			expirationDate = (<td>
 				{dateString}
 				<p>Your previous Zotero storage subscription has expired.</p>
 			</td>);
-		} else if(userSubscription.recur){
+		} else if (userSubscription.recur) {
 			expirationDate = (<td>
 				{dateString}
 				<p>Your Zotero storage subscription is set to automatically renew {d.toLocaleDateString('en-US', numDateFormatOptions)}.</p>
@@ -427,94 +427,90 @@ function Storage(props){
 	}
 
 	let quotaDescription = userSubscription.quota + ' MB';
-	if(userSubscription.quota == 1000000) {
+	if (userSubscription.quota == 1000000) {
 		quotaDescription = 'Unlimited';
 	}
 
 	let groupUsageNodes = [];
-	for(let groupID in userSubscription.usage.groups){
+	for (let groupID in userSubscription.usage.groups) {
 		let usage = parseInt(userSubscription.usage.groups[groupID]);
 		groupUsageNodes.push(<GroupUsage key={groupID} group={storageGroups[groupID]} usage={usage} />);
 	}
 
 	let paymentRow = null;
-	if(userSubscription.storageLevel != 1) {
+	if (userSubscription.storageLevel != 1) {
 		let defaultSource = null;
-		if(stripeCustomer){
+		if (stripeCustomer) {
 			defaultSource = stripeCustomer.default_source;
 		}
-		paymentRow = (<PaymentRow 
+		paymentRow = (<PaymentRow
 			defaultSource={defaultSource}
 		/>);
 	}
 	
 	let Payment = null;
-	if(purchase && !props.summary){
+	if (purchase && !props.summary) {
 		Payment = (<SubscriptionHandler
 			purchase={purchase}
 		/>);
 	}
 
 	return (
-		<StorageContext.Provider value={{storageDispatch, storageState}}>
-		<PaymentContext.Provider value={{paymentDispatch, paymentState}}>
-		<NotifierContext.Provider value={{notifyDispatch, notifyState}}>
-		<div className='storage-container'>
-			{Payment}
-			{operationPending ? 
-				<div className='modal'><div className='modal-text'><p className='modal-text'>Updating...</p></div></div> :
-				null
-			}
-			<Notifier {...notification} />
-			<div className='user-storage'>
-				<Row className='my-3'>
-					<Col md='12'>
-						<PendingInvoices userInvoices={props.userInvoices} type='individual' />
-					</Col>
-				</Row>
-				<Row>
-					<Col md='6'>
-						<div className='current-storage'>
-							<div className='section-header'>
-								<b>Current Plan</b>
+		<StorageContext.Provider value={{storageDispatch, storageState}}><PaymentContext.Provider value={{paymentDispatch, paymentState}}><NotifierContext.Provider value={{notifyDispatch, notifyState}}>
+			<div className='storage-container'>
+				{Payment}
+				{operationPending
+					? <div className='modal'><div className='modal-text'><p className='modal-text'>Updating...</p></div></div>
+					: null
+				}
+				<Notifier {...notification} />
+				<div className='user-storage'>
+					<Row className='my-3'>
+						<Col md='12'>
+							<PendingInvoices userInvoices={props.userInvoices} type='individual' />
+						</Col>
+					</Row>
+					<Row>
+						<Col md='6'>
+							<div className='current-storage'>
+								<div className='section-header'>
+									<b>Current Plan</b>
+								</div>
+								<div className='section-body'>
+									<table className='table'>
+										<tbody>
+											<tr>
+												<th>Quota</th>
+												<td>{quotaDescription}</td>
+											</tr>
+											<tr>
+												<th>Expiration</th>
+												{expirationDate}
+											</tr>
+											<tr>
+												<th>Current Usage</th>
+												<td>
+													<p>My Library - {userSubscription.usage.library} MB</p>
+													{groupUsageNodes}
+													<p>Total - {userSubscription.usage.total} MB</p>
+													<StorageMeter />
+												</td>
+											</tr>
+											{paymentRow}
+											<NextPaymentRow userSubscription={userSubscription} cancelRecur={cancelRecur} />
+											<InstitutionalRow institutions={userSubscription.institutions} />
+										</tbody>
+									</table>
+								</div>
 							</div>
-							<div className='section-body'>
-								<table className='table'>
-									<tbody>
-										<tr>
-											<th>Quota</th>
-											<td>{quotaDescription}</td>
-										</tr>
-										<tr>
-											<th>Expiration</th>
-											{expirationDate}
-										</tr>
-										<tr>
-											<th>Current Usage</th>
-											<td>
-												<p>My Library - {userSubscription.usage.library} MB</p>
-												{groupUsageNodes}
-												<p>Total - {userSubscription.usage.total} MB</p>
-												<StorageMeter />
-											</td>
-										</tr>
-										{paymentRow}
-										<NextPaymentRow userSubscription={userSubscription} cancelRecur={cancelRecur} />
-										<InstitutionalRow institutions={userSubscription.institutions} />
-									</tbody>
-								</table>
-							</div>
-						</div>
-					</Col>
-					<Col md='6'>
-						{userSubscription.institutionUnlimited ? null : <StoragePlansSection />}
-					</Col>
-				</Row>
+						</Col>
+						<Col md='6'>
+							{userSubscription.institutionUnlimited ? null : <StoragePlansSection />}
+						</Col>
+					</Row>
+				</div>
 			</div>
-		</div>
-		</NotifierContext.Provider>
-		</PaymentContext.Provider>
-		</StorageContext.Provider>
+		</NotifierContext.Provider></PaymentContext.Provider></StorageContext.Provider>
 	);
 }
 Storage.propTypes = {
@@ -525,7 +521,7 @@ Storage.propTypes = {
 	userInvoices: PropTypes.array,
 };
 
-function StorageSummary(props){
+function StorageSummary(props) {
 	return <Storage summary={true} {...props} />;
 }
 

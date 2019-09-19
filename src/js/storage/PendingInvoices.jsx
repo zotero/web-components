@@ -55,7 +55,9 @@ function PendingInvoices(props) {
 					{stripeCharge ? 'Paid' : 'Pending'}
 				</td>
 				<td>
-					<a href='#' onClick={() => { handleDelete(invoiceID); }}>Delete</a>
+					<a href='#' onClick={(e) => {
+						e.preventDefault(); handleDelete(invoiceID);
+					}}>Delete</a>
 				</td>
 			</tr>
 		);

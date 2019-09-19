@@ -1,18 +1,22 @@
-import {log as logger} from '../Log.js';
+import { log as logger } from '../Log.js';
 var log = logger.Logger('PaymentModal', 1);
 
 // CheckoutForm.js
-import {useState, useContext} from 'react';
-import {Elements, injectStripe, CardElement, IbanElement, PaymentRequestButtonElement} from 'react-stripe-elements';
-import {Button, Card, CardHeader, CardBody, TabContent, TabPane, Nav, NavItem, NavLink, Row, Col, Input, Form, FormGroup } from 'reactstrap';
+import { useState, useContext } from 'react';
+import { Elements, injectStripe, CardElement, IbanElement, PaymentRequestButtonElement } from 'react-stripe-elements';
+import { Button, Card, CardHeader, CardBody, TabContent, TabPane, Nav, NavItem, NavLink, Row, Col, Input, Form, FormGroup } from 'reactstrap';
+import { Notifier } from '../Notifier.js';
 import PropTypes from 'prop-types';
 import { PaymentContext, cancelPurchase } from './actions.js';
 
-function CardSection() {
+function CardSection(props) {
 	return (
-		<CardElement />
+		<CardElement onChange={props.onChange} />
 	);
 }
+CardSection.propTypes = {
+	onChange: PropTypes.func,
+};
 
 function CardCheckoutForm(props) {
 	if (typeof props.handleToken != 'function') {
@@ -20,13 +24,40 @@ function CardCheckoutForm(props) {
 	}
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
+	const [address1, setAddress1] = useState('');
+	const [address2, setAddress2] = useState('');
+	const [city, setCity] = useState('');
+	const [state, setState] = useState('');
+	const [cardStatus, setCardStatus] = useState(null);
+	const [notification, setNotification] = useState(null);
 	
 	const handleSubmit = async (ev) => {
 		ev.preventDefault();
 
+		let tokenData = {
+			name,
+			address_line1: address1,
+			address_line2: address2,
+			address_city: city,
+			address_state: state,
+		};
+
+		let sourceData = {
+			type: 'card',
+			currency: 'usd',
+			owner: {
+				name,
+				email,
+				address: {
+					line1: address1,
+					line2: address2,
+				}
+			},
+		};
+		
 		// Within the context of `Elements`, this call to createToken knows which Element to
 		// tokenize, since there's only one in this group.
-		let result = await props.stripe.createToken({name});
+		let result = await props.stripe.createToken(tokenData);
 		if (result.token) {
 			props.handleToken(result.token);
 		} else if (result.error) {
@@ -34,6 +65,15 @@ function CardCheckoutForm(props) {
 			throw result.error;
 		}
 	};
+	const handleCardChange = (cardData) => {
+		setCardStatus(cardData);
+		if (cardData.error) {
+			setNotification({ type: 'error', message: cardData.error.message });
+		} else {
+			setNotification(null);
+		}
+	};
+
 	const buttonLabel = props.buttonLabel || 'Confirm Order';
 	
 	let emailSection = null;
@@ -47,16 +87,38 @@ function CardCheckoutForm(props) {
 		);
 	}
 
+	let addressSection = null;
+	if (props.useAddress) {
+		addressSection = (
+			<FormGroup>
+				<Input type='address' placeholder='Address' value={address1}
+					onChange={(evt) => { setAddress1(evt.target.value); }}
+				/>
+				<Input type='address' placeholder='Address 2' value={address2}
+					onChange={(evt) => { setAddress2(evt.target.value); }}
+				/>
+				<Input type='text' placeholder='City' value={city}
+					onChange={(evt) => { setCity(evt.target.value); }}
+				/>
+				<Input type='text' placeholder='State' value={state}
+					onChange={(evt) => { setState(evt.target.value); }}
+				/>
+			</FormGroup>
+		);
+	}
+
 	return (
 		<Form onSubmit={handleSubmit}>
+			<Notifier {...notification} />
 			{emailSection}
 			<FormGroup>
 				<Input type='text' placeholder='Name' value={name}
 					onChange={(evt) => { setName(evt.target.value); }}
 				/>
 			</FormGroup>
+			{addressSection}
 			<FormGroup>
-				<CardSection />
+				<CardSection onChange={handleCardChange} />
 			</FormGroup>
 			<FormGroup>
 				<Button type='submit' color='secondary'>{buttonLabel}</Button>
@@ -70,10 +132,12 @@ CardCheckoutForm.propTypes = {
 	stripe: PropTypes.object.isRequired,
 	buttonLabel: PropTypes.string,
 	onClose: PropTypes.func.isRequired,
-	useEmail: PropTypes.bool
+	useEmail: PropTypes.bool,
+	useAddress: PropTypes.bool,
 };
 CardCheckoutForm.defaultProps = {
-	useEmail: false
+	useEmail: false,
+	useAddress: false,
 };
 
 
@@ -147,7 +211,7 @@ IBANCheckoutForm.propTypes = {
 };
 
 function _PaymentRequestForm(props) {
-	const {stripe, paymentAmount, handleToken} = props;
+	const { stripe, paymentAmount, handleToken } = props;
 	const [canMakePayment, setCanMakePayment] = useState(false);
 	const [paymentRequest, setPaymentRequest] = useState(null);
 
@@ -163,7 +227,7 @@ function _PaymentRequestForm(props) {
 			},
 		});
 
-		paymentRequest.on('token', ({complete, token, ...data}) => {
+		paymentRequest.on('token', ({ complete, token, ...data }) => {
 			log.debug('Received Stripe token in PaymentRequestForm: ', token);
 			log.debug('Received customer information: ', data);
 			handleToken(token);
@@ -184,7 +248,7 @@ function _PaymentRequestForm(props) {
 
 	return (
 		<PaymentRequestButtonElement
-			className="PaymentRequestButton"
+			className='PaymentRequestButton'
 			paymentRequest={paymentRequest}
 			style={{
 				paymentRequestButton: {
@@ -210,8 +274,8 @@ const InjectedIBANCheckoutForm = injectStripe(IBANCheckoutForm);
 
 function MultiPaymentModal(props) {
 	const [selectedMethod, setMethod] = useState('card');
-	const {handleToken, chargeAmount, buttonLabel, useEmail} = props;
-	const {paymentDispatch} = useContext(PaymentContext);
+	const { handleToken, chargeAmount, buttonLabel, useEmail, useAddress } = props;
+	const { paymentDispatch } = useContext(PaymentContext);
 	const handleClose = () => {
 		paymentDispatch(cancelPurchase());
 	};
@@ -244,18 +308,18 @@ function MultiPaymentModal(props) {
 				</CardHeader>
 				<CardBody>
 					<TabContent activeTab={selectedMethod}>
-						<TabPane tabId="card">
+						<TabPane tabId='card'>
 							<Row>
-								<Col sm="12">
+								<Col sm='12'>
 									<Elements>
-										<InjectedCardCheckoutForm handleToken={handleToken} buttonLabel={buttonLabel} onClose={handleClose} useEmail={useEmail} />
+										<InjectedCardCheckoutForm handleToken={handleToken} buttonLabel={buttonLabel} onClose={handleClose} useEmail={useEmail} useAddress={useAddress} />
 									</Elements>
 								</Col>
 							</Row>
 						</TabPane>
-						<TabPane tabId="sepa">
+						<TabPane tabId='sepa'>
 							<Row>
-								<Col sm="12">
+								<Col sm='12'>
 									<Elements>
 										<InjectedIBANCheckoutForm handleToken={handleToken} buttonLabel={buttonLabel} onClose={handleClose} />
 									</Elements>
@@ -274,15 +338,17 @@ MultiPaymentModal.propTypes = {
 	buttonLabel: PropTypes.string,
 	tokenCallback: PropTypes.func,
 	amount: PropTypes.number,
-	immediateCharge: PropTypes.bool
+	immediateCharge: PropTypes.bool,
+	useEmail: PropTypes.bool,
+	useAddress: PropTypes.bool,
 };
 MultiPaymentModal.defaultProps = {
 	buttonLabel: 'Confirm'
 };
 
 function CardPaymentModal(props) {
-	const {handleToken, chargeAmount, buttonLabel, useEmail} = props;
-	const {paymentDispatch} = useContext(PaymentContext);
+	const { handleToken, chargeAmount, buttonLabel, useEmail, useAddress } = props;
+	const { paymentDispatch } = useContext(PaymentContext);
 	const handleClose = () => {
 		paymentDispatch(cancelPurchase());
 	};
@@ -291,7 +357,7 @@ function CardPaymentModal(props) {
 	if (chargeAmount) {
 		paymentRequest = (
 			<Elements>
-				<InjectedPaymentRequestForm handleToken={handleToken} paymentAmount={chargeAmount} onClose={handleClose} useEmail={useEmail} />
+				<InjectedPaymentRequestForm handleToken={handleToken} paymentAmount={chargeAmount} onClose={handleClose} useEmail={useEmail} useAddress={useAddress} />
 			</Elements>
 		);
 	}
@@ -301,7 +367,7 @@ function CardPaymentModal(props) {
 				<CardBody>
 					{paymentRequest}
 					<Elements>
-						<InjectedCardCheckoutForm handleToken={handleToken} buttonLabel={buttonLabel} onClose={handleClose} useEmail={useEmail} />
+						<InjectedCardCheckoutForm handleToken={handleToken} buttonLabel={buttonLabel} onClose={handleClose} useEmail={useEmail} useAddress={useAddress} />
 					</Elements>
 				</CardBody>
 			</Card>
@@ -316,9 +382,12 @@ CardPaymentModal.propTypes = {
 	amount: PropTypes.number,
 	immediateCharge: PropTypes.bool,
 	useEmail: PropTypes.bool,
+	useAddress: PropTypes.bool,
 };
 CardPaymentModal.defaultProps = {
-	buttonLabel: 'Confirm'
+	buttonLabel: 'Confirm',
+	useEmail: false,
+	useAddress: false,
 };
 
-export {MultiPaymentModal, CardPaymentModal};
+export { MultiPaymentModal, CardPaymentModal };

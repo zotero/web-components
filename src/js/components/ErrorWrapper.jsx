@@ -1,6 +1,4 @@
-'use strict';
-
-import {log as logger} from '../Log.js';
+import { log as logger } from '../Log.js';
 var log = logger.Logger('ErrorWrapper');
 
 const React = require('react');
@@ -28,4 +26,4 @@ class ErrorWrapper extends React.Component {
 	}
 }
 
-export {ErrorWrapper};
+export { ErrorWrapper };

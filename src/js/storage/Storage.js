@@ -456,7 +456,7 @@ function Storage(props) {
 	}
 	
 	return (
-		<StorageContext.Provider value={{ storageDispatch, storageState }}><PaymentContext.Provider value={{ paymentDispatch, paymentState }}><NotifierContext.Provider value={{ notifyDispatch, notifyState }}>
+		<ErrorWrapper><StorageContext.Provider value={{ storageDispatch, storageState }}><PaymentContext.Provider value={{ paymentDispatch, paymentState }}><NotifierContext.Provider value={{ notifyDispatch, notifyState }}>
 			<div className='storage-container'>
 				{Payment}
 				{operationPending
@@ -510,7 +510,7 @@ function Storage(props) {
 					</Row>
 				</div>
 			</div>
-		</NotifierContext.Provider></PaymentContext.Provider></StorageContext.Provider>
+		</NotifierContext.Provider></PaymentContext.Provider></StorageContext.Provider></ErrorWrapper>
 	);
 }
 Storage.propTypes = {

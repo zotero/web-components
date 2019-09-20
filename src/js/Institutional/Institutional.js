@@ -1,6 +1,4 @@
-'use strict';
+import { Checkout } from './Checkout.js';
+import { Manage } from './Manage.js';
 
-import {Checkout} from './Checkout.js';
-import {Manage} from './Manage.js';
-
-export {Checkout, Manage};
+export { Checkout, Manage };

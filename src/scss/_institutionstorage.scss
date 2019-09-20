@@ -1,0 +1,22 @@
+.institution-checkout {
+    ul.nav-tabs {
+        li.nav-item {
+            width: 50%;
+            background: #ddd;
+            cursor: pointer;
+            font-size: 16px;
+
+            a.active {
+                color: inherit;
+                background: #fff;
+                border-top: 3px solid salmon;
+            }
+        }
+    }
+
+    .form-field-error {
+        margin: auto;
+        color: #f00;
+        font-size: smaller;
+    }
+}

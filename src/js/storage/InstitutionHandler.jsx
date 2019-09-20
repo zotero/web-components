@@ -1,59 +1,59 @@
-import {log as logger} from '../Log.js';
+import { log as logger } from '../Log.js';
 var log = logger.Logger('SubscriptionHandler', 1);
 
-import {useState, useContext} from 'react';
+import { useState, useContext } from 'react';
 import PropTypes from 'prop-types';
-import {StripeProvider} from 'react-stripe-elements';
+import { StripeProvider } from 'react-stripe-elements';
 import { Card, CardHeader, CardBody, FormGroup, Input, Modal, ModalBody, ModalHeader, Label, Row, Col, Button, Container } from 'reactstrap';
 
-import {labPrice, labUserPrice} from './calculations.js';
-import {CardPaymentModal} from './PaymentModal.jsx';
-import {PaymentSource} from './PaymentSource.jsx';
+import { labPrice, labUserPrice } from './calculations.js';
+import { CardPaymentModal } from './PaymentModal.jsx';
+import { PaymentSource } from './PaymentSource.jsx';
 
-import {postFormData} from '../ajax.js';
-import {buildUrl} from '../wwwroutes.js';
-import {LoadingSpinner} from '../LoadingSpinner.js';
+import { postFormData } from '../ajax.js';
+import { buildUrl } from '../wwwroutes.js';
+import { LoadingSpinner } from '../LoadingSpinner.js';
 
-import {PaymentContext, NotifierContext, notify} from './actions.js';
-import {cancelPurchase} from './actions.js';
+import { PaymentContext, NotifierContext, notify } from './actions.js';
+import { cancelPurchase } from './actions.js';
 
 import { formatCurrency } from '../Utils.js';
 
 const stripePublishableKey = window.zoteroData && window.zoteroData.stripePublishableKey ? window.zoteroData.stripePublishableKey : '';
-//const dateFormatOptions = {year: 'numeric', month: 'long', day: 'numeric'};
+// const dateFormatOptions = {year: 'numeric', month: 'long', day: 'numeric'};
 
-async function chargeLabSubscription(token=false, fte=false, name='', institutionID=false) {
+async function chargeLabSubscription(token = false, fte = false, name = '', institutionID = false) {
 	// You can access the token ID with `token.id`.
 	// Get the token ID to your server-side code for use.
 	log.debug(`charging stripe lab. FTE:${fte} - token.id:${token.id}`);
 	let resp;
-	try{
+	try {
 		let args = {
-			subscriptionType:'lab',
-			stripeToken:token.id,
-			userCount:fte,
-			institutionName:name
+			subscriptionType: 'lab',
+			stripeToken: token.id,
+			userCount: fte,
+			institutionName: name
 		};
-		if(institutionID){
-			args['institutionID'] = institutionID;
+		if (institutionID) {
+			args.institutionID = institutionID;
 		}
 		resp = await postFormData('/storage/stripechargelabajax', args);
 
 		log.debug(resp);
-		if(!resp.ok){
+		if (!resp.ok) {
 			throw resp;
 		}
 		let respData = await resp.json();
 		log.debug(respData);
-		if(respData.success){
-			if(institutionID){
-				//existing institution, no need to direct to management interface
+		if (respData.success) {
+			if (institutionID) {
+				// existing institution, no need to direct to management interface
 				return {
-					type:'success',
+					type: 'success',
 					message: <p>Success. Your Zotero Lab subscription has been updated</p>
 				};
 			} else {
-				let manageUrl = buildUrl('manageInstitution', {institutionID:respData.institutionID});
+				let manageUrl = buildUrl('manageInstitution', { institutionID: respData.institutionID });
 				return {
 					type: 'success',
 					message: (<p>Success. You can now <a href={manageUrl}>manage your Zotero Lab subscription</a></p>)
@@ -65,11 +65,11 @@ async function chargeLabSubscription(token=false, fte=false, name='', institutio
 				message: <p>There was an error updating your Zotero Lab subscription</p>
 			};
 		}
-	} catch(resp) {
+	} catch (resp) {
 		log.debug(resp);
 		let respData = await resp.json();
-		if(respData.stripeMessage){
-			return {type:'error', 'message':`There was an error processing your payment: ${respData.stripeMessage}`};
+		if (respData.stripeMessage) {
+			return { type: 'error', message: `There was an error processing your payment: ${respData.stripeMessage}` };
 		} else {
 			return {
 				type: 'error',
@@ -79,36 +79,36 @@ async function chargeLabSubscription(token=false, fte=false, name='', institutio
 	}
 }
 
-async function chargeLabAdditionalUsers(token=false, additionalFTE=false, name='', institutionID=false){
+async function chargeLabAdditionalUsers(token = false, additionalFTE = false, name = '', institutionID = false) {
 	log.debug(`charging stripe lab additional users. additionalFTE:${additionalFTE} - token.id:${token.id}`);
 	let resp;
-	try{
-		if(!institutionID){
-			throw 'InstitutionID is required in chargeLabAdditionalUsers';
+	try {
+		if (!institutionID) {
+			throw new Error('InstitutionID is required in chargeLabAdditionalUsers');
 		}
 		
 		let args = {
-			subscriptionType:'addLabUsers',
-			stripeToken:token.id,
-			userCount:additionalFTE,
+			subscriptionType: 'addLabUsers',
+			stripeToken: token.id,
+			userCount: additionalFTE,
 			name,
-			institutionID:institutionID
+			institutionID: institutionID
 		};
 		resp = await postFormData('/storage/stripechargelabajax', args);
 
-		if(!resp.ok){
+		if (!resp.ok) {
 			throw resp;
 		}
 		let respData = await resp.json();
-		if(respData.success){
-			if(institutionID){
-				//existing institution, no need to direct to management interface
+		if (respData.success) {
+			if (institutionID) {
+				// existing institution, no need to direct to management interface
 				return {
-					type:'success',
+					type: 'success',
 					message: <p>Success. Your Zotero Lab subscription has been updated</p>
 				};
 			} else {
-				let manageUrl = buildUrl('manageInstitution', {institutionID:respData.institutionID});
+				let manageUrl = buildUrl('manageInstitution', { institutionID: respData.institutionID });
 				return {
 					type: 'success',
 					message: (<p>Success. You can now <a href={manageUrl}>manage your Zotero Lab subscription</a></p>)
@@ -120,11 +120,11 @@ async function chargeLabAdditionalUsers(token=false, additionalFTE=false, name='
 				message: <p>There was an error updating your Zotero Lab subscription</p>
 			};
 		}
-	} catch(resp) {
+	} catch (resp) {
 		log.debug(resp);
 		let respData = await resp.json();
-		if(respData.stripeMessage){
-			return {type:'error', 'message':`There was an error processing your payment: ${respData.stripeMessage}`};
+		if (respData.stripeMessage) {
+			return { type: 'error', message: `There was an error processing your payment: ${respData.stripeMessage}` };
 		} else {
 			return {
 				type: 'error',
@@ -134,58 +134,58 @@ async function chargeLabAdditionalUsers(token=false, additionalFTE=false, name='
 	}
 }
 
-async function createInvoice(type, fte, additionalFTE, name, institutionID){
-	try{
+async function createInvoice(type, fte, additionalFTE, name, institutionID) {
+	try {
 		let resp;
 		switch (type) {
-			case 'labRenew':
-				if (!fte) throw new Error('no fte set');
-				if (!institutionID) throw new Error('no institutionID set');
-				
-				resp = await postFormData('/settings/storage/createinvoice', {type:'labRenew', numUsers:fte, institutionID}, {withSession:true});
-				break;
-			case 'lab':
-				if (!fte) throw new Error('no fte set');
-				
-				let params = {type:'lab', numUsers:fte};
-				if (institutionID) params.institutionID = institutionID;
-				resp = await postFormData('/settings/storage/createinvoice', params, {withSession:true});
-				break;
-			case 'addLabUsers':
-				if (!institutionID) throw new Error('no institutionID set');
-				if (!additionalFTE) throw new Error('no additionalFTE set');
-				
-				resp = await postFormData('/settings/storage/createinvoice', {type:'addLabUsers', numUsers:additionalFTE, institutionID}, {withSession:true});
-				break;
-			case 'institution':
-				//TODO
-				throw new Error('unimplemented invoice type');
-			default:
-				throw new Error('unrecognized type');
+		case 'labRenew':
+			if (!fte) throw new Error('no fte set');
+			if (!institutionID) throw new Error('no institutionID set');
+			
+			resp = await postFormData('/settings/storage/createinvoice', { type: 'labRenew', numUsers: fte, institutionID }, { withSession: true });
+			break;
+		case 'lab':
+			if (!fte) throw new Error('no fte set');
+			
+			let params = { type: 'lab', numUsers: fte };
+			if (institutionID) params.institutionID = institutionID;
+			resp = await postFormData('/settings/storage/createinvoice', params, { withSession: true });
+			break;
+		case 'addLabUsers':
+			if (!institutionID) throw new Error('no institutionID set');
+			if (!additionalFTE) throw new Error('no additionalFTE set');
+			
+			resp = await postFormData('/settings/storage/createinvoice', { type: 'addLabUsers', numUsers: additionalFTE, institutionID }, { withSession: true });
+			break;
+		case 'institution':
+			// TODO
+			throw new Error('unimplemented invoice type');
+		default:
+			throw new Error('unrecognized type');
 		}
 		
-		if(resp.ok){
+		if (resp.ok) {
 			const respData = await resp.json();
-			const {invoiceID} = respData;
-			return {type:'success', 'message':<span>Invoice created. <a href={`/storage/invoice/${invoiceID}`}>View Invoice</a></span>};
+			const { invoiceID } = respData;
+			return { type: 'success', message: <span>Invoice created. <a href={`/storage/invoice/${invoiceID}`}>View Invoice</a></span> };
 		} else {
 			throw resp;
 		}
-	} catch(e) {
+	} catch (e) {
 		log.error(e);
-		return {type:'error', 'message':'Error creating invoice. Please try again in a few minutes.'};
+		return { type: 'error', message: 'Error creating invoice. Please try again in a few minutes.' };
 	}
 }
 
-function InstitutionHandler(props){
-	const {purchase, renew, institutionID} = props;
-	const {type, fte, name, additionalFTE} = purchase;
-	const {paymentDispatch, paymentState} = useContext(PaymentContext);
-	const {notifyDispatch} = useContext(NotifierContext);
+function InstitutionHandler(props) {
+	const { purchase, renew, institutionID } = props;
+	const { type, fte, name, additionalFTE } = purchase;
+	const { paymentDispatch, paymentState } = useContext(PaymentContext);
+	const { notifyDispatch } = useContext(NotifierContext);
 	
-	const {stripeCustomer} = paymentState;
+	const { stripeCustomer } = paymentState;
 	
-	//clear the new subscription closing the Handler, because it is either complete, or canceled
+	// clear the new subscription closing the Handler, because it is either complete, or canceled
 	const cancel = () => {
 		setOperationPending(false);
 		paymentDispatch(cancelPurchase());
@@ -201,39 +201,39 @@ function InstitutionHandler(props){
 	const [operationPending, setOperationPending] = useState(false);
 	
 	switch (type) {
-		case 'paymentUpdate':
-			description.push(`Update your saved payment details for your next renewal. There will be no charge made until your expiration date.`);
-			break;
-		case 'labRenew':
-			description.push(`Renew your current subscription. Zotero Lab for ${fte} users.`);
-			description.push(`Your card or bank account will be charged immediately after confirming.`);
-			chargeAmount = labPrice(fte);
-			immediateChargeRequired = true;
-			break;
-		case 'lab':
-			description.push(`Purchase 1 year of Zotero Lab for ${fte} users.`);
-			description.push(`Lab Name: ${name}`);
-			chargeAmount = labPrice(fte);
-			immediateChargeRequired = true;
-			break;
-		case 'addLabUsers':
-			description.push(`Add ${additionalFTE} users to your current subscription.`);
-			description.push(`Your card or bank account will be charged immediately after confirming.`);
-			chargeAmount = labUserPrice(additionalFTE);
-			immediateChargeRequired = true;
-			break;
-		case 'institution':
-			//TODO
-			break;
-		default:
-			throw 'Unknown purchase type';
+	case 'paymentUpdate':
+		description.push(`Update your saved payment details for your next renewal. There will be no charge made until your expiration date.`);
+		break;
+	case 'labRenew':
+		description.push(`Renew your current subscription. Zotero Lab for ${fte} users.`);
+		description.push(`Your card or bank account will be charged immediately after confirming.`);
+		chargeAmount = labPrice(fte);
+		immediateChargeRequired = true;
+		break;
+	case 'lab':
+		description.push(`Purchase 1 year of Zotero Lab for ${fte} users.`);
+		description.push(`Lab Name: ${name}`);
+		chargeAmount = labPrice(fte);
+		immediateChargeRequired = true;
+		break;
+	case 'addLabUsers':
+		description.push(`Add ${additionalFTE} users to your current subscription.`);
+		description.push(`Your card or bank account will be charged immediately after confirming.`);
+		chargeAmount = labUserPrice(additionalFTE);
+		immediateChargeRequired = true;
+		break;
+	case 'institution':
+		// TODO
+		break;
+	default:
+		throw new Error('Unknown purchase type');
 	}
 	
-	if(immediateChargeRequired && !stripeCustomer && !editPayment){
+	if (immediateChargeRequired && !stripeCustomer && !editPayment) {
 		setEditPayment(true);
 	}
 	
-	let descriptionPs = description.map((d, i)=>{
+	let descriptionPs = description.map((d, i) => {
 		return <p key={i}>{d}</p>;
 	});
 	
@@ -241,36 +241,36 @@ function InstitutionHandler(props){
 		let result;
 		setOperationPending(true);
 		switch (type) {
-			/*
-			case 'paymentUpdate':
-				if(!token){
-					throw 'Required token not passed';
-				}
-				result = await updatePayment(token);
-				notify(result.type, result.message);
-				cancel();
-				break;
-			*/
-			case 'labRenew':
-				result = await chargeLabSubscription(token, fte, name, institutionID);
-				notifyDispatch(notify(result.type, result.message));
-				cancel();
-				break;
-			case 'lab':
-				result = await chargeLabSubscription(token, fte, name, false);
-				notifyDispatch(notify(result.type, result.message));
-				cancel();
-				break;
-			case 'addLabUsers':
-				result = await chargeLabAdditionalUsers(token, additionalFTE, name, institutionID);
-				notifyDispatch(notify(result.type, result.message));
-				cancel();
-				break;
-			case 'institution':
-				
-				break;
-			default:
-				throw 'Unknown subscriptionChange type';
+		/*
+		case 'paymentUpdate':
+			if(!token){
+				throw 'Required token not passed';
+			}
+			result = await updatePayment(token);
+			notify(result.type, result.message);
+			cancel();
+			break;
+		*/
+		case 'labRenew':
+			result = await chargeLabSubscription(token, fte, name, institutionID);
+			notifyDispatch(notify(result.type, result.message));
+			cancel();
+			break;
+		case 'lab':
+			result = await chargeLabSubscription(token, fte, name, false);
+			notifyDispatch(notify(result.type, result.message));
+			cancel();
+			break;
+		case 'addLabUsers':
+			result = await chargeLabAdditionalUsers(token, additionalFTE, name, institutionID);
+			notifyDispatch(notify(result.type, result.message));
+			cancel();
+			break;
+		case 'institution':
+			
+			break;
+		default:
+			throw new Error('Unknown subscriptionChange type');
 		}
 	};
 	
@@ -284,15 +284,15 @@ function InstitutionHandler(props){
 	let blabel = immediateChargeRequired ? `Pay ${formatCurrency(chargeAmount)}` : 'Confirm';
 	
 	let paymentSection = null;
-	if(editPayment){
+	if (editPayment) {
 		paymentSection = (
 			<StripeProvider apiKey={stripePublishableKey}>
 				<CardPaymentModal handleToken={handleConfirm} chargeAmount={chargeAmount} buttonLabel={blabel} />
 			</StripeProvider>
 		);
-	} else if(stripeCustomer && immediateChargeRequired){
+	} else if (stripeCustomer && immediateChargeRequired) {
 		const defaultSource = stripeCustomer.default_source;
-		if(defaultSource){
+		if (defaultSource) {
 			paymentSection = (
 				<div className='currentPaymentSource'>
 					<Card>
@@ -301,11 +301,11 @@ function InstitutionHandler(props){
 						</CardHeader>
 						<CardBody>
 							<PaymentSource source={defaultSource} />
-							<Button color='link' onClick={()=>{setEditPayment(true);}}>Change Payment Details</Button>
+							<Button color='link' onClick={() => { setEditPayment(true); }}>Change Payment Details</Button>
 						</CardBody>
 					</Card>
 					<Row className='mt-2'>
-						<Col className='text-center'><Button className='m-auto' onClick={()=>{handleConfirm(false);}}>{blabel}</Button></Col>
+						<Col className='text-center'><Button className='m-auto' onClick={() => { handleConfirm(false); }}>{blabel}</Button></Col>
 						<Col className='text-center'><Button className='m-auto' onClick={cancel}>Cancel</Button></Col>
 					</Row>
 				</div>
@@ -323,16 +323,16 @@ function InstitutionHandler(props){
 	}
 	
 	let renewSection = null;
-	if(renew){
+	if (renew) {
 		renewSection = (
 			<Card className='mt-4'>
 				<CardBody>
 					<FormGroup check>
 						<Label check>
 							<Input
-								type="checkbox"
+								type='checkbox'
 								checked={autorenew}
-								onChange={(evt)=>{setAutorenew(evt.target.checked);}}
+								onChange={(evt) => { setAutorenew(evt.target.checked); }}
 							/>{' '}
 							Automatically renew
 						</Label>
@@ -377,9 +377,11 @@ InstitutionHandler.propTypes = {
 	institutionID: PropTypes.number,
 	purchase: PropTypes.shape({
 		type: PropTypes.string.isRequired,
-		fte: PropTypes.number
+		name: PropTypes.string,
+		fte: PropTypes.number,
+		additionalFTE: PropTypes.number,
 	}).isRequired,
 	renew: PropTypes.bool,
 };
 
-export {InstitutionHandler};
+export { InstitutionHandler };

@@ -173,8 +173,38 @@ InstitutionData.propTypes = {
 	saveInstitutionName: PropTypes.func
 };
 
+function ReceiptsTable(props) {
+	// link to all charges that are not already being shown as invoices
+	const { charges, labInvoices } = props;
+	let receiptRows = [];
+	charges.forEach((charge) => {
+		let found = false;
+		for (let i = 0; i < labInvoices.lenghth; i++) {
+			if (labInvoices[i].stripeCharge == charge) {
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			receiptRows.push(<tr key={charge}><td><a key={charge} href={`/settings/storage/invoice?chargeID=${charge}`}>Receipt for {charge}</a></td></tr>);
+		}
+	});
+	if (receiptRows.length) {
+		return (
+			<table className='table striped'>
+				{receiptRows}
+			</table>
+		);
+	}
+	return null;
+}
+ReceiptsTable.propTypes = {
+	labInvoices: PropTypes.arrayOf(PropTypes.object),
+	charges: PropTypes.arrayOf(PropTypes.string)
+};
+
 function Manage(props) {
-	const { institutionID, expirationDate } = props;
+	const { institutionID, expirationDate, labInvoices, charges } = props;
 	const [paymentState, paymentDispatch] = useReducer(paymentReducer, {
 		stripeCustomer: props.stripeCustomer,
 	});
@@ -248,7 +278,8 @@ function Manage(props) {
 						<Notifier {...notification} />
 						<Row className='my-3'>
 							<Col md='12'>
-								<PendingInvoices invoices={props.labInvoices} />
+								<PendingInvoices invoices={labInvoices} />
+								<ReceiptsTable labInvoices={labInvoices} charges={charges} />
 							</Col>
 						</Row>
 						<Row>
@@ -291,7 +322,8 @@ Manage.propTypes = {
 	name: PropTypes.string,
 	expirationDate: PropTypes.number,
 	stripeCustomer: PropTypes.object,
-	labInvoices: PropTypes.arrayOf(PropTypes.object)
+	labInvoices: PropTypes.arrayOf(PropTypes.object),
+	charges: PropTypes.arrayOf(PropTypes.string)
 };
 Manage.defaultProps = {
 	userEmails: []

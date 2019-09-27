@@ -33,7 +33,7 @@ function PendingInvoices(props) {
 		notifyDispatch(notify(result.type, result.message));
 	};
 	if (type) {
-		log.debug(`filtering by type ${type}`);
+		log.debug(`filtering by type ${type}`, 4);
 		invoices = invoices.filter((invoice) => {
 			return invoice.invoiceType == type;
 		});

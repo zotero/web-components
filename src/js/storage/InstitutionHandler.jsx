@@ -73,7 +73,7 @@ async function chargeLabSubscription(token = false, fte = false, name = '', inst
 		} else {
 			return {
 				type: 'error',
-				message: 'There was an error updating your subscription. Please try again in a few minutes. If you continue to experience problems, email storage@zotero.org for assistance.'
+				message: <>There was an error updating your subscription. Please try again in a few minutes. If you continue to experience problems, email <a href='mailto:storage@zotero.org'>storage@zotero.org</a> for assistance.</>
 			};
 		}
 	}
@@ -128,7 +128,7 @@ async function chargeLabAdditionalUsers(token = false, additionalFTE = false, na
 		} else {
 			return {
 				type: 'error',
-				message: 'There was an error updating your subscription. Please try again in a few minutes. If you continue to experience problems, email storage@zotero.org for assistance.'
+				message: <>There was an error updating your subscription. Please try again in a few minutes. If you continue to experience problems, email <a href='mailto:storage@zotero.org'>storage@zotero.org</a> for assistance.</>
 			};
 		}
 	}

@@ -108,7 +108,7 @@ function InstitutionCheckout(props) {
 			log.debug(resp, 4);
 			setNotification({
 				type: 'error',
-				message: 'There was an error requesting an invoice. If you continue to experience problems, email storage@zotero.org for assistance.'
+				message: <>There was an error requesting an invoice. If you continue to experience problems, email <a href='mailto:storage@zotero.org'>storage@zotero.org</a> for assistance.</>
 			});
 		}
 	};

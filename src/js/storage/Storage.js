@@ -467,7 +467,7 @@ function Storage(props) {
 				<div className='user-storage'>
 					<Row className='my-3'>
 						<Col md='12'>
-							<PendingInvoices invoices={props.userInvoices} type='individual' />
+							<PendingInvoices invoices={props.userInvoices} />
 						</Col>
 					</Row>
 					<Row>

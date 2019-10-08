@@ -41,8 +41,16 @@ function PendingInvoices(props) {
 	
 	const invoiceRows = invoices.map((invoice) => {
 		const { invoiceID, created, stripeCharge } = invoice;
-		let invoiceUrl = `/storage/invoice/${invoiceID}`;
-		let createdDate = new Date(created);
+		const invoiceUrl = `/storage/invoice/${invoiceID}`;
+		const createdDate = new Date(created);
+		
+		// show delete link to hide invoice if invoice hasn't been paid
+		let deleteLink = null;
+		if (!stripeCharge) {
+			deleteLink = (<a href='#' onClick={(e) => {
+				e.preventDefault(); handleDelete(invoiceID);
+			}}>Delete</a>);
+		}
 		return (
 			<tr key={invoiceID}>
 				<td>
@@ -55,9 +63,7 @@ function PendingInvoices(props) {
 					{stripeCharge ? 'Paid' : 'Pending'}
 				</td>
 				<td>
-					<a href='#' onClick={(e) => {
-						e.preventDefault(); handleDelete(invoiceID);
-					}}>Delete</a>
+					{deleteLink}
 				</td>
 			</tr>
 		);

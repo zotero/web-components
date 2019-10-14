@@ -32,7 +32,7 @@ import { ErrorWrapper } from '../components/ErrorWrapper.jsx';
 import { Notifier } from '../Notifier.js';
 import { SubscriptionHandler } from './SubscriptionHandler.jsx';
 import { PaymentSource } from './PaymentSource.jsx';
-import { PendingInvoices } from './PendingInvoices.jsx';
+import { Invoices } from './Invoices.jsx';
 
 import { StorageContext, PaymentContext, NotifierContext, getUserCustomer, getSubscription, updatePayment, renewNow, selectPlan, START_OPERATION, STOP_OPERATION, notify } from './actions.js';
 import { storageReducer, notifyReducer, paymentReducer } from './actions.js';
@@ -467,7 +467,8 @@ function Storage(props) {
 				<div className='user-storage'>
 					<Row className='my-3'>
 						<Col md='12'>
-							<PendingInvoices invoices={props.userInvoices} />
+							<Invoices invoices={props.userInvoices} type='individual' collapseLabel='Show Invoices' />
+							<Invoices invoices={props.userInvoices} type='contribution' collapseLabel='Show Contributions' />
 						</Col>
 					</Row>
 					<Row>

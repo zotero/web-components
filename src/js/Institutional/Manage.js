@@ -17,7 +17,7 @@ import { postFormData } from '../ajax.js';
 import { buildUrl } from '../wwwroutes.js';
 import { InstitutionHandler } from '../storage/InstitutionHandler.jsx';
 import { LabContext, labReducer, PaymentContext, paymentReducer, NotifierContext, notifyReducer, notify, setEmails, UPDATE_NAME, UPDATE_PURCHASE } from '../storage/actions.js';
-import { PendingInvoices } from '../storage/PendingInvoices.jsx';
+import { Invoices } from '../storage/Invoices.jsx';
 
 
 function LabRenew(_props) {
@@ -278,7 +278,7 @@ function Manage(props) {
 						<Notifier {...notification} />
 						<Row className='my-3'>
 							<Col md='12'>
-								<PendingInvoices invoices={labInvoices} />
+								<Invoices invoices={labInvoices} />
 								<ReceiptsTable labInvoices={labInvoices} charges={charges} />
 							</Col>
 						</Row>

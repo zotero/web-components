@@ -28,7 +28,7 @@ function CardCheckoutForm(props) {
 	const [address2, setAddress2] = useState('');
 	const [city, setCity] = useState('');
 	const [state, setState] = useState('');
-	const [cardStatus, setCardStatus] = useState(null);
+	// const [cardStatus, setCardStatus] = useState(null);
 	const [notification, setNotification] = useState(null);
 	
 	const handleSubmit = async (ev) => {
@@ -41,7 +41,8 @@ function CardCheckoutForm(props) {
 			address_city: city,
 			address_state: state,
 		};
-
+		
+		/*
 		let sourceData = {
 			type: 'card',
 			currency: 'usd',
@@ -54,6 +55,7 @@ function CardCheckoutForm(props) {
 				}
 			},
 		};
+		*/
 		
 		// Within the context of `Elements`, this call to createToken knows which Element to
 		// tokenize, since there's only one in this group.
@@ -66,7 +68,7 @@ function CardCheckoutForm(props) {
 		}
 	};
 	const handleCardChange = (cardData) => {
-		setCardStatus(cardData);
+		// setCardStatus(cardData);
 		if (cardData.error) {
 			setNotification({ type: 'error', message: cardData.error.message });
 		} else {

@@ -112,7 +112,10 @@ function PayInvoice(props) {
 		description.push(`Add ${numUsers} users to existing Zotero Lab subscription managed by user ${invoiceUser.username} - ${invoiceUser.email}`);
 		chargeAmount = labUserPrice(numUsers);
 		break;
+	case 'contribution':
+		break;
 	default:
+		log.error(invoiceType);
 		throw new Error('Unknown invoice type');
 	}
 	if (invoiceType == 'individual' && overQuota) {
@@ -147,6 +150,8 @@ function PayInvoice(props) {
 	} else {
 		const source = stripeChargeObject.source;
 		log.debug(source);
+		log.debug(stripeChargeObject);
+		descriptionPs = <p>{stripeChargeObject.description}</p>;
 		let datePaid = new Date(stripeChargeObject.created * 1000);
 		
 		if (source) {
@@ -229,7 +234,7 @@ PayInvoice.propTypes = {
 		source: PropTypes.object,
 		created: PropTypes.number,
 	}),
-	institutionName: PropTypes.string
+	institutionName: PropTypes.oneOfType([PropTypes.string, PropTypes.bool])
 };
 
 export { PayInvoice };

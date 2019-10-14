@@ -1,9 +1,9 @@
 import { log as logger } from '../Log.js';
-var log = logger.Logger('PendingInvoices.jsx', 3);
+var log = logger.Logger('Invoices.jsx', 3);
 
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Table } from 'reactstrap';
+import { Table, Collapse } from 'reactstrap';
 import { postFormData } from '../ajax.js';
 
 import { NotifierContext, notify } from './actions.js';
@@ -22,9 +22,11 @@ const deleteInvoice = async (invoiceID) => {
 	}
 };
 
-function PendingInvoices(props) {
-	let { invoices, type } = props;
+function Invoices(props) {
+	let { invoices, type, collapseLabel } = props;
 	const { notifyDispatch } = useContext(NotifierContext);
+	const [isOpen, setIsOpen] = useState(false);
+
 	if (!invoices) {
 		return null;
 	}
@@ -37,6 +39,9 @@ function PendingInvoices(props) {
 		invoices = invoices.filter((invoice) => {
 			return invoice.invoiceType == type;
 		});
+	}
+	if (invoices.length == 0) {
+		return null;
 	}
 	
 	const invoiceRows = invoices.map((invoice) => {
@@ -60,7 +65,7 @@ function PendingInvoices(props) {
 					{createdDate.toLocaleDateString('en-US', dateFormatOptions)}
 				</td>
 				<td>
-					{stripeCharge ? 'Paid' : 'Pending'}
+					{!stripeCharge ? 'Pending' : ''}
 				</td>
 				<td>
 					{deleteLink}
@@ -69,19 +74,26 @@ function PendingInvoices(props) {
 		);
 	});
 	return (
-		<Table striped>
-			<tbody>
-				{invoiceRows}
-			</tbody>
-		</Table>
+		<>
+			<p><a href='#collapse' onClick={(e) => { e.preventDefault(); setIsOpen(!isOpen); }}>{collapseLabel}</a></p>
+			<Collapse isOpen={isOpen}>
+				<Table striped>
+					<tbody>
+						{invoiceRows}
+					</tbody>
+				</Table>
+			</Collapse>
+		</>
 	);
 }
-PendingInvoices.defaultProps = {
+Invoices.defaultProps = {
+	collapseLabel: "Show Invoices",
 	invoices: [],
 };
-PendingInvoices.propTypes = {
+Invoices.propTypes = {
+	collapseLabel: PropTypes.string,
 	invoices: PropTypes.array,
-	type: PropTypes.oneOf(['individual', 'lab', 'institution'])
+	type: PropTypes.oneOf(['individual', 'lab', 'institution', 'contribution'])
 };
 
-export { PendingInvoices };
+export { Invoices };

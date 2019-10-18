@@ -12,6 +12,34 @@ import { ContributionPaymentHandler } from './ContributionPaymentHandler.jsx';
 import { postFormData } from '../ajax.js';
 import classnames from 'classnames';
 
+const dateFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+
+function nextContributionCharge(created, period) {
+	let createdDate = new Date(created);
+	let nowDate = new Date();
+	let nextChargeDate = new Date(created);
+	nextChargeDate.setFullYear(nowDate.getFullYear());
+
+	if (period == 'month') {
+		if (createdDate.getDate() > nowDate.getDate()) {
+			nextChargeDate.setMonth(nowDate.getMonth());
+			nextChargeDate.setDate(createdDate.getDate());
+		} else {
+			nextChargeDate.setMonth(nowDate.getMonth() + 1);
+			nextChargeDate.setDate(createdDate.getDate());
+		}
+	} else if (period == 'year') {
+		if (nextChargeDate < nowDate) {
+			nextChargeDate.setFullYear(nextChargeDate.getFullYear() + 1);
+		} else {
+			// nextChargeDate has already been set to this year
+		}
+	} else {
+		throw new Error('unexpected period for contribution');
+	}
+	return nextChargeDate;
+}
+
 function AmountCell(props) {
 	const { amount, label, currentAmount, setAmount } = props;
 	const selected = (currentAmount == amount);
@@ -69,7 +97,7 @@ function Contribute(props) {
 	const [amount, setAmount] = useState(0);
 	const [custom, setCustom] = useState(false);
 	const [currentContribution, setCurrentContribution] = useState(props.currentContribution);
-	
+
 	// set values if contribution already in effect
 	useEffect(() => {
 		if (currentContribution) {
@@ -215,7 +243,13 @@ function Contribute(props) {
 	let contributionNode = null;
 	if (currentContribution) {
 		let amtDollars = currentContribution.amount / 100;
-		let description = <p>{`You currently have an active contribution for US $${amtDollars} once per ${currentContribution.period}.`}</p>;
+		let nextChargeDate = nextContributionCharge(currentContribution.created, currentContribution.period);
+		let description = (
+			<>
+				<p>{`You currently have an active contribution for US $${amtDollars} once per ${currentContribution.period}.`}</p>
+				<p>{`The next charge will be on ${nextChargeDate.toLocaleDateString(undefined, dateFormatOptions)}.`}</p>
+			</>
+		);
 		
 		contributionNode = (
 			<Row className = 'my-1'>

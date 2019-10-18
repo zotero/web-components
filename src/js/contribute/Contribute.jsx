@@ -8,6 +8,7 @@ import { Notifier } from '../Notifier.js';
 import PropTypes from 'prop-types';
 
 import { PaymentContext, paymentReducer, NotifierContext, notifyReducer, notify, UPDATE_PURCHASE, UPDATE_CUSTOMER } from '../storage/actions.js';
+import { Invoices } from '../storage/Invoices.jsx';
 import { ContributionPaymentHandler } from './ContributionPaymentHandler.jsx';
 import { postFormData } from '../ajax.js';
 import classnames from 'classnames';
@@ -328,6 +329,7 @@ function ManageContribution(props) {
 					<Row>
 						<Col>
 							<Contribute currentUser={currentUser} currentContribution={currentContribution} />
+							<Invoices invoices={props.userInvoices} type='contribution' collapseLabel='Show Contribution Receipts' />
 						</Col>
 					</Row>
 				</div>
@@ -339,6 +341,7 @@ ManageContribution.propTypes = {
 	stripeCustomer: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
 	currentUser: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
 	currentContribution: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
+	userInvoices: PropTypes.oneOfType([PropTypes.array, PropTypes.bool]),
 };
 
 export { ManageContribution };

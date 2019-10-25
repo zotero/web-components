@@ -1,16 +1,16 @@
-import {log as logger} from './Log.js';
+import { log as logger } from './Log.js';
 var log = logger.Logger('ApiKeyEditor');
 
-import {Fragment, useState, useEffect, useContext, createContext} from 'react';
+import { Fragment, useState, useEffect, useContext, createContext } from 'react';
 import PropTypes from 'prop-types';
 
-import {RadioGroup, Radio} from './react-radio-group.js';
-import {ajax, postFormData, loadAllUserGroups} from './ajax.js';
-import {buildUrl} from './wwwroutes.js';
-import {Notifier} from './Notifier.js';
-import {getCurrentUser, querystring, parseQuery} from './Utils.js';
-import {Alert, Label, Button, Input, Form, FormGroup, Card, CardBody, CardTitle} from 'reactstrap';
-import {ErrorWrapper} from './components/ErrorWrapper.jsx';
+import { RadioGroup, Radio } from './react-radio-group.js';
+import { ajax, postFormData, loadAllUserGroups } from './ajax.js';
+import { buildUrl } from './wwwroutes.js';
+import { Notifier } from './Notifier.js';
+import { getCurrentUser, querystring, parseQuery } from './Utils.js';
+import { Alert, Label, Button, Input, Form, FormGroup, Card, CardBody, CardTitle } from 'reactstrap';
+import { ErrorWrapper } from './components/ErrorWrapper.jsx';
 import { Spinner } from './LoadingSpinner.js';
 
 const currentUser = getCurrentUser();
@@ -90,10 +90,10 @@ const requestedPermissions = function (userGroups = []) {
 		access.groups.all = {};
 		break;
 	case 'read':
-		access.groups.all = {library: true};
+		access.groups.all = { library: true };
 		break;
 	case 'write':
-		access.groups.all = {library: true, write: true};
+		access.groups.all = { library: true, write: true };
 		break;
 	}
 	
@@ -109,7 +109,7 @@ const requestedPermissions = function (userGroups = []) {
 };
 
 const OAuthVerify = function (props) {
-	const {applicationName, verifier} = props;
+	const { applicationName, verifier } = props;
 	return (
 		<Alert color='success'>
 			<h1 className='text-center'>Access Granted</h1>
@@ -125,8 +125,8 @@ OAuthVerify.propTypes = {
 
 // human readable summary of currently selected permissions
 const PermissionsSummary = function (props) {
-	const {access} = useContext(accessContext);
-	const {userGroups} = props;
+	const { access } = useContext(accessContext);
+	const { userGroups } = props;
 	let userGroupsByKey = {};
 	for (let group of userGroups) {
 		userGroupsByKey[group.id] = group;
@@ -187,12 +187,11 @@ const PermissionsSummary = function (props) {
 };
 
 PermissionsSummary.propTypes = {
-	access: accessShape.isRequired,
 	userGroups: PropTypes.array
 };
 
 const PersonalLibraryPermissions = function () {
-	const {access, updateAccess} = useContext(accessContext);
+	const { access, updateAccess } = useContext(accessContext);
 	const handleChange = (evt) => {
 		let newAccess = Object.assign({}, access);
 		if (!updateAccess) {
@@ -250,7 +249,7 @@ const PersonalLibraryPermissions = function () {
 };
 
 const AllGroupsPermissions = function () {
-	const {access, updateAccess} = useContext(accessContext);
+	const { access, updateAccess } = useContext(accessContext);
 	
 	const handleChange = (newAllValue) => {
 		let newAccess = Object.assign({}, access);
@@ -259,10 +258,10 @@ const AllGroupsPermissions = function () {
 			delete newAccess.groups.all;
 			break;
 		case 'read':
-			newAccess.groups.all = {library: true, write: false};
+			newAccess.groups.all = { library: true, write: false };
 			break;
 		case 'write':
-			newAccess.groups.all = {library: true, write: true};
+			newAccess.groups.all = { library: true, write: true };
 			break;
 		default:
 			log.error(`Unexpected value for AllGroupsPermissions: ${newAllValue}`);
@@ -309,14 +308,10 @@ const AllGroupsPermissions = function () {
 		</div>
 	);
 };
-AllGroupsPermissions.propTypes = {
-	access: accessShape.isRequired,
-	updateAccess: PropTypes.func.isRequired
-};
 
 const IndividualGroupPermissions = function (props) {
-	const {access, updateAccess} = useContext(accessContext);
-	const {group} = props;
+	const { access, updateAccess } = useContext(accessContext);
+	const { group } = props;
 	const groupID = group.id;
 	
 	const handleChange = (newGroupValue) => {
@@ -326,10 +321,10 @@ const IndividualGroupPermissions = function (props) {
 			delete newAccess.groups[groupID];
 			break;
 		case 'read':
-			newAccess.groups[groupID] = {library: true, write: false};
+			newAccess.groups[groupID] = { library: true, write: false };
 			break;
 		case 'write':
-			newAccess.groups[groupID] = {library: true, write: true};
+			newAccess.groups[groupID] = { library: true, write: true };
 			break;
 		default:
 			log.error(`Unexpected value for IndividualGroupPermissions: ${newGroupValue}`);
@@ -379,7 +374,7 @@ IndividualGroupPermissions.propTypes = {
 
 
 const AcceptDefaults = function (props) {
-	const {saveKey, editPermissions} = props;
+	const { saveKey, editPermissions } = props;
 	return (
 		<div>
 			<Button onClick={saveKey}>Accept Defaults</Button>{' '}
@@ -393,7 +388,7 @@ AcceptDefaults.propTypes = {
 };
 
 const KeyAccessEditor = function (props) {
-	const {perGroup, userGroups, changePerGroup} = props;
+	const { perGroup, userGroups, changePerGroup } = props;
 
 	let individualGroupNodes = null;
 	if (perGroup) {
@@ -428,22 +423,22 @@ KeyAccessEditor.propTypes = {
 };
 
 const IdentityRequest = function (props) {
-	const {oauthClientName} = props;
+	const { oauthClientName } = props;
 	const [notification, setNotification] = useState(null);
 	const [verifier, setVerifier] = useState(null);
 
 	const saveKey = async () => {
 		const identityUrl = buildUrl('authorizeIdentity');
-		const resp = await ajax({url: identityUrl, type: 'POST', withSession: true});
+		const resp = await ajax({ url: identityUrl, type: 'POST', withSession: true });
 
 		scrollToTop();
 		if (!resp.ok) {
 			log.error('Error processing request');
 		}
 		const data = await resp.json();
-		const {success, verifier, redirect} = data;
+		const { success, verifier, redirect } = data;
 		if (success) {
-			setNotification({type: 'success', message: 'Permission granted'});
+			setNotification({ type: 'success', message: 'Permission granted' });
 			
 			// redirect if savekey response indicates one
 			// this would be an oauth app redirect, otherwise the redirect will in in our own url parsed below
@@ -459,7 +454,7 @@ const IdentityRequest = function (props) {
 				return;
 			}
 		} else {
-			setNotification({type: 'error', message: 'Error processing request'});
+			setNotification({ type: 'error', message: 'Error processing request' });
 		}
 		scrollToTop();
 	};
@@ -496,7 +491,7 @@ IdentityRequest.propTypes = {
 };
 
 const ApiKeyEditor = function (props) {
-	const {editKey, identity, oauthRequest, oauthClientName} = props;
+	const { editKey, identity, oauthRequest, oauthClientName } = props;
 	const [loading, setLoading] = useState(true);
 	const [userGroups, setUserGroups] = useState(props.userGroups);
 	const [access, setAccess] = useState(null);
@@ -548,7 +543,7 @@ const ApiKeyEditor = function (props) {
 			setLoading(false);
 		};
 		initializeRequested();
-	}, []);
+	}, [editKey, oauthClientName, oauthRequest, props.userGroups, userGroups]);
 
 	const updateAccess = (updatedAccess) => {
 		log.debug('updateAccess', 4);
@@ -573,7 +568,7 @@ const ApiKeyEditor = function (props) {
 		// don't allow setting blank name
 		if (name == '') {
 			scrollToTop();
-			setNotification({type: 'error', message: 'Key is missing name'});
+			setNotification({ type: 'error', message: 'Key is missing name' });
 			return;
 		}
 		
@@ -584,19 +579,19 @@ const ApiKeyEditor = function (props) {
 			};
 		}
 		
-		const saveUrl = buildUrl('saveKey', {key: key, oauth: oauthRequest});
-		const resp = await ajax({url: saveUrl, type: 'POST', withSession: true, data: JSON.stringify(keyObject)});
+		const saveUrl = buildUrl('saveKey', { key: key, oauth: oauthRequest });
+		const resp = await ajax({ url: saveUrl, type: 'POST', withSession: true, data: JSON.stringify(keyObject) });
 	
 		if (!resp.ok) {
 			log.error('Error saving key');
-			setNotification({type: 'error', message: 'Error saving key'});
+			setNotification({ type: 'error', message: 'Error saving key' });
 			scrollToTop();
 			return;
 		}
 		const data = await resp.json();
-		const {success, verifier, redirect, updatedKey} = data;
+		const { success, verifier, redirect, updatedKey } = data;
 		if (success) {
-			setNotification({type: 'success', message: 'Key Saved'});
+			setNotification({ type: 'success', message: 'Key Saved' });
 			
 			// redirect if savekey response indicates one
 			// this would be an oauth app redirect, otherwise the redirect will in in our own url parsed below
@@ -633,7 +628,7 @@ const ApiKeyEditor = function (props) {
 				setCreatedKey(updatedKey.key);
 			}
 		} else {
-			setNotification({type: 'error', message: 'Error saving key'});
+			setNotification({ type: 'error', message: 'Error saving key' });
 		}
 		scrollToTop();
 	};
@@ -641,18 +636,18 @@ const ApiKeyEditor = function (props) {
 	const revokeKey = async () => {
 		const key = editKey.key;
 		
-		const revokeUrl = buildUrl('revokeKey', {key});
-		const resp = await postFormData(revokeUrl, {revoke: '1', key: key}, {withSession: true});
+		const revokeUrl = buildUrl('revokeKey', { key });
+		const resp = await postFormData(revokeUrl, { revoke: '1', key: key }, { withSession: true });
 		scrollToTop();
 		if (!resp.ok) {
 			log.error('Error deleting key');
-			setNotification({type: 'error', message: 'Error deleting key'});
+			setNotification({ type: 'error', message: 'Error deleting key' });
 		}
 		const data = await resp.json();
 		if (data.success) {
-			setNotification({type: 'success', message: 'Key Revoked'});
+			setNotification({ type: 'success', message: 'Key Revoked' });
 		} else {
-			setNotification({type: 'error', message: 'Error deleting key'});
+			setNotification({ type: 'error', message: 'Error deleting key' });
 		}
 		scrollToTop();
 	};
@@ -722,7 +717,7 @@ const ApiKeyEditor = function (props) {
 	
 	return (
 		<ErrorWrapper>
-			<accessContext.Provider value={{access, updateAccess}}>
+			<accessContext.Provider value={{ access, updateAccess }}>
 				<div className='key-editor'>
 					{title}
 					<Notifier {...notification} />
@@ -751,4 +746,4 @@ ApiKeyEditor.propTypes = {
 	userGroups: PropTypes.array
 };
 
-export {ApiKeyEditor};
+export { ApiKeyEditor };

@@ -50,7 +50,10 @@ Iban.propTypes = {
 };
 
 function PaymentSource(props) {
-	const {source} = props;
+	const { source } = props;
+	if (!source) {
+		return null;
+	}
 	let type = source.type;
 	if (!type && source.object) {
 		type = source.object;
@@ -67,7 +70,7 @@ function PaymentSource(props) {
 	}
 }
 PaymentSource.propTypes = {
-	source: PropTypes.object.isRequired
+	source: PropTypes.object
 };
 
 export {PaymentSource};

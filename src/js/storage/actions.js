@@ -1,8 +1,8 @@
-import {log as logger} from '../Log.js';
+import { log as logger } from '../Log.js';
 const log = logger.Logger('storage/actions.js');
 
-import {createContext} from 'react';
-import {ajax} from '../ajax.js';
+import { createContext } from 'react';
+import { ajax } from '../ajax.js';
 
 const StorageContext = createContext(null);
 const NotifierContext = createContext(null);
@@ -42,12 +42,12 @@ function paymentReducer(state, action) {
 }
 
 function notifyReducer(state, action) {
-	switch (action.type){
+	switch (action.type) {
 	case NOTIFY:
-		return Object.assign({}, state, {notification: {
+		return Object.assign({}, state, { notification: {
 			type: action.notificationType,
 			message: action.message
-		}});
+		} });
 	default:
 		return state;
 	}
@@ -73,9 +73,9 @@ function labReducer(state, action) {
 			name: action.name
 		});
 	case SET_FTE:
-		return Object.assign({}, state, {fte: action.fte});
+		return Object.assign({}, state, { fte: action.fte });
 	case SET_EMAILS:
-		return Object.assign({}, state, {emails: action.emails});
+		return Object.assign({}, state, { emails: action.emails });
 	default:
 		return state;
 	}
@@ -132,7 +132,7 @@ function setEmails(emails) {
 async function getSubscription(dispatch) {
 	log.debug('getSubscription', 4);
 	try {
-		let resp = await ajax({url: '/storage/usersubscription'});
+		let resp = await ajax({ url: '/storage/usersubscription' });
 		let data = await resp.json();
 		dispatch({
 			type: UPDATE_USER_SUBSCRIPTION,
@@ -149,10 +149,10 @@ async function getSubscription(dispatch) {
 async function getUserCustomer(dispatch) {
 	log.debug('getUserCustomer', 4);
 	try {
-		let resp = await ajax({url: '/storage/getusercustomer'});
+		let resp = await ajax({ url: '/storage/getusercustomer' });
 		log.debug(resp, 4);
 		let data = await resp.json();
-		dispatch({type: UPDATE_CUSTOMER, stripeCustomer: data});
+		dispatch({ type: UPDATE_CUSTOMER, stripeCustomer: data });
 	} catch (e) {
 		log.debug('Error retrieving customer data', 2);
 		log.debug(e, 2);

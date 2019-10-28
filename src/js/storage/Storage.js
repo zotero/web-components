@@ -204,6 +204,8 @@ GroupUsage.propTypes = {
 	usage: PropTypes.number
 };
 
+// Row that shows user's payment method and allows updating the method that will be used
+// or forcing an immediate renewal charge regardless of scheduled automatic renewal
 function PaymentRow(props) {
 	const { defaultSource } = props;
 	const { storageState } = useContext(StorageContext);
@@ -384,7 +386,7 @@ function Storage(props) {
 		notifyDispatch({ type: START_OPERATION });
 
 		try {
-			let resp = await postFormData('/storage/cancelautorenew');
+			let resp = await postFormData('/storage/cancelautorenew', undefined, { withSession: true });
 			log.debug(resp, 4);
 			notifyDispatch(notify('success', 'Automatic renewal disabled'));
 			notifyDispatch({ type: STOP_OPERATION });
@@ -439,13 +441,13 @@ function Storage(props) {
 
 	let paymentRow = null;
 	if (userSubscription.storageLevel != 1) {
-		let defaultSource = null;
 		if (stripeCustomer) {
-			defaultSource = stripeCustomer.default_source;
+			paymentRow = (<PaymentRow
+				defaultSource={stripeCustomer.default_source}
+			/>);
+		} else {
+			paymentRow = <PaymentRow />;
 		}
-		paymentRow = (<PaymentRow
-			defaultSource={defaultSource}
-		/>);
 	}
 	
 	let Payment = null;

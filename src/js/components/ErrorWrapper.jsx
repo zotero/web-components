@@ -20,7 +20,7 @@ class ErrorWrapper extends React.Component {
 	render() {
 		if (this.state.hasError) {
 			// You can render any custom fallback UI
-			return <h1>Something went wrong loading part of this page.</h1>;
+			return <h2>Something went wrong loading part of this page.</h2>;
 		}
 		return this.props.children;
 	}

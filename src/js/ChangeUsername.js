@@ -1,222 +1,213 @@
-'use strict';
-
-import {log as logger} from './Log.js';
+import { log as logger } from './Log.js';
 let log = logger.Logger('ChangeUsernameComponent');
 
-const React = require('react');
-const {Component} = React;
-const Fragment = React.Fragment;
+import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 
-import {postFormData} from './ajax.js';
-import {slugify} from './Utils.js';
-import {buildUrl} from './wwwroutes.js';
-import {Notifier} from './Notifier.js';
-import {usernameValidation} from './Validate.js';
+import { ErrorWrapper } from './components/ErrorWrapper.jsx';
+import { postFormData } from './ajax.js';
+import { slugify } from './Utils.js';
+import { buildUrl } from './wwwroutes.js';
+import { Notifier } from './Notifier.js';
+import { usernameValidation } from './Validate.js';
 
-class FormFieldErrorMessage extends Component {
-	render() {
-		return (
-			<p className='form-field-error'>{this.props.message}</p>
-		);
-	}
+function FormFieldErrorMessage(props) {
+	return (
+		<p className='form-field-error'>{props.message}</p>
+	);
 }
+FormFieldErrorMessage.propTypes = {
+	message: PropTypes.string
+};
 
-class UsernameForm extends Component{
-	constructor(props){
-		super(props);
-		let forumSpecific = (props.username !== props.forumUsername);
-		this.state = {
-			formData:{
-				username:props.username,
-				forumUsername:props.forumUsername
-			},
-			usernameValidity:'undecided',
-			usernameMessage:'',
-			forumUsernameValidity:'undecided',
-			forumUsernameMessage:'',
-			formErrors:{},
-			forumSpecific:forumSpecific
-		};
-		this.checkUsername = this.checkUsername.bind(this);
-		this.saveUsername = this.saveUsername.bind(this);
-		this.handleChange = this.handleChange.bind(this);
-		this.handleBlur = this.handleBlur.bind(this);
-		this.handleForumCheck = this.handleForumCheck.bind(this);
-	}
-	handleForumCheck(evt){
-		this.setState({
-			forumSpecific: evt.target.checked
-		});
-	}
-	handleBlur(evt){
-		if(evt.target.name == 'username'){
-			if(evt.target.value != this.props.username){
-				this.checkUsername(false);
+function UsernameForm(props) {
+	const [formData, setFormData] = useState({
+		username: props.username,
+		forumUsername: props.forumUsername,
+	});
+	const [usernameValidity, setUsernameValidity] = useState('undecided');
+	const [usernameMessage, setUsernameMessage] = useState('');
+	const [forumUsernameValidity, setForumUsernameValidity] = useState('undecided');
+	const [forumUsernameMessage, setForumUsernameMessage] = useState('');
+	const [formErrors, setFormErrors] = useState({});
+	const [formError, setFormError] = useState(undefined);
+	const [forumSpecific, setForumSpecific] = useState(props.username !== props.forumUsername);
+	const [changeSuccessful, setChangeSuccessful] = useState(undefined);
+
+	const handleForumCheck = (evt) => {
+		setForumSpecific(evt.target.checked);
+	};
+
+	const handleBlur = (evt) => {
+		if (evt.target.name == 'username') {
+			if (evt.target.value != props.username) {
+				checkUsername(false);
 			}
-		} else if(evt.target.name == 'forumUsername'){
-			if(evt.target.value != this.props.forumUsername){
-				this.checkForumUsername(false);
+		} else if (evt.target.name == 'forumUsername') {
+			if (evt.target.value != props.forumUsername) {
+				checkForumUsername(false);
 			}
 		}
-	}
-	async checkForumUsername(skipServer=false){
-		log.debug('checkForumUsername');
-		let username = this.state.formData.forumUsername;
+	};
+
+	const checkForumUsername = async (skipServer = false) => {
+		log.debug('checkForumUsername', 4);
+		let username = formData.forumUsername;
 		let result = await usernameValidation(username, skipServer);
-		log.debug(result);
-		let nstate = {
-			forumUsernameValidity: result.usernameValidity,
-			forumUsernameMessage: result.usernameMessage
-		};
-		this.setState(nstate);
-	}
-	async checkUsername(skipServer=false){
-		let username = this.state.formData.username;
+		log.debug(result, 4);
+		setForumUsernameValidity(result.usernameValidity);
+		setForumUsernameMessage(result.usernameMessage);
+	};
+
+	const checkUsername = async (skipServer = false) => {
+		let username = formData.username;
 		let result = await usernameValidation(username, skipServer);
-		log.debug(result);
-		this.setState(result);
-	}
-	saveUsername(evt){
-		if(evt){
+		log.debug(result, 4);
+		setUsernameValidity(result.usernameValidity);
+		setUsernameMessage(result.usernameMessage);
+	};
+
+	const saveUsername = async (evt) => {
+		if (evt) {
 			evt.preventDefault();
 		}
-		const {username, forumUsername} = this.state.formData;
-		const {forumSpecific} = this.state;
+		const { username, forumUsername } = formData;
 		
 		let changeUrl = buildUrl('changeUsername');
-		let saveData = {username:username, forumUsername:username};
-		if(forumSpecific){
-			saveData = {username, forumUsername};
+		let saveData = { username: username, forumUsername: username };
+		if (forumSpecific) {
+			saveData = { username, forumUsername };
 		}
-		postFormData(changeUrl, saveData, {withSession:true}).then((response)=>{
-			response.json().then((data)=>{
-				if(data.success){
-					this.setState({changeSuccessful:true});
-				} else {
-					this.setState({
-						changeSuccessful:false,
-						formError:'There was an error changing your username'
-					});
-				}
-			});
-		}).catch((response)=>{
-			if(response.status == 429){
-				this.setState({
-					changeSuccessful:false,
-					formError:'Username has been changed too recently'
-				});
+		try {
+			const response = await postFormData(changeUrl, saveData, { withSession: true });
+			const data = await response.json();
+			if (data.success) {
+				setChangeSuccessful(true);
 			} else {
-				this.setState({
-					changeSuccessful:false,
-					formError:'There was an error changing your username'
-				});
+				setChangeSuccessful(false);
+				setFormError('There was an error changing your username');
 			}
-		});
-	}
-	handleChange(evt){
+		} catch (response) {
+			if (response.status == 429) {
+				setChangeSuccessful(false);
+				setFormError('Username has been changed too recently');
+			} else {
+				setChangeSuccessful(false);
+				setFormError('There was an error changing your username');
+			}
+		}
+	};
+
+	const handleChange = (evt) => {
 		const target = evt.target;
 		const value = target.type === 'checkbox' ? target.checked : target.value;
-		let formData = this.state.formData;
-		formData[evt.target.name] = value;
+		let newFormData = formData;
+		newFormData[target.name] = value;
 
-		this.setState({formData:formData});
-		if(evt.target.name == 'username'){
-			this.setState({usernameValidity:'undecided', usernameMessage:''}, ()=>{
-				if(value !== this.props.username){
-					this.checkUsername(true); //check username validity on every change, but only locally
-				}
-			});
-		} else if(evt.target.name == 'forumUsername') {
-			this.setState({forumUsernameValidity:'undecided', forumUsernameMessage:''});
-			if(value !== this.props.forumUsername){
-				this.checkForumUsername(true); //check username validity on every change, but only locally
+		setFormData(newFormData);
+		if (target.name == 'username') {
+			setUsernameValidity('undecided');
+			setUsernameMessage('');
+			if (value !== props.username) {
+				checkUsername(true); // check username validity on every change, but only locally
+			}
+		} else if (target.name == 'forumUsername') {
+			setForumUsernameValidity('undecided');
+			setForumUsernameMessage('');
+			if (value !== props.forumUsername) {
+				this.checkForumUsername(true); // check username validity on every change, but only locally
 			}
 		}
-	}
-	render(){
-		const {formData, formErrors, usernameValidity, usernameMessage, forumSpecific, forumUsernameMessage, forumUsernameValidity} = this.state;
-		let slug = '<username>';
-		if(formData.username) {
-			slug = slugify(formData.username);
-		}
-		let profileUrl = buildUrl('profileUrl', {slug});
-		let previewClass = 'profile-preview ' + usernameValidity;
-		let forumFeedbackClass = 'username-message ' + forumUsernameValidity;
+	};
 
-		let usernameForm = (
-			<form id='username-form'>
-				<div className='form-group'>
-					<input className='form-control' type='text' name='username' placeholder='Username' onChange={this.handleChange} onBlur={this.handleBlur} value={formData.username}></input>
-					<p className={previewClass}>{profileUrl}</p>
-					<p className='username-message'>{usernameMessage}</p>
-					<FormFieldErrorMessage message={formErrors['username']} />
-					<label htmlFor='forumSpecific'>
-						<input type='checkbox' checked={forumSpecific} name='forumSpecific' id='forumSpecific' onChange={this.handleForumCheck} />
-						Use a different username on the Zotero forums
-					</label>
-					{forumSpecific ? 
-						<Fragment>
-							<input className='form-control' type='text' name='forumUsername' placeholder='Forum Username' onChange={this.handleChange} onBlur={this.handleBlur} value={formData.forumUsername}></input>
-							<p className={forumFeedbackClass}>{forumUsernameMessage}</p>
-							<FormFieldErrorMessage message={formErrors['forumUsername']} />
-						</Fragment>
-						: ''
-					}
-				</div>
-				<button className='btn btn-secondary' onClick={this.saveUsername}>Save</button>
-			</form>
-		);
-
-		let notifier = null;
-		if(this.state.changeSuccessful){
-			let message = 'Your username has been updated';
-			notifier = <Notifier type='success' message={message} />;
-		} else if(this.state.formError){
-			notifier = <Notifier type='error' message={this.state.formError} />;
-		}
-		
-		return (
-			<section className='change-username-section'>
-				{usernameForm}
-				{notifier}
-			</section>
-		);
+	let slug = '<username>';
+	if (formData.username) {
+		slug = slugify(formData.username);
 	}
+	let profileUrl = buildUrl('profileUrl', { slug });
+	let previewClass = 'profile-preview ' + usernameValidity;
+	let forumFeedbackClass = 'username-message ' + forumUsernameValidity;
+
+	let usernameForm = (
+		<form id='username-form'>
+			<div className='form-group'>
+				<input className='form-control' type='text' name='username' placeholder='Username' onChange={handleChange} onBlur={handleBlur} value={formData.username}></input>
+				<p className={previewClass}>{profileUrl}</p>
+				<p className='username-message'>{usernameMessage}</p>
+				<FormFieldErrorMessage message={formErrors.username} />
+				<label htmlFor='forumSpecific'>
+					<input type='checkbox' checked={forumSpecific} name='forumSpecific' id='forumSpecific' onChange={handleForumCheck} />
+					Use a different username on the Zotero forums
+				</label>
+				{forumSpecific
+					? <>
+						<input className='form-control' type='text' name='forumUsername' placeholder='Forum Username' onChange={handleChange} onBlur={handleBlur} value={formData.forumUsername}></input>
+						<p className={forumFeedbackClass}>{forumUsernameMessage}</p>
+						<FormFieldErrorMessage message={formErrors.forumUsername} />
+					</>
+					: ''
+				}
+			</div>
+			<button className='btn btn-secondary' onClick={saveUsername}>Save</button>
+		</form>
+	);
+
+	let notifier = null;
+	if (changeSuccessful) {
+		let message = 'Your username has been updated';
+		notifier = <Notifier type='success' message={message} />;
+	} else if (formError) {
+		notifier = <Notifier type='error' message={formError} />;
+	}
+	
+	return (
+		<section className='change-username-section'>
+			{usernameForm}
+			{notifier}
+		</section>
+	);
 }
+UsernameForm.propTypes = {
+	username: PropTypes.string,
+	forumUsername: PropTypes.string,
+};
 
-class ChangeUsername extends Component{
-	constructor(props){
-		super(props);
-		this.state = {
-			username:props.username,
-			forumUsername: props.forumUsername,
-			activated:false
-		};
-		this.activate = this.activate.bind(this);
-	}
-	componentDidMount(){
+function ChangeUsername(props) {
+	const { username, forumUsername } = props;
+	// const [username, setUsername] = useState(props.username);
+	// const [forumUsername, setForumUsername] = useState(props.forumUsername);
+	const [activated, setActivated] = useState(false);
+
+	useEffect(() => {
 		document.documentElement.className += ' react-mounted';
-	}
-	activate(evt){
+	});
+
+	const activate = (evt) => {
 		evt.preventDefault();
-		this.setState({activated:true});
-	}
-	render(){
-		const {activated, username, forumUsername} = this.state;
-		if(activated){
-			return (
+		setActivated(true);
+	};
+
+	if (activated) {
+		return (
+			<ErrorWrapper>
 				<div className='change-username react'>
 					<UsernameForm username={username} forumUsername={forumUsername} />
 				</div>
-			);
-		} else {
-			return (
+			</ErrorWrapper>
+		);
+	} else {
+		return (
+			<ErrorWrapper>
 				<div className='change-username react'>
-					<strong>Username: {username}</strong> <p className='hint'><a href='#' onClick={this.activate}>change</a></p>
+					<strong>Username: {username}</strong> <p className='hint'><a href='#' onClick={activate}>change</a></p>
 				</div>
-			);
-		}
+			</ErrorWrapper>
+		);
 	}
 }
+ChangeUsername.propTypes = {
+	username: PropTypes.string,
+	forumUsername: PropTypes.string,
+};
 
-export {ChangeUsername};
+export { ChangeUsername };

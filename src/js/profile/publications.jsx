@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, createRef } from 'react';
 import PropTypes from 'prop-types';
 
 import ZoteroPublications from 'zotero-publications';
 import { Spinner } from '../LoadingSpinner.js';
+// import { log } from '../Log.js';
 
 const SHOW_SPINNER_DELAY = 500;
+const containerRef = createRef();
 
 function Publications(props) {
 	const [hidden, setHidden] = useState(true);
@@ -33,7 +35,7 @@ function Publications(props) {
 					if (data.length) {
 						setLoading(false);
 						setHidden(false);
-						zp.render(data, this.publicationsContainer);
+						zp.render(data, containerRef.current);
 						onPublicationsLoaded();
 					} else {
 						setLoading(false);
@@ -47,7 +49,7 @@ function Publications(props) {
 				});
 		};
 		loadPublications();
-	}, [userID, onPublicationsLoaded]);
+	}, []);
 
 	if (hidden) {
 		return null;
@@ -63,7 +65,7 @@ function Publications(props) {
 	return (
 		<div>
 			<h2>Publications</h2>
-			<div ref={ ref => this.publicationsContainer = ref}></div>
+			<div ref={ containerRef }></div>
 		</div>
 	);
 }

@@ -1,13 +1,12 @@
 import { log as logger } from '../Log.js';
 let log = logger.Logger('OrcidProfile');
 
-import { useState } from 'react';
+import { useState, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { OrcidIcon, PencilIcon } from '../Icons.js';
 import { Notifier } from '../Notifier.js';
 import { ajax } from '../ajax.js';
 import { Row, Col, Button } from 'reactstrap';
-import { Fragment } from 'react';
 
 // const config = window.zoteroConfig;
 // const orcidClientID = config.orcidClientID;
@@ -84,7 +83,7 @@ function FuzzyDate(props) {
 	if (date.month !== null) {
 		s += '-' + date.month.value;
 	}
-	if (date.day !== null) {
+	if (typeof date.day !== 'undefined') {
 		s += '-' + date.day.value;
 	}
 	return s;
@@ -437,7 +436,7 @@ OrcidProfile.propTypes = {
 };
 
 function OrcidProfileControl(props) {
-	log.debug(props);
+	// log.debug(props);
 
 	/*
 	linkOrcid = () => {

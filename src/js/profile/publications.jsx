@@ -1,4 +1,4 @@
-import { useState, useEffect, createRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 
 import ZoteroPublications from 'zotero-publications';
@@ -6,12 +6,12 @@ import { Spinner } from '../LoadingSpinner.js';
 // import { log } from '../Log.js';
 
 const SHOW_SPINNER_DELAY = 500;
-const containerRef = createRef();
 
 function Publications(props) {
 	const [hidden, setHidden] = useState(true);
 	const [loading, setLoading] = useState(true);
 	const { userID, onPublicationsLoaded } = props;
+	const containerRef = useRef(null);
 	
 	useEffect(() => {
 		let loadPublications = async () => {

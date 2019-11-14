@@ -88,6 +88,19 @@
     }
   }
 
+  .dropdown-menu {
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .badge {
+      color: $white;
+      background-color: $gray-700;
+    }
+  }
+
   .upgrade-storage {
     $btn-padding-y: $btn-padding-y-sm
       + ($font-size-base - $font-size-sm) * $btn-line-height-sm / 2;

@@ -37,7 +37,9 @@
     }
 
     .nav-link {
-      display: block;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       padding: {
         left: $spacer-xl;
         right: $spacer-xl;
@@ -62,6 +64,14 @@
           z-index: -1;
         }
       }
+    }
+
+    .badge {
+      color: $gray-900;
+      background-color: $white;
+      font-size: 100%;
+      padding-top: 0.1em;
+      padding-bottom: 0.1em;
     }
   }
 }

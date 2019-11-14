@@ -1,127 +1,136 @@
-'use strict';
-
-import {log as logger} from '../Log.js';
+import { log as logger } from '../Log.js';
 let log = logger.Logger('editable-timeline');
 
-import React from 'react';
+import { useState, useEffect, createElement } from 'react';
 import PropTypes from 'prop-types';
 
-import {Button} from 'reactstrap';
+import { Button } from 'reactstrap';
 
-class EditableTimeline extends React.Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			counter: props.value && props.value.length + 1 || 1,
-			value: props.value && JSON.parse(props.value) || [],
-			processing: false,
-			editLast: false
+function EditableTimeline(props) {
+	const { field, template, entryClass, title, editable } = props;
+
+	const [counter, setCounter] = useState(props.value && props.value.length + 1 || 1);
+	const [value, setValue] = useState(props.value && JSON.parse(props.value) || []);
+	const [processing, setProcessing] = useState(false);
+	const [editLast, setEditLast] = useState(false);
+	const [editing, setEditing] = useState(false);
+
+	useEffect(() => {
+		const save = async () => {
+			// if(evt){
+			// 	evt.preventDefault();
+			// }
+			
+			setProcessing(true);
+			// this.setState({
+			// 	processing: true,
+			// });
+	
+			await props.saveField(field, JSON.stringify(value));
+			setProcessing(false);
+			setEditing(false);
+			// this.setState({
+			// 	processing: false,
+			// 	editing: false,
+			// });
 		};
-	}
-	componentDidUpdate(prevProps) {
-		if(this.props.value != prevProps.value){
-			this.setState({value:JSON.parse(this.props.value)});
-		}
-	}
-	addEmpty = (evt) => {
+		
+		save();
+	}, [field, value]);
+
+	// componentDidUpdate(prevProps) {
+	// 	if (this.props.value != prevProps.value) {
+	// 		this.setState({ value: JSON.parse(this.props.value) });
+	// 	}
+	// }
+
+	const addEmpty = (evt) => {
 		evt.preventDefault();
-		let {value, counter} = this.state;
-		let {template} = this.props;
-		if(!template){
-			throw 'no template';
+		if (!template) {
+			throw new Error('no template');
 		}
 		let addObject;
-		if(template === undefined){
-			addObject = {id:++counter};
+		if (template === undefined) {
+			addObject = { id: counter + 1 };
 		} else {
-			addObject = Object.assign({}, template, {id:++counter});
+			addObject = Object.assign({}, template, { id: counter + 1 });
 		}
-		value.push(addObject);
-		this.setState({value, addValue:'', counter, editLast:true});
-	}
+		let newValue = value.slice(0);
+		newValue.push(addObject);
+		
+		setValue(newValue);
+		setCounter(counter + 1);
+		setEditLast(true);
 
-	updateEntry = (index, entry) => {
-		if(index === undefined || entry === undefined){
+		// this.setState({ value, addValue: '', counter, editLast: true });
+	};
+
+	const updateEntry = (index, entry) => {
+		if (index === undefined || entry === undefined) {
 			log.error('Insufficient arguments to updateEntry');
-			throw 'Insufficient arguments to updateEntry';
+			throw new Error('Insufficient arguments to updateEntry');
 		}
-		let {value} = this.state;
 		let newValue = value.slice(0);
 		newValue[index] = entry;
-		this.setState({value:newValue, editLast:false}, this.save);
-	}
 
-	save = async (evt) => {
-		if(evt){
-			evt.preventDefault();
-		}
-		const {field} = this.props;
-		const {value} = this.state;
+		setValue(newValue);
+		setEditLast(false);
+		// save();
+		// this.setState({ value: newValue, editLast: false }, this.save);
+	};
 
-		this.setState({
-			processing: true,
-		});
-
-		await this.props.saveField(field, JSON.stringify(value));
-		this.setState({
-			processing: false,
-			editing: false,
-		});
-		return;
-	}
-
-	remove = (index) => {
-		if(index === undefined){
+	const remove = (index) => {
+		if (index === undefined) {
 			log.error('Insufficient arguments to _remove');
-			throw 'Insufficient arguments to _remove';
+			throw new Error('Insufficient arguments to _remove');
 		}
-		let {value} = this.state;
-		value.splice(index, 1);
-		this.setState({
-			value,
-			editLast:false
-		}, this.save);
+		let newValue = value.slice(0);
+		newValue.splice(index, 1);
+		setValue(newValue);
+		setEditLast(false);
+		// save();
+
+		// this.setState({
+		// 	value,
+		// 	editLast: false
+		// }, this.save);
+	};
+
+	let edit = null;
+	let cssClasses = 'profile-editable-items profile-editable-editing ' + (value.length ? '' : 'profile-editable-items-empty');
+
+	let titleNode = title ? <h2>{title}</h2> : null;
+
+	if (typeof entryClass === 'undefined') {
+		return null;
 	}
 
-	render() {
-		const {entryClass, title, editable} = this.props;
-		const {processing, value, editLast} = this.state;
-		let edit = null;
-		let cssClasses = 'profile-editable-items profile-editable-editing ' + (value.length ? '' : 'profile-editable-items-empty');
-
-		let titleNode = title ? <h2>{title}</h2> : null;
-
-		if(typeof entryClass === 'undefined') {
-			return null;
-		}
-
-		if(processing) {
-			return <div className={cssClasses}>
-				{title}
-				<div className="profile-editable-spinner"></div>
-			</div>;
-		}
-
-		let add = editable ? <Button outline size='sm' color='secondary' onClick={this.addEmpty} className='ml-2' >Add</Button> : null;
-	
+	if (processing) {
 		return <div className={cssClasses}>
-			{titleNode} {add}
-			<div>
-				{value.map((entry, index) => {
-					return React.createElement(entryClass, {
-						index,
-						value: entry,
-						key: index,
-						onUpdate: this.updateEntry,
-						remove: this.remove,
-						editable: editable,
-						editing: (editLast && (index == (value.length - 1)))
-					});
-				})}
-				{edit}
-			</div>
+			{title}
+			<div className='profile-editable-spinner'></div>
 		</div>;
 	}
+
+	let add = editable ? <Button outline size='sm' color='secondary' onClick={addEmpty} className='ml-2' >Add</Button> : null;
+
+	return <div className={cssClasses}>
+		{titleNode} {add}
+		<div>
+			{value.map((entry, index) => {
+				return createElement(entryClass, {
+					index,
+					value: entry,
+					key: index,
+					onUpdate: updateEntry,
+					remove,
+					editable,
+					editing: (editLast && (index == (value.length - 1)))
+				});
+			})}
+			{edit}
+		</div>
+	</div>;
 }
 
 EditableTimeline.propTypes = {
@@ -131,4 +140,4 @@ EditableTimeline.propTypes = {
 	value: PropTypes.string,
 };
 
-export {EditableTimeline};
+export { EditableTimeline };

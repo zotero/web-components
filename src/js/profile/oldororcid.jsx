@@ -4,7 +4,6 @@ let log = logger.Logger('Profile');
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-import { ErrorWrapper } from '../components/ErrorWrapper.jsx';
 import { ajax, postFormData } from '../ajax.js';
 import { apiRequestString } from '../ApiRouter.js';
 import { eventSystem } from '../EventSystem.js';
@@ -19,7 +18,7 @@ import { EditableRich } from './editable-rich.jsx';
 import { Groups, GroupsDetailed } from './groups.jsx';
 import { Publications } from './publications.jsx';
 import { RelatedPeople, RelatedPeopleDetailed } from './related-people.jsx';
-// import { FollowButtons } from '../FollowButtons.jsx';
+import { FollowButtons } from '../FollowButtons.jsx';
 import { InviteToGroups } from '../InviteToGroups.js';
 import { MessageUserButton } from './message-user-button.jsx';
 import { Alert, Container, Row, Col, Nav, NavItem, NavLink, TabPane, TabContent, Card, CardBody } from 'reactstrap';
@@ -99,7 +98,7 @@ function Profile(props) {
 				start: (groupsLoaded ? groups.length : 0)
 			});
 			let resp = await ajax({ url: url, credentials: 'omit' });
-			// let totalResults = parseInt(resp.headers.get('Total-Results'));
+			let totalResults = parseInt(resp.headers.get('Total-Results'));
 			let groups = await resp.json();
 			if (groups.length > 3) {
 				setExtended(true);
@@ -343,12 +342,12 @@ function Profile(props) {
 	}
 
 	return (
-		<ErrorWrapper><Container>
+		<Container>
 			{alertNode}
 			<Row className='user-profile-personal-details'>
 				<Col xs={12} md={4}>
 					<EditableAvatar
-						value={ profile.meta.avatar }
+						value={ profileMeta.avatar }
 						saveField={saveField}
 					/>
 				</Col>
@@ -415,11 +414,9 @@ function Profile(props) {
 					</ul>
 					{orcidProfileControl}
 					<div className='user-actions clearfix'>
-						{/*
 						<div className='float-left mr-4'>
 							<FollowButtons profileUserID={userID} isFollowing={isFollowing} />
 						</div>
-						*/}
 						<div className='float-left mr-4'>
 							<MessageUserButton username={profile.username} />
 						</div>
@@ -442,7 +439,7 @@ function Profile(props) {
 					</TabContent>
 				</Col>
 			</Row>
-		</Container></ErrorWrapper>
+		</Container>
 	);
 }
 

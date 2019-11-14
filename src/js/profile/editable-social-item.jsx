@@ -1,181 +1,170 @@
-'use strict';
+/* eslint-disable camelcase */
 
 // import {log as logger} from '../Log.js';
 // const log = logger.Logger('editable-social-item');
 
-import React from 'react';
-const {Fragment} = React;
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 
-import {PencilIcon, TrashIcon} from '../Icons.js';
-import {Form, CustomInput, Input, Button} from 'reactstrap';
+import { PencilIcon, TrashIcon } from '../Icons.js';
+import { Form, CustomInput, Input, Button } from 'reactstrap';
 
 
 let social_networks = {
-	'ORCID': {
+	ORCID: {
 		iconClass: 'social social-orcid',
-		getUrl: username => {
+		getUrl: (username) => {
 			return `http://orcid.org/${username}`;
 		}
 	},
 	'Scopus Author ID': {
 		iconClass: 'social social-scopus',
-		getUrl: username => {
+		getUrl: (username) => {
 			return `https://www.scopus.com/authid/detail.uri?authorId=${username}`;
 		}
 	},
-	'Twitter': {
+	Twitter: {
 		iconClass: 'social social-twitter',
-		getUrl: username => {
+		getUrl: (username) => {
 			return `https://twitter.com/${username}`;
 		}
 	},
-	'Mendeley': {
+	Mendeley: {
 		iconClass: 'social social-mendeley',
-		getUrl: username => {
+		getUrl: (username) => {
 			return `https://www.mendeley.com/profiles/${username}`;
 		}
 	},
-	'Facebook': {
+	Facebook: {
 		iconClass: 'social social-facebook',
-		getUrl: username => {
+		getUrl: (username) => {
 			return `https://www.facebook.com/${username}`;
 		}
 	}
 };
 
-class EditableSocial extends React.Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			value:JSON.parse(props.value),
-			editing:false,
-			counter: props.value.length
-		};
-	}
-	edit = () => {
-		this.setState({editing:true});
-	}
-	addEmpty = () => {
-		let {value, counter} = this.state;
-		let {template} = this.props;
+function EditableSocial(props) {
+	const { template, field, saveField, editable, emptytext } = props;
+	const [value, setValue] = useState(JSON.parse(props.value));
+	// const [addValue, setAddValue] = useState('');
+	const [editing, setEditing] = useState(false);
+	const [counter, setCounter] = useState(props.value.length);
+
+	const edit = () => {
+		setEditing(true);
+	};
+
+	const addEmpty = () => {
 		let addObject;
-		if(template === undefined){
-			addObject = {id:++counter};
+		if (template === undefined) {
+			addObject = { id: counter + 1 };
 		} else {
-			addObject = Object.assign({}, template, {id:++counter});
+			addObject = Object.assign({}, template, { id: counter + 1 });
 		}
-		value.push(addObject);
-		this.setState({value, addValue:'', counter});
-	}
-	save = async () => {
-		let {value} = this.state;
-		await this.props.saveField(this.props.field, JSON.stringify(value));
-		this.setState({editing:false});
-	}
-	remove = (index) => {
-		let {value} = this.state;
-		value.splice(index, 1);
-		this.setState({value});
-	}
-	cancel = () => {
-		this.setState({
-			value:this.props.value,
-			editing:false
-		});
-	}
+		let newValue = value.slice(0);
+		newValue.push(addObject);
+		setValue(newValue);
+		// setAddValue('');
+		setCounter(counter + 1);
+	};
 
-	handleNameChange = (evt) => {
-		let {value} = this.state;
+	const save = async () => {
+		await saveField(field, JSON.stringify(value));
+		setEditing(false);
+	};
+
+	const remove = (index) => {
+		let newValue = value.slice(0);
+		newValue.splice(index, 1);
+		setValue(newValue);
+	};
+
+	// const cancel = () => {
+	// 	setValue(JSON.parse(props.value));
+	// 	setEditing(false);
+	// };
+
+	const handleNameChange = (evt) => {
 		let index = evt.target.getAttribute('data-index');
-		index = parseInt(index, 10);
-		value[index].name = evt.target.value;
-		this.setState({value});
-	}
-	handleValueChange = (evt) => {
-		let {value} = this.state;
+		index = parseInt(index);
+		let newValue = value.slice(0);
+		newValue[index].name = evt.target.value;
+		setValue(newValue);
+	};
+
+	const handleValueChange = (evt) => {
 		let index = evt.target.getAttribute('data-index');
-		index = parseInt(index, 10);
-		value[index].value = evt.target.value;
-		this.setState({value});
-	}
+		index = parseInt(index);
+		let newValue = value.slice(0);
+		newValue[index].value = evt.target.value;
+		setValue(newValue);
+	};
 
-	handleKeyboard = () => {
+	// const handleKeyboard = () => {};
 
-	}
+	// const handleBlur = () => {};
 
-	handleBlur = () => {
-
-	}
-
-	render() {
-		const {editable} = this.props;
-		const {value, editing} = this.state;
-
-		let editNode = null;
-		if(editable){
-			if(editing){
-				editNode = (
-					<Fragment>
-						<Button outline color='secondary' onClick={this.save} className='ml-2'>Save</Button>{' '}
-						<Button outline color='secondary' onClick={this.addEmpty}>Add</Button>
-					</Fragment>
-				);
-			} else {
-				editNode = <PencilIcon onClick={this.edit} title="Edit" className='pointer' />;
-			}
+	let editNode = null;
+	if (editable) {
+		if (editing) {
+			editNode = (
+				<>
+					<Button outline color='secondary' onClick={save} className='ml-2'>Save</Button>{' '}
+					<Button outline color='secondary' onClick={addEmpty}>Add</Button>
+				</>
+			);
+		} else {
+			editNode = <PencilIcon onClick={edit} title='Edit' className='pointer' />;
 		}
-
-		let socialNodes = value.map((socialEntry, index) => {
-			if(editing) {
-				return <Form key={socialEntry.id} inline className="profile-editable-social profile-editable-editing mb-2" onSubmit={this.save}>
-					<CustomInput
-						type="select"
-						id='social-select'
-						onChange={this.handleNameChange }
-						defaultValue={ socialEntry.name }
-						data-index={index}
-						clearable='false'
-					>
-						{ Object.keys(social_networks).map(network => 
-							<option value={ network } key={ network }>{ network }</option>
-						)}
-					</CustomInput>{' '}
-					<Input
-						defaultValue={ socialEntry.value }
-						onChange={ this.handleValueChange }
-						data-index={index}
-						placeholder={'User name on ' + socialEntry.name}
-					/>
-					<div className="profile-editable-actions">
-						<a className="profile-editable-action" onClick={()=>{this.remove(index);}}>
-							<TrashIcon title='Delete' />
-						</a>
-					</div>
-				</Form>;
-			} else {
-				var entry = '';
-				if(this.state.value) {
-					entry = <a href={social_networks[socialEntry.name].getUrl(socialEntry.value)}>
-						<span className={social_networks[socialEntry.name]['iconClass']}></span>
-					</a>;
-				} else {
-					entry = this.props.emptytext;
-				}
-
-				return <div key={socialEntry.id} className="profile-editable-social profile-editable-{this.state.value ? 'value' : 'emptytext'}">
-					<span>{ entry }</span>
-				</div>;
-			}
-		});
-
-		return (
-			<div className="editable-social">
-				{socialNodes}
-				{editNode}
-			</div>
-		);
 	}
+
+	let socialNodes = value.map((socialEntry, index) => {
+		if (editing) {
+			return <Form key={socialEntry.id} inline className='profile-editable-social profile-editable-editing mb-2' onSubmit={save}>
+				<CustomInput
+					type='select'
+					id='social-select'
+					onChange={handleNameChange }
+					defaultValue={ socialEntry.name }
+					data-index={index}
+					clearable='false'
+				>
+					{ Object.keys(social_networks).map(network => <option value={ network } key={ network }>{ network }</option>)}
+				</CustomInput>{' '}
+				<Input
+					defaultValue={ socialEntry.value }
+					onChange={ handleValueChange }
+					data-index={index}
+					placeholder={'User name on ' + socialEntry.name}
+				/>
+				<div className='profile-editable-actions'>
+					<a className='profile-editable-action' onClick={() => { remove(index); }}>
+						<TrashIcon title='Delete' />
+					</a>
+				</div>
+			</Form>;
+		} else {
+			var entry = '';
+			if (value) {
+				entry = <a href={social_networks[socialEntry.name].getUrl(socialEntry.value)}>
+					<span className={social_networks[socialEntry.name].iconClass}></span>
+				</a>;
+			} else {
+				entry = emptytext;
+			}
+
+			return <div key={socialEntry.id} className={`profile-editable-social profile-editable-${value ? 'value' : 'emptytext'}`}>
+				<span>{ entry }</span>
+			</div>;
+		}
+	});
+
+	return (
+		<div className='editable-social'>
+			{socialNodes}
+			{editNode}
+		</div>
+	);
 }
 
 EditableSocial.defaultProps = {
@@ -189,4 +178,4 @@ EditableSocial.propTypes = {
 	template: PropTypes.object.isRequired
 };
 
-export {EditableSocial};
+export { EditableSocial };

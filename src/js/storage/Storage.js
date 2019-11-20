@@ -1,3 +1,4 @@
+/* eslint-disable no-duplicate-imports */
 /*
 TODO:
  - clean up
@@ -38,6 +39,7 @@ import { StorageContext, PaymentContext, NotifierContext, getUserCustomer, getSu
 import { storageReducer, notifyReducer, paymentReducer } from './actions.js';
 
 import { postFormData } from '../ajax.js';
+import { LoadingSpinner } from '../LoadingSpinner.js';
 
 const dateFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
 
@@ -401,7 +403,7 @@ function Storage(props) {
 	};
 	
 	if (userSubscription === null) {
-		return null;
+		return <LoadingSpinner loading={true} />;
 	}
 
 	let expirationDate = <td>Never</td>;

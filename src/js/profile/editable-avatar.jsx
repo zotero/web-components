@@ -84,6 +84,7 @@ function EditableAvatar(props) {
 		setProcessing(true);
 
 		try {
+			// eslint-disable-next-line camelcase
 			let response = await postFormData(updateUrl, { profile_image: imageFile }, { withSession: true });
 			let data = await response.json();
 			if (data.success) {

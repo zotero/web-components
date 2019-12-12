@@ -88,97 +88,157 @@
 
 					let tests = {
 						test1: function(){
-							window.downloadElement.setState({
-								featuredOS:'Mac',
-								featuredBrowser:'Safari',
-								arch:'x86_64',
-								oldMac:false
-							});
+							var props = {
+								featuredOS: 'Mac',
+								featuredBrowser: 'Safari',
+								arch: 'x86_64',
+								oldMac: false,
+								mobile:false
+							}
+							window.downloadElement = ReactDOM.render(
+								React.createElement(ZoteroWebComponents.Downloads, props),
+								document.getElementById('react-download')
+							);
 						},
 						test2: function(){
-							window.downloadElement.setState({
-								featuredOS:'Windows',
-								featuredBrowser:'Chrome',
-								arch:'x86_64'
-							});
+							var props = {
+								featuredOS: 'Windows',
+								featuredBrowser: 'Chrome',
+								arch: 'x86_64',
+							}
+							window.downloadElement = ReactDOM.render(
+								React.createElement(ZoteroWebComponents.Downloads, props),
+								document.getElementById('react-download')
+							);
 						},
 						test3: function(){
-							window.downloadElement.setState({
-								featuredOS:'Windows',
-								featuredBrowser:'Edge',
-								arch:'x86_64'
-							});
+							var props = {
+								featuredOS: 'Windows',
+								featuredBrowser: 'Edge',
+								arch: 'x86_64',
+							}
+							window.downloadElement = ReactDOM.render(
+								React.createElement(ZoteroWebComponents.Downloads, props),
+								document.getElementById('react-download')
+							);
 						},
 						test4: function(){
-							window.downloadElement.setState({
-								featuredOS:'Linux',
-								featuredBrowser:'Firefox',
-								arch:'x86_64'
-							});
+							var props = {
+								featuredOS: 'Linux',
+								featuredBrowser: 'Firefox',
+								arch: 'x86_64',
+							}
+							window.downloadElement = ReactDOM.render(
+								React.createElement(ZoteroWebComponents.Downloads, props),
+								document.getElementById('react-download')
+							);
 						},
 						test5: function(){
-							window.downloadElement.setState({
-								featuredOS:'Windows',
-								featuredBrowser:'Opera',
-								arch:'x86_64'
-							});
+							var props = {
+								featuredOS: 'Windows',
+								featuredBrowser: 'Opera',
+								arch: 'x86_64',
+							}
+							window.downloadElement = ReactDOM.render(
+								React.createElement(ZoteroWebComponents.Downloads, props),
+								document.getElementById('react-download')
+							);
 						},
 						test6: function(){
-							window.downloadElement.setState({
-								featuredOS:'Mac',
-								featuredBrowser:'Firefox',
-								arch:'x86_64'
-							});
+							var props = {
+								featuredOS: 'Mac',
+								featuredBrowser: 'Firefox',
+								arch: 'x86_64',
+							}
+							window.downloadElement = ReactDOM.render(
+								React.createElement(ZoteroWebComponents.Downloads, props),
+								document.getElementById('react-download')
+							);
 						},
 						test7: function(){
-							window.downloadElement.setState({
-								featuredOS:'Linux',
-								featuredBrowser:'Firefox',
-								arch:'i686'
-							});
+							var props = {
+								featuredOS: 'Linux',
+								featuredBrowser: 'Firefox',
+								arch: 'i686',
+							}
+							window.downloadElement = ReactDOM.render(
+								React.createElement(ZoteroWebComponents.Downloads, props),
+								document.getElementById('react-download')
+							);
 						},
 						test8: function(){
-							window.downloadElement.setState({
-								featuredOS:'',
-								featuredBrowser:'Edge',
-								arch:'i686'
-							});
+							var props = {
+								featuredOS: '',
+								featuredBrowser: 'Edge',
+								arch: 'i686',
+							}
+							window.downloadElement = ReactDOM.render(
+								React.createElement(ZoteroWebComponents.Downloads, props),
+								document.getElementById('react-download')
+							);
 						},
 						test9: function(){
-							window.downloadElement.setState({
-								featuredOS:'',
-								featuredBrowser:'Safari',
-								arch:'x86_64',
-								oldMac:false,
+							var props = {
+								featuredOS: '',
+								featuredBrowser: 'Safari',
+								arch: 'x86_64',
+								oldMac: false,
 								mobile:true
-							});
+							}
+							window.downloadElement = ReactDOM.render(
+								React.createElement(ZoteroWebComponents.Downloads, props),
+								document.getElementById('react-download')
+							);
 						},
 						test10: function(){
-							window.downloadElement.setState({
-								featuredOS:'Mac',
-								featuredBrowser:'Safari',
-								arch:'x86_64',
-								oldMac:true
-							});
+							var props = {
+								featuredOS: 'Mac',
+								featuredBrowser: 'Safari',
+								arch: 'x86_64',
+								oldMac: true,
+							}
+							window.downloadElement = ReactDOM.render(
+								React.createElement(ZoteroWebComponents.Downloads, props),
+								document.getElementById('react-download')
+							);
 						},
 						test11: function(){
-							window.downloadElement.refs.downloadConnector.setState({
-								featuredBrowser:'Safari',
-								oldSafari:true
-							});
+							window.zoteroConfig.installData.oldSafari = true;
+							var props = {
+								featuredOS: 'Mac',
+								featuredBrowser: 'Safari',
+								arch: 'x86_64',
+							}
+							window.downloadElement = ReactDOM.render(
+								React.createElement(ZoteroWebComponents.Downloads, props),
+								document.getElementById('react-download')
+							);
+							window.zoteroConfig.installData.oldSafari = false;
 						},
 						test12: function(){
-							window.downloadElement.setState({
-								featuredOS:'Mac',
-								featuredBrowser:'Firefox',
-								arch:'x86_64'
-							});
-							window.downloadElement.refs.downloadConnector.setState({
-								featuredBrowser:'Firefox',
-								oldSafari:false,
-								firefox45:true
-							});
+							var props = {
+								featuredOS: 'Mac',
+								featuredBrowser: 'Firefox',
+								arch: 'x86_64',
+							}
+							window.downloadElement = ReactDOM.render(
+								React.createElement(ZoteroWebComponents.Downloads, props),
+								document.getElementById('react-download')
+							);
 						},
+						test13: function(){
+							var props = {
+								featuredOS: 'Windows',
+								featuredBrowser: 'Chrome',
+								arch: 'x86_64',
+								oldWindows: true,
+							}
+							window.downloadElement = ReactDOM.render(
+								React.createElement(ZoteroWebComponents.Downloads, props),
+								document.getElementById('react-download')
+							);
+						},
+						
 					};
 
 					let testCase = tests['test1'];

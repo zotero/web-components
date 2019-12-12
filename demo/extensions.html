@@ -151,32 +151,52 @@
 
 					let tests = {
 						test1: function(){
-							window.extensionsPickerElement.refs.installConnectorPrompt.setState({
-								browser:'Safari',
-								oldSafari:true
-							});
+							let props = {
+								featuredBrowser: 'Safari',
+								oldSafari: true,
+							};
+							window.extensionsPickerElement = ReactDOM.render(
+								React.createElement(ZoteroWebComponents.ExtensionsPicker, props),
+								document.getElementById('extensions-picker')
+							);
 						},
 						test2: function(){
-							window.extensionsPickerElement.refs.installConnectorPrompt.setState({
-								browser:'Safari',
-								oldSafari:false
-							});
+							let props = {
+								featuredBrowser: 'Safari',
+								oldSafari: false,
+							};
+							window.extensionsPickerElement = ReactDOM.render(
+								React.createElement(ZoteroWebComponents.ExtensionsPicker, props),
+								document.getElementById('extensions-picker')
+							);
 						},
 						test3: function(){
-							window.extensionsPickerElement.refs.installConnectorPrompt.setState({
-								browser:'Chrome',
-								oldSafari:false
-							});
+							let props = {
+								featuredBrowser: 'Chrome',
+								oldSafari: false,
+							};
+							window.extensionsPickerElement = ReactDOM.render(
+								React.createElement(ZoteroWebComponents.ExtensionsPicker, props),
+								document.getElementById('extensions-picker')
+							);
 						},
 						test4: function(){
-							window.extensionsPickerElement.refs.installConnectorPrompt.setState({
-								browser:'Firefox'
-							});
+							let props = {
+								featuredBrowser: 'Firefox',
+							};
+							window.extensionsPickerElement = ReactDOM.render(
+								React.createElement(ZoteroWebComponents.ExtensionsPicker, props),
+								document.getElementById('extensions-picker')
+							);
 						},
 						test5: function(){
-							window.extensionsPickerElement.refs.installConnectorPrompt.setState({
-								browser:'Opera',
-							});
+							let props = {
+								featuredBrowser: 'Opera',
+							};
+							window.extensionsPickerElement = ReactDOM.render(
+								React.createElement(ZoteroWebComponents.ExtensionsPicker, props),
+								document.getElementById('extensions-picker')
+							);
 						},
 					};
 

@@ -20,12 +20,6 @@ function EditableRich(props) {
 	const [editing, setEditing] = useState(false);
 	const [processing, setProcessing] = useState(false);
 
-	// componentDidUpdate(prevProps) {
-	// 	if (this.props.value != prevProps.value) {
-	// 		this.setState({ value: this.props.value });
-	// 	}
-	// }
-
 	const edit = () => {
 		setEditing(true);
 		
@@ -49,7 +43,7 @@ function EditableRich(props) {
 	const save = async () => {
 		let newValue;
 		let tinyInstance = tinymce.get(id);
-		if (tinyInstance != null) {
+		if (tinyInstance !== null) {
 			newValue = tinyInstance.getContent();
 			tinyInstance.remove();
 		} else {
@@ -59,14 +53,14 @@ function EditableRich(props) {
 		setEditing(false);
 		setProcessing(true);
 
-		await saveField(field, value);
+		await saveField(field, newValue);
 		
 		setProcessing(false);
 	};
 
 	const cancel = () => {
 		let tinyInstance = tinymce.get(id);
-		if (tinyInstance != null) {
+		if (tinyInstance !== null) {
 			tinyInstance.remove();
 		}
 		setEditing(false);

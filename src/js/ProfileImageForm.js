@@ -1,116 +1,70 @@
-'use strict';
-
-import {log as logger} from './Log.js';
+import { log as logger } from './Log.js';
 let log = logger.Logger('ProfileImageForm');
 
-import {postFormData, ajax} from './ajax.js';
-import {buildUrl} from './wwwroutes.js';
-import {Notifier} from './Notifier.js';
-import {useState, createRef} from 'react';
-import {PropTypes} from 'prop-types';
-import {Button} from 'reactstrap';
+import { CroppedImagePicker, getCroppedImg } from './components/CroppedImagePicker.jsx';
+
+import { postFormData, ajax } from './ajax.js';
+import { buildUrl } from './wwwroutes.js';
+import { Notifier } from './Notifier.js';
+import { useState } from 'react';
+import { Button } from 'reactstrap';
+import { PropTypes } from 'prop-types';
 import { randomString } from './Utils.js';
 
-function EmptyImage(props){
-	const {width, height} = props;
-	let style = {
-		'backgroundColor':'#CCC',
-		width,
-		height
-	};
-	return <div className='profile-image-placeholder' style={style}></div>;
-}
-EmptyImage.defaultProps = {
-	width: '150px',
-	height: '150px'
-};
-EmptyImage.propTypes = {
-	width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-	height: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-};
-
-
-function ProfileImage(props){
-	const {type, hasImage, purpose, entityID, width, height, usePlaceholder, cacheBuster} = props;
-	const style = {
-		width,
-		height
-	};
-	
-	let imgSrc = null;
-	if(!hasImage){
-		if(usePlaceholder){
-			return <EmptyImage width={width} height={height} />;
-		} else {
-			return null;
-		}
-	}
-	if(type == 'user'){
-		imgSrc = hasImage ? buildUrl('profileImage', {userID: entityID, 'purpose':purpose}) : buildUrl('profileImage', {'purpose':purpose});
-	} else if(type == 'group'){
-		imgSrc = hasImage ? buildUrl('groupImage', {groupID: entityID, 'purpose': purpose}) : '';
-	}
-	if(cacheBuster){
-		imgSrc += `?r=${randomString(10)}`;
-	}
-	return <img src={imgSrc} style={style} />;
-}
-ProfileImage.defaultProps = {
-	width: '150px',
-	height: '150px',
-	usePlaceholder:true
-};
-ProfileImage.propTypes = {
-	type: PropTypes.oneOf(['user', 'group']),
-	hasImage: PropTypes.bool,
-	purpose: PropTypes.oneOf(['thumb', 'original', 'profile']),
-	entityID: PropTypes.number,
-	width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-	height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-	usePlaceholder: PropTypes.bool,
-	cacheBuster: PropTypes.bool
-};
-
-function ProfileImageForm(props){
-	const {type, entityID} = props;
-	const updateUrl = (type == 'group') ? buildUrl('updateGroupImage', {'groupID':entityID}) : buildUrl('updateProfileImage');
+function ProfileImageForm(props) {
+	const { type, entityID } = props;
+	const updateUrl = (type == 'group') ? buildUrl('updateGroupImage', { groupID: entityID }) : buildUrl('updateProfileImage');
 	
 	const [hasImage, setHasImage] = useState(props.hasImage);
 	const [changeSuccessful, setChangeSuccessful] = useState(null);
 	const [formError, setFormError] = useState(null);
+
+	let value = null;
+	if (hasImage) {
+		value = type == 'group'
+			? buildUrl('groupImage', { groupID: entityID, purpose: 'profile' }) + `?r=${randomString(10)}`
+			: buildUrl('profileImage', { userID: entityID, purpose: 'profile' }) + `?r=${randomString(10)}`;
+	}
 	
-	const fileInputRef = createRef('imageFileInput');
-	
-	const updateImage = async (evt) => {
-		let imageFile = evt.target.files[0];
-		if(imageFile.size > 1048576) {
+	const save = async (imageRef, crop) => {
+		let croppedImg = await getCroppedImg(imageRef, crop, 'cropped.jpg');
+		let croppedImgFile = new File([croppedImg], 'cropped.jpg');
+		let imageFile = croppedImgFile;
+
+		if (imageFile.size > 1000000) {
 			setChangeSuccessful(false);
 			setFormError('Image too large. Must be less than 1 MB');
-			return;
+			throw new Error('Image too large. Must be less than 1 MB');
 		}
-
-		try{
-			let resp = await postFormData(updateUrl, {'profile_image': imageFile}, {withSession:true});
+		
+		try {
+			// eslint-disable-next-line camelcase
+			let resp = await postFormData(updateUrl, { profile_image: imageFile }, { withSession: true });
 			let data = await resp.json();
-			if(data.success){
+			if (data.success) {
 				setChangeSuccessful(true);
 				setHasImage(true);
+				let imgSrc = type == 'group'
+					? buildUrl('groupImage', { groupID: entityID, purpose: 'profile' }) + `?r=${randomString(10)}`
+					: buildUrl('profileImage', { userID: entityID, purpose: 'profile' }) + `?r=${randomString(10)}`;
+				return imgSrc;
 			} else {
 				throw resp;
 			}
-		} catch (e) {
-			log.error(e);
-			setChangeSuccessful(false);
-			setFormError('There was an error updating your image');
+		} catch (error) {
+			setFormError('Failed to upload image');
+			throw new Error('Failed to upload image');
 		}
 	};
+
 	const deleteImage = async () => {
 		try {
-			let resp = await ajax({url:updateUrl, type:'DELETE', withSession:true});
+			let resp = await ajax({ url: updateUrl, type: 'DELETE', withSession: true });
 			let data = await resp.json();
-			if(data.success){
+			if (data.success) {
 				setChangeSuccessful(true);
 				setHasImage(false);
+				return true;
 			} else {
 				throw resp;
 			}
@@ -119,37 +73,31 @@ function ProfileImageForm(props){
 			setChangeSuccessful(false);
 			setFormError('There was an error deleting your image');
 		}
-	};
-	const chooseFile = () => {
-		fileInputRef.current.click();
+		return false;
 	};
 	
 	let notifier = null;
-	if(changeSuccessful){
+	if (changeSuccessful) {
 		let message = 'Image updated';
 		notifier = <Notifier type='success' message={message} />;
-	} else if(formError){
+	} else if (formError) {
 		notifier = <Notifier type='error' message={formError} />;
 	}
 
-	let image = <ProfileImage hasImage={hasImage} type={type} entityID={entityID} cacheBuster={changeSuccessful} />;
+	// let image = <ProfileImage hasImage={hasImage} type={type} entityID={entityID} cacheBuster={changeSuccessful} />;
 
+	log.debug(`rendering ProfileImageForm with value ${value}`);
 	return (
 		<div className='profile-image-form'>
-			<label htmlFor='imageFileInput'>Profile Image</label>
 			{notifier}
-			{image}
-			<div>
-				<input className='d-none' type='file' id='imageFileInput' ref={fileInputRef} onChange={updateImage} />
-				<Button color='secondary' size='sm' className='mt-1' onClick={chooseFile}>Choose Image</Button>
-				{hasImage ? <Button color='danger' size='sm' className='mt-1' onClick={deleteImage}>Delete</Button> : null}
-			</div>
+			<CroppedImagePicker value={value} save={save} deleteImage={deleteImage} crop={{ aspect: 1, unit: '%', width: 100 }}></CroppedImagePicker>
+			{hasImage ? <Button color='danger' size='sm' className='mt-1' onClick={deleteImage}>Delete</Button> : null}
 		</div>
 	);
 }
 ProfileImageForm.defaultProps = {
 	hasImage: 0,
-	type:'user'
+	type: 'user'
 };
 ProfileImageForm.propTypes = {
 	type: PropTypes.oneOf(['user', 'group']),
@@ -158,4 +106,4 @@ ProfileImageForm.propTypes = {
 };
 
 
-export {ProfileImageForm, ProfileImage};
+export { ProfileImageForm };

@@ -1,4 +1,4 @@
-// import {log as logger} from '../Log.js';
+// import { log as logger } from '../Log.js';
 // let log = logger.Logger('NewGroupDiscussions');
 
 import PropTypes from 'prop-types';
@@ -102,13 +102,13 @@ GroupDiscussionMessageSummary.propTypes = {
 	title: PropTypes.string,
 	sender: PropTypes.number,
 	displayNames: PropTypes.shape({
-		slug: PropTypes.array,
-		displayName: PropTypes.array,
+		slug: PropTypes.object,
+		displayName: PropTypes.object,
 	}),
 	lastActivity: PropTypes.number,
 	rsender: PropTypes.number,
 	group: PropTypes.number,
-	showFields: PropTypes.array,
+	showFields: PropTypes.object,
 	narrow: PropTypes.bool,
 };
 
@@ -191,7 +191,7 @@ NewGroupDiscussions.propTypes = {
 	group: groupShape,
 	pageSize: PropTypes.number,
 	allGroups: PropTypes.bool,
-	showFields: PropTypes.arrayOf(PropTypes.string),
+	showFields: PropTypes.object,
 	narrow: PropTypes.bool,
 };
 

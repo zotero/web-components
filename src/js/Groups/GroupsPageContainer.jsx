@@ -40,11 +40,13 @@ let loadGroups = async (userID = false, start = 0) => {
 };
 
 function GroupsPageContainer() {
-	const [groupData, setGroupData] = useState({ loading: true });
+	const [groupData, setGroupData] = useState({ loading: true, groupsLoaded: false, titleOnly: false });
 	
 	useEffect(() => {
 		const fetchData = async () => {
 			let data = await loadGroups();
+			data.groupsLoaded = true;
+			data.loading = false;
 			setGroupData(data);
 		};
 		

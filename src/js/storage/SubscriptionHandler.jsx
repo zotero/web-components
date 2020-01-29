@@ -200,7 +200,7 @@ function SubscriptionHandler(props) {
 			let oldExp = new Date(parseInt(userSubscription.expirationDate) * 1000);
 			let newExp = calculateNewExpiration(userSubscription.expirationDate, userSubscription.storageLevel, storageLevel);
 			description.push(`Your current expiration date is ${oldExp.toLocaleDateString('en-US', dateFormatOptions)}.`);
-			description.push(`Your new expiration date will be ${newExp.toLocaleDateString('en-US', dateFormatOptions)}.`);
+			description.push(`The time left on your current subscription will be applied to your new subscription. Your new expiration date will be ${newExp.toLocaleDateString('en-US', dateFormatOptions)}.`);
 			description.push(`A charge will not be made to your account until your new expiration date.`);
 		}
 		break;

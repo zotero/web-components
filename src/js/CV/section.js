@@ -1,17 +1,14 @@
-'use strict';
+// import { log as logger } from '../Log.js';
+// let log = logger.Logger('Section');
 
-//import {log as logger} from '../Log.js';
-//let log = logger.Logger('Section');
+import React, { useRef } from 'react';
+import { useDrag, useDrop } from 'react-dnd';
 
-const React = require('react');
-const {Component} = React;
-import { findDOMNode } from 'react-dom';
-import { DragSource, DropTarget } from 'react-dnd';
-
-import {RTE} from './text.js';
-import {Collection} from './collection.js';
-import {EditableTextInput, EditableRichText} from './editableTextInput.js';
-import {Button, ButtonGroup, Card, CardBody} from 'reactstrap';
+import { PropTypes } from 'prop-types';
+import { RTE } from './text.js';
+import { Collection } from './collection.js';
+import { EditableTextInput } from './editableTextInput.js';
+import { Button, ButtonGroup, Card, CardBody } from 'reactstrap';
 
 // Drag sources and drop targets only interact
 // if they have the same string type.
@@ -21,148 +18,114 @@ const Types = {
 	CVSECTION: 'cvsection'
 };
 
-/**
- * Specifies the drag source contract.
- * Only `beginDrag` function is required.
- */
-const sectionSource = {
-	beginDrag(props) {
-		// Return the data describing the dragged item
-		const item = { tracking: props.section.tracking, index:props.index };
-		return item;
-	}
-};
+const Section = (props) => {
+	const { updateEntry, removeEntry, moveEntry, section, index } = props;
 
-const sectionTarget = {
-	hover(props, monitor, component) {
-		const dragIndex = monitor.getItem().index;
-		const hoverIndex = props.index;
+	const ref = useRef(null);
 	
-		// Don't replace items with themselves
-		if (dragIndex === hoverIndex) {
-			return;
-		}
+	const [, drop] = useDrop({
+		accept: Types.CVSECTION,
+		hover(item, monitor) {
+			if (!ref.current) {
+				return;
+			}
+			const dragIndex = item.index;
+			const hoverIndex = index;
+			// Don't replace items with themselves
+			if (dragIndex === hoverIndex) {
+				return;
+			}
+			// Determine rectangle on screen
+			const hoverBoundingRect = ref.current.getBoundingClientRect();
+			// Get vertical middle
+			const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+			// Determine mouse position
+			const clientOffset = monitor.getClientOffset();
+			// Get pixels to the top
+			const hoverClientY = clientOffset.y - hoverBoundingRect.top;
+			// Only perform the move when the mouse has crossed half of the items height
+			// When dragging downwards, only move when the cursor is below 50%
+			// When dragging upwards, only move when the cursor is above 50%
+			// Dragging downwards
+			if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
+				return;
+			}
+			// Dragging upwards
+			if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
+				return;
+			}
+			// Time to actually perform the action
+			moveEntry(dragIndex, hoverIndex);
+			// Note: we're mutating the monitor item here!
+			// Generally it's better to avoid mutations,
+			// but it's good here for the sake of performance
+			// to avoid expensive index searches.
+			item.index = hoverIndex;
+		},
+	});
+	const [/* { isDragging }*/, drag] = useDrag({
+		item: { type: Types.CVSECTION, section, index },
+		collect: monitor => ({
+			isDragging: monitor.isDragging(),
+		}),
+	});
+	// const opacity = isDragging ? 0 : 1;
+	drag(drop(ref));
 
-		// Determine rectangle on screen
-		const hoverBoundingRect = findDOMNode(component).getBoundingClientRect();
+	const updateHeading = (newval) => {
+		updateEntry(section.tracking, 'heading', newval);
+	};
 
-		// Get vertical middle
-		const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+	const moveUp = () => {
+		moveEntry(index, index - 1);
+	};
 
-		// Determine mouse position
-		const clientOffset = monitor.getClientOffset();
+	const moveDown = () => {
+		moveEntry(index, index + 1);
+	};
 
-		// Get pixels to the top
-		const hoverClientY = clientOffset.y - hoverBoundingRect.top;
+	const remove = () => {
+		removeEntry(index);
+	};
 
-		// Only perform the move when the mouse has crossed half of the items height
-		// When dragging downwards, only move when the cursor is below 50%
-		// When dragging upwards, only move when the cursor is above 50%
-
-		// Dragging downwards
-		if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
-			return;
-		}
-
-		// Dragging upwards
-		if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
-			return;
-		}
-
-		// Time to actually perform the action
-		props.moveEntry(dragIndex, hoverIndex);
-
-		// Note: we're mutating the monitor item here!
-		// Generally it's better to avoid mutations,
-		// but it's good here for the sake of performance
-		// to avoid expensive index searches.
-		monitor.getItem().index = hoverIndex;
-	},
-	drop(props, monitor) {
-		let item = monitor.getItem();
-		props.moveEntry(item.index, props.index);
+	let typedSection = null;
+	if (section.type == 'text') {
+		typedSection = <RTE {...props} />;
+	} else if (section.type == 'collection') {
+		typedSection = <Collection {...props} />;
 	}
+	return (
+		<div className='cv_section m-3' ref={ref} >
+			<Card>
+				<div className='drag_handle' ref={drag}></div>
+				<CardBody>
+					<ButtonGroup className='mb-2'>
+						<Button outline onClick={moveUp} title='Move Up'>▲</Button>
+						<Button outline onClick={moveDown} title='Move Down'>▼</Button>
+						<Button outline onClick={remove} title='Remove Section'>x</Button>
+						{/* <Button outline onClick={this.edit} title='Edit Section'>Edit</Button>*/}
+					</ButtonGroup>
+					<h2 className='profile_cvHead'>
+						<EditableTextInput value={section.heading} save={updateHeading} placeholder='Section Header' />
+					</h2>
+					<div className='mt-2'>
+						{typedSection}
+					</div>
+				</CardBody>
+			</Card>
+		</div>
+	);
+};
+Section.propTypes = {
+	index: PropTypes.number,
+	section: PropTypes.shape({
+		heading: PropTypes.string,
+		tracking: PropTypes.string,
+		type: PropTypes.string,
+	}),
+	updateEntry: PropTypes.func,
+	removeEntry: PropTypes.func,
+	moveEntry: PropTypes.func,
 };
 
-/**
-* Specifies which props to inject into your component.
-*/
-function dragcollect(connect, monitor) {
-	return {
-		// Call this function inside render()
-		// to let React DnD handle the drag events:
-		connectDragSource: connect.dragSource(),
-		connectDragPreview: connect.dragPreview(),
-		// You can ask the monitor about the current drag state:
-		isDragging: monitor.isDragging()
-	};
-}
-
-function dropcollect(connect, monitor){
-	return {
-		connectDropTarget: connect.dropTarget(),
-		isOver: monitor.isOver(),
-		canDrop: monitor.canDrop()
-	};
-}
-
-class Section extends Component {
-	headingChange = (evt) => {
-		this.props.updateEntry(this.props.section.tracking, 'heading', evt.target.value);
-	}
-	updateHeading = (newval) => {
-		this.props.updateEntry(this.props.section.tracking, 'heading', newval);
-	}
-	moveUp = () => {
-		this.props.moveEntry(this.props.index, this.props.index-1);
-	}
-	moveDown = () => {
-		this.props.moveEntry(this.props.index, this.props.index+1);
-	}
-	remove = () => {
-		this.props.removeEntry(this.props.index);
-	}
-	edit = () => {
-		this.props.edit(this.props.index);
-	}
-	save = () => {
-		this.props.save(this.props.index);
-	}
-	render() {
-		const {type} = this.props.section;
-		// These two props are injected by React DnD,
-		// as defined by your `collect` function above:
-		const { isDragging, connectDragPreview, connectDragSource, connectDropTarget, isOver, canDrop } = this.props;
-
-		let typedSection = null;
-		if(type == 'text'){
-			typedSection = <RTE {...this.props} />;
-		} else if(type == 'collection'){
-			typedSection = <Collection {...this.props} />;
-		}
-		return connectDropTarget(connectDragPreview(
-			<div className='cv_section m-3'>
-				<Card>
-					{connectDragSource(<div className='drag_handle'></div>)}
-					<CardBody>
-						<ButtonGroup className='mb-2'>
-							<Button outline onClick={this.moveUp} title='Move Up'>▲</Button>
-							<Button outline onClick={this.moveDown} title='Move Down'>▼</Button>
-							<Button outline onClick={this.remove} title='Remove Section'>x</Button>
-							{/*<Button outline onClick={this.edit} title='Edit Section'>Edit</Button>*/}
-						</ButtonGroup>
-						<h2 className="profile_cvHead">
-							<EditableTextInput value={this.props.section.heading} save={this.updateHeading} placeholder='Section Header' />
-						</h2>
-						<div className='mt-2'>
-							{typedSection}
-						</div>
-					</CardBody>
-				</Card>
-			</div>
-		));
-	}
-}
-
-export default DropTarget(Types.CVSECTION, sectionTarget, dropcollect)(DragSource(Types.CVSECTION, sectionSource, dragcollect)(Section));
-//export default Section;
+export default Section;

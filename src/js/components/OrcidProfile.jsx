@@ -83,7 +83,7 @@ function FuzzyDate(props) {
 	if (date.month !== null) {
 		s += '-' + date.month.value;
 	}
-	if (typeof date.day !== 'undefined') {
+	if (typeof date.day !== 'undefined' && date.day !== null) {
 		s += '-' + date.day.value;
 	}
 	return s;
@@ -92,6 +92,9 @@ FuzzyDate.propTypes = {
 	date: dateShape
 };
 function TimeSpan(props) {
+	if (props.startDate === null) {
+		return null;
+	}
 	const getDuration = () => {
 		const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 		// don't just grab props because they will be references
@@ -248,41 +251,66 @@ Biography.propTypes = {
 };
 
 function Educations(props) {
-	if (!props.educations.length) {
+	if (!props.educations['affiliation-group'].length) {
 		return null;
 	}
+	let entries = props.educations['affiliation-group'].map(
+		(edu) => {
+			return edu.summaries.map(
+				(summary) => {
+					let edSummary = summary['education-summary'];
+					return <OrganizationEntry key={edSummary.path} entry={edSummary} />;
+				}
+			);
+		}
+	);
+
 	return (
 		<div className='orcid-educations'>
 			<h2>Education</h2>
-			{props.educations.map(
-				(edu) => {
-					return <OrganizationEntry key={edu.path} entry={edu} />;
-				}
-			)}
+			{entries}
 		</div>
 	);
 }
 Educations.propTypes = {
-	educations: PropTypes.arrayOf(organizationEntryShape)
+	educations: PropTypes.shape({
+		'affiliation-group': PropTypes.arrayOf(PropTypes.shape({
+			summaries: PropTypes.arrayOf(PropTypes.shape({
+				'education-summary': organizationEntryShape
+			}))
+		}))
+	})
 };
 
 function Employments(props) {
-	if (!props.employments.length) {
+	if (!props.employments['affiliation-group'].length) {
 		return null;
 	}
+	let entries = props.employments['affiliation-group'].map(
+		(edu) => {
+			return edu.summaries.map(
+				(summary) => {
+					let empSummary = summary['employment-summary'];
+					return <OrganizationEntry key={empSummary.path} entry={empSummary} />;
+				}
+			);
+		}
+	);
 	return (
 		<div className='orcid-employments'>
 			<h2>Employment</h2>
-			{props.employments.map(
-				(emp) => {
-					return <OrganizationEntry key={emp.path} entry={emp} />;
-				}
-			)}
+			{entries}
 		</div>
 	);
 }
 Employments.propTypes = {
-	employments: PropTypes.arrayOf(organizationEntryShape)
+	employments: PropTypes.shape({
+		'affiliation-group': PropTypes.arrayOf(PropTypes.shape({
+			summaries: PropTypes.arrayOf(PropTypes.shape({
+				'employment-summary': organizationEntryShape
+			}))
+		}))
+	})
 };
 
 
@@ -404,6 +432,8 @@ Keywords.propTypes = {
 
 function OrcidProfile(props) {
 	let { orcidProfile } = props;
+	// log.debug(orcidProfile);
+	window.orcidProfile = orcidProfile;
 	let orcidHref = `https://orcid.org/${orcidProfile.orcid}`;
 
 	let person = orcidProfile.profile.person;
@@ -412,8 +442,8 @@ function OrcidProfile(props) {
 	let keywords = person.keywords.keyword;
 
 	let acts = orcidProfile.profile['activities-summary'];
-	let edus = acts.educations['education-summary'];
-	let emps = acts.employments['employment-summary'];
+	let edus = acts.educations;
+	let emps = acts.employments;
 	let works = acts.works.group;
 	let fundings = acts.fundings.group;
 

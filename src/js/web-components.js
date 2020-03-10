@@ -48,7 +48,7 @@ import { Start, RegisterForm } from './Start.js';
 import { Downloads } from './Downloads.js';
 import { ExtensionsPicker } from './ExtensionsPicker.js';
 import { CreateGroup } from './CreateGroup.js';
-import { GroupInfo } from './Groups/GroupInfo.js';
+import { GroupInfo } from './Groups/GroupInfo.jsx';
 import { RecentItems } from './RecentItems.js';
 import { ApiKeyEditor } from './ApiKeyEditor.js';
 import { pageReady, jsError } from './Utils.js';

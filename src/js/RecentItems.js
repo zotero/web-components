@@ -1,30 +1,31 @@
-'use strict';
+// import {log as logger} from './Log.js';
+// let log = logger.Logger('RecentItems');
 
-//import {log as logger} from './Log.js';
-//let log = logger.Logger('RecentItems');
-
-import {ItemMaps} from './maps/ItemMaps.js';
-import {loadRecentGroupItems} from './ajaxHelpers.js';
-import {formatItemField, getCurrentUser} from './Utils.js';
-import {buildUrl} from './wwwroutes.js';
-import {LoadingSpinner} from './LoadingSpinner.js';
-import {groupIsReadable} from './Groups/GroupInfo.js';
-import {jsError} from './Utils.js';
-import {useState, useEffect} from 'react';
+import { ItemMaps } from './maps/ItemMaps.js';
+import { loadRecentGroupItems } from './ajaxHelpers.js';
+import { formatItemField, getCurrentUser, jsError } from './Utils.js';
+import { buildUrl } from './wwwroutes.js';
+import { LoadingSpinner } from './LoadingSpinner.js';
+import { groupIsReadable } from './Groups/GroupInfo.jsx';
+import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 
 const currentUser = getCurrentUser();
 
-function ItemTypeIcon(props){
+function ItemTypeIcon(props) {
 	let c = `sprite-icon sprite-treeitem-${props.itemType} left`;
 	return (<span className={c}></span>);
 }
+ItemTypeIcon.propTypes = {
+	itemType: PropTypes.string
+};
 
-function RecentItemRow(props){
-	const {item, displayFields} = props;
-	let itemHref = buildUrl('itemUrl', {item:item});
-	let fields = displayFields.map((field)=>{
+function RecentItemRow(props) {
+	const { item, displayFields } = props;
+	let itemHref = buildUrl('itemUrl', { item: item });
+	let fields = displayFields.map((field) => {
 		let icon = null;
-		if(field == 'title'){
+		if (field == 'title') {
 			icon = <ItemTypeIcon itemType={item.data.itemType} />;
 		}
 		return (
@@ -45,33 +46,41 @@ function RecentItemRow(props){
 RecentItemRow.defaultProps = {
 	item: {}
 };
+RecentItemRow.propTypes = {
+	item: PropTypes.shape({
+		key: PropTypes.string,
+		data: PropTypes.shape({
+			itemType: PropTypes.string,
+		})
+	}),
+	displayFields: PropTypes.arrayOf(PropTypes.string)
+};
 
-
-function RecentItems(props){
-	const {group, displayFields} = props;
+function RecentItems(props) {
+	const { group, displayFields } = props;
 	const [loading, setLoading] = useState(false);
 	const [items, setItems] = useState(props.items);
 	const [totalResults, setTotalResults] = useState(props.totalResults);
 	const [notReadable, setNotReadable] = useState(false);
 	
-	useEffect(()=>{
-		const fetchData = async ()=>{
-			//load items iff we have access
+	useEffect(() => {
+		const fetchData = async () => {
+			// load items iff we have access
 			let userID = null;
-			if(currentUser){
+			if (currentUser) {
 				userID = currentUser.userID;
 			}
 
-			if(groupIsReadable(group, userID) && items.length == 0){
+			if (groupIsReadable(group, userID) && items.length == 0) {
 				setLoading(true);
-				try{
+				try {
 					let resp = await loadRecentGroupItems(group);
 					let data = await resp.json();
 					let totalResults = parseInt(resp.headers.get('Total-Results'));
 					setItems(data);
 					setTotalResults(totalResults);
 					setLoading(false);
-				} catch(e) {
+				} catch (e) {
 					setLoading(false);
 					jsError('There was an error loading the group library. Please try again in a few minutes');
 				}
@@ -83,18 +92,18 @@ function RecentItems(props){
 		fetchData();
 	}, []);
 	
-	if(notReadable){
+	if (notReadable) {
 		return (<p>Library will be viewable after joining this group.</p>);
 	}
-	let itemRows = items.map((item)=>{
+	let itemRows = items.map((item) => {
 		return (
 			<RecentItemRow key={item.key} displayFields={displayFields} item={item} />
 		);
 	});
 
-	let headers = displayFields.map((header)=>{
+	let headers = displayFields.map((header) => {
 		return (
-			<th key={header} className="field-table-header">
+			<th key={header} className='field-table-header'>
 				{ItemMaps.fieldMap[header] ? ItemMaps.fieldMap[header] : header}
 			</th>
 		);
@@ -114,12 +123,12 @@ function RecentItems(props){
 	);
 
 	let totalNode = null;
-	if(totalResults === 0){
+	if (totalResults === 0) {
 		table = null;
 		totalNode = <p>There are not yet any items in this collection</p>;
-	} else if(totalResults){
+	} else if (totalResults) {
 		totalNode = (
-			<p>See all {totalResults} items for this group in the <a href={buildUrl('groupLibrary', {group})}>Group Library</a>.</p>
+			<p>See all {totalResults} items for this group in the <a href={buildUrl('groupLibrary', { group })}>Group Library</a>.</p>
 		);
 	}
 
@@ -134,7 +143,23 @@ function RecentItems(props){
 RecentItems.defaultProps = {
 	displayFields: ['title', 'addedBy', 'dateModified'],
 	items: [],
-	totalResults:null
+	totalResults: null
+};
+RecentItems.propTypes = {
+	group: PropTypes.shape({
+		data: PropTypes.shape({
+			type: PropTypes.string,
+			members: PropTypes.array,
+			admins: PropTypes.array,
+			owner: PropTypes.number
+		})
+	}),
+	displayFields: PropTypes.arrayOf(PropTypes.string),
+	items: PropTypes.shape({
+		data: PropTypes.object,
+		key: PropTypes.string,
+	}),
+	totalResults: PropTypes.number
 };
 
-export {RecentItems};
+export { RecentItems };

@@ -5,6 +5,7 @@ import { LoadingSpinner } from '../LoadingSpinner.js';
 import { buildUrl } from '../wwwroutes.js';
 import { getCurrentUser } from '../Utils.js';
 import { accessMap, typeMap } from '../maps/groupMaps.js';
+import { Notifier } from '../Notifier.js';
 import classNames from 'classnames';
 
 const currentUser = getCurrentUser();
@@ -20,28 +21,6 @@ const groupShape = PropTypes.shape({
 		type: PropTypes.string.isRequired
 	})
 });
-
-/*
-let groupIsWritable = function(group, userID) {
-	let admins = group.data.admins;
-	if(!admins){
-		admins = [];
-	}
-
-	switch(true){
-		case group.get('owner') == userID:
-			return true;
-		case (admins.indexOf(userID) != -1):
-			return true;
-		case ((group.data.libraryEditing == 'members') &&
-			(group.data.members) &&
-			(group.data.members.indexOf(userID) != -1)):
-			return true;
-		default:
-			return false;
-	}
-};
-*/
 
 function IntroVideo() {
 	let style = { margin: 'auto' };
@@ -192,7 +171,16 @@ function GroupsExplainer() {
 
 function UserGroups(props) {
 	log.debug(props);
-	let { titleOnly, ownedOnly, groups, userID, groupsLoaded, totalResults, loading, loadMore } = props;
+	let { titleOnly, ownedOnly, groups, userID, groupsLoaded, totalResults, loading, loadMore, errorLoading } = props;
+
+	if (errorLoading) {
+		return (
+			<div id='user-groups-div' className='user-groups'>
+				<Notifier type='error' message='There was an error loading your groups' />
+				<GroupsExplainer />;
+			</div>
+		);
+	}
 
 	if (ownedOnly) {
 		groups = groups.filter((group) => {
@@ -240,7 +228,8 @@ UserGroups.propTypes = {
 	loading: PropTypes.bool,
 	groupsLoaded: PropTypes.bool,
 	totalResults: PropTypes.number,
-	loadMore: PropTypes.func
+	loadMore: PropTypes.func,
+	errorLoading: PropTypes.bool
 };
 
 export { UserGroups, GroupNugget, GroupsExplainer };

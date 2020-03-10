@@ -1,5 +1,5 @@
-// import {log as logger} from '../Log.js';
-// let log = logger.Logger('GroupsPageContainer');
+import { log as logger } from '../Log.js';
+let log = logger.Logger('GroupsPageContainer');
 
 import { useEffect, useState } from 'react';
 
@@ -21,26 +21,31 @@ let loadGroups = async (userID = false, start = 0) => {
 		}
 	}
 	if (userID) {
-		let url = apiRequestString({
-			target: 'userGroups',
-			libraryType: 'user',
-			libraryID: userID,
-			order: 'title',
-			limit: 25,
-			start
-		});
-		let resp = await ajax({ url: url, credentials: 'omit' });
-		let totalResults = parseInt(resp.headers.get('Total-Results'));
-		let data = await resp.json();
-		let groups = data;
-		return { userID, groups, totalResults, loading: false };
+		try {
+			let url = apiRequestString({
+				target: 'userGroups',
+				libraryType: 'user',
+				libraryID: userID,
+				order: 'title',
+				limit: 25,
+				start
+			});
+			let resp = await ajax({ url: url, credentials: 'omit' });
+			let totalResults = parseInt(resp.headers.get('Total-Results'));
+			let data = await resp.json();
+			let groups = data;
+			return { userID, groups, totalResults, loading: false };
+		} catch (e) {
+			log.error(e);
+			return { userID, groupsLoaded: true, loading: false, errorLoading: true };
+		}
 	} else {
 		return { groupsLoaded: true, loading: false };
 	}
 };
 
 function GroupsPageContainer() {
-	const [groupData, setGroupData] = useState({ loading: true, groupsLoaded: false, titleOnly: false });
+	const [groupData, setGroupData] = useState({ loading: true, groupsLoaded: false, titleOnly: false, errorLoading: false });
 	
 	useEffect(() => {
 		const fetchData = async () => {

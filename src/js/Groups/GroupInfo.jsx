@@ -9,7 +9,7 @@ import { jsError, jsSuccess, getCurrentUser } from '../Utils.js';
 import classnames from 'classnames';
 import striptags from 'striptags';
 
-import React from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 
 const currentUser = getCurrentUser();
@@ -58,281 +58,257 @@ let groupIsReadable = function (group, userID) {
 };
 
 // component to list groups a user can invite another user to
-class GroupMembershipActions extends React.Component {
-	constructor(props) {
-		super(props);
+function GroupMembershipActions(props) {
+	const { group, refreshGroup } = props;
+	const [loading, setLoading] = useState(false);
+	const [pending, setPending] = useState(props.pending);
+	const [applicationPending, setApplicationPending] = useState(props.pending && props.pending.invitation == '0');
+	const [membershipInvitation, setMembershipInvitation] = useState(props.pending && props.pending.invitation == '1');
+	const [ownershipInvitation, setOwnershipInvitation] = useState(props.ownershipInvitation);
+	const [notifier, setNotifier] = useState(null);
 
-		let applicationPending = false;
-		let membershipInvitation = false;
-		if (this.props.pending) {
-			if (this.props.pending.invitation == '1') {
-				membershipInvitation = true;
-			} else {
-				applicationPending = true;
-			}
-		}
-		this.state = {
-			loading: false,
-			pending: this.props.pending,
-			applicationPending: applicationPending,
-			membershipInvitation: membershipInvitation,
-			ownershipInvitation: this.props.ownershipInvitation
-		};
-		this.joinGroup = this.joinGroup.bind(this);
-		this.leaveGroup = this.leaveGroup.bind(this);
-		this.acceptOwnership = this.acceptOwnership.bind(this);
-		this.ignoreInvite = this.ignoreInvite.bind(this);
-	}
-
-	joinGroup() {
-		let joinUrl = buildUrl('groupJoin', { group: this.props.group });
+	const joinGroup = async () => {
+		let joinUrl = buildUrl('groupJoin', { group });
 		let postData = { ajax: true };
-		if (this.state.membershipInvitation) {
-			postData.token = this.state.pending.token;
+		if (membershipInvitation) {
+			postData.token = pending.token;
 		}
-		postFormData(joinUrl, postData).then((resp) => {
-			return resp.json().then((data) => {
-				if (data.pending === true) {
-					this.setState({ applicationPending: true });
-					jsSuccess('You have applied to join this group. A group admin must approve your application.');
-				} else if (data.success === true) {
-					this.props.refreshGroup();
-					this.setState({ membershipInvitation: false });
-					jsSuccess('You are now a member of this group');
-				} else {
-					jsError('There was a problem joining this group.');
-				}
-			});
-		});
-	}
+		let resp = await postFormData(joinUrl, postData);
+		let data = await resp.json();
+		if (data.pending === true) {
+			setApplicationPending(true);
+			jsSuccess('You have applied to join this group. A group admin must approve your application.');
+		} else if (data.success === true) {
+			refreshGroup();
+			setMembershipInvitation(false);
+			jsSuccess('You are now a member of this group');
+		} else {
+			jsError('There was a problem joining this group.');
+		}
+	};
 
-	leaveGroup() {
-		let leaveUrl = buildUrl('groupLeave', { group: this.props.group });
-		postFormData(leaveUrl, { ajax: true }, { withSession: true }).then((resp) => {
-			return resp.json().then((data) => {
-				if (data.success === true) {
-					this.props.refreshGroup();
-					jsSuccess('You are no longer a member of this group');
-				} else {
-					jsError('There was a problem leaving this group. Please try again in a few minutes.');
-				}
-			});
-		}).catch(() => {
+	const leaveGroup = async () => {
+		let leaveUrl = buildUrl('groupLeave', { group });
+		let resp = await postFormData(leaveUrl, { ajax: true }, { withSession: true });
+		let data = await resp.json();
+		if (data.success === true) {
+			refreshGroup();
+			jsSuccess('You are no longer a member of this group');
+		} else {
 			jsError('There was a problem leaving this group. Please try again in a few minutes.');
-		});
-	}
+		}
+	};
 
-	acceptOwnership() {
-		let acceptUrl = buildUrl('groupAcceptOwnership', { group: this.props.group });
-		postFormData(acceptUrl, { ajax: true }).then((resp) => {
-			return resp.json().then((data) => {
-				if (data.success === true) {
-					let settingsUrl = buildUrl('groupSettings', { group: this.props.group });
-					let message = `You're now the owner of this group. You can access all the group settings at ${settingsUrl}`;
-					this.props.refreshGroup();
-					this.setState({
-						ownershipInvitation: false,
-						notifier: <Notifier type='success' message={message} />
-					});
-				} else {
-					jsError('There was a problem processing this action. Please try again in a few minutes.');
-				}
-			});
-		});
-	}
+	const acceptOwnership = async () => {
+		let acceptUrl = buildUrl('groupAcceptOwnership', { group });
+		let resp = await postFormData(acceptUrl, { ajax: true });
+		let data = await resp.json();
+		if (data.success === true) {
+			let settingsUrl = buildUrl('groupSettings', { group });
+			let message = `You're now the owner of this group. You can access all the group settings at ${settingsUrl}`;
+			refreshGroup();
+			setOwnershipInvitation(false);
+			setNotifier(<Notifier type='success' message={message} />);
+		} else {
+			jsError('There was a problem processing this action. Please try again in a few minutes.');
+		}
+	};
 
-	ignoreInvite() {
+	const ignoreInvite = async () => {
 		// log.debug('ignoreInvite');
-		if (!this.state.pending || (this.state.pending.invitation != '1')) {
+		if (!pending || (pending.invitation != '1')) {
 			throw new Error('ignoreInvite called without pending invitation');
 		}
-		let token = this.state.pending.token;
-		let ignoreUrl = buildUrl('groupDeclineInvitation', { group: this.props.group, token: token });
+		let token = pending.token;
+		let ignoreUrl = buildUrl('groupDeclineInvitation', { group, token });
 		// log.debug(`posting ignore: ${ignoreUrl}`);
-		postFormData(ignoreUrl, { ajax: true, token: token }).then((resp) => {
-			return resp.json().then((data) => {
-				if (data.success === true) {
-					this.setState({
-						membershipInvitation: false
-					});
-					window.location = '/groups';
-				} else {
-					jsError('There was a problem processing this action. Please try again in a few minutes.');
-				}
-			});
-		});
-	}
-
-	render() {
-		if (!currentUser) {
-			return <p><a href={buildUrl('login')}>Log in</a> or <a href={buildUrl('register')}>Register</a> to join groups</p>;
-		}
-		let group = this.props.group;
-		let member = allGroupMembers(group).includes(currentUser.userID);
-		// log.debug(`member is ${member} in GroupMembershipActions render`);
-
-		let controls = null;
-		if (group.data.owner == currentUser.userID) {
-			controls = null;
-		} else if (this.state.ownershipInvitation) {
-			controls = (
-				<div className='join-group'>
-					<p>You have been offered ownership of this group.</p>
-					<button className={classnames('btn', 'mr-3')} onClick={this.acceptOwnership}>Accept</button>
-					<button className={classnames('btn', 'mr-3', { 'd-none': !member })} onClick={this.leaveGroup}>Leave</button>
-				</div>
-			);
-		} else if (this.state.membershipInvitation) {
-			controls = (
-				<div className='join-group'>
-					<p>You have been invited to join this group.</p>
-					<button className={classnames('btn', 'mr-3')} onClick={this.joinGroup}>Join</button>
-					<button className={classnames('btn', 'mr-3')} onClick={this.ignoreInvite}>Ignore</button>
-				</div>
-			);
-		} else if (!member && this.state.applicationPending) {
-			controls = (
-				<div className='join-group'>
-					<p>Membership Pending</p>
-				</div>
-			);
+		let resp = await postFormData(ignoreUrl, { ajax: true, token: token });
+		let data = await resp.json();
+		if (data.success === true) {
+			setMembershipInvitation(false);
+			window.location = '/groups';
 		} else {
-			controls = (
-				<div className='join-group'>
-					<button className={classnames('btn', 'mr-3', { 'd-none': member })} onClick={this.joinGroup}>Join</button>
-					<button className={classnames('btn', 'mr-3', { 'd-none': !member })} onClick={this.leaveGroup}>Leave</button>
-				</div>
-			);
+			jsError('There was a problem processing this action. Please try again in a few minutes.');
 		}
+	};
 
-		return (
-			<div>
-				{this.state.notifier}
-				{controls}
+	// render
+	if (!currentUser) {
+		return <p><a href={buildUrl('login')}>Log in</a> or <a href={buildUrl('register')}>Register</a> to join groups</p>;
+	}
+	let member = allGroupMembers(group).includes(currentUser.userID);
+	
+	let controls = null;
+	if (group.data.owner == currentUser.userID) {
+		controls = null;
+	} else if (ownershipInvitation) {
+		controls = (
+			<div className='join-group'>
+				<p>You have been offered ownership of this group.</p>
+				<button className={classnames('btn', 'mr-3')} onClick={acceptOwnership}>Accept</button>
+				<button className={classnames('btn', 'mr-3', { 'd-none': !member })} onClick={leaveGroup}>Leave</button>
+			</div>
+		);
+	} else if (membershipInvitation) {
+		controls = (
+			<div className='join-group'>
+				<p>You have been invited to join this group.</p>
+				<button className={classnames('btn', 'mr-3')} onClick={joinGroup}>Join</button>
+				<button className={classnames('btn', 'mr-3')} onClick={ignoreInvite}>Ignore</button>
+			</div>
+		);
+	} else if (!member && applicationPending) {
+		controls = (
+			<div className='join-group'>
+				<p>Membership Pending</p>
+			</div>
+		);
+	} else {
+		controls = (
+			<div className='join-group'>
+				<button className={classnames('btn', 'mr-3', { 'd-none': member })} onClick={joinGroup}>Join</button>
+				<button className={classnames('btn', 'mr-3', { 'd-none': !member })} onClick={leaveGroup}>Leave</button>
 			</div>
 		);
 	}
+
+	return (
+		<div>
+			{notifier}
+			{controls}
+		</div>
+	);
 }
 GroupMembershipActions.defaultProps = {
 	member: false,
 	pending: false,
 	ownershipInvitation: false
 };
+GroupMembershipActions.propTypes = {
+	group: PropTypes.shape({
+		data: PropTypes.shape({
+			owner: PropTypes.number
+		})
+	}),
+	refreshGroup: PropTypes.func,
+	pending: PropTypes.shape({
+		invitation: PropTypes.string,
+		token: PropTypes.string,
+	}),
+	ownershipInvitation: PropTypes.bool,
+};
 
 // component to display the general information about a group
-class GroupInfo extends React.Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			group: this.props.group
-		};
-		this.refreshGroup = this.refreshGroup.bind(this);
-	}
+function GroupInfo(props) {
+	const { displayNames } = props;
+	const [group, setGroup] = useState(props.group);
 
-	refreshGroup = async () => {
+	const refreshGroup = async () => {
 		// log.debug('GroupInfo refreshGroup');
-		let groupID = this.props.group.id;
+		let groupID = group.id;
 		try {
 			let resp = await loadGroupInfo(groupID);
 			let data = await resp.json();
-			this.setState({ group: data });
+			setGroup(data);
 		} catch (e) {
 			jsError('There was an error loading the updated group information');
 		}
+	};
+
+	let groupImage = null;
+	if (props.groupImage) {
+		groupImage = <img src={props.groupImage} alt='Group picture' id='group-image' />;
 	}
 
-	render() {
-		let group = this.state.group;
-		let displayNames = this.props.displayNames;
+	let groupDescription = null;
+	let groupUrl = null;
+	if (group.data.url) {
+		let url = striptags(group.data.url);
+		groupUrl = <a href={url} rel='nofollow'>{url}</a>;
+	}
 
-		let groupImage = null;
-		if (this.props.groupImage) {
-			groupImage = <img src={this.props.groupImage} alt='Group picture' id='group-image' />;
-		}
+	let created = new Date(group.meta.created);
+	let groupMembership;
+	if (group.data.type == 'Private') {
+		groupMembership = 'Invitation';
+	} else if (group.data.type == 'PublicClosed') {
+		groupMembership = 'Closed';
+	} else {
+		groupMembership = 'Open';
+	}
 
-		let groupDescription = null;
-		let groupUrl = null;
-		if (group.data.url) {
-			let url = striptags(group.data.url);
-			groupUrl = <a href={url} rel='nofollow'>{url}</a>;
-		}
-
-		let created = new Date(group.meta.created);
-		let groupMembership;
-		if (group.data.type == 'Private') {
-			groupMembership = 'Invitation';
-		} else if (group.data.type == 'PublicClosed') {
-			groupMembership = 'Closed';
-		} else {
-			groupMembership = 'Open';
-		}
-
-		let libraryAccess;
-		if (!currentUser) {
-			if (groupIsReadable(group, 0)) {
-				libraryAccess = 'You can only view';
-			} else {
-				libraryAccess = 'None';
-			}
-		} else if (groupIsWritable(group, currentUser.userID)) {
-			libraryAccess = 'You can view and edit';
-		} else if (groupIsReadable(group, currentUser.userID)) {
+	let libraryAccess;
+	if (!currentUser) {
+		if (groupIsReadable(group, 0)) {
 			libraryAccess = 'You can only view';
 		} else {
 			libraryAccess = 'None';
 		}
-		return (
-			<div className='card border-0 mb-4'>
-				{groupImage}
-				{groupDescription}
-				{groupUrl}
-				<table className='table'>
-					<tbody>
-						<tr>
-							<th scope='row'>Owner:</th>
-							<td>
-								<a href={buildUrl('profileUrl', { slug: displayNames.slug[group.data.owner] })}>{displayNames.displayName[group.data.owner]}</a>
-							</td>
-						</tr>
-						<tr>
-							<th scope='row'>Registered:</th>
-							<td>
-								{created.toISOString().substr(0, 10)}
-							</td>
-						</tr>
-						<tr>
-							<th scope='row'>Type:</th>
-							<td>
-								{group.data.type == 'Private' ? 'Private' : 'Public'}
-							</td>
-						</tr>
-						<tr>
-							<th scope='row'>Membership:</th>
-							<td>
-								{groupMembership}
-							</td>
-						</tr>
-						<tr>
-							<th scope='row'>Library Access:</th>
-							<td>
-								{libraryAccess}
-							</td>
-						</tr>
-					</tbody>
-				</table>
-				
-				<GroupMembershipActions
-					group={group}
-					pending={this.props.pending}
-					ownershipInvitation={this.props.ownershipInvitation}
-					refreshGroup={this.refreshGroup} />
-			</div>
-		);
+	} else if (groupIsWritable(group, currentUser.userID)) {
+		libraryAccess = 'You can view and edit';
+	} else if (groupIsReadable(group, currentUser.userID)) {
+		libraryAccess = 'You can only view';
+	} else {
+		libraryAccess = 'None';
 	}
+	return (
+		<div className='card border-0 mb-4'>
+			{groupImage}
+			{groupDescription}
+			{groupUrl}
+			<table className='table'>
+				<tbody>
+					<tr>
+						<th scope='row'>Owner:</th>
+						<td>
+							<a href={buildUrl('profileUrl', { slug: displayNames.slug[group.data.owner] })}>{displayNames.displayName[group.data.owner]}</a>
+						</td>
+					</tr>
+					<tr>
+						<th scope='row'>Registered:</th>
+						<td>
+							{created.toISOString().substr(0, 10)}
+						</td>
+					</tr>
+					<tr>
+						<th scope='row'>Type:</th>
+						<td>
+							{group.data.type == 'Private' ? 'Private' : 'Public'}
+						</td>
+					</tr>
+					<tr>
+						<th scope='row'>Membership:</th>
+						<td>
+							{groupMembership}
+						</td>
+					</tr>
+					<tr>
+						<th scope='row'>Library Access:</th>
+						<td>
+							{libraryAccess}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			
+			<GroupMembershipActions
+				group={group}
+				pending={props.pending}
+				ownershipInvitation={props.ownershipInvitation}
+				refreshGroup={refreshGroup} />
+		</div>
+	);
 }
 GroupInfo.propTypes = {
 	displayNames: PropTypes.object.isRequired,
-	pending: PropTypes.bool.isRequired
+	pending: PropTypes.bool.isRequired,
+	ownershipInvitation: PropTypes.bool,
+	group: PropTypes.shape({
+		data: PropTypes.shape({
+			owner: PropTypes.number
+		})
+	}),
+	groupImage: PropTypes.string,
 };
 
 export { GroupMembershipActions, GroupInfo, groupIsReadable };

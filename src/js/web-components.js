@@ -73,7 +73,6 @@ import { Search } from './Search.jsx';
 import { PurchaseWorkshop } from './PurchaseWorkshop.jsx';
 import { GroupLibrarySettings, TransferOwnership } from './components/GroupSettings/GroupSettings.js';
 import { GroupsPageContainer } from './Groups/GroupsPageContainer.jsx';
-import { GroupsContainer } from './Groups/GroupsContainer.jsx';
 import { MemberSettingsContainer } from './Groups/MemberSettingsContainer.jsx';
 import { ManageContribution } from './contribute/Contribute.jsx';
 import { PayInvoice } from './storage/PayInvoice.jsx';
@@ -117,7 +116,6 @@ let ZoteroWebComponents = {
 	Search,
 	PurchaseWorkshop,
 	GroupsPageContainer,
-	GroupsContainer,
 	MemberSettingsContainer,
 	ManageContribution,
 	PayInvoice,

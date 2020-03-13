@@ -1,30 +1,29 @@
-'use strict';
-
-import {log as logger} from '../Log.js';
+import { log as logger } from '../Log.js';
 let log = logger.Logger('MemberSettingsContainer.jsx');
 
-import {useState} from 'react';
-import {Table} from 'reactstrap';
+import { useState } from 'react';
+import { Table } from 'reactstrap';
 
-import {RolesTable} from './MemberRolesTable.jsx';
-import {postFormData} from '../ajax.js';
-import {buildUrl} from '../wwwroutes.js';
+import { RolesTable } from './MemberRolesTable.jsx';
+import { postFormData } from '../ajax.js';
+import { buildUrl } from '../wwwroutes.js';
 import { loadGroupInfo } from '../ajaxHelpers.js';
+import PropTypes from 'prop-types';
 
-function PendingApplications(props){
-	const {applications, group} = props;
-	if(!applications || applications.length == 0){
+function PendingApplications(props) {
+	const { applications, group } = props;
+	if (!applications || applications.length == 0) {
 		return null;
 	}
 	
-	let applicationRows = applications.map((user)=>{
+	let applicationRows = applications.map((user) => {
 		return (
 			<tr key={user.userID}>
-				<td><a href={buildUrl('profileUrl', {slug:user.slug})} >{user.username}</a></td>
+				<td><a href={buildUrl('profileUrl', { slug: user.slug })} >{user.username}</a></td>
 				<td>{user.displayName}</td>
 				<td>{user.dateSent}</td>
-				<td> <a href={buildUrl('groupApproveApplication', {group, userID:user.userID})}>Approve</a>{' '}
-					| <a href={buildUrl('groupDenyApplication', {group, userID:user.userID})}>Deny</a> </td>
+				<td> <a href={buildUrl('groupApproveApplication', { group, userID: user.userID })}>Approve</a>{' '}
+					| <a href={buildUrl('groupDenyApplication', { group, userID: user.userID })}>Deny</a> </td>
 			</tr>
 		);
 	});
@@ -47,22 +46,26 @@ function PendingApplications(props){
 		</>
 	);
 }
+PendingApplications.propTypes = {
+	applications: PropTypes.array,
+	group: PropTypes.object
+};
 
-function PendingInvitations(props){
-	const {invitations, group, displayNames} = props;
+function PendingInvitations(props) {
+	const { invitations, group, displayNames } = props;
 	
-	if(!invitations || invitations.length == 0){
+	if (!invitations || invitations.length == 0) {
 		return null;
 	}
 	
 	let invitationRows = invitations.map((user) => {
-		let displayName = user.userID ? displayNames['displayName'][user.userID] : user.username;
+		let displayName = user.userID ? displayNames.displayName[user.userID] : user.username;
 		return (
 			<tr key={user.userID}>
 				<td>{user.username ? user.username : user.email}</td>
 				<td>{displayName}</td>
 				<td> {user.dateSent}</td>
-				<td><a href={buildUrl('groupRevokeInvitation', {group, token:user.token})}>Cancel</a> </td>
+				<td><a href={buildUrl('groupRevokeInvitation', { group, token: user.token })}>Cancel</a> </td>
 			</tr>
 		);
 	});
@@ -85,35 +88,51 @@ function PendingInvitations(props){
 		</>
 	);
 }
-function MemberSettingsContainer(props){
-	const {members, invitations, applications, displayNames} = props;
+PendingInvitations.propTypes = {
+	invitations: PropTypes.array,
+	group: PropTypes.object,
+	displayNames: PropTypes.object
+};
+
+function MemberSettingsContainer(props) {
+	const { members, invitations, applications, displayNames } = props;
 	const [group, setGroup] = useState(props.group);
 	
 	const refreshGroup = async (groupID) => {
 		let resp = await loadGroupInfo(groupID);
 		let group = await resp.json();
 		setGroup(group);
-		//return group;
+		// return group;
 	};
 	
 	const updateRole = async (member, group, role) => {
-		let resp = await postFormData(buildUrl('groupUpdateRole', {group}), {userID:member.userID, role}, {withSession:true});
+		let resp = await postFormData(buildUrl('groupUpdateRole', { group }), { userID: member.userID, role }, { withSession: true });
 		let d = await resp.json();
-		if(d.success){
+		if (d.success) {
 			log.debug('success');
 			refreshGroup(group.id);
 		} else {
 			log.error('error');
-			//TODO:notify on errors
+			// TODO:notify on errors
 		}
 	};
 	
 	return (<div>
-		<PendingApplications {...{group, applications}} />
+		<PendingApplications {...{ group, applications }} />
 		<h2 className='main-heading'>Current Members</h2>
-		<RolesTable {...{members, group, updateRole}} />
-		<PendingInvitations {...{group, invitations, displayNames}} />
+		<RolesTable {...{ members, group, updateRole }} />
+		<PendingInvitations {...{ group, invitations, displayNames }} />
 	</div>);
 }
+MemberSettingsContainer.propTypes = {
+	group: PropTypes.shape({
+		id: PropTypes.number,
+		data: PropTypes.object
+	}),
+	members: PropTypes.array,
+	invitations: PropTypes.array,
+	applications: PropTypes.array,
+	displayNames: PropTypes.object
+};
 
-export {MemberSettingsContainer};
+export { MemberSettingsContainer };

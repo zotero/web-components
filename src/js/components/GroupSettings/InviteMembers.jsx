@@ -1,16 +1,13 @@
 import { log as logger } from '../../Log.js';
 let log = logger.Logger('InviteMembers');
 
-import { ajax, postFormData } from '../../ajax.js';
-// import { getCurrentUser } from '../Utils.js';
+import { postFormData } from '../../ajax.js';
 import { Form, Input, FormGroup, Label, Button, FormText } from 'reactstrap';
-
-// const currentUser = getCurrentUser();
+import { Notifier } from '../../Notifier.js';
+import { buildUrl } from '../../wwwroutes.js';
 
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-
-// import { buildUrl } from '../wwwroutes.js';
 
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 const usernameRegex = /^[a-z0-9._-]{3,}$/i;
@@ -26,6 +23,7 @@ FormFieldErrorMessage.propTypes = {
 };
 
 function InviteMembers(props) {
+	const { group } = props;
 	const [inviteText, setInviteText] = useState('');
 	const [feedback, setFeedback] = useState([]);
 	const [notification, setNotification] = useState(false);
@@ -76,12 +74,15 @@ function InviteMembers(props) {
 				}
 				let respData = await resp.json();
 				log.debug(respData, 4);
+				let redirectUrl = buildUrl('groupMemberSettings', { group });
 				setNotification({
 					type: 'success',
-					message: (<p>Invitations have been sent</p>)
+					message: (<p>Invitations have been sent. <a href={redirectUrl}>Return to members settings</a></p>)
 				});
+				setInviteText('');
 			} catch (e) {
-				log.debug(resp, 4);
+				log.debug(e);
+				// log.debug(resp);
 				setNotification({
 					type: 'error',
 					message: <p>There was an error sending your invitations. Please try again in a few minutes.</p>
@@ -94,7 +95,8 @@ function InviteMembers(props) {
 		<Form onSubmit={validateForm}>
 			<FormGroup>
 				<Label for='invite_members'>Invite Members</Label>
-				<Input type='textarea' name='invite_members' id='invite_members' onChange={(evt) => { setInviteText(evt.target.value); }} />
+				<Notifier {...notification} />
+				<Input type='textarea' name='invite_members' id='invite_members' value={inviteText} onChange={(evt) => { setInviteText(evt.target.value); }} />
 				<FormText>Separate email addresses or Zotero usernames with a comma or newline.</FormText>
 				{feedback.map((err, i) => <FormFieldErrorMessage key={i} message={err} />)}
 			</FormGroup>
@@ -102,5 +104,10 @@ function InviteMembers(props) {
 		</Form>
 	);
 }
+InviteMembers.propTypes = {
+	group: PropTypes.shape({
+		data: PropTypes.object.isRequired
+	})
+};
 
 export { InviteMembers };

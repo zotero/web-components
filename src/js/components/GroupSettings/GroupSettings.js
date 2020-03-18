@@ -1,4 +1,4 @@
-import {GroupLibrarySettings} from './GroupLibrarySettings.js';
-import {TransferOwnership} from './TransferOwnership.jsx';
+import { GroupLibrarySettings } from './GroupLibrarySettings.jsx';
+import { TransferOwnership } from './TransferOwnership.jsx';
 
-export {GroupLibrarySettings, TransferOwnership};
+export { GroupLibrarySettings, TransferOwnership };

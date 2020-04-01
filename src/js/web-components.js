@@ -72,6 +72,7 @@ import { FollowButtons, FollowSection } from './FollowButtons.jsx';
 import { Search } from './Search.jsx';
 import { PurchaseWorkshop } from './PurchaseWorkshop.jsx';
 import { GroupLibrarySettings, TransferOwnership } from './components/GroupSettings/GroupSettings.js';
+import { DeleteGroup } from './components/GroupSettings/DeleteGroup.jsx';
 import { GroupsPageContainer } from './Groups/GroupsPageContainer.jsx';
 import { MemberSettingsContainer } from './Groups/MemberSettingsContainer.jsx';
 import { ManageContribution } from './contribute/Contribute.jsx';
@@ -108,6 +109,7 @@ let ZoteroWebComponents = {
 	ProfileImageForm,
 	GroupLibrarySettings,
 	TransferOwnership,
+	DeleteGroup,
 	OrcidProfile,
 	OrcidProfileControl,
 	CVEditor,

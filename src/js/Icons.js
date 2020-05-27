@@ -17,8 +17,8 @@ function ZoteroIcon(props) {
 	return (<img {...p} />);
 }
 ZoteroIcon.defaultProps = {
-	width: 147,
-	height: 160
+	width: '147',
+	height: '160'
 };
 ZoteroIcon.propTypes = {
 	width: PropTypes.string,
@@ -37,7 +37,7 @@ function BrowserIcon(props) {
 	return (<img {...p} />);
 }
 BrowserIcon.defaultProps = {
-	size: 64
+	size: '64'
 };
 BrowserIcon.propTypes = {
 	browser: PropTypes.string.isRequired,
@@ -62,9 +62,9 @@ function BrowserExtensionIcon(props) {
 	);
 }
 BrowserExtensionIcon.defaultProps = {
-	browserIconSize: 128,
-	zoteroIconWidth: 128,
-	zoteroIconHeight: 140
+	browserIconSize: '128',
+	zoteroIconWidth: '128',
+	zoteroIconHeight: '140',
 };
 BrowserExtensionIcon.propTypes = {
 	browser: PropTypes.string.isRequired,
@@ -90,7 +90,7 @@ function OrcidIcon(props) {
 }
 OrcidIcon.defaultProps = {
 	width: '16px',
-	height: '16px'
+	height: '16px',
 };
 OrcidIcon.propTypes = {
 	width: PropTypes.string.isRequired,

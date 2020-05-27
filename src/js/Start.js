@@ -1,5 +1,3 @@
-'use strict';
-
 import {log as logger} from './Log.js';
 let log = logger.Logger('StartComponent');
 
@@ -267,7 +265,7 @@ class Start extends Component{
 						<p className="install-success">Success! You installed Zotero!</p>
 					</div>
 				<div className='extensions-picker'>
-					<InstallConnectorPrompt ref='installConnectorPrompt' numbered={true} />
+					<InstallConnectorPrompt numbered={true} />
 				</div>
 				</section>
 				<RegisterForm ref='registerForm' />

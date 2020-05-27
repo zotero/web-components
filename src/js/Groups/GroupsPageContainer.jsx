@@ -62,7 +62,6 @@ function GroupsPageContainer() {
 		return (
 			<div className='row'>
 				<div className='col'>
-					<h1 className='main-heading'>Groups</h1>
 					<UserGroups {...groupData} />
 				</div>
 			</div>

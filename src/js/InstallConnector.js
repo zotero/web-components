@@ -15,6 +15,7 @@ const installData = window.zoteroConfig.installData;
 
 const { firefoxHash, firefoxVersion } = installData;
 const chromeDownload = 'https://chrome.google.com/webstore/detail/ekhagklcjbdpajgpjgmbionohlpdbjgc';
+const edgeDownload = 'https://microsoftedge.microsoft.com/addons/detail/nmhdhpibnnopknkmonacoephklnflpho';
 const firefoxDownload = `https://www.zotero.org/download/connector/dl?browser=firefox&version=${firefoxVersion}`;
 const safariDownload = installData.oldSafari
 	? 'https://www.zotero.org/download/connector/dl?browser=safari'
@@ -84,6 +85,29 @@ InstallChromeButton.defaultProps = {
 	label: 'Install'
 };
 
+function InstallEdgeButton(props) {
+	const { type, label } = props;
+	if (type == 'button') {
+		return <a href={edgeDownload} id='edge-connector-download-button' className='btn download-link'>{label}</a>;
+	} else if (type == 'image') {
+		return (
+			<a href={edgeDownload}><BrowserIcon browser='edge' /></a>
+		);
+	} else if (type == 'full') {
+		return (
+			<div className='download-full'>
+				<div className='browser-image'><BrowserIcon browser='edge' /></div>
+				<h3>Edge connector</h3>
+				<div className='install-button'><a href={edgeDownload} id='edge-connector-download-button' className='btn download-link'>{label}</a></div>
+			</div>
+		);
+	}
+}
+InstallEdgeButton.defaultProps = {
+	type: 'button',
+	label: 'Install'
+};
+
 function InstallSafariButton(props) {
 	const { type, label } = props;
 	if (type == 'button') {
@@ -119,6 +143,8 @@ function InstallButton(props) {
 		return <InstallChromeButton label={label} />;
 	case 'safari':
 		return <InstallSafariButton label={label} />;
+	case 'edge':
+		return <InstallEdgeButton label={label} />;
 	default:
 		// TODO: unknown browser download?
 		return null;
@@ -134,14 +160,15 @@ InstallButton.propTypes = {
 
 function AllExtensionsSection(props) {
 	const { type, except } = props;
-	let otherBrowsers = ['chrome', 'firefox', 'safari'].filter((browser) => {
+	let otherBrowsers = ['chrome', 'firefox', 'safari', 'edge'].filter((browser) => {
 		return browser != except.toLowerCase();
 	});
 
 	let installButtons = {
 		chrome: <li key='chrome'><InstallChromeButton type={type} /></li>,
 		firefox: <li key='firefox'><InstallFirefoxButton type={type} /></li>,
-		safari: <li key='safari'><InstallSafariButton type={type} /></li>
+		safari: <li key='safari'><InstallSafariButton type={type} /></li>,
+		edge: <li key='edge'><InstallEdgeButton type={type} /></li>
 	};
 	let installNodes = otherBrowsers.map((browser) => {
 		return installButtons[browser];
@@ -207,12 +234,16 @@ function InstallConnectorPrompt(props) {
 			);
 		}
 		break;
+	case 'Edge':
+		connectorText = 'Zotero Connector for Edge';
+		connectorImage = <BrowserExtensionIcon browser='edge' />;
+		break;
 	default:
 		connectorText = 'Zotero Connector for Chrome';
 		connectorImage = <BrowserExtensionIcon browser='chrome' />;
 	}
 
-	let otherBrowsers = ['chrome', 'firefox', 'safari'].filter((browser) => { return browser.toLowerCase() != featuredBrowser.toLowerCase(); });
+	let otherBrowsers = ['chrome', 'firefox', 'safari', 'edge'].filter((browser) => { return browser.toLowerCase() != featuredBrowser.toLowerCase(); });
 	let otherBrowserImages = otherBrowsers.map((browser) => {
 		return <BrowserIcon key={browser} browser={browser} size='32' />;
 	});

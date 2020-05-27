@@ -1,6 +1,10 @@
 
 const dataBrowser = [
-	{
+	{ // new Edge
+		string: navigator.userAgent,
+		subString: 'Edg/',
+		identity: 'Edge'
+	}, {
 		string: navigator.userAgent,
 		subString: 'Chrome',
 		identity: 'Chrome'

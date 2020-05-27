@@ -278,7 +278,7 @@ function DownloadPlugins() {
 
 function Downloads(props) {
 	let featuredBrowser = props.featuredBrowser || BrowserDetect.browser;
-	if (['chrome', 'firefox', 'safari'].indexOf(featuredBrowser.toLowerCase()) == -1) {
+	if (['chrome', 'firefox', 'safari', 'edge'].indexOf(featuredBrowser.toLowerCase()) == -1) {
 		featuredBrowser = 'Chrome';
 	}
 	const featuredOS = props.featuredOS || BrowserDetect.OS;

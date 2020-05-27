@@ -1,25 +1,24 @@
-'use strict';
-
 // import {log as logger} from './Log.js';
 // let log = logger.Logger('Search.jsx');
 
-import {useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 
-import {PropTypes} from 'prop-types';
-import {Row, Col, Form, Input, InputGroup, Button, Nav, NavItem, NavLink, InputGroupAddon, Pagination, PaginationItem, PaginationLink} from 'reactstrap';
-import {postFormData} from './ajax.js';
-import {LargeUser} from './components/UserList.jsx';
-import {GroupNugget} from './Groups/UserGroups.js';
-import {LocationState} from './LocationState.js';
+import { PropTypes } from 'prop-types';
+import { Row, Col, Form, Input, InputGroup, Button, Nav, NavItem, NavLink, InputGroupAddon, Pagination, PaginationItem, PaginationLink } from 'reactstrap';
+import { postFormData } from './ajax.js';
+import { LargeUser } from './components/UserList.jsx';
+import { GroupNugget } from './Groups/UserGroups.js';
+import { LocationState } from './LocationState.js';
+import { LoadingSpinner } from './LoadingSpinner.js';
 
-function SearchPagination (props) {
-	let {locationState, totalResults, page, resultsPerPage, pageVar, changePage} = props;
+function SearchPagination(props) {
+	let { locationState, totalResults, page, resultsPerPage, pageVar, changePage } = props;
 	let numPages = Math.min(Math.ceil(totalResults / resultsPerPage), 10);
 	let pageLinks = [];
-	for(let i=1; i<numPages+1; i++){
-		if(changePage) {
+	for (let i = 1; i < numPages + 1; i++) {
+		if (changePage) {
 			pageLinks.push(<PaginationItem key={i} active={i == page}>
-				<PaginationLink href='#' onClick={()=>{changePage(i);}}>{i}</PaginationLink>
+				<PaginationLink href='#' onClick={() => { changePage(i); }}>{i}</PaginationLink>
 			</PaginationItem>);
 		} else {
 			locationState.setQueryVar(pageVar, i);
@@ -37,10 +36,10 @@ function SearchPagination (props) {
 	);
 }
 SearchPagination.defaultProps = {
-	pageVar:'p',
-	pageType:'query',
-	page:1,
-	resultsPerPage:10,
+	pageVar: 'p',
+	pageType: 'query',
+	page: 1,
+	resultsPerPage: 10,
 };
 SearchPagination.propTypes = {
 	locationState: PropTypes.object,
@@ -52,19 +51,19 @@ SearchPagination.propTypes = {
 };
 
 function Search(props) {
-	const {basePath, searchTypes, defaultType, resultsPerPage} = props;
+	const { basePath, searchTypes, defaultType, resultsPerPage } = props;
 	const ls = new LocationState(basePath);
 	ls.parseVars();
 	const [type, setType] = useState(ls.getVar('type') ?? defaultType);
 	const [query, setQuery] = useState(ls.getVar('q') ?? '');
 	const [totalResults, setTotalResults] = useState(null);
 	const [results, setResults] = useState([]);
-	const [page, setPage] = useState(parseInt(ls.getVar('p')) ?? 1);
+	const [page, setPage] = useState(parseInt(ls.getVar('p') || 1) ?? 1);
 	const [searchPerformed, setSearchPerformed] = useState(false);
 	const [searchSubmitted, setSearchSubmitted] = useState(true);
 
 	const search = async (evt) => {
-		if(evt) {
+		if (evt) {
 			evt.preventDefault();
 		}
 		setSearchSubmitted(true);
@@ -91,16 +90,16 @@ function Search(props) {
 		search();
 	};
 	
-	//perform search when searchType changes or query is submitted
+	// perform search when searchType changes or query is submitted
 	useEffect(() => {
 		const performSearch = async () => {
 			if (query && searchSubmitted) {
-				//change url
+				// change url
 				ls.setQueryVar('q', query);
 				ls.pushState();
 				
-				//perform query
-				let resp = await postFormData('/searchresults', {type, query, page});
+				// perform query
+				let resp = await postFormData('/searchresults', { type, query, page });
 				let results = await resp.json();
 				setTotalResults(results.total);
 				setResults(results.results);
@@ -112,34 +111,32 @@ function Search(props) {
 	}, [type, searchSubmitted]);
 
 	let resultNodes = null;
-	if(searchPerformed && results.length === 0) {
+	if (searchPerformed && results.length === 0) {
 		resultNodes = (
-			<div className="card border-0">
+			<div className='card border-0'>
 				<div className='card-body border-top'>
 					No results
 				</div>
 			</div>
 		);
 	} else if (searchPerformed) {
-		if(type == 'people'){
-			resultNodes = results.map((user)=>{
+		if (type == 'people') {
+			resultNodes = results.map((user) => {
 				return <LargeUser key={user.userID} user={user} />;
 			});
-		} else if(type == 'group') {
-			resultNodes = results.map((group)=>{
+		} else if (type == 'group') {
+			resultNodes = results.map((group) => {
 				return <GroupNugget key={group.apiObj.id} group={group.apiObj} className='m-2' />;
 			});
 		}
+	} else if (type == 'people') {
+		resultNodes = <p className='my-6 text-center'>Use &quot;double quotes&quot; to search for exact phrases. Otherwise we will search for users with any of the search terms.</p>;
 	} else {
-		if (type == 'people') {
-			resultNodes = <p className='my-6 text-center'>Use &quot;double quotes&quot; to search for exact phrases. Otherwise we will search for users with any of the search terms.</p>;
-		} else {
-			resultNodes = null;
-		}
+		resultNodes = null;
 	}
 
 	let pagination = null;
-	if(totalResults > resultsPerPage) {
+	if (totalResults > resultsPerPage) {
 		pagination = <SearchPagination locationState={ls} totalResults={totalResults} page={page} changePage={changePage} resultsPerPage={resultsPerPage} />;
 	}
 	
@@ -148,10 +145,10 @@ function Search(props) {
 			<Col className='search-form'>
 				<Nav tabs>
 					<NavItem>
-						<NavLink active={type=='people'} data-type='people' onClick={changeType} href='#'>People</NavLink>
+						<NavLink active={type == 'people'} data-type='people' onClick={changeType} href='#'>People</NavLink>
 					</NavItem>
 					<NavItem>
-						<NavLink active={type=='group'} data-type='group' onClick={changeType} href='#'>Groups</NavLink>
+						<NavLink active={type == 'group'} data-type='group' onClick={changeType} href='#'>Groups</NavLink>
 					</NavItem>
 				</Nav>
 			</Col>
@@ -166,7 +163,7 @@ function Search(props) {
 					<Form onSubmit={search} className='my-3'>
 						<InputGroup>
 							<Input type='text' name='q' onChange={handleQueryChange} defaultValue={query} />
-							<InputGroupAddon addonType="append"><Button onClick={search}>Search</Button></InputGroupAddon>
+							<InputGroupAddon addonType='append'><Button onClick={search}>Search</Button></InputGroupAddon>
 						</InputGroup>
 					</Form>
 				</Col>
@@ -174,6 +171,7 @@ function Search(props) {
 			<Row>
 				<Col>
 					<div id='search-results'>
+						<LoadingSpinner className='mx-auto my-5' loading={searchSubmitted} />
 						{resultNodes}
 					</div>
 					{pagination}
@@ -196,4 +194,4 @@ Search.propTypes = {
 	resultsPerPage: PropTypes.number,
 };
 
-export {Search};
+export { Search };

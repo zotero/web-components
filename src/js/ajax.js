@@ -10,7 +10,7 @@ const apiKey = zoteroConfig.apiKey;
 // perform a network request defined by config, and return a promise for a Response
 // resolve with a successful status (200-300) reject, but with the same Response object otherwise
 let ajax = async function (config) {
-	config = Object.assign({ type: 'GET', credentials: 'include' }, config);
+	config = Object.assign({ type: 'GET', credentials: 'include', throwOnError: true }, config);
 
 	// get headers from config, or blank, and optionally add auth header for session postback
 	let headersInit = config.headers || {};
@@ -33,6 +33,9 @@ let ajax = async function (config) {
 	});
 	try {
 		let response = await fetch(request);
+		if (config.throwOnError === false) {
+			return response;
+		}
 		if (response.status >= 200 && response.status < 300) {
 			log.debug('200-300 response: resolving Net.ajax promise', 3);
 			// Performs the function "resolve" when this.status is equal to 2xx

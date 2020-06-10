@@ -87,14 +87,14 @@ function GroupLibrarySettings(props) {
 	const changeType = (evt) => {
 		let type = evt.target.value;
 		let newLibrarySettings = Object.assign({}, librarySettings);
-		if (type == 'PublicOpen') {
+		if (type == 'PublicOpen' && props.type !== 'PublicOpen') {
 			if (!confirm("Changing a group to 'Public Open' will disallow storing of files for the group. Before settings can be applied, all file attachments for the group will be deleted")) {
 				return;
 			} else {
 				newLibrarySettings.fileEditing = 'none';
 			}
 		}
-		if (type == 'Private') {
+		if (type == 'Private' && props.type !== 'Private') {
 			if (newLibrarySettings.libraryReading == 'all') {
 				if (!confirm("Changing a group to 'Private' will no longer allow it to be read by the public")) {
 					return;
@@ -165,7 +165,7 @@ function GroupLibrarySettings(props) {
 	useEffect(() => {
 		if ((originalFileEditing != 'none') && (type == 'PublicOpen')) {
 			setDeletionRequired(true);
-		} else if (fileEditing == 'none') {
+		} else if (fileEditing == 'none' && originalFileEditing != 'none') {
 			setDeletionRequired(true);
 		} else {
 			setDeletionRequired(false);

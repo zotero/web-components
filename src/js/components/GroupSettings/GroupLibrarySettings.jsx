@@ -88,7 +88,7 @@ function GroupLibrarySettings(props) {
 		let type = evt.target.value;
 		let newLibrarySettings = Object.assign({}, librarySettings);
 		if (type == 'PublicOpen') {
-			if (!confirm("Changing a group to 'Public Open' will disallow storing of files for the group. Before settings can be applied, all file attachments for the gorup will be deleted")) {
+			if (!confirm("Changing a group to 'Public Open' will disallow storing of files for the group. Before settings can be applied, all file attachments for the group will be deleted")) {
 				return;
 			} else {
 				newLibrarySettings.fileEditing = 'none';

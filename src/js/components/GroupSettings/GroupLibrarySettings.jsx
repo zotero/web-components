@@ -136,19 +136,16 @@ function GroupLibrarySettings(props) {
 		let totalResults = parseInt(resp.headers.get('Total-Results'));
 		if (totalResults == 0) {
 			try {
-				let settingsResp = await postFormData(`/group/updatesettings?groupID=${groupID}&settingsType=library`, librarySettings, { withSession: true });
-				if (settingsResp.ok) {
-					let data = await settingsResp.json();
-					if (data.success) {
-						setNotification({ type: 'success', message: 'Settings saved' });
-						window.location.reload();
-						return;
-					} else if (data.message) {
-						setNotification({ type: 'error', message: data.message });
-						return;
-					}
+				let settingsResp = await postFormData(`/group/updatesettings?groupID=${groupID}&settingsType=library`, librarySettings, { withSession: true, throwOnError: false });
+				let data = await settingsResp.json();
+				if (data.success) {
+					setNotification({ type: 'success', message: 'Settings saved' });
+					window.location.reload();
+					return;
+				} else if (data.message) {
+					setNotification({ type: 'error', message: data.message });
+					return;
 				}
-				setNotification({ type: 'error', message: 'Error saving settings' });
 			} catch (e) {
 				setNotification({ type: 'error', message: 'Error saving settings' });
 			}

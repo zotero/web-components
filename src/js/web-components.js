@@ -41,8 +41,8 @@ globalScope.BezierEasing = BezierEasing;
 
 import { Storage, StorageSummary } from './storage/Storage.js';
 import { MakeEditable } from './MakeEditable.js';
-import { GroupInvitations } from './Groups/GroupInvitations.js';
-import { NewGroupDiscussions } from './Groups/NewGroupDiscussions.js';
+import { GroupInvitations } from './Groups/GroupInvitations.jsx';
+import { NewGroupDiscussions } from './Groups/NewGroupDiscussions.jsx';
 import { InviteToGroups } from './InviteToGroups.js';
 import { Start, RegisterForm } from './Start.js';
 import { Downloads } from './Downloads.js';

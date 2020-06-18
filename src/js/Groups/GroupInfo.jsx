@@ -9,6 +9,7 @@ import { jsError, jsSuccess, getCurrentUser } from '../Utils.js';
 import classnames from 'classnames';
 import striptags from 'striptags';
 
+import { Button } from 'reactstrap';
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 
@@ -59,9 +60,7 @@ let groupIsReadable = function (group, userID) {
 
 // component to list groups a user can invite another user to
 function GroupMembershipActions(props) {
-	const { group, refreshGroup } = props;
-	const [loading, setLoading] = useState(false);
-	const [pending, setPending] = useState(props.pending);
+	const { group, refreshGroup, pending } = props;
 	const [applicationPending, setApplicationPending] = useState(props.pending && props.pending.invitation == '0');
 	const [membershipInvitation, setMembershipInvitation] = useState(props.pending && props.pending.invitation == '1');
 	const [ownershipInvitation, setOwnershipInvitation] = useState(props.ownershipInvitation);
@@ -145,16 +144,16 @@ function GroupMembershipActions(props) {
 		controls = (
 			<div className='join-group'>
 				<p>You have been offered ownership of this group.</p>
-				<button className={classnames('btn', 'mr-3')} onClick={acceptOwnership}>Accept</button>
-				<button className={classnames('btn', 'mr-3', { 'd-none': !member })} onClick={leaveGroup}>Leave</button>
+				<Button className='mr-3' onClick={acceptOwnership}>Accept</Button>
+				<Button className={classnames('mr-3', { 'd-none': !member })} onClick={leaveGroup}>Leave</Button>
 			</div>
 		);
 	} else if (membershipInvitation) {
 		controls = (
 			<div className='join-group'>
 				<p>You have been invited to join this group.</p>
-				<button className={classnames('btn', 'mr-3')} onClick={joinGroup}>Join</button>
-				<button className={classnames('btn', 'mr-3')} onClick={ignoreInvite}>Ignore</button>
+				<Button className='mr-3' onClick={joinGroup}>Join</Button>
+				<Button className='mr-3' onClick={ignoreInvite}>Ignore</Button>
 			</div>
 		);
 	} else if (!member && applicationPending) {
@@ -166,8 +165,8 @@ function GroupMembershipActions(props) {
 	} else {
 		controls = (
 			<div className='join-group'>
-				<button className={classnames('btn', 'mr-3', { 'd-none': member })} onClick={joinGroup}>Join</button>
-				<button className={classnames('btn', 'mr-3', { 'd-none': !member })} onClick={leaveGroup}>Leave</button>
+				<Button className={classnames('mr-3', { 'd-none': member })} onClick={joinGroup}>Join</Button>
+				<Button className={classnames('mr-3', { 'd-none': !member })} onClick={leaveGroup}>Leave</Button>
 			</div>
 		);
 	}
@@ -191,10 +190,13 @@ GroupMembershipActions.propTypes = {
 		})
 	}),
 	refreshGroup: PropTypes.func,
-	pending: PropTypes.shape({
-		invitation: PropTypes.string,
-		token: PropTypes.string,
-	}),
+	pending: PropTypes.oneOfType([
+		PropTypes.bool,
+		PropTypes.shape({
+			invitation: PropTypes.string,
+			token: PropTypes.string,
+		}),
+	]),
 	ownershipInvitation: PropTypes.bool,
 };
 
@@ -308,7 +310,7 @@ GroupInfo.propTypes = {
 			owner: PropTypes.number
 		})
 	}),
-	groupImage: PropTypes.string,
+	groupImage: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
 };
 
 export { GroupMembershipActions, GroupInfo, groupIsReadable };

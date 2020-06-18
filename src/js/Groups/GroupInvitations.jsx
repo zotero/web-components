@@ -13,13 +13,14 @@ import PropTypes from 'prop-types';
 import { buildUrl } from '../wwwroutes.js';
 
 function GroupInvitation(props) {
-	const { group, invitation } = props;
+	const { group, invitation, reloadGroups } = props;
 	const [done, setDone] = useState(false);
 
 	const acceptInvitation = () => {
 		let url = buildUrl('groupJoin', { group });
 		postFormData(url, { token: invitation.token }).then(() => {
 			setDone(true);
+			reloadGroups();
 		});
 	};
 
@@ -50,9 +51,10 @@ GroupInvitation.propTypes = {
 	invitation: PropTypes.shape({
 		token: PropTypes.string,
 	}),
+	reloadGroups: PropTypes.func,
 };
 
-function GroupInvitations(_props) {
+function GroupInvitations(props) {
 	const [invitations, setInvitations] = useState([]);
 	const [invitationGroups, setInvitiationGroups] = useState([]);
 	const [loaded, setLoaded] = useState(false);
@@ -83,7 +85,7 @@ function GroupInvitations(_props) {
 		return (
 			<Row key={invitation.groupID}>
 				<Col>
-					<GroupInvitation key={invitation.groupID} group={group} invitation={invitation} />
+					<GroupInvitation key={invitation.groupID} group={group} invitation={invitation} reloadGroups={props.reloadGroups} />
 				</Col>
 			</Row>
 		);
@@ -101,5 +103,8 @@ function GroupInvitations(_props) {
 		</Card>
 	);
 }
+GroupInvitations.propTypes = {
+	reloadGroups: PropTypes.func
+};
 
 export { GroupInvitations };

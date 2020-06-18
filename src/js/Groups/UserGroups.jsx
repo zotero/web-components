@@ -1,5 +1,5 @@
-import { log as logger } from '../Log.js';
-let log = logger.Logger('UserGroups');
+// import { log as logger } from '../Log.js';
+// let log = logger.Logger('UserGroups');
 
 import { LoadingSpinner } from '../LoadingSpinner.js';
 import { buildUrl } from '../wwwroutes.js';
@@ -170,7 +170,6 @@ function GroupsExplainer() {
 }
 
 function UserGroups(props) {
-	log.debug(props);
 	let { titleOnly, ownedOnly, groups, userID, groupsLoaded, totalResults, loading, loadMore, errorLoading } = props;
 
 	if (errorLoading) {
@@ -206,8 +205,8 @@ function UserGroups(props) {
 
 	return (
 		<div id='user-groups-div' className='user-groups'>
-			{groupNuggets}
 			<div className='text-center'><LoadingSpinner className='m-auto' loading={loading} /></div>
+			{groupNuggets}
 			{moreLink}
 		</div>
 	);
@@ -228,7 +227,7 @@ UserGroups.propTypes = {
 	loading: PropTypes.bool,
 	groupsLoaded: PropTypes.bool,
 	totalResults: PropTypes.number,
-	loadMore: PropTypes.func,
+	loadMore: PropTypes.func.isRequired,
 	errorLoading: PropTypes.bool
 };
 

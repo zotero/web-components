@@ -155,10 +155,12 @@ RecentItems.propTypes = {
 		})
 	}),
 	displayFields: PropTypes.arrayOf(PropTypes.string),
-	items: PropTypes.shape({
-		data: PropTypes.object,
-		key: PropTypes.string,
-	}),
+	items: PropTypes.arrayOf(
+		PropTypes.shape({
+			data: PropTypes.object,
+			key: PropTypes.string,
+		}),
+	),
 	totalResults: PropTypes.number
 };
 

@@ -7,7 +7,7 @@ import { PropTypes } from 'prop-types';
 import { Row, Col, Form, Input, InputGroup, Button, Nav, NavItem, NavLink, InputGroupAddon, Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 import { postFormData } from './ajax.js';
 import { LargeUser } from './components/UserList.jsx';
-import { GroupNugget } from './Groups/UserGroups.js';
+import { GroupNugget } from './Groups/UserGroups.jsx';
 import { LocationState } from './LocationState.js';
 import { LoadingSpinner } from './LoadingSpinner.js';
 

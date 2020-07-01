@@ -2,8 +2,8 @@ import { log as logger } from '../Log.js';
 var log = logger.Logger('PaymentModal', 1);
 
 // CheckoutForm.js
-import { useState, useContext } from 'react';
-import { Elements, injectStripe, CardElement, IbanElement, PaymentRequestButtonElement } from 'react-stripe-elements';
+import { useState, useEffect, useContext } from 'react';
+import { Elements, useElements, CardElement, IbanElement, PaymentRequestButtonElement } from '@stripe/react-stripe-js';
 import { Button, Card, CardHeader, CardBody, TabContent, TabPane, Nav, NavItem, NavLink, Row, Col, Input, Form, FormGroup } from 'reactstrap';
 import { Notifier } from '../Notifier.js';
 import PropTypes from 'prop-types';
@@ -22,6 +22,9 @@ function CardCheckoutForm(props) {
 	if (typeof props.handleToken != 'function') {
 		log.error('props error in CardCheckoutForm: handleToken must be function');
 	}
+	const stripe = window.stripe;// useStripe();
+	const elements = useElements();
+
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
 	const [address1, setAddress1] = useState('');
@@ -34,6 +37,9 @@ function CardCheckoutForm(props) {
 	const handleSubmit = async (ev) => {
 		ev.preventDefault();
 
+		// Use elements.getElement to get a reference to the mounted Element.
+		const cardElement = elements.getElement(CardElement);
+		
 		let tokenData = {
 			name,
 			address_line1: address1,
@@ -42,24 +48,8 @@ function CardCheckoutForm(props) {
 			address_state: state,
 		};
 		
-		/*
-		let sourceData = {
-			type: 'card',
-			currency: 'usd',
-			owner: {
-				name,
-				email,
-				address: {
-					line1: address1,
-					line2: address2,
-				}
-			},
-		};
-		*/
-		
-		// Within the context of `Elements`, this call to createToken knows which Element to
-		// tokenize, since there's only one in this group.
-		let result = await props.stripe.createToken(tokenData);
+		// create a token using the card element
+		let result = await stripe.createToken(cardElement, tokenData);
 		if (result.token) {
 			props.handleToken(result.token);
 		} else if (result.error) {
@@ -131,7 +121,6 @@ function CardCheckoutForm(props) {
 }
 CardCheckoutForm.propTypes = {
 	handleToken: PropTypes.func.isRequired,
-	stripe: PropTypes.object.isRequired,
 	buttonLabel: PropTypes.string,
 	onClose: PropTypes.func.isRequired,
 	useEmail: PropTypes.bool,
@@ -147,6 +136,9 @@ function IBANCheckoutForm(props) {
 	if (typeof props.handleToken != 'function') {
 		log.error('props error in CardCheckoutForm: handleToken must be function');
 	}
+	const stripe = window.stripe;// useStripe();
+	// const elements = useElements();
+
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
 	
@@ -167,7 +159,7 @@ function IBANCheckoutForm(props) {
 				notification_method: 'email',
 			},
 		};
-		let result = await props.stripe.createToken(sourceData);
+		let result = await stripe.createToken(sourceData);
 		if (result.token) {
 			props.handleToken(result.token);
 		} else if (result.error) {
@@ -207,51 +199,56 @@ function IBANCheckoutForm(props) {
 }
 IBANCheckoutForm.propTypes = {
 	handleToken: PropTypes.func.isRequired,
-	stripe: PropTypes.object.isRequired,
 	label: PropTypes.string,
 	onClose: PropTypes.func.isRequired
 };
 
 function _PaymentRequestForm(props) {
-	const { stripe, paymentAmount, handleToken } = props;
-	const [canMakePayment, setCanMakePayment] = useState(false);
+	if (typeof props.handleToken != 'function') {
+		log.error('props error in CardCheckoutForm: handleToken must be function');
+	}
+	
+	const { paymentAmount, handleToken } = props;
+	// const [canMakePayment, setCanMakePayment] = useState(false);
 	const [paymentRequest, setPaymentRequest] = useState(null);
 
-	if (paymentRequest === null) {
-		const paymentRequest = stripe.paymentRequest({
-			country: 'US',
-			currency: 'usd',
-			total: {
-				label: 'Zotero Storage',
-				amount: paymentAmount,
+	const stripe = window.stripe;// useStripe();
+
+	useEffect(() => {
+		if (stripe) {
+			const pr = stripe.paymentRequest({
+				country: 'US',
+				currency: 'usd',
+				total: {
+					label: 'Zotero Storage',
+					amount: paymentAmount,
+				},
 				requestPayerName: true,
 				requestPayerEmail: true,
-			},
-		});
+			});
 
-		paymentRequest.on('token', ({ complete, token, ...data }) => {
-			log.debug('Received Stripe token in PaymentRequestForm: ', token);
-			log.debug('Received customer information: ', data);
-			handleToken(token);
-			complete('success');
-		});
+			pr.on('token', ({ complete, token, ...data }) => {
+				log.debug('Received Stripe token in PaymentRequestForm: ', token);
+				log.debug('Received customer information: ', data);
+				handleToken(token);
+				complete('success');
+			});
 
-		setPaymentRequest(paymentRequest);
-		log.debug(paymentRequest);
-		paymentRequest.canMakePayment().then((result) => {
-			log.debug('paymentRequest canMakePayment:');
-			log.debug(result);
-			setCanMakePayment(!!result);
-			log.debug(paymentRequest);
-		});
-	}
+			// Check the availability of the Payment Request API.
+			pr.canMakePayment().then((result) => {
+				if (result) {
+					setPaymentRequest(pr);
+				}
+			});
+		}
+	}, [stripe, handleToken, paymentAmount]);
 
-	if (!canMakePayment) return null;
+	if (paymentRequest === null) return null;
 
 	return (
 		<PaymentRequestButtonElement
 			className='PaymentRequestButton'
-			paymentRequest={paymentRequest}
+			options={{ paymentRequest }}
 			style={{
 				paymentRequestButton: {
 					theme: 'light',
@@ -265,18 +262,13 @@ function _PaymentRequestForm(props) {
 _PaymentRequestForm.propTypes = {
 	paymentAmount: PropTypes.number.isRequired,
 	handleToken: PropTypes.func.isRequired,
-	stripe: PropTypes.object.isRequired,
 	label: PropTypes.string,
 	onClose: PropTypes.func.isRequired
 };
 
-const InjectedPaymentRequestForm = injectStripe(_PaymentRequestForm);
-const InjectedCardCheckoutForm = injectStripe(CardCheckoutForm);
-const InjectedIBANCheckoutForm = injectStripe(IBANCheckoutForm);
-
 function MultiPaymentModal(props) {
 	const [selectedMethod, setMethod] = useState('card');
-	const { handleToken, chargeAmount, buttonLabel, useEmail, useAddress } = props;
+	const { stripe, handleToken, chargeAmount, buttonLabel, useEmail, useAddress } = props;
 	const { paymentDispatch } = useContext(PaymentContext);
 	const handleClose = () => {
 		paymentDispatch(cancelPurchase());
@@ -285,8 +277,8 @@ function MultiPaymentModal(props) {
 	let paymentRequest = null;
 	if (chargeAmount) {
 		paymentRequest = (
-			<Elements>
-				<InjectedPaymentRequestForm handleToken={handleToken} paymentAmount={chargeAmount} onClose={handleClose} />
+			<Elements stripe={stripe}>
+				<_PaymentRequestForm handleToken={handleToken} paymentAmount={chargeAmount} onClose={handleClose} />
 			</Elements>
 		);
 	}
@@ -313,8 +305,8 @@ function MultiPaymentModal(props) {
 						<TabPane tabId='card'>
 							<Row>
 								<Col sm='12'>
-									<Elements>
-										<InjectedCardCheckoutForm handleToken={handleToken} buttonLabel={buttonLabel} onClose={handleClose} useEmail={useEmail} useAddress={useAddress} />
+									<Elements stripe={stripe}>
+										<CardCheckoutForm handleToken={handleToken} buttonLabel={buttonLabel} onClose={handleClose} useEmail={useEmail} useAddress={useAddress} />
 									</Elements>
 								</Col>
 							</Row>
@@ -322,8 +314,8 @@ function MultiPaymentModal(props) {
 						<TabPane tabId='sepa'>
 							<Row>
 								<Col sm='12'>
-									<Elements>
-										<InjectedIBANCheckoutForm handleToken={handleToken} buttonLabel={buttonLabel} onClose={handleClose} />
+									<Elements stripe={stripe}>
+										<IBANCheckoutForm handleToken={handleToken} buttonLabel={buttonLabel} onClose={handleClose} />
 									</Elements>
 								</Col>
 							</Row>
@@ -343,13 +335,14 @@ MultiPaymentModal.propTypes = {
 	immediateCharge: PropTypes.bool,
 	useEmail: PropTypes.bool,
 	useAddress: PropTypes.bool,
+	stripe: PropTypes.object.isRequired,
 };
 MultiPaymentModal.defaultProps = {
 	buttonLabel: 'Confirm'
 };
 
 function CardPaymentModal(props) {
-	const { handleToken, chargeAmount, buttonLabel, useEmail, useAddress } = props;
+	const { stripe, handleToken, chargeAmount, buttonLabel, useEmail, useAddress } = props;
 	const { paymentDispatch } = useContext(PaymentContext);
 	const handleClose = () => {
 		paymentDispatch(cancelPurchase());
@@ -358,8 +351,8 @@ function CardPaymentModal(props) {
 	let paymentRequest = null;
 	if (chargeAmount) {
 		paymentRequest = (
-			<Elements>
-				<InjectedPaymentRequestForm handleToken={handleToken} paymentAmount={chargeAmount} onClose={handleClose} useEmail={useEmail} useAddress={useAddress} />
+			<Elements stripe={stripe}>
+				<_PaymentRequestForm handleToken={handleToken} paymentAmount={chargeAmount} onClose={handleClose} useEmail={useEmail} useAddress={useAddress} />
 			</Elements>
 		);
 	}
@@ -368,8 +361,8 @@ function CardPaymentModal(props) {
 			<Card>
 				<CardBody>
 					{paymentRequest}
-					<Elements>
-						<InjectedCardCheckoutForm handleToken={handleToken} buttonLabel={buttonLabel} onClose={handleClose} useEmail={useEmail} useAddress={useAddress} />
+					<Elements stripe={stripe}>
+						<CardCheckoutForm handleToken={handleToken} buttonLabel={buttonLabel} onClose={handleClose} useEmail={useEmail} useAddress={useAddress} />
 					</Elements>
 				</CardBody>
 			</Card>
@@ -385,6 +378,7 @@ CardPaymentModal.propTypes = {
 	immediateCharge: PropTypes.bool,
 	useEmail: PropTypes.bool,
 	useAddress: PropTypes.bool,
+	stripe: PropTypes.object.isRequired,
 };
 CardPaymentModal.defaultProps = {
 	buttonLabel: 'Confirm',

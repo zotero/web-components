@@ -521,7 +521,7 @@ function Storage(props) {
 Storage.propTypes = {
 	userSubscription: PropTypes.object,
 	stripeCustomer: PropTypes.object,
-	storageGroups: PropTypes.array,
+	storageGroups: PropTypes.object,
 	summary: PropTypes.bool,
 	userInvoices: PropTypes.array,
 };

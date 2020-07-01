@@ -18,7 +18,6 @@ var log = logger.Logger('SubscriptionHandler', 1);
 
 import { useState, useContext } from 'react';
 import PropTypes from 'prop-types';
-import { StripeProvider } from 'react-stripe-elements';
 import { Alert, Card, CardHeader, CardBody, FormGroup, Input, Modal, ModalBody, ModalHeader, Label, Row, Col, Button, Container } from 'reactstrap';
 
 import { StorageContext, PaymentContext, NotifierContext, refresh, cancelPurchase, notify } from './actions.js';
@@ -30,7 +29,6 @@ import { postFormData } from '../ajax.js';
 import { LoadingSpinner } from '../LoadingSpinner.js';
 import { formatCurrency } from '../Utils.js';
 
-const stripePublishableKey = window.zoteroData && window.zoteroData.stripePublishableKey ? window.zoteroData.stripePublishableKey : '';
 const dateFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
 
 const storageLevelDescriptions = {
@@ -109,10 +107,11 @@ async function chargeSubscription(storageLevel = false, token = false) {
 			data.stripeToken = token.id;
 		}
 		let resp = await postFormData('/storage/stripechargeajax', data);
-		
+		let respData = await resp.json();
+		let chargeID = respData.chargeID;
 		log.debug(resp, 4);
 		if (resp.ok) {
-			return { type: 'success', message: <span>Success. <a href='/settings/storage/invoice'>View Payment Receipt</a></span> };
+			return { type: 'success', message: <span>Success. <a href={`/settings/storage/invoice?chargeID=${chargeID}`}>View Payment Receipt</a></span> };
 		} else {
 			throw resp;
 		}
@@ -220,6 +219,7 @@ function SubscriptionHandler(props) {
 	if (type == 'individualChange' || type == 'individualRenew') {
 		if (overQuota(storageLevel, userSubscription)) {
 			error = <Alert color='error'>Current usage exceeds the chosen plan&apos;s quota. You&apos;ll need to choose a larger storage plan, or delete some files from your Zotero storage.</Alert>;
+			description = [];
 		}
 	}
 	
@@ -288,11 +288,7 @@ function SubscriptionHandler(props) {
 	
 	let paymentSection = null;
 	if (editPayment) {
-		paymentSection = (
-			<StripeProvider apiKey={stripePublishableKey}>
-				<CardPaymentModal handleToken={handleConfirm} chargeAmount={chargeAmount} buttonLabel={blabel} />
-			</StripeProvider>
-		);
+		paymentSection = <CardPaymentModal stripe={window.stripe} handleToken={handleConfirm} chargeAmount={chargeAmount} buttonLabel={blabel} />;
 	} else if (stripeCustomer && immediateChargeRequired) {
 		const defaultSource = stripeCustomer.default_source;
 		if (defaultSource) {
@@ -356,6 +352,12 @@ function SubscriptionHandler(props) {
 				</Row>
 			</Container>
 		);
+	}
+
+	if (error !== null) {
+		paymentSection = null;
+		invoiceSection = null;
+		renewSection = null;
 	}
 	
 	return (

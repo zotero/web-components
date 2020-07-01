@@ -3,7 +3,6 @@ var log = logger.Logger('PayInvoice', 1);
 
 import { useState, useReducer } from 'react';
 import PropTypes from 'prop-types';
-import { StripeProvider } from 'react-stripe-elements';
 import { Alert, Card, CardHeader, CardBody, Row, Col } from 'reactstrap';
 
 import { Notifier } from '../Notifier.js';
@@ -17,8 +16,6 @@ import { formatCurrency } from '../Utils.js';
 import { PaymentContext, paymentReducer } from './actions.js';
 
 const dateFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-
-const stripePublishableKey = window.zoteroData && window.zoteroData.stripePublishableKey ? window.zoteroData.stripePublishableKey : '';
 
 const storageLevelDescriptions = {
 	2: '2 GB',
@@ -142,11 +139,7 @@ function PayInvoice(props) {
 	
 	let paymentSection = null;
 	if (!invoicePaid) {
-		paymentSection = (
-			<StripeProvider apiKey={stripePublishableKey}>
-				<CardPaymentModal handleToken={handleConfirm} chargeAmount={chargeAmount} buttonLabel={blabel} useEmail={true} />
-			</StripeProvider>
-		);
+		paymentSection = <CardPaymentModal stripe={window.stripe} handleToken={handleConfirm} chargeAmount={chargeAmount} buttonLabel={blabel} useEmail={true} />;
 	} else {
 		const source = stripeChargeObject.source;
 		log.debug(source);

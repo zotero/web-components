@@ -3,7 +3,6 @@ var log = logger.Logger('SubscriptionHandler', 1);
 
 import { useState, useContext } from 'react';
 import PropTypes from 'prop-types';
-import { StripeProvider } from 'react-stripe-elements';
 import { Card, CardHeader, CardBody, Modal, ModalBody, ModalHeader, Row, Col, Button, Input } from 'reactstrap';
 
 import { CardPaymentModal } from '../storage/PaymentModal.jsx';
@@ -15,8 +14,6 @@ import { LoadingSpinner } from '../LoadingSpinner.js';
 
 
 import { formatCurrency } from '../Utils.js';
-
-const stripePublishableKey = window.zoteroData && window.zoteroData.stripePublishableKey ? window.zoteroData.stripePublishableKey : '';
 
 async function chargeContribution(token = false, amount, period, email) {
 	log.debug(`charging stripe contribution. Amount:${amount} - token.id:${token.id}`, 4);
@@ -198,11 +195,7 @@ function ContributionPaymentHandler(props) {
 	
 	let paymentSection = null;
 	if (editPayment) {
-		paymentSection = (
-			<StripeProvider apiKey={stripePublishableKey}>
-				<CardPaymentModal handleToken={handleConfirm} chargeAmount={chargeAmount} buttonLabel={blabel} />
-			</StripeProvider>
-		);
+		paymentSection = <CardPaymentModal stripe={window.stripe} handleToken={handleConfirm} chargeAmount={chargeAmount} buttonLabel={blabel} />;
 	} else if (stripeCustomer) {
 		const defaultSource = stripeCustomer.default_source;
 		if (defaultSource) {
@@ -229,7 +222,7 @@ function ContributionPaymentHandler(props) {
 	return (
 		<div className='subscription-handler'>
 			<Modal isOpen={true} toggle={cancel} className='payment-modal'>
-				<ModalHeader>Institution Subscription</ModalHeader>
+				<ModalHeader>Contribute to Zotero</ModalHeader>
 				<ModalBody>
 					<LoadingSpinner className='m-auto' loading={operationPending} />
 					<Card className='mb-4'>

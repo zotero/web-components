@@ -3,7 +3,6 @@ var log = logger.Logger('SubscriptionHandler', 1);
 
 import { useState, useContext } from 'react';
 import PropTypes from 'prop-types';
-import { StripeProvider } from 'react-stripe-elements';
 import { Card, CardHeader, CardBody, FormGroup, Input, Modal, ModalBody, ModalHeader, Label, Row, Col, Button, Container } from 'reactstrap';
 
 import { labPrice, labUserPrice } from './calculations.js';
@@ -14,13 +13,9 @@ import { postFormData } from '../ajax.js';
 import { buildUrl } from '../wwwroutes.js';
 import { LoadingSpinner } from '../LoadingSpinner.js';
 
-import { PaymentContext, NotifierContext, notify } from './actions.js';
-import { cancelPurchase } from './actions.js';
+import { PaymentContext, NotifierContext, notify, cancelPurchase } from './actions.js';
 
 import { formatCurrency } from '../Utils.js';
-
-const stripePublishableKey = window.zoteroData && window.zoteroData.stripePublishableKey ? window.zoteroData.stripePublishableKey : '';
-// const dateFormatOptions = {year: 'numeric', month: 'long', day: 'numeric'};
 
 async function chargeLabSubscription(token = false, fte = false, name = '', institutionID = false) {
 	// You can access the token ID with `token.id`.
@@ -241,6 +236,7 @@ function InstitutionHandler(props) {
 		let result;
 		setOperationPending(true);
 		switch (type) {
+
 		/*
 		case 'paymentUpdate':
 			if(!token){
@@ -285,11 +281,7 @@ function InstitutionHandler(props) {
 	
 	let paymentSection = null;
 	if (editPayment) {
-		paymentSection = (
-			<StripeProvider apiKey={stripePublishableKey}>
-				<CardPaymentModal handleToken={handleConfirm} chargeAmount={chargeAmount} buttonLabel={blabel} />
-			</StripeProvider>
-		);
+		paymentSection = <CardPaymentModal stripe={window.stripe} handleToken={handleConfirm} chargeAmount={chargeAmount} buttonLabel={blabel} />;
 	} else if (stripeCustomer && immediateChargeRequired) {
 		const defaultSource = stripeCustomer.default_source;
 		if (defaultSource) {

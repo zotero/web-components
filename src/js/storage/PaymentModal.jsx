@@ -137,14 +137,21 @@ function IBANCheckoutForm(props) {
 		log.error('props error in CardCheckoutForm: handleToken must be function');
 	}
 	const stripe = window.stripe;// useStripe();
-	// const elements = useElements();
+	const elements = useElements();
 
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
-	
+
+	const elementOptions = {
+		supportedCountries: ['SEPA']
+	};
+
 	let handleSubmit = async (ev) => {
 		// We don't want to let default form submission happen here, which would refresh the page.
 		ev.preventDefault();
+
+		// Use elements.getElement to get a reference to the mounted Element.
+		const ibanElement = elements.getElement(IbanElement);
 
 		let sourceData = {
 			type: 'sepa_debit',
@@ -159,7 +166,7 @@ function IBANCheckoutForm(props) {
 				notification_method: 'email',
 			},
 		};
-		let result = await stripe.createToken(sourceData);
+		let result = await stripe.createToken(ibanElement, sourceData);
 		if (result.token) {
 			props.handleToken(result.token);
 		} else if (result.error) {
@@ -184,7 +191,7 @@ function IBANCheckoutForm(props) {
 			</FormGroup>
 			<FormGroup>
 				<IbanElement
-					supportedCountries={['SEPA']}
+					options={elementOptions}
 				/>
 				<p className='text-muted mt-3'>
 					By providing your IBAN and confirming this payment, you’re authorizing Zotero and Stripe, our payment provider, to send instructions to your bank to debit your account. You’re entitled to a refund under the terms and conditions of your agreement with your bank.

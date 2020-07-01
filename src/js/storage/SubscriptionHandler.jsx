@@ -289,6 +289,7 @@ function SubscriptionHandler(props) {
 	let paymentSection = null;
 	if (editPayment) {
 		paymentSection = <CardPaymentModal stripe={window.stripe} handleToken={handleConfirm} chargeAmount={chargeAmount} buttonLabel={blabel} />;
+		// paymentSection = <MultiPaymentModal stripe={window.stripe} handleToken={handleConfirm} chargeAmount={chargeAmount} buttonLabel={blabel} />;
 	} else if (stripeCustomer && immediateChargeRequired) {
 		const defaultSource = stripeCustomer.default_source;
 		if (defaultSource) {

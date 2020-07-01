@@ -218,32 +218,30 @@ const PersonalLibraryPermissions = function () {
 
 	return (
 		<div id='personal-library-permissions'>
-			<Form>
-				<FormGroup tag='fieldset'>
-					<legend>Personal Library</legend>
-					<FormGroup check>
-						<Label check htmlFor='library'>
-							<Input name='library' id='library' checked={access.user.library} type='checkbox' onChange={handleChange} />
-							Allow library access
-						</Label>
-						<p className='text-muted small'>Allow third party to access your library.</p>
-					</FormGroup>
-					<FormGroup check>
-						<Label check htmlFor='notes'>
-							<Input name='notes' id='notes' checked={access.user.notes} type='checkbox' onChange={handleChange} />
-							Allow notes access
-						</Label>
-						<p className='text-muted small'>Allow third party to access your notes.</p>
-					</FormGroup>
-					<FormGroup check>
-						<Label check htmlFor='write'>
-							<Input name='write' id='write' checked={access.user.write} type='checkbox' onChange={handleChange} />
-							Allow write access
-						</Label>
-						<p className='text-muted small'>Allow third party to make changes to your library.</p>
-					</FormGroup>
+			<FormGroup tag='fieldset'>
+				<legend>Personal Library</legend>
+				<FormGroup check>
+					<Label check htmlFor='library'>
+						<Input name='library' id='library' checked={access.user.library} type='checkbox' onChange={handleChange} />
+						Allow library access
+					</Label>
+					<p className='text-muted small'>Allow third party to access your library.</p>
 				</FormGroup>
-			</Form>
+				<FormGroup check>
+					<Label check htmlFor='notes'>
+						<Input name='notes' id='notes' checked={access.user.notes} type='checkbox' onChange={handleChange} />
+						Allow notes access
+					</Label>
+					<p className='text-muted small'>Allow third party to access your notes.</p>
+				</FormGroup>
+				<FormGroup check>
+					<Label check htmlFor='write'>
+						<Input name='write' id='write' checked={access.user.write} type='checkbox' onChange={handleChange} />
+						Allow write access
+					</Label>
+					<p className='text-muted small'>Allow third party to make changes to your library.</p>
+				</FormGroup>
+			</FormGroup>
 		</div>
 	);
 };
@@ -281,30 +279,28 @@ const AllGroupsPermissions = function () {
 
 	return (
 		<div className='all-groups-permissions'>
-			<Form>
-				<FormGroup tag='fieldset'>
-					<legend>Default Group Permissions</legend>
-					<Label htmlFor='all_groups'>All Groups
-						<RadioGroup name={radioName} selectedValue={selectedValue} onChange={handleChange}>
-							<Label htmlFor={radioName + 'none'}>
-								<Radio value='none' id={radioName + 'none'} className='radio' />{' '}
-								None
-							</Label>
-							<br />
-							<Label htmlFor={radioName + 'read'}>
-								<Radio value='read' id={radioName + 'read'} className='radio' />{' '}
-								Read Only
-							</Label>
-							<br />
-							<Label htmlFor={radioName + 'write'}>
-								<Radio value='write' id={radioName + 'write'} className='radio' />{' '}
-								Read/Write
-							</Label>
-						</RadioGroup>
-					</Label>
-					<p className='text-muted small'>Allow access to all current and future groups.</p>
-				</FormGroup>
-			</Form>
+			<FormGroup tag='fieldset'>
+				<legend>Default Group Permissions</legend>
+				<Label htmlFor='all_groups'>All Groups
+					<RadioGroup name={radioName} selectedValue={selectedValue} onChange={handleChange}>
+						<Label htmlFor={radioName + 'none'}>
+							<Radio value='none' id={radioName + 'none'} className='radio' />{' '}
+							None
+						</Label>
+						<br />
+						<Label htmlFor={radioName + 'read'}>
+							<Radio value='read' id={radioName + 'read'} className='radio' />{' '}
+							Read Only
+						</Label>
+						<br />
+						<Label htmlFor={radioName + 'write'}>
+							<Radio value='write' id={radioName + 'write'} className='radio' />{' '}
+							Read/Write
+						</Label>
+					</RadioGroup>
+				</Label>
+				<p className='text-muted small'>Allow access to all current and future groups.</p>
+			</FormGroup>
 		</div>
 	);
 };
@@ -400,19 +396,21 @@ const KeyAccessEditor = function (props) {
 
 	return (
 		<div>
-			<PersonalLibraryPermissions />
-			<AllGroupsPermissions />
-			<FormGroup tag='fieldset'>
-				<legend>Specific Groups</legend>
-				<FormGroup>
-					<Label check htmlFor='individual_groups'>
-						<Input name='individual_groups' id='individual_groups' type='checkbox' onChange={changePerGroup} checked={perGroup} />
-						Per Group Permissions
-					</Label>
-					<p className='text-muted small'>Set group by group permissions for this key</p>
+			<Form>
+				<PersonalLibraryPermissions />
+				<AllGroupsPermissions />
+				<FormGroup tag='fieldset'>
+					<legend>Specific Groups</legend>
+					<FormGroup check>
+						<Label check htmlFor='individual_groups'>
+							<Input name='individual_groups' id='individual_groups' type='checkbox' onChange={changePerGroup} checked={perGroup} />
+							Per Group Permissions
+						</Label>
+						<p className='text-muted small'>Set group by group permissions for this key</p>
+					</FormGroup>
+					{individualGroupNodes}
 				</FormGroup>
-				{individualGroupNodes}
-			</FormGroup>
+			</Form>
 		</div>
 	);
 };

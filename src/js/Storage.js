@@ -102,6 +102,9 @@ class StoragePlanRow extends Component {
 		if(current){
 			button = 'Current Plan';
 			rowClass = 'current-plan';
+			if (userSubscription.expired) {
+				button = 'Expired Plan';
+			}
 		}
 		if(plan.storageLevel == 1) {
 			button = '';
@@ -653,6 +656,7 @@ class Storage extends Component {
 					{dateString}
 					<p>Your previous Zotero storage subscription has expired.</p>
 				</td>);
+				userSubscription.expired = true;
 			} else if (institutionCovered) {
 				expirationDate = (<td><p>
 					Your current Zotero storage subscription will expire {d.toLocaleDateString('en-US', numDateFormatOptions)}.

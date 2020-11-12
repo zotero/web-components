@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { log as logger } from '../Log.js';
 var log = logger.Logger('PaymentModal', 1);
 
@@ -8,6 +9,20 @@ import { Button, Card, CardHeader, CardBody, TabContent, TabPane, Nav, NavItem, 
 import { Notifier } from '../Notifier.js';
 import PropTypes from 'prop-types';
 import { PaymentContext, cancelPurchase } from './actions.js';
+import { postFormData } from '../ajax.js';
+
+async function beginPaymentIntent(amount, description, storageLevel) {
+	log.debug(`beginPaymentIntent: ${amount} - ${description}`);
+	let resp = await postFormData('/storage/newstripeintent', { amount, description, storageLevel }, { withSession: true });
+	log.debug(resp, 4);
+	let data = await resp.json();
+	if (data.success) {
+		return data.client_secret;
+		// dispatch({ type: UPDATE_INTENT, paymentIntent: { client_secret: data.client_secret } });
+	} else {
+		throw data;
+	}
+}
 
 function CardSection(props) {
 	return (
@@ -22,6 +37,7 @@ function CardCheckoutForm(props) {
 	if (typeof props.handleToken != 'function') {
 		log.error('props error in CardCheckoutForm: handleToken must be function');
 	}
+	const { chargeAmount, chargeDescription, purchase } = props;
 	const stripe = window.stripe;// useStripe();
 	const elements = useElements();
 
@@ -37,6 +53,9 @@ function CardCheckoutForm(props) {
 	const handleSubmit = async (ev) => {
 		ev.preventDefault();
 
+		let storageLevel = (purchase && purchase.storageLevel) ? purchase.storageLevel : null;
+		let paymentIntentClientSecret = await beginPaymentIntent(chargeAmount, chargeDescription, storageLevel);
+
 		// Use elements.getElement to get a reference to the mounted Element.
 		const cardElement = elements.getElement(CardElement);
 		
@@ -48,6 +67,38 @@ function CardCheckoutForm(props) {
 			address_state: state,
 		};
 		
+		// create a PaymentMethod using the card element
+		// const paymentIntentClientSecret = props.paymentIntent.client_secret;
+		log.debug('calling stripe.confirmCardPayment');
+		log.debug(paymentIntentClientSecret);
+		log.debug(cardElement);
+		let result = await stripe.confirmCardPayment(paymentIntentClientSecret, {
+			payment_method: {
+				card: cardElement,
+				billing_details: {
+					name
+				}
+			}
+		});
+		if (result.error) {
+			setNotification({ type: 'error', message: cardData.error.message });
+		} else if (result.paymentIntent) {
+			// send completed paymentIntent to server so subscription can be updated
+			log.debug(result.paymentIntent);
+			postFormData('/storage/confirmpayment', { intentID: result.paymentIntent.id });
+		}
+		log.debug(result);
+		
+		/*
+		if (result.token) {
+			props.handleToken(result.token);
+		} else if (result.error) {
+			log.error(result.error);
+			throw result.error;
+		}
+		*/
+
+		/*
 		// create a token using the card element
 		let result = await stripe.createToken(cardElement, tokenData);
 		if (result.token) {
@@ -56,6 +107,7 @@ function CardCheckoutForm(props) {
 			log.error(result.error);
 			throw result.error;
 		}
+		*/
 	};
 	const handleCardChange = (cardData) => {
 		// setCardStatus(cardData);
@@ -120,11 +172,14 @@ function CardCheckoutForm(props) {
 	);
 }
 CardCheckoutForm.propTypes = {
+	chargeAmount: PropTypes.number.isRequired,
+	chargeDescription: PropTypes.string.isRequired,
 	handleToken: PropTypes.func.isRequired,
 	buttonLabel: PropTypes.string,
 	onClose: PropTypes.func.isRequired,
 	useEmail: PropTypes.bool,
 	useAddress: PropTypes.bool,
+	paymentIntent: PropTypes.object,
 };
 CardCheckoutForm.defaultProps = {
 	useEmail: false,
@@ -215,7 +270,7 @@ function _PaymentRequestForm(props) {
 		log.error('props error in CardCheckoutForm: handleToken must be function');
 	}
 	
-	const { paymentAmount, handleToken } = props;
+	const { chargeAmount, handleToken } = props;
 	// const [canMakePayment, setCanMakePayment] = useState(false);
 	const [paymentRequest, setPaymentRequest] = useState(null);
 
@@ -228,7 +283,7 @@ function _PaymentRequestForm(props) {
 				currency: 'usd',
 				total: {
 					label: 'Zotero Storage',
-					amount: paymentAmount,
+					amount: chargeAmount,
 				},
 				requestPayerName: true,
 				requestPayerEmail: true,
@@ -248,7 +303,7 @@ function _PaymentRequestForm(props) {
 				}
 			});
 		}
-	}, [stripe, handleToken, paymentAmount]);
+	}, [stripe, handleToken, chargeAmount]);
 
 	if (paymentRequest === null) return null;
 
@@ -267,7 +322,7 @@ function _PaymentRequestForm(props) {
 	);
 }
 _PaymentRequestForm.propTypes = {
-	paymentAmount: PropTypes.number.isRequired,
+	chargeAmount: PropTypes.number.isRequired,
 	handleToken: PropTypes.func.isRequired,
 	label: PropTypes.string,
 	onClose: PropTypes.func.isRequired
@@ -276,7 +331,9 @@ _PaymentRequestForm.propTypes = {
 function MultiPaymentModal(props) {
 	const [selectedMethod, setMethod] = useState('card');
 	const { stripe, handleToken, chargeAmount, buttonLabel, useEmail, useAddress } = props;
-	const { paymentDispatch } = useContext(PaymentContext);
+	const { paymentDispatch, paymentState } = useContext(PaymentContext);
+	const { paymentIntent } = paymentState;
+
 	const handleClose = () => {
 		paymentDispatch(cancelPurchase());
 	};
@@ -285,7 +342,7 @@ function MultiPaymentModal(props) {
 	if (chargeAmount) {
 		paymentRequest = (
 			<Elements stripe={stripe}>
-				<_PaymentRequestForm handleToken={handleToken} paymentAmount={chargeAmount} onClose={handleClose} />
+				<_PaymentRequestForm handleToken={handleToken} chargeAmount={chargeAmount} onClose={handleClose} />
 			</Elements>
 		);
 	}
@@ -349,8 +406,11 @@ MultiPaymentModal.defaultProps = {
 };
 
 function CardPaymentModal(props) {
-	const { stripe, handleToken, chargeAmount, buttonLabel, useEmail, useAddress } = props;
-	const { paymentDispatch } = useContext(PaymentContext);
+	const { stripe, handleToken, chargeAmount, chargeDescription, buttonLabel, useEmail, useAddress } = props;
+	const { paymentDispatch, paymentState } = useContext(PaymentContext);
+	// const { paymentIntent } = paymentState;
+	const { purchase } = paymentState;
+	
 	const handleClose = () => {
 		paymentDispatch(cancelPurchase());
 	};
@@ -359,7 +419,15 @@ function CardPaymentModal(props) {
 	if (chargeAmount) {
 		paymentRequest = (
 			<Elements stripe={stripe}>
-				<_PaymentRequestForm handleToken={handleToken} paymentAmount={chargeAmount} onClose={handleClose} useEmail={useEmail} useAddress={useAddress} />
+				<_PaymentRequestForm
+					// paymentIntent={paymentIntent}
+					handleToken={handleToken}
+					chargeAmount={chargeAmount}
+					chargeDescription={chargeDescription}
+					purchase={purchase}
+					onClose={handleClose}
+					useEmail={useEmail}
+					useAddress={useAddress} />
 			</Elements>
 		);
 	}
@@ -369,7 +437,16 @@ function CardPaymentModal(props) {
 				<CardBody>
 					{paymentRequest}
 					<Elements stripe={stripe}>
-						<CardCheckoutForm handleToken={handleToken} buttonLabel={buttonLabel} onClose={handleClose} useEmail={useEmail} useAddress={useAddress} />
+						<CardCheckoutForm
+							// paymentIntent={paymentIntent}
+							handleToken={handleToken}
+							chargeAmount={chargeAmount}
+							chargeDescription={chargeDescription}
+							purchase={purchase}
+							buttonLabel={buttonLabel}
+							onClose={handleClose}
+							useEmail={useEmail}
+							useAddress={useAddress} />
 					</Elements>
 				</CardBody>
 			</Card>
@@ -379,9 +456,9 @@ function CardPaymentModal(props) {
 CardPaymentModal.propTypes = {
 	handleToken: PropTypes.func.isRequired,
 	chargeAmount: PropTypes.number.isRequired,
+	chargeDescription: PropTypes.string.isRequired,
 	buttonLabel: PropTypes.string,
 	tokenCallback: PropTypes.func,
-	amount: PropTypes.number,
 	immediateCharge: PropTypes.bool,
 	useEmail: PropTypes.bool,
 	useAddress: PropTypes.bool,

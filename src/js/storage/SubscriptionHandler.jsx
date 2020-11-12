@@ -16,7 +16,7 @@ Flows:
 import { log as logger } from '../Log.js';
 var log = logger.Logger('SubscriptionHandler', 1);
 
-import { useState, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { Alert, Card, CardHeader, CardBody, FormGroup, Input, Modal, ModalBody, ModalHeader, Label, Row, Col, Button, Container } from 'reactstrap';
 
@@ -162,7 +162,7 @@ function SubscriptionHandler(props) {
 	const { paymentDispatch, paymentState } = useContext(PaymentContext);
 	
 	const { userSubscription } = storageState;
-	const { stripeCustomer } = paymentState;
+	const { stripeCustomer, paymentIntent } = paymentState;
 	log.debug(stripeCustomer, 4);
 	// clear the new subscription closing the Handler, because it is either complete, or canceled
 	const cancel = () => {
@@ -223,10 +223,21 @@ function SubscriptionHandler(props) {
 		}
 	}
 	
-	if (immediateChargeRequired && (!stripeCustomer || stripeCustomer.deleted == true) && !editPayment) {
+	log.debug(`immediateChargeRequired: ${immediateChargeRequired}`);
+	log.debug(stripeCustomer);
+	if (immediateChargeRequired && (!stripeCustomer || stripeCustomer.deleted == true || stripeCustomer.default_source === null) && !editPayment) {
 		setEditPayment(true);
 	}
-	
+
+	/*
+	useEffect(() => {
+		// begin payment intent
+		if (immediateChargeRequired) {
+			let chargeDescription = storageLevelDescriptions[storageLevel];
+			beginPaymentIntent(paymentDispatch, chargeAmount, chargeDescription);
+		}
+	}, [immediateChargeRequired, chargeAmount]);
+	*/
 	let descriptionPs = description.map((d, i) => {
 		return <p key={i}>{d}</p>;
 	});
@@ -288,8 +299,8 @@ function SubscriptionHandler(props) {
 	
 	let paymentSection = null;
 	if (editPayment) {
-		paymentSection = <CardPaymentModal stripe={window.stripe} handleToken={handleConfirm} chargeAmount={chargeAmount} buttonLabel={blabel} />;
-		// paymentSection = <MultiPaymentModal stripe={window.stripe} handleToken={handleConfirm} chargeAmount={chargeAmount} buttonLabel={blabel} />;
+		paymentSection = <CardPaymentModal stripe={window.stripe} handleToken={handleConfirm} paymentIntent={paymentIntent} chargeAmount={chargeAmount} chargeDescription={storageLevelDescriptions[storageLevel]} buttonLabel={blabel} />;
+		// paymentSection = <MultiPaymentModal stripe={window.stripe} handleToken={handleConfirm} paymentIntent={paymentIntent} chargeAmount={chargeAmount} buttonLabel={blabel} />;
 	} else if (stripeCustomer && immediateChargeRequired) {
 		const defaultSource = stripeCustomer.default_source;
 		if (defaultSource) {

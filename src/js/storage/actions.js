@@ -2,7 +2,7 @@ import { log as logger } from '../Log.js';
 const log = logger.Logger('storage/actions.js');
 
 import { createContext } from 'react';
-import { ajax } from '../ajax.js';
+import { ajax, postFormData } from '../ajax.js';
 
 const StorageContext = createContext(null);
 const NotifierContext = createContext(null);
@@ -17,6 +17,7 @@ const STOP_OPERATION = 'stopOperation';
 // paymentReducer actions
 const UPDATE_CUSTOMER = 'updateCustomer';
 const UPDATE_PURCHASE = 'updatePurchase';
+const UPDATE_INTENT = 'updateIntent';
 
 // storageReducer actions
 const UPDATE_USER_SUBSCRIPTION = 'updateUserSubscription';
@@ -36,6 +37,10 @@ function paymentReducer(state, action) {
 		return Object.assign({}, state, {
 			purchase: action.purchase
 		});
+	// case UPDATE_INTENT:
+	// 	return Object.assign({}, state, {
+	// 		paymentIntent: action.paymentIntent
+	// 	});
 	default:
 		return state;
 	}
@@ -159,6 +164,27 @@ async function getUserCustomer(dispatch) {
 		dispatch(notify('error', 'There was an error retrieving your subscription data'));
 	}
 }
+
+/*
+async function beginPaymentIntent(dispatch, paymentState, description) {
+	let resp;
+	try {
+		resp = await postFormData('/storage/newstripeintent', { amount, description }, { withSession: true });
+		log.debug(resp, 4);
+		let data = await resp.json();
+		if (data.success) {
+			dispatch({ type: UPDATE_INTENT, paymentIntent: { client_secret: data.client_secret } });
+		} else {
+			throw data;
+		}
+	} catch (e) {
+		log.debug('Error beginning paymentIntent', 2);
+		log.debug(e, 2);
+		dispatch(notify('error', 'There was an error retrieving your subscription data'));
+	}
+}
+*/
+
 function refresh(storageDispatch, paymentDispatch) {
 	getSubscription(storageDispatch);
 	getUserCustomer(paymentDispatch);
@@ -176,6 +202,7 @@ export {
 	SET_FTE,
 	SET_EMAILS,
 	refresh,
+	// beginPaymentIntent,
 	getUserCustomer,
 	getSubscription,
 	cancelPurchase,

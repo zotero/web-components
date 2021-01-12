@@ -9,7 +9,7 @@ import { labPrice, labUserPrice } from './calculations.js';
 import { CardPaymentModal } from './PaymentModal.jsx';
 import { PaymentSource } from './PaymentSource.jsx';
 
-import { postFormData } from '../ajax.js';
+import { postFormData, ajax } from '../ajax.js';
 import { buildUrl } from '../wwwroutes.js';
 import { LoadingSpinner } from '../LoadingSpinner.js';
 
@@ -17,6 +17,7 @@ import { PaymentContext, NotifierContext, notify, cancelPurchase } from './actio
 
 import { formatCurrency } from '../Utils.js';
 
+/*
 async function chargeLabSubscription(token = false, fte = false, name = '', institutionID = false) {
 	// You can access the token ID with `token.id`.
 	// Get the token ID to your server-side code for use.
@@ -128,6 +129,7 @@ async function chargeLabAdditionalUsers(token = false, additionalFTE = false, na
 		}
 	}
 }
+*/
 
 async function createInvoice(type, fte, additionalFTE, name, institutionID) {
 	try {
@@ -232,21 +234,105 @@ function InstitutionHandler(props) {
 		return <p key={i}>{d}</p>;
 	});
 	
-	const handleConfirm = async (token) => {
-		let result;
+	const handleConfirm = async (paymentMethod) => {
+		log.debug('handleConfirm');
+		log.debug(paymentMethod);
+		if (operationPending) {
+			log.debug('operation already pending');
+			return;
+		}
+
+		let result, invoiceUrl, manageUrl;
 		setOperationPending(true);
+		let purchaseData = Object.assign({}, purchase, { paymentMethod: paymentMethod.id });
+		if (purchase.fte) {
+			purchaseData.numUsers = purchase.fte;
+		} else if (purchase.additionalFTE) {
+			purchaseData.numUsers = purchase.additionalFTE;
+		}
+		if (purchase.name) {
+			purchaseData.institutionName = name;
+		}
+		log.debug(purchaseData);
+		let resp = await ajax({
+			type: 'POST',
+			withSession: true,
+			url: '/storage/purchase',
+			data: JSON.stringify(purchaseData),
+		});
+		if (resp.ok) {
+			const respData = await resp.json();
+			if (!respData.success) {
+				result = {
+					type: 'error',
+					message: <p>There was an error completing the requested action. Please try again in a few minutes. If you continue to experience problems, email <a href='mailto:storage@zotero.org'>storage@zotero.org</a> with details for assistance.</p>
+				};
+			} else if (respData.invoiceID && !respData.charge) {
+				result = {
+					type: 'success',
+					message: <span>Invoice created. <a href={`/storage/invoice/${invoiceID}`}>View Invoice</a>. This invoice can also be found linked at the top of your <a href='/settings/storage'>storage settings</a>.</span>
+				};
+			} else {
+				switch (type) {
+				case 'paymentUpdate':
+					result = {
+						type: 'success',
+						message: <p>Your payment details have been updated.</p>
+					};
+					break;
+				case 'labRenew':
+					invoiceUrl = `/storage/invoice/${respData.invoiceID}`;
+
+					result = {
+						type: 'success',
+						message: <p>Success. An invoice has been created for this charge. You can <a href={invoiceUrl}>view the invoice now</a>, and it will also be available from your <a href='/settings/storage'>storage settings</a>.</p>
+					};
+					break;
+				case 'lab':
+					manageUrl = buildUrl('manageInstitution', { institutionID: respData.institutionID });
+					invoiceUrl = `/storage/invoice/${respData.invoiceID}`;
+
+					result = {
+						type: 'success',
+						message: (
+							<p>Success. You can now <a href={manageUrl}>manage your Zotero Lab subscription</a>.
+								You can also <a href={invoiceUrl}>view the invoice for this charge</a>.
+								Both of these will always be available to you from your <a href='/settings/storage'>storage settings</a>
+							</p>
+						)
+					};
+					break;
+				case 'addLabUsers':
+					invoiceUrl = `/storage/invoice/${respData.invoiceID}`;
+
+					result = {
+						type: 'success',
+						message: <p>Success. An invoice has been created for this charge. You can <a href={invoiceUrl}>view the invoice now</a>, and it will also be available from your <a href='/settings/storage'>storage settings</a>.</p>
+					};
+					break;
+				case 'institution':
+					// TODO
+					break;
+				default:
+					throw new Error('Unknown purchase type');
+				}
+			}
+		}
+
+		notifyDispatch(notify(result.type, result.message));
+		cancel();
+	};
+	
+	/*
+	const handleConfirm = async (paymentMethod) => {
+		if (operationPending) {
+			return;
+		}
+		setOperationPending(true);
+		let result;
+		
 		switch (type) {
 
-		/*
-		case 'paymentUpdate':
-			if(!token){
-				throw 'Required token not passed';
-			}
-			result = await updatePayment(token);
-			notify(result.type, result.message);
-			cancel();
-			break;
-		*/
 		case 'labRenew':
 			result = await chargeLabSubscription(token, fte, name, institutionID);
 			notifyDispatch(notify(result.type, result.message));
@@ -269,7 +355,8 @@ function InstitutionHandler(props) {
 			throw new Error('Unknown subscriptionChange type');
 		}
 	};
-	
+	*/
+
 	const handleInvoiceRequest = async () => {
 		setOperationPending(true);
 		let result = await createInvoice(type, fte, additionalFTE, name, institutionID);
@@ -281,9 +368,13 @@ function InstitutionHandler(props) {
 	
 	let paymentSection = null;
 	if (editPayment) {
-		paymentSection = <CardPaymentModal stripe={window.stripe} handleToken={handleConfirm} chargeAmount={chargeAmount} buttonLabel={blabel} />;
+		paymentSection = <CardPaymentModal
+			stripe={window.stripe}
+			{...{ handleConfirm, chargeAmount, immediateChargeRequired, setOperationPending }}
+			buttonLabel={blabel}
+		/>;
 	} else if (stripeCustomer && immediateChargeRequired) {
-		const defaultSource = stripeCustomer.default_source;
+		const defaultSource = stripeCustomer.default_source || stripeCustomer.invoice_settings.default_payment_method;
 		if (defaultSource) {
 			paymentSection = (
 				<div className='currentPaymentSource'>

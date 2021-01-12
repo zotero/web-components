@@ -10,7 +10,7 @@ import { priceCents, labPrice, labUserPrice } from './calculations.js';
 import { CardPaymentModal } from './PaymentModal.jsx';
 import { PaymentSource } from './PaymentSource.jsx';
 
-import { postFormData } from '../ajax.js';
+import { postFormData, ajax } from '../ajax.js';
 import { LoadingSpinner } from '../LoadingSpinner.js';
 import { formatCurrency } from '../Utils.js';
 import { PaymentContext, paymentReducer } from './actions.js';
@@ -76,6 +76,8 @@ function PayInvoice(props) {
 	const [stripeChargeObject, setStripeChargeObject] = useState(props.stripeChargeObject);
 	
 	const [invoicePaid, setInvoicePaid] = useState(!!stripeCharge);
+	const { paymentIntent } = paymentState;
+	
 	let description = [];
 	let chargeAmount = 0;
 	let error = null;
@@ -91,7 +93,7 @@ function PayInvoice(props) {
 	switch (invoiceType) {
 	case 'individual':
 		description.push(`Zotero Storage subscription for user ${invoiceUser.username} - ${invoiceUser.email}`);
-		description.push(`Zotero file storage: ${storageLevelDescriptions[storageLevel]}`);
+		description.push(`1 year of Zotero file storage: ${storageLevelDescriptions[storageLevel]}`);
 		chargeAmount = priceCents[storageLevel];
 		break;
 	case 'lab':
@@ -99,7 +101,7 @@ function PayInvoice(props) {
 			description.push(`${institutionName}`);
 		}
 		description.push(`Zotero Lab subscription managed by user ${invoiceUser.username} - ${invoiceUser.email}`);
-		description.push(`Zotero Lab subscription will provide unlimited Zotero file storage for ${numUsers} users`);
+		description.push(`Zotero Lab subscription will provide one year of unlimited Zotero file storage for ${numUsers} users`);
 		chargeAmount = labPrice(numUsers);
 		break;
 	case 'addLabUsers':
@@ -123,10 +125,45 @@ function PayInvoice(props) {
 		return <p key={i}>{d}</p>;
 	});
 	
-	const handleConfirm = async (token) => {
+	/*
+	const handleConfirm = async (paymentMethod) => {
 		let result;
 		setOperationPending(true);
-		result = await chargeInvoice(invoiceID, token);
+		result = await chargeInvoice(invoiceID, paymentMethod);
+		setNotification(result);
+		if (result.type == 'success') {
+			setStripeChargeObject(result.data.stripeChargeObject);
+			setInvoicePaid(true);
+			setOperationPending(false);
+		}
+	};
+	*/
+
+	const handleConfirm = async (paymentMethod) => {
+		log.debug('handleConfirm');
+		log.debug(paymentMethod);
+		if (operationPending) {
+			log.debug('operation already pending');
+			return;
+		}
+		let result;
+		setOperationPending(true);
+		let purchaseData = { invoiceID, type: 'chargePayableInvoice', paymentMethod: paymentMethod.id };// Object.assign({}, purchase, { paymentMethod: paymentMethod.id });
+		log.debug(purchaseData);
+		let resp = await ajax({
+			type: 'POST',
+			withSession: true,
+			url: '/storage/purchase',
+			data: JSON.stringify(purchaseData),
+		});
+		if (resp.ok) {
+			let respData = await resp.json();
+			result = {
+				type: 'success',
+				message: <span>Invoice Paid</span>,
+				data: respData
+			};
+		}
 		setNotification(result);
 		if (result.type == 'success') {
 			setStripeChargeObject(result.data.stripeChargeObject);
@@ -139,7 +176,25 @@ function PayInvoice(props) {
 	
 	let paymentSection = null;
 	if (!invoicePaid) {
-		paymentSection = <CardPaymentModal stripe={window.stripe} handleToken={handleConfirm} chargeAmount={chargeAmount} buttonLabel={blabel} useEmail={true} />;
+		log.debug(description);
+		paymentSection = <CardPaymentModal
+			stripe={window.stripe}
+			{...{ handleConfirm, paymentIntent, chargeAmount, setOperationPending }}
+			immediateChargeRequired={true}
+			chargeDescription={description}
+			buttonLabel={blabel}
+			useEmail={true}
+		/>;
+		
+		/*
+			stripe={window.stripe}
+			handleToken={handleConfirm}
+			chargeAmount={chargeAmount}
+			chargeDescription={description}
+			buttonLabel={blabel}
+			useEmail={true}
+		/>;
+		*/
 	} else {
 		const source = stripeChargeObject.source;
 		log.debug(source);

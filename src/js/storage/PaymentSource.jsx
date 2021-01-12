@@ -54,8 +54,13 @@ function PaymentSource(props) {
 	if (!source) {
 		return null;
 	}
+	
 	let type = source.type;
-	if (!type && source.object) {
+	if (source.object == 'payment_method') {
+		if (source.type == 'card') {
+			type = 'paymentMethodCard';
+		}
+	} else if (!type && source.object) {
 		type = source.object;
 	}
 
@@ -64,6 +69,8 @@ function PaymentSource(props) {
 		return <Card card={source} />;
 	case 'sepa_debit':
 		return <Iban iban={source} />;
+	case 'paymentMethodCard':
+		return <Card card={source.card} />;
 	default:
 		log.error('Unknown source type passed to PaymentSource');
 		return null;

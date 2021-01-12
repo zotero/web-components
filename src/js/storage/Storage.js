@@ -209,7 +209,9 @@ GroupUsage.propTypes = {
 // Row that shows user's payment method and allows updating the method that will be used
 // or forcing an immediate renewal charge regardless of scheduled automatic renewal
 function PaymentRow(props) {
-	const { defaultSource } = props;
+	log.debug(PaymentRow);
+	log.debug(props);
+	const { defaultSource, defaultPaymentMethod } = props;
 	const { storageState } = useContext(StorageContext);
 	const { paymentDispatch } = useContext(PaymentContext);
 	const { userSubscription } = storageState;
@@ -221,25 +223,27 @@ function PaymentRow(props) {
 		paymentDispatch(renewNow(userSubscription));
 	};
 	
-	const renewNowButton = <Button color='secondary' size='small' onClick={renewHandler}>Renew Now</Button>;
+	let paymentMethod = defaultSource || defaultPaymentMethod;
+
+	const renewNowButton = <Button color='secondary' size='sm' className='m-1' onClick={renewHandler}>Renew Now</Button>;
 	if (userSubscription.institutionUnlimited) {
 		// don't allow renewal when institution provides unlimited
 		return (
 			<tr>
 				<th>Payment Method</th>
 				<td>
-					<PaymentSource source={defaultSource} />
+					<PaymentSource source={paymentMethod} />
 					<Row className='mt-2'>
 						<Col>
-							<Button color='secondary' size='small' onClick={updateCardHandler}>Update Payment</Button>
+							<Button color='secondary' size='sm' onClick={updateCardHandler}>Update Payment</Button>
 						</Col>
 					</Row>
 				</td>
 			</tr>
 		);
 	}
-	if (!defaultSource || !userSubscription.recur) {
-		let autoRenewButton = <Button color='secondary' onClick={updateCardHandler}>Enable Automatic Renewal</Button>;
+	if (!paymentMethod || !userSubscription.recur) {
+		let autoRenewButton = <Button color='secondary' size='sm' className='m-1' onClick={updateCardHandler}>Enable Automatic Renewal</Button>;
 		let renewButton = null;
 		
 		let expiration = new Date(userSubscription.expirationDate * 1000);
@@ -256,8 +260,6 @@ function PaymentRow(props) {
 					<Row className='mt-2'>
 						<Col>
 							{autoRenewButton}
-						</Col>
-						<Col>
 							{renewButton}
 						</Col>
 					</Row>
@@ -269,10 +271,10 @@ function PaymentRow(props) {
 		<tr>
 			<th>Payment Method</th>
 			<td>
-				<PaymentSource source={defaultSource} />
+				<PaymentSource source={paymentMethod} />
 				<Row className='mt-2'>
 					<Col>
-						<Button color='secondary' size='small' onClick={updateCardHandler}>Update Payment</Button>
+						<Button color='secondary' size='sm' className='m-1' onClick={updateCardHandler}>Update Payment</Button>
 					</Col>
 					<Col>
 						{renewNowButton}
@@ -284,6 +286,7 @@ function PaymentRow(props) {
 }
 PaymentRow.propTypes = {
 	defaultSource: PropTypes.object,
+	defaultPaymentMethod: PropTypes.object,
 };
 
 function NextPaymentRow(props) {
@@ -446,6 +449,7 @@ function Storage(props) {
 		if (stripeCustomer) {
 			paymentRow = (<PaymentRow
 				defaultSource={stripeCustomer.default_source}
+				defaultPaymentMethod={stripeCustomer.invoice_settings.default_payment_method}
 			/>);
 		} else {
 			paymentRow = <PaymentRow />;

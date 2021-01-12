@@ -9,11 +9,20 @@ import { Button, Card, CardHeader, CardBody, TabContent, TabPane, Nav, NavItem, 
 import { Notifier } from '../Notifier.js';
 import PropTypes from 'prop-types';
 import { PaymentContext, cancelPurchase } from './actions.js';
-import { postFormData } from '../ajax.js';
+import { postFormData, ajax } from '../ajax.js';
 
-async function beginPaymentIntent(amount, description, storageLevel) {
-	log.debug(`beginPaymentIntent: ${amount} - ${description}`);
-	let resp = await postFormData('/storage/newstripeintent', { amount, description, storageLevel }, { withSession: true });
+// async function beginIntent(amount, description, storageLevel, immediateCharge) {
+async function beginIntent(purchase) {
+	log.debug(`beginIntent:`);
+	log.debug(purchase);
+	// let args = { amount, description, storageLevel, immediateCharge };
+	let resp = await ajax({
+		url: '/storage/purchase',
+		type: 'POST',
+		withSession: true,
+		data: JSON.stringify(purchase),
+	});
+	// let resp = await postFormData('/storage/newstripeintent', args, { withSession: true });
 	log.debug(resp, 4);
 	let data = await resp.json();
 	if (data.success) {
@@ -34,8 +43,11 @@ CardSection.propTypes = {
 };
 
 function CardCheckoutForm(props) {
-	if (typeof props.handleToken != 'function') {
-		log.error('props error in CardCheckoutForm: handleToken must be function');
+	// if (typeof props.handleToken != 'function') {
+	// 	log.error('props error in CardCheckoutForm: handleToken must be function');
+	// }
+	if (typeof props.handleConfirm != 'function') {
+		log.error('props error in CardCheckoutForm: handleConfirm must be function');
 	}
 	const { chargeAmount, chargeDescription, purchase } = props;
 	const stripe = window.stripe;// useStripe();
@@ -53,11 +65,52 @@ function CardCheckoutForm(props) {
 	const handleSubmit = async (ev) => {
 		ev.preventDefault();
 
-		let storageLevel = (purchase && purchase.storageLevel) ? purchase.storageLevel : null;
-		let paymentIntentClientSecret = await beginPaymentIntent(chargeAmount, chargeDescription, storageLevel);
-
+		props.setOperationPending(true);
 		// Use elements.getElement to get a reference to the mounted Element.
 		const cardElement = elements.getElement(CardElement);
+		
+		let billingDetails = {
+			name,
+		};
+		if (props.useEmail && email != '') {
+			billingDetails.email = email;
+		}
+		if (props.useAddress) {
+			billingDetails.address = {
+				line1: address1,
+				line2: address2,
+				city: city,
+				state: state,
+			};
+		}
+		
+		// create paymentMethod using the card element
+		let result = await stripe.createPaymentMethod({
+			type: 'card',
+			card: cardElement,
+			billing_details: billingDetails,
+		});
+		if (result.error) {
+			log.error(result.error);
+			setNotification({ type: 'error', message: 'Error with your payment method' });
+		} else {
+			props.handleConfirm(result.paymentMethod);
+		}
+		return;
+
+		/*
+		if (result.token) {
+			props.handleToken(result.token);
+		} else if (result.error) {
+			log.error(result.error);
+			throw result.error;
+		}
+		*/
+
+		/*
+		let storageLevel = (purchase && purchase.storageLevel) ? purchase.storageLevel : null;
+		// let paymentIntentClientSecret = await beginIntent(chargeAmount, chargeDescription, storageLevel, props.immediateChargeRequired);
+		let paymentIntentClientSecret = await beginIntent(purchase);
 		
 		let tokenData = {
 			name,
@@ -80,14 +133,23 @@ function CardCheckoutForm(props) {
 				}
 			}
 		});
+		log.debug(result);
 		if (result.error) {
 			setNotification({ type: 'error', message: cardData.error.message });
 		} else if (result.paymentIntent) {
 			// send completed paymentIntent to server so subscription can be updated
 			log.debug(result.paymentIntent);
-			postFormData('/storage/confirmpayment', { intentID: result.paymentIntent.id });
+			let confirmResponse = await postFormData('/storage/confirmpayment', { intentID: result.paymentIntent.id });
+			let confirmResult = await confirmResponse.json();
+			log.debug(confirmResult);
+			if (confirmResult.requires_action) {
+				// TODO: have stripe confirm
+			} else if (confirmResult.success) {
+				log.debug('Got successful confirmation');
+				props.handleConfirm(confirmResult);
+			}
 		}
-		log.debug(result);
+		*/
 		
 		/*
 		if (result.token) {
@@ -173,8 +235,10 @@ function CardCheckoutForm(props) {
 }
 CardCheckoutForm.propTypes = {
 	chargeAmount: PropTypes.number.isRequired,
-	chargeDescription: PropTypes.string.isRequired,
-	handleToken: PropTypes.func.isRequired,
+	// chargeDescription: PropTypes.string.isRequired,
+	// handleToken: PropTypes.func.isRequired,
+	handleConfirm: PropTypes.func.isRequired,
+	immediateChargeRequired: PropTypes.bool.isRequired,
 	buttonLabel: PropTypes.string,
 	onClose: PropTypes.func.isRequired,
 	useEmail: PropTypes.bool,
@@ -188,9 +252,13 @@ CardCheckoutForm.defaultProps = {
 
 
 function IBANCheckoutForm(props) {
-	if (typeof props.handleToken != 'function') {
-		log.error('props error in CardCheckoutForm: handleToken must be function');
+	// if (typeof props.handleToken != 'function') {
+	// 	log.error('props error in CardCheckoutForm: handleToken must be function');
+	// }
+	if (typeof props.handleConfirm != 'function') {
+		log.error('props error in CardCheckoutForm: handleConfirm must be function');
 	}
+	
 	const stripe = window.stripe;// useStripe();
 	const elements = useElements();
 
@@ -260,14 +328,17 @@ function IBANCheckoutForm(props) {
 	);
 }
 IBANCheckoutForm.propTypes = {
-	handleToken: PropTypes.func.isRequired,
+	// handleToken: PropTypes.func.isRequired,
 	label: PropTypes.string,
 	onClose: PropTypes.func.isRequired
 };
 
 function _PaymentRequestForm(props) {
-	if (typeof props.handleToken != 'function') {
-		log.error('props error in CardCheckoutForm: handleToken must be function');
+	// if (typeof props.handleToken != 'function') {
+	// 	log.error('props error in CardCheckoutForm: handleToken must be function');
+	// }
+	if (typeof props.handleConfirm != 'function') {
+		log.error('props error in CardCheckoutForm: handleConfirm must be function');
 	}
 	
 	const { chargeAmount, handleToken } = props;
@@ -323,7 +394,7 @@ function _PaymentRequestForm(props) {
 }
 _PaymentRequestForm.propTypes = {
 	chargeAmount: PropTypes.number.isRequired,
-	handleToken: PropTypes.func.isRequired,
+	// handleToken: PropTypes.func.isRequired,
 	label: PropTypes.string,
 	onClose: PropTypes.func.isRequired
 };
@@ -391,7 +462,7 @@ function MultiPaymentModal(props) {
 	);
 }
 MultiPaymentModal.propTypes = {
-	handleToken: PropTypes.func.isRequired,
+	// handleToken: PropTypes.func.isRequired,
 	chargeAmount: PropTypes.number.isRequired,
 	buttonLabel: PropTypes.string,
 	tokenCallback: PropTypes.func,
@@ -406,7 +477,7 @@ MultiPaymentModal.defaultProps = {
 };
 
 function CardPaymentModal(props) {
-	const { stripe, handleToken, chargeAmount, chargeDescription, buttonLabel, useEmail, useAddress } = props;
+	const { stripe, handleToken, handleConfirm, immediateChargeRequired, chargeAmount, chargeDescription, buttonLabel, useEmail, useAddress } = props;
 	const { paymentDispatch, paymentState } = useContext(PaymentContext);
 	// const { paymentIntent } = paymentState;
 	const { purchase } = paymentState;
@@ -420,14 +491,20 @@ function CardPaymentModal(props) {
 		paymentRequest = (
 			<Elements stripe={stripe}>
 				<_PaymentRequestForm
+					{...props}
+					purchase={purchase}
 					// paymentIntent={paymentIntent}
-					handleToken={handleToken}
+					// handleToken={handleToken}
+					/*
+					handleConfirm={handleConfirm}
+					immediateChargeRequired={immediateChargeRequired}
 					chargeAmount={chargeAmount}
 					chargeDescription={chargeDescription}
 					purchase={purchase}
-					onClose={handleClose}
 					useEmail={useEmail}
-					useAddress={useAddress} />
+					useAddress={useAddress}*/
+					onClose={handleClose}
+				/>
 			</Elements>
 		);
 	}
@@ -439,14 +516,21 @@ function CardPaymentModal(props) {
 					<Elements stripe={stripe}>
 						<CardCheckoutForm
 							// paymentIntent={paymentIntent}
-							handleToken={handleToken}
+							// handleToken={handleToken}
+							{...props}
+							purchase={purchase}
+							
+							/*
+							handleConfirm={handleConfirm}
+							immediateChargeRequired={immediateChargeRequired}
 							chargeAmount={chargeAmount}
 							chargeDescription={chargeDescription}
-							purchase={purchase}
 							buttonLabel={buttonLabel}
-							onClose={handleClose}
 							useEmail={useEmail}
-							useAddress={useAddress} />
+							useAddress={useAddress}
+							*/
+							onClose={handleClose}
+						/>
 					</Elements>
 				</CardBody>
 			</Card>
@@ -454,12 +538,14 @@ function CardPaymentModal(props) {
 	);
 }
 CardPaymentModal.propTypes = {
-	handleToken: PropTypes.func.isRequired,
+	// handleToken: PropTypes.func.isRequired,
+	handleConfirm: PropTypes.func.isRequired,
+	setOperationPending: PropTypes.func,
 	chargeAmount: PropTypes.number.isRequired,
-	chargeDescription: PropTypes.string.isRequired,
+	// chargeDescription: PropTypes.string.isRequired,
 	buttonLabel: PropTypes.string,
 	tokenCallback: PropTypes.func,
-	immediateCharge: PropTypes.bool,
+	immediateChargeRequired: PropTypes.bool.isRequired,
 	useEmail: PropTypes.bool,
 	useAddress: PropTypes.bool,
 	stripe: PropTypes.object.isRequired,

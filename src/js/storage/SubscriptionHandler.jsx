@@ -25,7 +25,7 @@ import { imminentExpiration, calculateNewExpiration, priceCents } from './calcul
 import { CardPaymentModal } from './PaymentModal.jsx';
 import { PaymentSource } from './PaymentSource.jsx';
 
-import { postFormData } from '../ajax.js';
+import { postFormData, ajax } from '../ajax.js';
 import { LoadingSpinner } from '../LoadingSpinner.js';
 import { formatCurrency } from '../Utils.js';
 
@@ -53,6 +53,7 @@ const overQuota = function (storageLevel, userSubscription) {
 	return false;
 };
 
+/*
 async function updateSubscription(storageLevel = false) {
 	if (storageLevel === false) {
 		throw new Error('no storageLevel set for updateSubscription');
@@ -126,6 +127,8 @@ async function chargeSubscription(storageLevel = false, token = false) {
 		}
 	}
 }
+*/
+
 async function createInvoice(storageLevel = false) {
 	if (storageLevel === false) {
 		throw new Error('no storageLevel set for createInvoice');
@@ -169,9 +172,7 @@ function SubscriptionHandler(props) {
 		setOperationPending(false);
 		paymentDispatch(cancelPurchase());
 	};
-	const dnotify = (type, message) => {
-		notifyDispatch(notify(type, message));
-	};
+	
 	let description = [];
 	let chargeAmount = 0;
 	let error = null;
@@ -225,7 +226,14 @@ function SubscriptionHandler(props) {
 	
 	log.debug(`immediateChargeRequired: ${immediateChargeRequired}`);
 	log.debug(stripeCustomer);
-	if (immediateChargeRequired && (!stripeCustomer || stripeCustomer.deleted == true || stripeCustomer.default_source === null) && !editPayment) {
+	let havePaymentMethod = false;
+	if (stripeCustomer && stripeCustomer.deleted !== true) {
+		if (stripeCustomer.default_source !== null || stripeCustomer.invoice_settings.default_payment_method !== null) {
+			havePaymentMethod = true;
+		}
+	}
+	// (stripeCustomer && (stripeCustomer.deleted !== true) && (stripeCustomer.default_source !== null || stripeCustomer.invoice_settings.default_payment_method !== null));
+	if (immediateChargeRequired && !havePaymentMethod && !editPayment) {
 		setEditPayment(true);
 	}
 
@@ -242,56 +250,33 @@ function SubscriptionHandler(props) {
 		return <p key={i}>{d}</p>;
 	});
 	
-	const handleConfirm = async (token) => {
+	const handleConfirm = async (paymentMethod) => {
+		log.debug('handleConfirm');
+		log.debug(paymentMethod);
+		if (operationPending) {
+			log.debug('operation already pending');
+			return;
+		}
 		let result;
 		setOperationPending(true);
-		switch (type) {
-		case 'individualChange':
-			if (immediateChargeRequired) {
-				// charge the subscription now
-				log.debug('immediate charge, chargeSubscription');
-				log.debug(token);
-				if (!token) {
-					throw new Error('Required token not passed');
-				}
-				result = await chargeSubscription(storageLevel, token);
-				refresh(storageDispatch, paymentDispatch);
-			} else {
-				// update without charge
-				result = await updateSubscription(storageLevel);
-				refresh(storageDispatch, paymentDispatch);
-			}
-			dnotify(result.type, result.message);
-			cancel();
-			break;
-		case 'individualPaymentUpdate':
-			if (!token) {
-				throw new Error('Required token not passed');
-			}
-			result = await updatePayment(token);
-			refresh(storageDispatch, paymentDispatch);
-			dnotify(result.type, result.message);
-			cancel();
-			break;
-		case 'individualRenew':
-			// if token is present it will be used, otherwise existing customer will be charged
-			log.debug('individualRenew, chargeSubscription');
-			log.debug(token);
-			result = await chargeSubscription(storageLevel, token);
-			refresh(storageDispatch, paymentDispatch);
-			dnotify(result.type, result.message);
-			cancel();
-			break;
-		default:
-			throw new Error('Unknown purchase type');
-		}
+		let purchaseData = Object.assign({}, purchase, { paymentMethod: paymentMethod.id });
+		log.debug(purchaseData);
+		result = await ajax({
+			type: 'POST',
+			withSession: true,
+			url: '/storage/purchase',
+			data: JSON.stringify(purchaseData),
+		});
+		refresh(storageDispatch, paymentDispatch);
+		notifyDispatch(notify(result.type, result.message));
+		cancel();
 	};
 	
 	const handleInvoiceRequest = async (evt) => {
 		evt.preventDefault();
 		setOperationPending(true);
 		let result = await createInvoice(storageLevel);
-		dnotify(result.type, result.message);
+		notifyDispatch(notify(result.type, result.message));
 		cancel();
 	};
 	
@@ -299,10 +284,21 @@ function SubscriptionHandler(props) {
 	
 	let paymentSection = null;
 	if (editPayment) {
-		paymentSection = <CardPaymentModal stripe={window.stripe} handleToken={handleConfirm} paymentIntent={paymentIntent} chargeAmount={chargeAmount} chargeDescription={storageLevelDescriptions[storageLevel]} buttonLabel={blabel} />;
+		paymentSection = <CardPaymentModal
+			stripe={window.stripe}
+			{...{ immediateChargeRequired, handleConfirm, paymentIntent, chargeAmount, setOperationPending }}
+			
+			/*
+			immediateChargeRequired={immediateChargeRequired}
+			handleConfirm={handleConfirm}
+			paymentIntent={paymentIntent}
+			chargeAmount={chargeAmount}
+			*/
+			chargeDescription={storageLevel ? storageLevelDescriptions[storageLevel] : "Update payment method"}
+			buttonLabel={blabel} />;
 		// paymentSection = <MultiPaymentModal stripe={window.stripe} handleToken={handleConfirm} paymentIntent={paymentIntent} chargeAmount={chargeAmount} buttonLabel={blabel} />;
 	} else if (stripeCustomer && immediateChargeRequired) {
-		const defaultSource = stripeCustomer.default_source;
+		const defaultSource = stripeCustomer.default_source || stripeCustomer.invoice_settings.default_payment_method;
 		if (defaultSource) {
 			paymentSection = (
 				<div className='currentPaymentSource'>

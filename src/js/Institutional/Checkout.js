@@ -24,10 +24,10 @@ class FormFieldErrorMessage extends Component {
 	}
 }
 
-//Checkout is a component that allows a user to enter a number of FTE for their institution and preview
-//the price for an institutional plan with that many users, then make the purchase or request an invoice
-class Checkout extends Component{
-	render(){
+// Checkout is a component that allows a user to enter a number of FTE for their institution and preview
+// the price for an institutional plan with that many users, then make the purchase or request an invoice
+class Checkout extends Component {
+	render() {
 		return (
 			<div className='institution-checkout'>
 				<h1>Zotero Lab and Zotero Institution</h1>
@@ -50,8 +50,8 @@ class Checkout extends Component{
 	}
 }
 
-class InstitutionCheckout extends Component{
-	constructor(props){
+class InstitutionCheckout extends Component {
+	constructor(props) {
 		super(props);
 		this.state = {
 			fte:props.fte,
@@ -157,7 +157,7 @@ class InstitutionCheckout extends Component{
 					Zotero Institution provides unlimited storage for entire universities, research institutions, and corporations. All members of your organization are automatically added to your Zotero Institution subscription, based on their organizational email addresses.
 				</p>
 				<p>
-					Zotero Institution costs $2000 for the first 500 FTE, plus $0.40 per additional FTE.
+					Pricing is based on institution size rather than usage and offers a deeply discounted rate without the need to individually manage users. The cost is $2000 for the first 500 FTE and $0.40 per additional FTE.
 				</p>
 				<div className='form-line'>
 					<label htmlFor='institution_fte'>FTE:</label>

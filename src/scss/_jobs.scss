@@ -1,0 +1,33 @@
+// /jobs page
+#jobs {
+	margin-bottom: 30px;
+
+	article {
+		margin-top: 2em;
+		margin-bottom: 3em;
+	}
+
+	h2 .anchor-link {
+		text-decoration: none;
+	}
+
+	h2:not(:hover) .anchor-link {
+		display: none;
+	}
+
+	.qualifications {
+		margin-top: 1.5em;
+	}
+
+	p, li {
+		line-height: 1.5em;
+	}
+
+	li {
+		padding-bottom: .7em;
+	}
+}
+
+#jobs-eeo {
+	margin-bottom: 2em;
+}

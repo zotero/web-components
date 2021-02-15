@@ -1,5 +1,4 @@
 {
-	"rootMode": "upward",
 	"env": {
 		"production": {
 			"presets": [

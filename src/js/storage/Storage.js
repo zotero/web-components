@@ -48,25 +48,21 @@ const plans = [
 		storageLevel: 1,
 		description: '300 MB',
 		price: 'Free',
-		discountedPrice: 'Free'
 	},
 	{
 		storageLevel: 2,
 		description: '2 GB',
 		price: '$20',
-		discountedPrice: '$16'
 	},
 	{
 		storageLevel: 3,
 		description: '6 GB',
 		price: '$60',
-		discountedPrice: '$48'
 	},
 	{
 		storageLevel: 6,
 		description: 'Unlimited',
 		price: '$120',
-		discountedPrice: '$96'
 	}
 ];
 
@@ -91,7 +87,7 @@ function StoragePlanRow(props) {
 	return (
 		<tr key={plan.storageLevel} className={rowClass}>
 			<td>{plan.description}</td>
-			<td>{userSubscription.discountEligible ? plan.discountedPrice : plan.price}</td>
+			<td>{plan.price}</td>
 			<td>
 				{button}
 			</td>
@@ -103,7 +99,6 @@ StoragePlanRow.propTypes = {
 	plan: PropTypes.shape({
 		storageLevel: PropTypes.number,
 		description: PropTypes.string,
-		discountedPrice: PropTypes.string,
 		price: PropTypes.string
 	}).isRequired,
 };

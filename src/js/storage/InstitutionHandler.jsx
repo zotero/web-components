@@ -253,14 +253,19 @@ function InstitutionHandler(props) {
 		if (purchase.name) {
 			purchaseData.institutionName = name;
 		}
+		let resp;
 		log.debug(purchaseData);
-		let resp = await ajax({
-			type: 'POST',
-			withSession: true,
-			url: '/storage/purchase',
-			data: JSON.stringify(purchaseData),
-		});
-		if (resp.ok) {
+		try {
+			resp = await ajax({
+				type: 'POST',
+				withSession: true,
+				url: '/storage/purchase',
+				data: JSON.stringify(purchaseData),
+				throwOnError: false,
+			});
+		} catch (unexpectedThrownResponse) {
+			log.error("UNEXPECTED THROWN RESPONSE WHEN ATTEMPTING PURCHASE");
+		} finally {
 			const respData = await resp.json();
 			if (!respData.success) {
 				result = {
@@ -270,7 +275,7 @@ function InstitutionHandler(props) {
 			} else if (respData.invoiceID && !respData.charge) {
 				result = {
 					type: 'success',
-					message: <span>Invoice created. <a href={`/storage/invoice/${invoiceID}`}>View Invoice</a>. This invoice can also be found linked at the top of your <a href='/settings/storage'>storage settings</a>.</span>
+					message: <span>Invoice created. <a href={`/storage/invoice/${respData.invoiceID}`}>View Invoice</a>. This invoice can also be found linked at the top of your <a href='/settings/storage'>storage settings</a>.</span>
 				};
 			} else {
 				switch (type) {

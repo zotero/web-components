@@ -20,9 +20,9 @@ import { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { Alert, Card, CardHeader, CardBody, FormGroup, Input, Modal, ModalBody, ModalHeader, Label, Row, Col, Button, Container } from 'reactstrap';
 
-import { StorageContext, PaymentContext, NotifierContext, refresh, cancelPurchase, notify } from './actions.js';
+import { StorageContext, PaymentContext, NotifierContext, refresh, cancelPurchase, notify, immediateCharge } from './actions.js';
 import { imminentExpiration, calculateNewExpiration, priceCents } from './calculations.js';
-import { CardPaymentModal } from './PaymentModal.jsx';
+import { CardPaymentModal, MultiPaymentModal } from './PaymentModal.jsx';
 import { PaymentSource } from './PaymentSource.jsx';
 
 import { postFormData, ajax } from '../ajax.js';
@@ -237,6 +237,13 @@ function SubscriptionHandler(props) {
 		setEditPayment(true);
 	}
 
+	// update payment with immediateChargeRequired
+	useEffect(() => {
+		if (immediateChargeRequired) {
+			paymentDispatch(immediateCharge(immediateChargeRequired));
+		}
+	}, []);
+
 	/*
 	useEffect(() => {
 		// begin payment intent
@@ -257,19 +264,63 @@ function SubscriptionHandler(props) {
 			log.debug('operation already pending');
 			return;
 		}
+		let response;
 		let result;
 		setOperationPending(true);
-		let purchaseData = Object.assign({}, purchase, { paymentMethod: paymentMethod.id });
+		let purchaseData = Object.assign({}, purchase, { paymentMethod: paymentMethod.id, paymentMethodType: paymentMethod.type });
 		log.debug(purchaseData);
-		result = await ajax({
-			type: 'POST',
-			withSession: true,
-			url: '/storage/purchase',
-			data: JSON.stringify(purchaseData),
-		});
-		refresh(storageDispatch, paymentDispatch);
-		notifyDispatch(notify(result.type, result.message));
-		cancel();
+		try {
+			response = await ajax({
+				type: 'POST',
+				withSession: true,
+				url: '/storage/purchase',
+				data: JSON.stringify(purchaseData),
+				throwOnError: false,
+			});
+		} catch (unexpectedThrownResponse) {
+			log.error("UNEXPECTED THROWN RESPONSE WHEN ATTEMPTING PURCHASE");
+		} finally {
+			log.debug('got response from handleConfirm');
+			result = await response.json();
+			log.debug(result);
+			let notifyType = result.success ? 'success' : 'error';
+			let notifyMessage = result.message;
+
+			if (!result.success && result.requires_action) {
+				const stripe = window.stripe;
+				let confirmResult;
+				if (paymentMethod.type == 'card') {
+					confirmResult = await stripe.confirmCardPayment(result.client_secret);
+				} else if (paymentMethod.type == 'sepa_debit') {
+					confirmResult = await stripe.confirmSepaDebitPayment(result.client_secret);
+				}
+				log.debug(confirmResult);
+				if (confirmResult.error) {
+					log.debug('confirmResult error');
+					notifyType = 'error';
+				} else if (confirmResult.paymentIntent) {
+					log.debug('confirmResult paymentIntent');
+					// resumbmit the purchase with the paymentIntent so the subscription gets updated
+					let resubPurchaseData = Object.assign({}, purchaseData, { paymentIntentID: confirmResult.paymentIntent.id });
+					response = await ajax({
+						type: 'POST',
+						withSession: true,
+						url: '/storage/purchase',
+						data: JSON.stringify(resubPurchaseData),
+						throwOnError: false,
+					});
+					log.debug('got response from resubmitted handleConfirm');
+					result = await response.json();
+					log.debug(result);
+					notifyType = result.success ? 'success' : 'error';
+					notifyMessage = result.message;
+				}
+			}
+
+			refresh(storageDispatch, paymentDispatch);
+			notifyDispatch(notify(notifyType, notifyMessage));
+			cancel();
+		}
 	};
 	
 	const handleInvoiceRequest = async (evt) => {
@@ -284,18 +335,22 @@ function SubscriptionHandler(props) {
 	
 	let paymentSection = null;
 	if (editPayment) {
+		/*
 		paymentSection = <CardPaymentModal
 			stripe={window.stripe}
 			{...{ immediateChargeRequired, handleConfirm, paymentIntent, chargeAmount, setOperationPending }}
-			
-			/*
-			immediateChargeRequired={immediateChargeRequired}
-			handleConfirm={handleConfirm}
-			paymentIntent={paymentIntent}
-			chargeAmount={chargeAmount}
-			*/
 			chargeDescription={storageLevel ? storageLevelDescriptions[storageLevel] : "Update payment method"}
-			buttonLabel={blabel} />;
+			buttonLabel={blabel}
+		/>;
+		*/
+		
+		paymentSection = <MultiPaymentModal
+			stripe={window.stripe}
+			{...{ immediateChargeRequired, handleConfirm, paymentIntent, chargeAmount, setOperationPending }}
+			chargeDescription={storageLevel ? storageLevelDescriptions[storageLevel] : "Update payment method"}
+			buttonLabel={blabel}
+		/>;
+		
 		// paymentSection = <MultiPaymentModal stripe={window.stripe} handleToken={handleConfirm} paymentIntent={paymentIntent} chargeAmount={chargeAmount} buttonLabel={blabel} />;
 	} else if (stripeCustomer && immediateChargeRequired) {
 		const defaultSource = stripeCustomer.default_source || stripeCustomer.invoice_settings.default_payment_method;

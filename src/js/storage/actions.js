@@ -17,6 +17,7 @@ const STOP_OPERATION = 'stopOperation';
 // paymentReducer actions
 const UPDATE_CUSTOMER = 'updateCustomer';
 const UPDATE_PURCHASE = 'updatePurchase';
+const UPDATE_PURCHASE_IMMEDIATE = 'updatePurchaseImmediate';
 const UPDATE_INTENT = 'updateIntent';
 
 // storageReducer actions
@@ -37,6 +38,10 @@ function paymentReducer(state, action) {
 		return Object.assign({}, state, {
 			purchase: action.purchase
 		});
+	case UPDATE_PURCHASE_IMMEDIATE:
+		let purchase = Object.assign({}, state.purchase);
+		purchase.immediateCharge = action.immediateCharge;
+		return Object.assign({}, state, { purchase });
 	// case UPDATE_INTENT:
 	// 	return Object.assign({}, state, {
 	// 		paymentIntent: action.paymentIntent
@@ -49,6 +54,12 @@ function paymentReducer(state, action) {
 function notifyReducer(state, action) {
 	switch (action.type) {
 	case NOTIFY:
+		if (!action.notificationType) {
+			throw new Error('No notificationType for notifyReducer');
+		}
+		if (!action.message) {
+			throw new Error('No message for notifyReducer');
+		}
 		return Object.assign({}, state, { notification: {
 			type: action.notificationType,
 			message: action.message
@@ -86,6 +97,12 @@ function labReducer(state, action) {
 	}
 }
 
+function immediateCharge(immediate) {
+	return {
+		type: UPDATE_PURCHASE_IMMEDIATE,
+		immediateCharge: immediate
+	};
+}
 function selectPlan(plan) {
 	return {
 		type: UPDATE_PURCHASE,
@@ -210,6 +227,7 @@ export {
 	updatePayment,
 	renewNow,
 	notify,
+	immediateCharge,
 	selectPlan,
 	notifyReducer,
 	paymentReducer,

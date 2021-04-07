@@ -9,8 +9,9 @@ import { Button, Card, CardHeader, CardBody, TabContent, TabPane, Nav, NavItem, 
 import { Notifier } from '../Notifier.js';
 import PropTypes from 'prop-types';
 import { PaymentContext, cancelPurchase } from './actions.js';
-import { postFormData, ajax } from '../ajax.js';
+// import { ajax } from '../ajax.js';
 
+/*
 // async function beginIntent(amount, description, storageLevel, immediateCharge) {
 async function beginIntent(purchase) {
 	log.debug(`beginIntent:`);
@@ -32,6 +33,7 @@ async function beginIntent(purchase) {
 		throw data;
 	}
 }
+*/
 
 function CardSection(props) {
 	return (
@@ -49,7 +51,7 @@ function CardCheckoutForm(props) {
 	if (typeof props.handleConfirm != 'function') {
 		log.error('props error in CardCheckoutForm: handleConfirm must be function');
 	}
-	const { chargeAmount, chargeDescription, purchase } = props;
+	// const { chargeAmount, chargeDescription, purchase } = props;
 	const stripe = window.stripe;// useStripe();
 	const elements = useElements();
 
@@ -93,6 +95,7 @@ function CardCheckoutForm(props) {
 		if (result.error) {
 			log.error(result.error);
 			setNotification({ type: 'error', message: 'Error with your payment method' });
+			props.setOperationPending(false);
 		} else {
 			props.handleConfirm(result.paymentMethod);
 		}
@@ -234,6 +237,7 @@ function CardCheckoutForm(props) {
 	);
 }
 CardCheckoutForm.propTypes = {
+	setOperationPending: PropTypes.func.isRequired,
 	chargeAmount: PropTypes.number.isRequired,
 	// chargeDescription: PropTypes.string.isRequired,
 	// handleToken: PropTypes.func.isRequired,
@@ -264,18 +268,52 @@ function IBANCheckoutForm(props) {
 
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
+	const [address1, setAddress1] = useState('');
+	const [address2, setAddress2] = useState('');
+	const [city, setCity] = useState('');
+	const [state, setState] = useState('');
+	const [notification, setNotification] = useState(null);
 
 	const elementOptions = {
 		supportedCountries: ['SEPA']
 	};
 
-	let handleSubmit = async (ev) => {
-		// We don't want to let default form submission happen here, which would refresh the page.
+	const handleSubmit = async (ev) => {
 		ev.preventDefault();
 
+		props.setOperationPending(true);
 		// Use elements.getElement to get a reference to the mounted Element.
 		const ibanElement = elements.getElement(IbanElement);
+		
+		let billingDetails = {
+			name,
+			email,
+		};
+		if (props.useAddress) {
+			billingDetails.address = {
+				line1: address1,
+				line2: address2,
+				city: city,
+				state: state,
+			};
+		}
+		
+		// create paymentMethod using the card element
+		let result = await stripe.createPaymentMethod({
+			type: 'sepa_debit',
+			sepa_debit: ibanElement,
+			billing_details: billingDetails,
+		});
+		if (result.error) {
+			log.error(result.error);
+			setNotification({ type: 'error', message: 'Error with your payment method' });
+			props.setOperationPending(false);
+		} else {
+			props.handleConfirm(result.paymentMethod);
+		}
+		return;
 
+/*		
 		let sourceData = {
 			type: 'sepa_debit',
 			currency: 'eur',
@@ -296,12 +334,34 @@ function IBANCheckoutForm(props) {
 			log.error(result.error);
 			throw result.error;
 		}
+*/
 	};
 	
 	const buttonLabel = props.label || 'Confirm Order';
 
+	let addressSection = null;
+	if (props.useAddress) {
+		addressSection = (
+			<FormGroup>
+				<Input type='address' placeholder='Address' value={address1}
+					onChange={(evt) => { setAddress1(evt.target.value); }}
+				/>
+				<Input type='address' placeholder='Address 2' value={address2}
+					onChange={(evt) => { setAddress2(evt.target.value); }}
+				/>
+				<Input type='text' placeholder='City' value={city}
+					onChange={(evt) => { setCity(evt.target.value); }}
+				/>
+				<Input type='text' placeholder='State' value={state}
+					onChange={(evt) => { setState(evt.target.value); }}
+				/>
+			</FormGroup>
+		);
+	}
+
 	return (
 		<Form onSubmit={handleSubmit}>
+			<Notifier {...notification} />
 			<FormGroup>
 				<Input type='text' placeholder='Name' value={name}
 					onChange={(evt) => { setName(evt.target.value); }}
@@ -312,6 +372,7 @@ function IBANCheckoutForm(props) {
 					onChange={(evt) => { setEmail(evt.target.value); }}
 				/>
 			</FormGroup>
+			{addressSection}
 			<FormGroup>
 				<IbanElement
 					options={elementOptions}
@@ -330,7 +391,10 @@ function IBANCheckoutForm(props) {
 IBANCheckoutForm.propTypes = {
 	// handleToken: PropTypes.func.isRequired,
 	label: PropTypes.string,
-	onClose: PropTypes.func.isRequired
+	onClose: PropTypes.func.isRequired,
+	setOperationPending: PropTypes.func.isRequired,
+	handleConfirm: PropTypes.func.isRequired,
+	useAddress: PropTypes.bool,
 };
 
 function _PaymentRequestForm(props) {
@@ -401,10 +465,11 @@ _PaymentRequestForm.propTypes = {
 
 function MultiPaymentModal(props) {
 	const [selectedMethod, setMethod] = useState('card');
-	const { stripe, handleToken, chargeAmount, buttonLabel, useEmail, useAddress } = props;
+	const { stripe, handleConfirm, immediateChargeRequired, chargeAmount, chargeDescription, buttonLabel, useEmail, useAddress } = props;
 	const { paymentDispatch, paymentState } = useContext(PaymentContext);
-	const { paymentIntent } = paymentState;
-
+	// const { paymentIntent } = paymentState;
+	const { purchase } = paymentState;
+	
 	const handleClose = () => {
 		paymentDispatch(cancelPurchase());
 	};
@@ -413,10 +478,15 @@ function MultiPaymentModal(props) {
 	if (chargeAmount) {
 		paymentRequest = (
 			<Elements stripe={stripe}>
-				<_PaymentRequestForm handleToken={handleToken} chargeAmount={chargeAmount} onClose={handleClose} />
+				<_PaymentRequestForm
+					{...props}
+					purchase={purchase}
+					onClose={handleClose}
+				/>
 			</Elements>
 		);
 	}
+	
 	return (
 		<div className='payment-chooser'>
 			<Card>
@@ -441,7 +511,12 @@ function MultiPaymentModal(props) {
 							<Row>
 								<Col sm='12'>
 									<Elements stripe={stripe}>
-										<CardCheckoutForm handleToken={handleToken} buttonLabel={buttonLabel} onClose={handleClose} useEmail={useEmail} useAddress={useAddress} />
+										<CardCheckoutForm
+											{...props}
+											purchase={purchase}
+											onClose={handleClose}
+										/>
+										{/*<CardCheckoutForm handleToken={handleToken} buttonLabel={buttonLabel} onClose={handleClose} useEmail={useEmail} useAddress={useAddress} />*/}
 									</Elements>
 								</Col>
 							</Row>
@@ -450,7 +525,12 @@ function MultiPaymentModal(props) {
 							<Row>
 								<Col sm='12'>
 									<Elements stripe={stripe}>
-										<IBANCheckoutForm handleToken={handleToken} buttonLabel={buttonLabel} onClose={handleClose} />
+										<IBANCheckoutForm
+											{...props}
+											purchase={purchase}
+											onClose={handleClose}
+										/>
+										{/*<IBANCheckoutForm handleToken={handleToken} buttonLabel={buttonLabel} onClose={handleClose} />*/}
 									</Elements>
 								</Col>
 							</Row>

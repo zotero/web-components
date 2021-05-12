@@ -34,12 +34,7 @@ function Iban(props) {
 		<div className='stripe-iban'>
 			<Row>
 				<Col>
-					<b>{iban}</b>
-				</Col>
-			</Row>
-			<Row>
-				<Col>
-					Exp:
+					<b>{iban.country} ****-****-**** {iban.last4}</b>
 				</Col>
 			</Row>
 		</div>

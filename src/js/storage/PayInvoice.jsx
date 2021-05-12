@@ -1,19 +1,20 @@
 import { log as logger } from '../Log.js';
 var log = logger.Logger('PayInvoice', 1);
 
-import { useState, useReducer } from 'react';
+import { useState, useReducer, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { Alert, Card, CardHeader, CardBody, Row, Col } from 'reactstrap';
 
+import { ErrorWrapper } from '../components/ErrorWrapper.jsx';
 import { Notifier } from '../Notifier.js';
 import { priceCents, labPrice, labUserPrice } from './calculations.js';
-import { CardPaymentModal } from './PaymentModal.jsx';
+import { CardPaymentModal, MultiPaymentModal } from './PaymentModal.jsx';
 import { PaymentSource } from './PaymentSource.jsx';
 
 import { ajax } from '../ajax.js';
 import { LoadingSpinner } from '../LoadingSpinner.js';
 import { formatCurrency } from '../Utils.js';
-import { PaymentContext, paymentReducer } from './actions.js';
+import { StorageContext, PaymentContext, paymentReducer } from './actions.js';
 
 const dateFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
 
@@ -72,9 +73,12 @@ function PayInvoice(props) {
 	const { invoice, invoiceUser, institutionName, overQuota } = props;
 	const { invoiceID, invoiceType, stripeCharge, numUsers, storageLevel, created } = invoice;
 	
+	// const { notifyDispatch } = useContext(NotifierContext);
+	// const { paymentDispatch, paymentState } = useContext(PaymentContext);
 	const [paymentState, paymentDispatch] = useReducer(paymentReducer, {
 		stripeCustomer: props.stripeCustomer,
 	});
+	
 	const [stripeChargeObject, setStripeChargeObject] = useState(props.stripeChargeObject);
 	
 	const [invoicePaid, setInvoicePaid] = useState(!!stripeCharge);
@@ -141,6 +145,7 @@ function PayInvoice(props) {
 	};
 	*/
 
+	/*
 	const handleConfirm = async (paymentMethod) => {
 		log.debug('handleConfirm');
 		log.debug(paymentMethod);
@@ -185,12 +190,92 @@ function PayInvoice(props) {
 			setOperationPending(false);
 		}
 	};
+	*/
+	const handleConfirm = async (paymentMethod) => {
+		log.debug('handleConfirm');
+		log.debug(paymentMethod);
+		if (operationPending) {
+			log.debug('operation already pending');
+			return;
+		}
+		let response;
+		let result;
+		setOperationPending(true);
+		let purchaseData = { invoiceID, type: 'chargePayableInvoice', paymentMethod: paymentMethod.id, paymentMethodType: paymentMethod.type };// Object.assign({}, purchase, { paymentMethod: paymentMethod.id });
+		// let purchaseData = Object.assign({}, purchase, { paymentMethod: paymentMethod.id, paymentMethodType: paymentMethod.type });
+		log.debug(purchaseData);
+		try {
+			response = await ajax({
+				type: 'POST',
+				withSession: true,
+				url: '/storage/purchase',
+				data: JSON.stringify(purchaseData),
+				throwOnError: false,
+			});
+		} catch (unexpectedThrownResponse) {
+			log.error("UNEXPECTED THROWN RESPONSE WHEN ATTEMPTING PURCHASE");
+		} finally {
+			log.debug('got response from handleConfirm');
+			result = await response.json();
+			log.debug(result);
+			let notifyType = result.success ? 'success' : 'error';
+			let notifyMessage = result.message;
+
+			if (!result.success && result.requires_action) {
+				const stripe = window.stripe;
+				let confirmResult;
+				if (paymentMethod.type == 'card') {
+					confirmResult = await stripe.confirmCardPayment(result.client_secret);
+				} else if (paymentMethod.type == 'sepa_debit') {
+					confirmResult = await stripe.confirmSepaDebitPayment(result.client_secret);
+				}
+				log.debug(confirmResult);
+				if (confirmResult.error) {
+					log.debug('confirmResult error');
+					notifyType = 'error';
+				} else if (confirmResult.paymentIntent) {
+					log.debug('confirmResult paymentIntent');
+					// resumbmit the purchase with the paymentIntent so the subscription gets updated
+					let resubPurchaseData = Object.assign({}, purchaseData, { paymentIntentID: confirmResult.paymentIntent.id });
+					response = await ajax({
+						type: 'POST',
+						withSession: true,
+						url: '/storage/purchase',
+						data: JSON.stringify(resubPurchaseData),
+						throwOnError: false,
+					});
+					log.debug('got response from resubmitted handleConfirm');
+					result = await response.json();
+					log.debug(result);
+					notifyType = result.success ? 'success' : 'error';
+					notifyMessage = result.message;
+				}
+			}
+
+			// refresh(storageDispatch, paymentDispatch);
+			setNotification({type: notifyType, message: notifyMessage});
+			// notifyDispatch(notify(notifyType, notifyMessage));
+			
+			if (result.success) {
+				setStripeChargeObject(result.stripeChargeObject);
+				setInvoicePaid(true);
+				setOperationPending(false);
+			} else {
+				log.error('Payment was not processed successfully');
+				log.error(result);
+			}
+			setOperationPending(false);
+		}
+	};
+	
 	
 	let blabel = `Pay ${formatCurrency(chargeAmount)}`;
 	
 	let paymentSection = null;
 	if (!invoicePaid) {
 		log.debug(description);
+		
+		/*
 		paymentSection = <CardPaymentModal
 			stripe={window.stripe}
 			{...{ handleConfirm, paymentIntent, chargeAmount, setOperationPending }}
@@ -199,7 +284,15 @@ function PayInvoice(props) {
 			buttonLabel={blabel}
 			useEmail={true}
 		/>;
-		
+		*/
+		paymentSection = <MultiPaymentModal
+			stripe={window.stripe}
+			{...{ immediateChargeRequired: true, handleConfirm, paymentIntent, chargeAmount, setOperationPending }}
+			chargeDescription={description}
+			buttonLabel={blabel}
+			useEmail={true}
+		/>;
+
 		/*
 			stripe={window.stripe}
 			handleToken={handleConfirm}
@@ -210,13 +303,13 @@ function PayInvoice(props) {
 		/>;
 		*/
 	} else {
-		const source = stripeChargeObject.source;
-		log.debug(source);
+		const paymentMethodDetails = stripeChargeObject.payment_method_details;
+		log.debug(paymentMethodDetails);
 		log.debug(stripeChargeObject);
 		descriptionPs = <p>{stripeChargeObject.description}</p>;
 		let datePaid = new Date(stripeChargeObject.created * 1000);
 		
-		if (source) {
+		if (paymentMethodDetails) {
 			paymentSection = (
 				<div className='currentPaymentSource'>
 					<Card>
@@ -225,7 +318,7 @@ function PayInvoice(props) {
 						</CardHeader>
 						<CardBody>
 							<h4>Payment Method</h4>
-							<PaymentSource source={source} />
+							<PaymentSource source={paymentMethodDetails} />
 						</CardBody>
 					</Card>
 				</div>
@@ -234,7 +327,7 @@ function PayInvoice(props) {
 	}
 	
 	return (
-		<PaymentContext.Provider value={{ paymentDispatch, paymentState }}>
+		<ErrorWrapper><PaymentContext.Provider value={{ paymentDispatch, paymentState }}>
 			<div className='pay-invoice'>
 				<Row>
 					<Col sm={{ size: 4, offset: 2 }}>
@@ -270,7 +363,7 @@ function PayInvoice(props) {
 					</Col>
 				</Row>
 			</div>
-		</PaymentContext.Provider>
+		</PaymentContext.Provider></ErrorWrapper>
 	);
 }
 
@@ -293,7 +386,7 @@ PayInvoice.propTypes = {
 	overQuota: PropTypes.bool,
 	stripeCustomer: PropTypes.object,
 	stripeChargeObject: PropTypes.shape({
-		source: PropTypes.object,
+		payment_method_details: PropTypes.object,
 		created: PropTypes.number,
 	}),
 	institutionName: PropTypes.oneOfType([PropTypes.string, PropTypes.bool])

@@ -8,6 +8,12 @@ TODO:
  x use new PaymentModal to get token to create source with card or IBAN
  x don't allow automatic renewal if institution provides storage
  x show that individual subscription won't be renewed with institutional storage
+ - add support for Alipay which we may want
+ - whether payment/recur is enabled not always detected correctly (Enable automatic renewal and Disable autorenew both shown)
+ - make sure invoices always show the information we have for whatever payment method/charge object
+ - show link to receipt/invoice immediately after processing payment
+ -
+
 
 Flows:
  - First time subscription

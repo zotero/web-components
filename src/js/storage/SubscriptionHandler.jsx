@@ -335,6 +335,7 @@ function SubscriptionHandler(props) {
 	
 	let paymentSection = null;
 	if (editPayment) {
+		//
 		/*
 		paymentSection = <CardPaymentModal
 			stripe={window.stripe}
@@ -343,14 +344,14 @@ function SubscriptionHandler(props) {
 			buttonLabel={blabel}
 		/>;
 		*/
-		
+
 		paymentSection = <MultiPaymentModal
 			stripe={window.stripe}
 			{...{ immediateChargeRequired, handleConfirm, paymentIntent, chargeAmount, setOperationPending }}
 			chargeDescription={storageLevel ? storageLevelDescriptions[storageLevel] : "Update payment method"}
 			buttonLabel={blabel}
 		/>;
-		
+
 		// paymentSection = <MultiPaymentModal stripe={window.stripe} handleToken={handleConfirm} paymentIntent={paymentIntent} chargeAmount={chargeAmount} buttonLabel={blabel} />;
 	} else if (stripeCustomer && immediateChargeRequired) {
 		const defaultSource = stripeCustomer.default_source || stripeCustomer.invoice_settings.default_payment_method;

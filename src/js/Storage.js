@@ -1,3 +1,5 @@
+/* eslint-disable lines-between-class-members */
+/* eslint-disable space-before-blocks */
 'use strict';
 
 import {log as logger} from './Log.js';
@@ -350,6 +352,7 @@ class Storage extends Component {
 				this.setState({
 					userSubscription: data.userSubscription,
 					storageGroups:data.storageGroups,
+					lastPurchaseQuota: data.lastPurchaseQuota,
 					planQuotas: data.planQuotas
 				});
 			});
@@ -633,6 +636,7 @@ class Storage extends Component {
 		let userSubscription = this.state.userSubscription;
 		let groups = this.state.storageGroups;
 		let dateFormatOptions = {year: 'numeric', month: 'long', day: 'numeric'};
+		const lastPurchaseQuota = this.state.lastPurchaseQuota;
 
 		if(userSubscription === null){
 			return <LoadingSpinner loading={true} />;
@@ -645,33 +649,38 @@ class Storage extends Component {
 			}
 		});
 		
-		let expirationDate = <td>Never</td>;
+		let expirationDate = <>Never</>;
+		let changedFromPurchase = null;
 		if(userSubscription.expirationDate && (userSubscription.expirationDate != '0')) {
 			let d = new Date(parseInt(userSubscription.expirationDate)*1000);
 			let dateString = <p>{d.toLocaleDateString('en-US', dateFormatOptions)}</p>;
 			let numDateFormatOptions = {year: 'numeric', month: 'numeric', day: 'numeric'};
 			
 			if(d < Date.now()){
-				expirationDate = (<td>
+				expirationDate = (<>
 					{dateString}
 					<p>Your previous Zotero storage subscription has expired.</p>
-				</td>);
+				</>);
 				userSubscription.expired = true;
 			} else if (institutionCovered) {
-				expirationDate = (<td><p>
+				expirationDate = (<><p>
 					Your current Zotero storage subscription will expire {d.toLocaleDateString('en-US', numDateFormatOptions)}.
 					You are currently eligible for unlimited storage from your institution so your subscription does not need to be renewed.
-				</p></td>);
+				</p></>);
 			} else if(userSubscription.recur){
-				expirationDate = (<td>
+				expirationDate = (<>
 					{dateString}
 					<p>Your Zotero storage subscription is set to automatically renew {d.toLocaleDateString('en-US', numDateFormatOptions)}.</p>
-				</td>);
+				</>);
 			} else {
-				expirationDate = (<td>
+				expirationDate = (<>
 					{dateString}
 					<p>Your Zotero storage subscription will expire {d.toLocaleDateString('en-US', numDateFormatOptions)} if you don't renew before then.</p>
-				</td>);
+				</>);
+			}
+
+			if (userSubscription.quota != lastPurchaseQuota) {
+				changedFromPurchase = <p>Your last payment was made for a different level of storage. Your expiration date has been <a href='https://www.zotero.org/support/storage_faq#how_can_i_change_my_current_storage_plan'>adjusted accordingly</a>.</p>;
 			}
 		}
 
@@ -739,7 +748,10 @@ class Storage extends Component {
 									</tr>
 									<tr>
 										<th>Expiration</th>
-										{expirationDate}
+										<td>
+											{expirationDate}
+											{changedFromPurchase}
+										</td>
 									</tr>
 									<tr>
 										<th>Current Usage</th>

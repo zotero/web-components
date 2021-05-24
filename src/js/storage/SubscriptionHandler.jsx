@@ -290,9 +290,17 @@ function SubscriptionHandler(props) {
 				const stripe = window.stripe;
 				let confirmResult;
 				if (paymentMethod.type == 'card') {
-					confirmResult = await stripe.confirmCardPayment(result.client_secret);
+					if (immediateChargeRequired) {
+						confirmResult = await stripe.confirmCardPayment(result.client_secret);
+					} else {
+						confirmResult = await stripe.confirmCardSetup(result.client_secret);
+					}
 				} else if (paymentMethod.type == 'sepa_debit') {
-					confirmResult = await stripe.confirmSepaDebitPayment(result.client_secret);
+					if (immediateChargeRequired) {
+						confirmResult = await stripe.confirmSepaDebitPayment(result.client_secret);
+					} else {
+						confirmResult = await stripe.confirmSepaDebitSetup(result.client_secret);
+					}
 				}
 				log.debug(confirmResult);
 				if (confirmResult.error) {

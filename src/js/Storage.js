@@ -336,6 +336,7 @@ class Storage extends Component {
 			this.setState({
 				userSubscription: window.zoteroData.userSubscription,
 				storageGroups:window.zoteroData.storageGroups,
+				lastPurchaseQuota: window.zoteroData.lastPurchaseQuota,
 				planQuotas: window.zoteroData.planQuotas,
 				stripeCustomer: window.zoteroData.stripeCustomer
 			});

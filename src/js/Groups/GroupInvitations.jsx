@@ -55,9 +55,9 @@ GroupInvitation.propTypes = {
 };
 
 function GroupInvitations(props) {
-	const [invitations, setInvitations] = useState([]);
-	const [invitationGroups, setInvitiationGroups] = useState([]);
-	const [loaded, setLoaded] = useState(false);
+	const [invitations, setInvitations] = useState(props.invitations);
+	const [invitationGroups, setInvitiationGroups] = useState(props.invitationGroups);
+	const [loaded, setLoaded] = useState(props.loaded);
 
 	const loadInvitations = async () => {
 		if (currentUser) {
@@ -75,8 +75,10 @@ function GroupInvitations(props) {
 	};
 
 	useEffect(() => {
-		loadInvitations();
-	}, []);
+		if (!loaded) {
+			loadInvitations();
+		}
+	}, [loaded]);
 	
 	if (!loaded) { return null; }
 
@@ -103,8 +105,16 @@ function GroupInvitations(props) {
 		</Card>
 	);
 }
+GroupInvitations.defaultProps = {
+	invitations: [],
+	invitationGroups: {},
+	loaded: false,
+};
 GroupInvitations.propTypes = {
-	reloadGroups: PropTypes.func
+	reloadGroups: PropTypes.func,
+	invitations: PropTypes.arrayOf(PropTypes.object),
+	invitationGroups: PropTypes.object,
+	loaded: PropTypes.bool,
 };
 
 export { GroupInvitations };

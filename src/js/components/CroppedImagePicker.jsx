@@ -9,7 +9,7 @@ import ReactCrop from 'react-image-crop';
 import { LoadingSpinner } from '../LoadingSpinner.js';
 import { PencilIcon } from '../Icons.js';
 
-const FALLBACK_PORTRAIT = '/static/images/theme/portrait-fallback.png';
+const FALLBACK_PORTRAIT = '/assets/images/theme/portrait-fallback.png';
 // const AVATAR_UPLOAD_HANDLER_URL = '/settings/profileimage';
 
 function CroppedImagePicker(props) {

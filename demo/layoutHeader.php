@@ -21,6 +21,12 @@
 			if(!window.Zotero){
 				window.Zotero = {};
 			}
+
+			<?if($user) {?>
+				window.zoteroData = {
+					"currentUser":<?=json_encode($user)?>
+				};
+			<?}?>
 		</script>
 
 		<script src="../build/web-components.js"></script>
@@ -38,6 +44,9 @@
 				}
 			});
 		</script>
+		<? if($useTinyMce) {?>
+			<script src="../assets/library/tinymce/tinymce.min.js"></script>
+		<?}?>
 	</head>
 	<body class="<?=$bodyClass?>">
 		<!-- hidden area for possible JS messages -->
@@ -47,7 +56,7 @@
 				<ul class="mobile-nav">
 					<li class="active"><a class="nav-link" href="/">Zotero</a></li>
 					<? if($user):?>
-					<li><a class="nav-link" href="https://www.zotero.org/mylibrary">My Library</a></li>
+					<li><a class="nav-link" href="https://www.zotero.org/mylibrary">Web Library</a></li>
 					<? endif;?>
 					<li><a class="nav-link" href="https://www.zotero.org/groups/">Groups</a></li>
 					<li><a class="nav-link" href="https://www.zotero.org/support/">Documentation</a></li>
@@ -75,7 +84,7 @@
 					<nav>
 						<ul class="main-nav d-none d-lg-flex">
 							<? if($user):?>
-							<li><a class="nav-link" href="https://www.zotero.org/mylibrary">My Library</a></li>
+							<li><a class="nav-link" href="https://www.zotero.org/mylibrary">Web Library</a></li>
 							<? endif;?>
 							<li class="nav-item active"><a href="https://www.zotero.org/groups/" class="nav-link">Groups</a></li>
 							<li class="nav-item"><a href="https://www.zotero.org/support/" class="nav-link">Documentation</a></li>

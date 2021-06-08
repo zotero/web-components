@@ -2,6 +2,7 @@ import { log as logger } from '../Log.js';
 let log = logger.Logger('GroupsPageContainer');
 
 import { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 
 import { UserGroups } from './UserGroups.jsx';
 import { GroupInvitations } from './GroupInvitations.jsx';
@@ -44,12 +45,13 @@ let loadGroups = async (userID = false, start = 0) => {
 	}
 };
 
-function GroupsPageContainer() {
-	const [groupData, setGroupData] = useState({ loading: true, groupsLoaded: false, titleOnly: false, errorLoading: false });
-	const [dataNeeded, setDataNeeded] = useState(true);
+function GroupsPageContainer(props) {
+	// const [groupData, setGroupData] = useState({ loading: true, groupsLoaded: false, titleOnly: false, errorLoading: false });
+	const [groupData, setGroupData] = useState({...props});
+	const [dataNeeded, setDataNeeded] = useState(props.dataNeeded);
 
 	useEffect(() => {
-		log.debug('useEffect');
+		// log.debug('useEffect');
 		const fetchData = async () => {
 			let data = await loadGroups();
 			// data.groupsLoaded = true;
@@ -90,7 +92,7 @@ function GroupsPageContainer() {
 		return (
 			<div className='row'>
 				<div className='col'>
-					<UserGroups {...groupData} />
+					<UserGroups {...groupData} loadMore={() => {}} />
 				</div>
 			</div>
 		);
@@ -108,7 +110,7 @@ function GroupsPageContainer() {
 				</nav>
 				
 				<div id='group-alerts' className='alerts'>
-					<GroupInvitations reloadGroups={reloadGroups} />
+					<GroupInvitations reloadGroups={reloadGroups} {...props.invitationData} />
 				</div>
 				
 				{groupData.loading ? null : <NewGroupDiscussions allGroups={true} narrow={true} showFields={{ title: true, lastActive: true, lastPoster: true }} />}
@@ -117,5 +119,18 @@ function GroupsPageContainer() {
 		</div>
 	);
 }
+GroupsPageContainer.defaultProps = {
+	loading: true,
+	groupsLoaded: false,
+	titleOnly: false,
+	errorLoading: false,
+	dataNeeded: true,
+	invitationData: {},
+	groups: [],
+};
+GroupsPageContainer.propTypes = {
+	dataNeeded: PropTypes.bool,
+	invitationData: PropTypes.object,
+};
 
 export { GroupsPageContainer };

@@ -118,9 +118,9 @@ function MemberSettingsContainer(props) {
 	};
 	
 	return (<div>
-		<PendingApplications {...{ group, applications }} />
 		<h2 className='main-heading'>Current Members</h2>
 		<RolesTable {...{ members, group, updateRole }} />
+		<PendingApplications {...{ group, applications }} />
 		<PendingInvitations {...{ group, invitations, displayNames }} />
 	</div>);
 }

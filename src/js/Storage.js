@@ -397,7 +397,7 @@ class Storage extends Component {
 		log.debug(`select plan ${storageLevel}`);
 
 		let planQuota = this.state.planQuotas[storageLevel];
-		if(userSubscription.usage.total > planQuota) {
+		if(userSubscription.usage.total > (planQuota + 10)) {
 			this.setState({
 				operationPending:false,
 				notification:{
@@ -424,7 +424,7 @@ class Storage extends Component {
 		let storageLevel = userSubscription.storageLevel;
 
 		let planQuota = this.state.planQuotas[storageLevel];
-		if(userSubscription.usage.total > planQuota) {
+		if(userSubscription.usage.total > (planQuota + 10)) {
 			this.setState({
 				operationPending:false,
 				notification: {
@@ -548,7 +548,7 @@ class Storage extends Component {
 		let storageLevel = userSubscription.storageLevel;
 
 		let planQuota = this.state.planQuotas[storageLevel];
-		if(userSubscription.usage.total > planQuota) {
+		if(userSubscription.usage.total > (planQuota + 10)) {
 			this.setState({
 				operationPending:false,
 				notification: {

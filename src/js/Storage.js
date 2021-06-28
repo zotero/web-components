@@ -680,7 +680,7 @@ class Storage extends Component {
 				</>);
 			}
 
-			if (userSubscription.quota != lastPurchaseQuota) {
+			if ((userSubscription.quota != lastPurchaseQuota) && (userSubscription.quota != 300)) {
 				changedFromPurchase = <p>Your last payment was made for a different level of storage. Your expiration date has been <a href='https://www.zotero.org/support/storage_faq#how_can_i_change_my_current_storage_plan'>adjusted accordingly</a>.</p>;
 			}
 		}

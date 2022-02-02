@@ -95,7 +95,7 @@ function Contribute(props) {
 	const { currentUser } = props;
 	const { purchase } = paymentState;
 	const [period, setPeriod] = useState('once');
-	const [amount, setAmount] = useState(0);
+	const [amount, setAmount] = useState(3000);
 	const [custom, setCustom] = useState(false);
 	const [currentContribution, setCurrentContribution] = useState(props.currentContribution);
 
@@ -278,7 +278,7 @@ function Contribute(props) {
 		<div>
 			{Payment}
 			<Row>
-				<PeriodCell currentPeriod={period} period={'once'} label='Once' setPeriod={handlePeriod} />
+				<PeriodCell currentPeriod={period} period={'once'} label='One Time' setPeriod={handlePeriod} />
 				<PeriodCell currentPeriod={period} period={'month'} label='Monthly' setPeriod={handlePeriod} />
 				<PeriodCell currentPeriod={period} period={'year'} label='Yearly' setPeriod={handlePeriod} />
 			</Row>

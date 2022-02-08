@@ -13,7 +13,7 @@ import {formatCurrency} from '../Utils.js';
 import {postFormData} from '../ajax.js';
 
 let institutionPrice = function(fte){
-	return (200000 + ((Math.max(500, fte) - 500) * 40));
+	return (210000 + ((Math.max(500, fte) - 500) * 42));
 };
 
 class FormFieldErrorMessage extends Component {
@@ -27,13 +27,30 @@ class FormFieldErrorMessage extends Component {
 // Checkout is a component that allows a user to enter a number of FTE for their institution and preview
 // the price for an institutional plan with that many users, then make the purchase or request an invoice
 class Checkout extends Component {
+	constructor(props) {
+		super(props);
+		let defaultTabIndex = 0;
+		if(location.hash == '#institution') {
+			defaultTabIndex = 1;
+		}
+		this.state = {
+			defaultTabIndex
+		};
+	}
+	updateHash = (index, lastIndex, evt) => {
+		if (index == 0) {
+			location.hash = "lab";
+		} else if (index == 1) {
+			location.hash = "institution";
+		}
+	}
 	render() {
 		return (
 			<div className='institution-checkout'>
 				<h1>Zotero Lab and Zotero Institution</h1>
 				<p>Zotero offers two types of unlimited <a href="https://www.zotero.org/support/storage">storage</a> plans for organizations: Zotero Lab and Zotero Institution. These subscriptions provide members of your organization with unlimited personal and group cloud storage. And as is always the case with Zotero, your users can create as many research groups as they like, with as many members as they need.</p>
 				<p>To request more information, please contact <a href="mailto:storage@zotero.org">storage@zotero.org</a>.</p>
-				<Tabs onSelect={this.handleSelect} forceRenderTabPanel={true}>
+				<Tabs onSelect={this.handleSelect} forceRenderTabPanel={true} defaultIndex={this.state.defaultTabIndex} onSelect={this.updateHash}>
 					<TabList>
 						<Tab>Lab</Tab>
 						<Tab>Institution</Tab>
@@ -127,7 +144,7 @@ class InstitutionCheckout extends Component {
 
 			log.debug(resp);
 			if(!resp.ok){
-				throw 'Error requesting invoice';
+				throw resp;
 			}
 			let respData = await resp.json();
 			log.debug(respData);
@@ -139,13 +156,22 @@ class InstitutionCheckout extends Component {
 			});
 
 		} catch(e) {
-			log.debug(resp);
-			this.setState({
-				notification: {
-					type: 'error',
-					message: 'There was an error requesting an invoice. If you continue to experience problems, email storage@zotero.org for assistance.'
-				}
-			});
+			log.debug(e);
+			if(e.status == 429) {
+				this.setState({
+					notification: {
+						type: 'error',
+						message: "There was an error requesting an invoice. If you've already requested an invoice we'll get back to you shortly. If you continue to experience problems, email storage@zotero.org for assistance."
+					}
+				});
+			} else {
+				this.setState({
+					notification: {
+						type: 'error',
+						message: 'There was an error requesting an invoice. If you continue to experience problems, email storage@zotero.org for assistance.'
+					}
+				});
+			}
 		}
 	}
 	render(){
@@ -157,7 +183,7 @@ class InstitutionCheckout extends Component {
 					Zotero Institution provides unlimited storage for entire universities, research institutions, and corporations. All members of your organization are automatically added to your Zotero Institution subscription, based on their organizational email addresses.
 				</p>
 				<p>
-					Pricing is based on institution size rather than usage and offers a deeply discounted rate without the need to individually manage users. The cost is $2000 for the first 500 FTE and $0.40 per additional FTE.
+					Pricing is based on institution size rather than usage and offers a deeply discounted rate without the need to individually manage users. The cost is $2100 for the first 500 FTE and $0.42 per additional FTE.
 				</p>
 				<div className='form-line'>
 					<label htmlFor='institution_fte'>FTE:</label>

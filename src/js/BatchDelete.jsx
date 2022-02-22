@@ -86,7 +86,8 @@ class BatchDelete extends Component {
 		
 		log.debug('got all attachments, finding relevant ones', 4);
 		let relevantAttachments = attachments.filter((item) => {
-			return (item.data.linkMode == 'imported_url' || item.data.linkMode == 'imported_file');
+			return (item.links.hasOwnProperty('enclosure') || item.data.linkMode == 'imported_url' || item.data.linkMode == 'imported_file');
+			// return (item.data.linkMode == 'imported_url' || item.data.linkMode == 'imported_file');
 		});
 		log.debug(relevantAttachments, 4);
 		this.setState({relevantAttachments, loading: false, progress: null});

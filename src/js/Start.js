@@ -19,6 +19,7 @@ import {Notifier} from './Notifier.js';
 import {VerticalExpandable} from './VerticalExpandable.js';
 import {InstallConnectorPrompt} from './InstallConnector.js';
 import {usernameValidation} from './Validate.js';
+import {readCookie} from './Utils.js';
 
 const currentUser = getCurrentUser();
 
@@ -62,7 +63,8 @@ class RegisterForm extends Component{
 			usernameValidity:'undecided',
 			usernameMessage:'',
 			formErrors:{},
-			registrationSuccessful:false
+			registrationSuccessful:false,
+			iosApp: readCookie('iosApp'),
 		};
 		this.checkUsername = this.checkUsername.bind(this);
 		this.handleChange = this.handleChange.bind(this);
@@ -199,7 +201,10 @@ class RegisterForm extends Component{
 
 		let notifier = null;
 		if(this.state.registrationSuccessful){
-			let message = 'Thanks for registering. We’ve sent an email to activate your account.';
+			let message = <span style={{fontSize:'large'}}>Thanks for registering. We’ve sent an email to activate your account.</span>;
+			if (this.state.iosApp) {
+				message = <span style={{fontSize:'large'}}>Your Zotero account has been created. You can now close this window and sign in to Zotero for iOS.</span>;
+			}
 			notifier = <Notifier type='success' message={message} />;
 		} else if(this.state.formError){
 			notifier = <Notifier type='error' message={this.state.formError} />;

@@ -123,7 +123,7 @@ function InstallSafariButton(props) {
 			<div className='download-full'>
 				<div className='browser-image'><BrowserIcon browser='safari' /></div>
 				<h3>Safari connector</h3>
-				<a href={safariDownload} id='safari-connector-download-button' className='btn download-link'>{label}</a>
+				<p id="safari-download-text-small">The Zotero Connector for Safari is bundled with Zotero. You can enable it from the Extensions pane of the Safari preferences.</p>
 			</div>
 		);
 	}
@@ -179,8 +179,11 @@ function AllExtensionsSection(props) {
 			<ul>
 				{installNodes}
 			</ul>
+			{/*
 			<p className='bookmarklet'>A <a href='/download/bookmarklet'>bookmarklet</a> that works
 			in any browser, including those on smartphones and tablets, is also available.</p>
+			*/}
+			<p className='save-page'>If you&apos;re unable to install an extension in your browser, you can save web pages or identifiers to your library from <a href='https://www.zotero.org/save'>this page</a> or with the magic wand button from <a href='https://www.zotero.org/mylibrary'>your web library</a>.</p>
 		</section>
 	);
 }

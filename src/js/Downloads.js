@@ -159,7 +159,7 @@ function DownloadStandalone(props) {
 				width='147'
 				height='160'
 			/>
-			<h1 className={wrapHeader ? 'wrap' : null}>Zotero 6.0 for {OSLabel}</h1>
+			<h1 className={wrapHeader ? 'wrap' : null}>Zotero 6 for {OSLabel}</h1>
 			<p className='lead'>Your personal research assistant</p>
 			{featuredButton}
 

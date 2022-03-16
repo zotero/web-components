@@ -244,6 +244,16 @@ function DownloadConnector(props) {
 	if (oldFirefox) {
 		installButton = <p className='danger'>It looks like you’re using an outdated version of Firefox. Please install Firefox 52 or later to use the Zotero Connector.</p>;
 	}
+	let installAndDescription = (<>
+		{installButton}
+		<p className='description'>Zotero Connectors automatically sense content as you browse the web and allow you to save it to Zotero with a single click.</p>
+	</>);
+	if (props.featuredBrowser == 'Safari') {
+		installAndDescription = (<>
+			<p className='description'>Zotero Connectors automatically sense content as you browse the web and allow you to save it to Zotero with a single click.</p>
+			{installButton}
+		</>);
+	}
 	return (
 		<section className='connector'>
 			<BrowserExtensionIcon
@@ -256,8 +266,7 @@ function DownloadConnector(props) {
 			/>
 			<h1>Zotero Connector</h1>
 			<p className='lead'>Save to Zotero from your browser</p>
-			{installButton}
-			<p className='description'>Zotero Connectors automatically sense content as you browse the web and allow you to save it to Zotero with a single click.</p>
+			{installAndDescription}
 			{versionNote}
 			{!showAllExtensions
 				? <p className='other-versions'><a href='#' onClick={(evt) => { setShowAllExtensions(true); evt.preventDefault(); }}>Zotero Connectors for other browsers</a></p>

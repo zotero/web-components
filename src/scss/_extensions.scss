@@ -27,7 +27,7 @@
 	// Grid
 
 	.container {
-		padding: 0 ($grid-gutter-width / 2);
+		padding: 0 ($grid-gutter-width * 0.5);
 
 		@media (min-width: $screen-sm-min) {
 			padding: 0 80px;
@@ -117,7 +117,7 @@
 
 		.bookmarklet {
 			margin-bottom: 25px;
-			padding: 0 ($grid-gutter-width / 2);
+			padding: 0 ($grid-gutter-width * 0.5);
 		}
 	}
 

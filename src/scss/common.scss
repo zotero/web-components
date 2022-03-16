@@ -91,23 +91,23 @@ a {
 // --------------------------------------------------
 
 .row {
-	margin: 0 (-$grid-gutter-width / 2);
+	margin: 0 (-$grid-gutter-width * 0.5);
 
 	&.compact {
 		@media (min-width: $screen-sm-min) {
-			margin: 0 (-$grid-gutter-compact / 2);
+			margin: 0 (-$grid-gutter-compact * 0.5);
 		}
 	}
 
 	&.loose {
 		@media (min-width: $screen-sm-min) {
-			margin: 0 (-$grid-gutter-loose / 2);
+			margin: 0 (-$grid-gutter-loose * 0.5);
 		}
 	}
 }
 
 .col-4, .col-6 {
-	padding: 0 ($grid-gutter-width / 2);
+	padding: 0 ($grid-gutter-width * 0.5);
 
 	@media (min-width: $screen-sm-min) {
 		float: left;
@@ -129,7 +129,7 @@ a {
 .row.compact {
 	.col-4, .col-6 {
 		@media (min-width: $screen-sm-min) {
-			padding: 0 ($grid-gutter-compact / 2);
+			padding: 0 ($grid-gutter-compact * 0.5);
 		}
 	}
 }
@@ -137,7 +137,7 @@ a {
 .row.loose {
 	.col-4, .col-6 {
 		@media (min-width: $screen-sm-min) {
-			padding: 0 ($grid-gutter-loose / 2);
+			padding: 0 ($grid-gutter-loose * 0.5);
 		}
 	}
 }

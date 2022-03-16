@@ -235,7 +235,7 @@
 		.all-extensions {
 			ul {
 				li {
-					padding: 0 ($grid-gutter-width / 2);
+					padding: 0 ($grid-gutter-width * 0.5);
 				}
 			}
 

@@ -302,7 +302,8 @@
 	}
 
 	#safari-download-text-small {
-		font-size: 14px;
 		color: #777;
-	}
+		max-width: 330px;
+		margin: auto;
+}
 }

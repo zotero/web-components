@@ -160,7 +160,7 @@ InstallButton.propTypes = {
 
 function AllExtensionsSection(props) {
 	const { type, except } = props;
-	let otherBrowsers = ['chrome', 'firefox', 'safari', 'edge'].filter((browser) => {
+	let otherBrowsers = ['chrome', 'firefox', 'edge', 'safari'].filter((browser) => {
 		return browser != except.toLowerCase();
 	});
 

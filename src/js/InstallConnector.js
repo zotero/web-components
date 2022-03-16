@@ -112,7 +112,7 @@ function InstallSafariButton(props) {
 	const { type, label } = props;
 	if (type == 'button') {
 		return (
-			<a href={safariDownload} id='safari-connector-download-button' className='btn download-link'>{label}</a>
+			<p id="safari-download-text">The Zotero Connector for Safari is bundled with Zotero. You can enable it from the Extensions pane of the Safari preferences.</p>
 		);
 	} else if (type == 'image') {
 		return (

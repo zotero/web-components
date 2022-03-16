@@ -135,11 +135,13 @@ function DownloadStandalone(props) {
 			featuredButton = <DownloadStandaloneButton href={url} />;
 			otherVersions.splice(2, 1);
 		}
+		/*
 		versionNote = (
 			<p className='installation-help'>
 				<a href='/support/installation'>Installation Help</a>
 			</p>
 		);
+		*/
 		break;
 	}
 	}
@@ -157,7 +159,7 @@ function DownloadStandalone(props) {
 				width='147'
 				height='160'
 			/>
-			<h1 className={wrapHeader ? 'wrap' : null}>Zotero 5.0 for {OSLabel}</h1>
+			<h1 className={wrapHeader ? 'wrap' : null}>Zotero 6.0 for {OSLabel}</h1>
 			<p className='lead'>Your personal research assistant</p>
 			{featuredButton}
 
@@ -167,7 +169,8 @@ function DownloadStandalone(props) {
 			<ul className='os-list'>
 				{otherNodes}
 			</ul>
-
+			<p className='installation-help'><a href='https://www.zotero.org/support/installation'>Installation Help</a></p>
+			{/*
 			{!showOldVersions
 				? <p><a href='#' onClick={() => { setShowOldVersions(true); }}>Looking for Zotero 4.0?</a></p>
 				: ''
@@ -194,6 +197,7 @@ function DownloadStandalone(props) {
 					</li>
 				</ul>
 			</VerticalExpandable>
+			*/}
 		</section>
 	);
 }
@@ -212,6 +216,12 @@ function DownloadConnector(props) {
 	
 	let versionNote = null;
 	if (props.featuredBrowser == 'Safari') {
+		versionNote = (
+			<p className='installation-help'>
+				<a href='https://www.zotero.org/support/kb/safari_compatibility'>Don’t see the Zotero Connector in Safari?</a>
+			</p>
+		);
+		/*
 		if (oldSafari) {
 			versionNote = (
 				<p className='version-note'>
@@ -228,6 +238,7 @@ function DownloadConnector(props) {
 				</p>
 			);
 		}
+		*/
 	}
 	let installButton = <InstallButton browser={props.featuredBrowser} label={`Install ${props.featuredBrowser} Connector`} />;
 	if (oldFirefox) {

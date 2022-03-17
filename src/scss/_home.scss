@@ -187,12 +187,12 @@
 
   .collect-animation {
     @include media-breakpoint-down("md") {
-      padding-top: (rem(336) * 441 / 444);
+      padding-top: calc(rem(336) * 441 / 444);
       margin-top: rem(-46);
     }
 
     @include media-breakpoint-down("xs") {
-      padding-top: (rem(200) * 441 / 444);
+      padding-top: calc(rem(200) * 441 / 444);
       margin-top: rem(-27);
     }
 

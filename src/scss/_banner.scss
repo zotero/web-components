@@ -9,7 +9,7 @@
   font-size: 18px;
   text-align: center;
   border-top: 1px solid $gray-200;
-  padding: (20px - 4px) ($grid-gutter-width / 2) (20px - 7px);
+  padding: (20px - 4px) ($grid-gutter-width * 0.5) (20px - 7px);
 
   @include media-breakpoint-up(md) {
     display: none;

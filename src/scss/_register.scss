@@ -13,7 +13,7 @@
 
   .register-form {
     @include media-breakpoint-up(md) {
-      max-width: map-get($container-max-widths, xl) * 4 / 12 - $grid-gutter-width; // 4 xl cols
+      max-width: calc(map-get($container-max-widths, xl) * 4 / 12 - $grid-gutter-width); // 4 xl cols
       margin: auto;
     }
 

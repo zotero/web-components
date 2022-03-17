@@ -1,3 +1,5 @@
+@use "sass:math";
+
 .start {
   text-align: center;
 
@@ -7,11 +9,11 @@
     color: map-get($theme-colors, success);
     background-color: #d9ffe0;
     margin: 0;
-    padding: (17px) ($grid-gutter-width / 2); // 64px height
+    padding: (17px) ($grid-gutter-width * 0.5); // 64px height
 
     @include media-breakpoint-up(md) {
       font-size: $font-size-lg;
-      padding: (40px - 10px) ($grid-gutter-width / 2);
+      padding: (40px - 10px) ($grid-gutter-width * 0.5);
     }
   }
 
@@ -62,7 +64,11 @@
 
     .all-extensions {
       .bookmarklet {
-        padding: 0 ($grid-gutter-width / 2);
+        padding: 0 ($grid-gutter-width * 0.5);
+      }
+      
+      #safari-download-text-small {
+        max-width: 300px;
       }
     }
   }
@@ -80,7 +86,7 @@
 
   .register-form {
     @include media-breakpoint-up(md) {
-      max-width: map-get($container-max-widths, xl) * 4 / 12 - $grid-gutter-width; // 4 xl cols
+      max-width: map-get($container-max-widths, xl) * math.div(4, 12) - $grid-gutter-width; // 4 xl cols
       margin: auto;
     }
 
@@ -202,15 +208,15 @@
       }
 
       @include media-breakpoint-between(sm, md) {
-        flex-basis: percentage(4 / 12);
-        max-width: percentage(4 / 12);
+        flex-basis: percentage(math.div(4, 12));
+        max-width: percentage(math.div(4, 12));
 
         &:nth-child(n+4) {
           margin-bottom: 0;
         }
 
         &:nth-child(4) {
-          margin-left: percentage(2 / 12);
+          margin-left: percentage(math.div(2, 12));
         }
       }
 

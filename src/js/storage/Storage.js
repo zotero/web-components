@@ -1,6 +1,9 @@
 /* eslint-disable no-duplicate-imports */
 /*
 TODO:
+ - get rid of context/dispatch and just pass down functions a couple levels
+ - reload after timer or poll since payment updates are now done in webhook
+ - allow selection of payment type before starting intent so we can set up for future usage on payment methods that support it
  - clean up
  x clarify when institutional plan makes individual plan unnecessary
  x clarify when charge won't be made right away, allow to force immediate charge
@@ -8,7 +11,7 @@ TODO:
  x use new PaymentModal to get token to create source with card or IBAN
  x don't allow automatic renewal if institution provides storage
  x show that individual subscription won't be renewed with institutional storage
- - add support for Alipay which we may want
+ x add support for Alipay which we may want
  - whether payment/recur is enabled not always detected correctly (Enable automatic renewal and Disable autorenew both shown)
  - make sure invoices always show the information we have for whatever payment method/charge object
  - show link to receipt/invoice immediately after processing payment
@@ -31,7 +34,7 @@ Flows:
 import { log as logger } from '../Log.js';
 const log = logger.Logger('StorageComponent');
 
-import { useReducer, useEffect, useContext } from 'react';
+import { useReducer, useEffect, useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { Row, Col, Progress, Button } from 'reactstrap';
 
@@ -41,8 +44,8 @@ import { SubscriptionHandler } from './SubscriptionHandler.jsx';
 import { PaymentSource } from './PaymentSource.jsx';
 import { Invoices } from './Invoices.jsx';
 
-import { StorageContext, PaymentContext, NotifierContext, getUserCustomer, getSubscription, updatePayment, renewNow, selectPlan, START_OPERATION, STOP_OPERATION, notify } from './actions.js';
-import { storageReducer, notifyReducer, paymentReducer } from './actions.js';
+import { StorageContext, PaymentContext, getUserCustomer, getSubscription, updatePayment, renewNow, selectPlan, notify } from './actions.js';
+import { storageReducer, paymentReducer } from './actions.js';
 
 import { postFormData } from '../ajax.js';
 import { LoadingSpinner } from '../LoadingSpinner.js';
@@ -71,6 +74,8 @@ const plans = [
 		price: '$120',
 	}
 ];
+
+const storageUrl = window.zoteroConfig.baseWebsiteUrl ? `${window.zoteroConfig.baseWebsiteUrl}/storage` : '/settings/storage';
 
 function StoragePlanRow(props) {
 	const { plan } = props;
@@ -218,7 +223,7 @@ function PaymentRow(props) {
 	const { userSubscription } = storageState;
 	
 	const updateCardHandler = () => {
-		paymentDispatch(updatePayment());
+		paymentDispatch(updatePayment(userSubscription.storageLevel));
 	};
 	const renewHandler = () => {
 		paymentDispatch(renewNow(userSubscription));
@@ -368,14 +373,13 @@ function Storage(props) {
 	const [paymentState, paymentDispatch] = useReducer(paymentReducer, {
 		stripeCustomer: props.stripeCustomer,
 	});
-	const [notifyState, notifyDispatch] = useReducer(notifyReducer, {
-		operationPending: false,
-		notification: null
-	});
-	
+
 	const { userSubscription, storageGroups } = storageState;
 	const { stripeCustomer, purchase } = paymentState;
-	const { operationPending, notification } = notifyState;
+
+	const [ notification, setNotification ] = useState(null);
+	const [ operationPending, setOperationPending ] = useState(false);
+
 	useEffect(
 		() => {
 			if (!props.userSubscription) {
@@ -389,17 +393,17 @@ function Storage(props) {
 	);
 	
 	const cancelRecur = async () => {
-		notifyDispatch({ type: START_OPERATION });
+		setOperationPending(true);
 
 		try {
 			let resp = await postFormData('/storage/cancelautorenew', undefined, { withSession: true });
 			log.debug(resp, 4);
 			notifyDispatch(notify('success', 'Automatic renewal disabled'));
-			notifyDispatch({ type: STOP_OPERATION });
 		} catch (e) {
 			log.debug(e);
 			notifyDispatch(notify('error', 'Error updating payment method. Please try again in a few minutes.'));
-			notifyDispatch({ type: STOP_OPERATION });
+		} finally {
+			setOperationPending(false);
 		}
 
 		getUserCustomer(paymentDispatch);
@@ -407,7 +411,7 @@ function Storage(props) {
 	};
 	
 	if (userSubscription === null) {
-		return <LoadingSpinner loading={true} />;
+		return <LoadingSpinner className='m-auto' loading={true} />
 	}
 
 	let expirationDate = <td>Never</td>;
@@ -460,12 +464,16 @@ function Storage(props) {
 	let Payment = null;
 	if (purchase && !props.summary) {
 		Payment = (<SubscriptionHandler
-			purchase={purchase}
+			{...{
+				purchase,
+				setNotification
+			}}
+			returnUrl={storageUrl}
 		/>);
 	}
 	
 	return (
-		<ErrorWrapper><StorageContext.Provider value={{ storageDispatch, storageState }}><PaymentContext.Provider value={{ paymentDispatch, paymentState }}><NotifierContext.Provider value={{ notifyDispatch, notifyState }}>
+		<ErrorWrapper><StorageContext.Provider value={{ storageDispatch, storageState }}><PaymentContext.Provider value={{ paymentDispatch, paymentState }}>
 			<div className='storage-container'>
 				{Payment}
 				{operationPending
@@ -476,8 +484,8 @@ function Storage(props) {
 				<div className='user-storage'>
 					<Row className='my-3'>
 						<Col md='12'>
-							<Invoices invoices={props.userInvoices} type='individual' collapseLabel='Show Invoices' />
-							<Invoices invoices={props.userInvoices} type='contribution' collapseLabel='Show Contributions' />
+							<Invoices invoices={props.userInvoices} setNotification={setNotification} type='individual' collapseLabel='Show Invoices' />
+							<Invoices invoices={props.userInvoices} setNotification={setNotification} type='contribution' collapseLabel='Show Contributions' />
 						</Col>
 					</Row>
 					<Row>
@@ -520,7 +528,7 @@ function Storage(props) {
 					</Row>
 				</div>
 			</div>
-		</NotifierContext.Provider></PaymentContext.Provider></StorageContext.Provider></ErrorWrapper>
+		</PaymentContext.Provider></StorageContext.Provider></ErrorWrapper>
 	);
 }
 Storage.propTypes = {

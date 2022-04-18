@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import { Card, CardHeader, CardBody, FormGroup, Input, Modal, ModalBody, ModalHeader, Label, Row, Col, Button, Container } from 'reactstrap';
 
 import { labPrice, labUserPrice } from './calculations.js';
-import { CardPaymentModal } from './PaymentModal.jsx';
+import { PaymentElementModal } from './PaymentElementModal.jsx';
 import { PaymentSource } from './PaymentSource.jsx';
 
 import { postFormData, ajax } from '../ajax.js';
@@ -16,120 +16,6 @@ import { LoadingSpinner } from '../LoadingSpinner.js';
 import { PaymentContext, NotifierContext, notify, cancelPurchase } from './actions.js';
 
 import { formatCurrency } from '../Utils.js';
-
-/*
-async function chargeLabSubscription(token = false, fte = false, name = '', institutionID = false) {
-	// You can access the token ID with `token.id`.
-	// Get the token ID to your server-side code for use.
-	log.debug(`charging stripe lab. FTE:${fte} - token.id:${token.id}`);
-	let resp;
-	try {
-		let args = {
-			subscriptionType: 'lab',
-			stripeToken: token.id,
-			userCount: fte,
-			institutionName: name
-		};
-		if (institutionID) {
-			args.institutionID = institutionID;
-		}
-		resp = await postFormData('/storage/stripechargelabajax', args);
-
-		log.debug(resp);
-		if (!resp.ok) {
-			throw resp;
-		}
-		let respData = await resp.json();
-		log.debug(respData);
-		if (respData.success) {
-			if (institutionID) {
-				// existing institution, no need to direct to management interface
-				return {
-					type: 'success',
-					message: <p>Success. Your Zotero Lab subscription has been updated</p>
-				};
-			} else {
-				let manageUrl = buildUrl('manageInstitution', { institutionID: respData.institutionID });
-				return {
-					type: 'success',
-					message: (<p>Success. You can now <a href={manageUrl}>manage your Zotero Lab subscription</a></p>)
-				};
-			}
-		} else {
-			return {
-				type: 'error',
-				message: <p>There was an error updating your Zotero Lab subscription</p>
-			};
-		}
-	} catch (resp) {
-		log.debug(resp);
-		let respData = await resp.json();
-		if (respData.stripeMessage) {
-			return { type: 'error', message: `There was an error processing your payment: ${respData.stripeMessage}` };
-		} else {
-			return {
-				type: 'error',
-				message: <>There was an error updating your subscription. Please try again in a few minutes. If you continue to experience problems, email <a href='mailto:storage@zotero.org'>storage@zotero.org</a> for assistance.</>
-			};
-		}
-	}
-}
-
-async function chargeLabAdditionalUsers(token = false, additionalFTE = false, name = '', institutionID = false) {
-	log.debug(`charging stripe lab additional users. additionalFTE:${additionalFTE} - token.id:${token.id}`);
-	let resp;
-	try {
-		if (!institutionID) {
-			throw new Error('InstitutionID is required in chargeLabAdditionalUsers');
-		}
-		
-		let args = {
-			subscriptionType: 'addLabUsers',
-			stripeToken: token.id,
-			userCount: additionalFTE,
-			name,
-			institutionID: institutionID
-		};
-		resp = await postFormData('/storage/stripechargelabajax', args);
-
-		if (!resp.ok) {
-			throw resp;
-		}
-		let respData = await resp.json();
-		if (respData.success) {
-			if (institutionID) {
-				// existing institution, no need to direct to management interface
-				return {
-					type: 'success',
-					message: <p>Success. Your Zotero Lab subscription has been updated</p>
-				};
-			} else {
-				let manageUrl = buildUrl('manageInstitution', { institutionID: respData.institutionID });
-				return {
-					type: 'success',
-					message: (<p>Success. You can now <a href={manageUrl}>manage your Zotero Lab subscription</a></p>)
-				};
-			}
-		} else {
-			return {
-				type: 'error',
-				message: <p>There was an error updating your Zotero Lab subscription</p>
-			};
-		}
-	} catch (resp) {
-		log.debug(resp);
-		let respData = await resp.json();
-		if (respData.stripeMessage) {
-			return { type: 'error', message: `There was an error processing your payment: ${respData.stripeMessage}` };
-		} else {
-			return {
-				type: 'error',
-				message: <>There was an error updating your subscription. Please try again in a few minutes. If you continue to experience problems, email <a href='mailto:storage@zotero.org'>storage@zotero.org</a> for assistance.</>
-			};
-		}
-	}
-}
-*/
 
 async function createInvoice(type, fte, additionalFTE, name, institutionID) {
 	try {
@@ -373,6 +259,20 @@ function InstitutionHandler(props) {
 	
 	let paymentSection = null;
 	if (editPayment) {
+		paymentSection = <PaymentElementModal
+			stripe={window.stripe}
+			{...{
+				immediateChargeRequired,
+				handleConfirm,
+				paymentIntent,
+				chargeAmount,
+				operationPending,
+				setOperationPending,
+				buttonLabel,
+				useEmail: true,
+			}}
+			chargeDescription="Charge"
+		/>;
 		paymentSection = <CardPaymentModal
 			stripe={window.stripe}
 			{...{ handleConfirm, chargeAmount, immediateChargeRequired, setOperationPending }}

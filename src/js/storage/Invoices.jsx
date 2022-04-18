@@ -6,9 +6,6 @@ import PropTypes from 'prop-types';
 import { Table, Collapse } from 'reactstrap';
 import { postFormData } from '../ajax.js';
 
-import { NotifierContext, notify } from './actions.js';
-
-
 const dateFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
 
 const deleteInvoice = async (invoiceID) => {
@@ -23,8 +20,7 @@ const deleteInvoice = async (invoiceID) => {
 };
 
 function Invoices(props) {
-	let { invoices, type, collapseLabel } = props;
-	const { notifyDispatch } = useContext(NotifierContext);
+	let { invoices, type, collapseLabel, setNotification } = props;
 	const [isOpen, setIsOpen] = useState(false);
 
 	if (!invoices) {
@@ -32,7 +28,7 @@ function Invoices(props) {
 	}
 	const handleDelete = async (invoiceID) => {
 		let result = await deleteInvoice(invoiceID);
-		notifyDispatch(notify(result.type, result.message));
+		setNotification(result);
 	};
 	if (type) {
 		log.debug(`filtering by type ${type}`, 4);
@@ -65,7 +61,7 @@ function Invoices(props) {
 					{createdDate.toLocaleDateString('en-US', dateFormatOptions)}
 				</td>
 				<td>
-					{!stripeCharge ? 'Pending' : ''}
+					{!stripeCharge ? 'Pending' : 'Paid'}
 				</td>
 				<td>
 					{deleteLink}

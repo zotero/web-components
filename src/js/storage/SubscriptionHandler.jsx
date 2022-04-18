@@ -20,9 +20,9 @@ import { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { Alert, Card, CardHeader, CardBody, FormGroup, Input, Modal, ModalBody, ModalHeader, Label, Row, Col, Button, Container } from 'reactstrap';
 
-import { StorageContext, PaymentContext, NotifierContext, refresh, cancelPurchase, notify, immediateCharge } from './actions.js';
+import { StorageContext, PaymentContext, refresh, cancelPurchase, immediateCharge, updateIntent } from './actions.js';
 import { imminentExpiration, calculateNewExpiration, priceCents } from './calculations.js';
-import { CardPaymentModal, MultiPaymentModal } from './PaymentModal.jsx';
+import { PaymentElementModal } from './PaymentElementModal.jsx';
 import { PaymentSource } from './PaymentSource.jsx';
 
 import { postFormData, ajax } from '../ajax.js';
@@ -53,81 +53,32 @@ const overQuota = function (storageLevel, userSubscription) {
 	return false;
 };
 
-/*
-async function updateSubscription(storageLevel = false) {
-	if (storageLevel === false) {
-		throw new Error('no storageLevel set for updateSubscription');
-	}
-	
-	let resp;
-	try {
-		resp = await postFormData('/storage/updatesubscription', { storageLevel: storageLevel }, { withSession: true });
-		log.debug(resp, 4);
-		if (resp.ok) {
-			return { type: 'success', message: 'Subscription updated' };
-		} else {
-			throw resp;
-		}
-	} catch (e) {
-		log.error(e);
-		return { type: 'error', message: 'Error updating subscription. Please try again in a few minutes.' };
-	}
-}
-async function updatePayment(token) {
-	// You can access the token ID with `token.id`.
-	// Get the token ID to your server-side code for use.
-	log.debug(`updating stripe card - token.id:${token.id}`, 4);
-	try {
-		let resp = await postFormData('/storage/updatestripecard', { stripeToken: token.id });
-		log.debug(resp, 4);
-		if (resp.ok) {
-			return { type: 'success', message: 'Payment method updated' };
-		} else {
-			throw resp;
-		}
-	} catch (e) {
-		log.error(e);
-		return { type: 'error', message: 'Error updating payment method. Please try again in a few minutes.' };
+// async function beginIntent(amount, description, storageLevel, immediateCharge) {
+async function beginIntent(purchase, paymentDispatch) {
+	log.debug(`beginIntent:`);
+	// log.debug(paymentDispatch);
+	log.debug(purchase);
+	// let args = { amount, description, storageLevel, immediateCharge };
+	let resp = await ajax({
+		url: '/storage/newstripeintent',
+		// url: '/storage/purchase',
+		type: 'POST',
+		withSession: true,
+		data: JSON.stringify(purchase),
+	});
+	// let resp = await postFormData('/storage/newstripeintent', args, { withSession: true });
+	log.debug(resp, 4);
+	let data = await resp.json();
+	log.debug(data);
+	if (data.success) {
+		log.debug('successful beginIntent: dispatching UPDATE_INTENT');
+		paymentDispatch(updateIntent(data));
+		// paymentDispatch({ type: UPDATE_INTENT, paymentIntent: { client_secret: data.client_secret } });
+		return data.client_secret;
+	} else {
+		throw data;
 	}
 }
-async function chargeSubscription(storageLevel = false, token = false) {
-	if (storageLevel === false) {
-		throw new Error('no storageLevel set for chargeSubscription');
-	}
-	
-	// You can access the token ID with `token.id`.
-	// Get the token ID to your server-side code for use.
-	log.debug(`charging stripe ajax. storageLevel:${storageLevel} - token.id:${token.id}`, 4);
-	log.debug(token, 4);
-	try {
-		let data = {
-			recur: 1,
-			storageLevel: storageLevel
-		};
-		if (token) {
-			data.stripeToken = token.id;
-		}
-		let resp = await postFormData('/storage/stripechargeajax', data);
-		let respData = await resp.json();
-		let chargeID = respData.chargeID;
-		log.debug(resp, 4);
-		if (resp.ok) {
-			return { type: 'success', message: <span>Success. <a href={`/settings/storage/invoice?chargeID=${chargeID}`}>View Payment Receipt</a></span> };
-		} else {
-			throw resp;
-		}
-	} catch (resp) {
-		log.error(resp);
-		
-		let data = await resp.json();
-		if (data.stripeMessage) {
-			return { type: 'error', message: `There was an error processing your payment: ${data.stripeMessage}` };
-		} else {
-			return { type: 'error', message: 'Error updating subscription. Please try again in a few minutes.' };
-		}
-	}
-}
-*/
 
 async function createInvoice(storageLevel = false) {
 	if (storageLevel === false) {
@@ -158,10 +109,10 @@ async function createInvoice(storageLevel = false) {
 // type is one of: individualChange, individualUpdate, individualRenew
 
 function SubscriptionHandler(props) {
-	const { purchase, renew } = props;
+	const { purchase, renew, returnUrl, setNotification } = props;
 	const { type, storageLevel } = purchase;
 	const { storageDispatch, storageState } = useContext(StorageContext);
-	const { notifyDispatch } = useContext(NotifierContext);
+	// const { notifyDispatch } = useContext(NotifierContext);
 	const { paymentDispatch, paymentState } = useContext(PaymentContext);
 	
 	const { userSubscription } = storageState;
@@ -244,19 +195,59 @@ function SubscriptionHandler(props) {
 		}
 	}, []);
 
-	/*
-	useEffect(() => {
-		// begin payment intent
-		if (immediateChargeRequired) {
-			let chargeDescription = storageLevelDescriptions[storageLevel];
-			beginPaymentIntent(paymentDispatch, chargeAmount, chargeDescription);
+	useEffect(async () => {
+		log.debug("useEffect beginIntent");
+		log.debug(purchase);
+		if (!paymentIntent) {
+			if (purchase.immediateCharge || purchase.type=='individualPaymentUpdate') {
+				setOperationPending(true);
+				await beginIntent(purchase, paymentDispatch);
+				setOperationPending(false);
+			}
 		}
-	}, [immediateChargeRequired, chargeAmount]);
-	*/
+	}, [purchase, chargeAmount]);
+
 	let descriptionPs = description.map((d, i) => {
 		return <p key={i}>{d}</p>;
 	});
 	
+	const handleConfirmPI = async (paymentIntent) => {
+		log.debug('handleConfirmPI');
+		log.debug(paymentItent);
+		if (operationPending) {
+			log.debug('operation already pending');
+			return;
+		}
+		let response;
+		let result;
+		setOperationPending(true);
+		let purchaseData = Object.assign({}, purchase, { paymentIntent });
+		log.debug(purchaseData);
+		try {
+			response = await ajax({
+				type: 'POST',
+				withSession: true,
+				url: '/storage/purchase',
+				data: JSON.stringify(purchaseData),
+				throwOnError: false,
+			});
+		} catch (unexpectedThrownResponse) {
+			log.error("UNEXPECTED THROWN RESPONSE WHEN ATTEMPTING PURCHASE");
+		} finally {
+			log.debug('got response from handleConfirmPI');
+			result = await response.json();
+			log.debug(result);
+			let notifyType = result.success ? 'success' : 'error';
+			let notifyMessage = result.message;
+
+			refresh(storageDispatch, paymentDispatch);
+			setNotification({type: notifyType, message: notifyMessage});
+			// notifyDispatch(notify(notifyType, notifyMessage));
+			cancel();
+		}
+		setOperationPending(true);
+	};
+/*
 	const handleConfirm = async (paymentMethod) => {
 		log.debug('handleConfirm');
 		log.debug(paymentMethod);
@@ -330,37 +321,36 @@ function SubscriptionHandler(props) {
 			cancel();
 		}
 	};
-	
+*/	
 	const handleInvoiceRequest = async (evt) => {
 		evt.preventDefault();
 		setOperationPending(true);
 		let result = await createInvoice(storageLevel);
-		notifyDispatch(notify(result.type, result.message));
+		setNotification(result);
+		// notifyDispatch(notify(result.type, result.message));
 		cancel();
 	};
 	
-	let blabel = immediateChargeRequired ? `Pay ${formatCurrency(chargeAmount)}` : 'Confirm';
+	let buttonLabel = immediateChargeRequired ? `Pay ${formatCurrency(chargeAmount)}` : 'Confirm';
 	
 	let paymentSection = null;
 	if (editPayment) {
 		//
-		/*
-		paymentSection = <CardPaymentModal
+		paymentSection = <PaymentElementModal
 			stripe={window.stripe}
-			{...{ immediateChargeRequired, handleConfirm, paymentIntent, chargeAmount, setOperationPending }}
+			{...{ 
+				// immediateChargeRequired,
+				// handleConfirm: handleConfirmPI,
+				paymentIntent,
+				// chargeAmount,
+				operationPending,
+				setOperationPending,
+				buttonLabel,
+				returnUrl,
+				setNotification,
+			}}
 			chargeDescription={storageLevel ? storageLevelDescriptions[storageLevel] : "Update payment method"}
-			buttonLabel={blabel}
 		/>;
-		*/
-
-		paymentSection = <MultiPaymentModal
-			stripe={window.stripe}
-			{...{ immediateChargeRequired, handleConfirm, paymentIntent, chargeAmount, setOperationPending }}
-			chargeDescription={storageLevel ? storageLevelDescriptions[storageLevel] : "Update payment method"}
-			buttonLabel={blabel}
-		/>;
-
-		// paymentSection = <MultiPaymentModal stripe={window.stripe} handleToken={handleConfirm} paymentIntent={paymentIntent} chargeAmount={chargeAmount} buttonLabel={blabel} />;
 	} else if (stripeCustomer && immediateChargeRequired) {
 		const defaultSource = stripeCustomer.default_source || stripeCustomer.invoice_settings.default_payment_method;
 		if (defaultSource) {
@@ -376,7 +366,7 @@ function SubscriptionHandler(props) {
 						</CardBody>
 					</Card>
 					<Row className='mt-2'>
-						<Col className='text-center'><Button className='m-auto' onClick={() => { handleConfirm(false); }}>{blabel}</Button></Col>
+						<Col className='text-center'><Button className='m-auto' onClick={() => { handleConfirm(false); }}>{buttonLabel}</Button></Col>
 						<Col className='text-center'><Button className='m-auto' onClick={cancel}>Cancel</Button></Col>
 					</Row>
 				</div>
@@ -386,7 +376,7 @@ function SubscriptionHandler(props) {
 		paymentSection = (
 			<Container>
 				<Row>
-					<Col className='text-center'><Button className='m-auto' onClick={handleConfirm}>{blabel}</Button></Col>
+					<Col className='text-center'><Button className='m-auto' onClick={handleConfirmPI}>{buttonLabel}</Button></Col>
 					<Col className='text-center'><Button className='m-auto' onClick={cancel}>Cancel</Button></Col>
 				</Row>
 			</Container>
@@ -437,13 +427,13 @@ function SubscriptionHandler(props) {
 			<Modal isOpen={true} toggle={cancel} className='payment-modal'>
 				<ModalHeader>Manage Subscription</ModalHeader>
 				<ModalBody>
-					<LoadingSpinner className='m-auto' loading={operationPending} />
 					<Card className='mb-4'>
 						<CardBody>
 							{error}
 							{descriptionPs}
 						</CardBody>
 					</Card>
+					<LoadingSpinner className='m-auto' loading={operationPending} />
 					{paymentSection}
 					{invoiceSection}
 					{renewSection}

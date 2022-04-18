@@ -5,7 +5,7 @@ import { useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { Card, CardHeader, CardBody, Modal, ModalBody, ModalHeader, Row, Col, Button, Input } from 'reactstrap';
 
-import { CardPaymentModal } from '../storage/PaymentModal.jsx';
+import { PaymentElementModal } from '../storage/PaymentElementModal.jsx';
 import { PaymentSource } from '../storage/PaymentSource.jsx';
 import { PaymentContext, NotifierContext, notify, cancelPurchase } from '../storage/actions';
 
@@ -195,7 +195,7 @@ function ContributionPaymentHandler(props) {
 	
 	let paymentSection = null;
 	if (editPayment) {
-		paymentSection = <CardPaymentModal stripe={window.stripe} handleToken={handleConfirm} chargeAmount={chargeAmount} buttonLabel={blabel} />;
+		paymentSection = <PaymentElementModal stripe={window.stripe} handleToken={handleConfirm} chargeAmount={chargeAmount} buttonLabel={blabel} />;
 	} else if (stripeCustomer) {
 		const defaultSource = stripeCustomer.default_source;
 		if (defaultSource) {

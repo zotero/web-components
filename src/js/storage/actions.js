@@ -2,17 +2,17 @@ import { log as logger } from '../Log.js';
 const log = logger.Logger('storage/actions.js');
 
 import { createContext } from 'react';
-import { ajax, postFormData } from '../ajax.js';
+import { ajax } from '../ajax.js';
 
 const StorageContext = createContext(null);
-const NotifierContext = createContext(null);
+// const NotifierContext = createContext(null);
 const PaymentContext = createContext(null);
 const LabContext = createContext(null);
 
 // notifyReducer actions
-const NOTIFY = 'notify';
-const START_OPERATION = 'startOperation';
-const STOP_OPERATION = 'stopOperation';
+// const NOTIFY = 'notify';
+// const START_OPERATION = 'startOperation';
+// const STOP_OPERATION = 'stopOperation';
 
 // paymentReducer actions
 const UPDATE_CUSTOMER = 'updateCustomer';
@@ -29,6 +29,8 @@ const SET_FTE = 'setFTE';
 const SET_EMAILS = 'setEmails';
 
 function paymentReducer(state, action) {
+	log.debug('paymentReducer');
+	log.debug(action);
 	switch (action.type) {
 	case UPDATE_CUSTOMER:
 		return Object.assign({}, state, {
@@ -42,15 +44,18 @@ function paymentReducer(state, action) {
 		let purchase = Object.assign({}, state.purchase);
 		purchase.immediateCharge = action.immediateCharge;
 		return Object.assign({}, state, { purchase });
-	// case UPDATE_INTENT:
-	// 	return Object.assign({}, state, {
-	// 		paymentIntent: action.paymentIntent
-	// 	});
+	case UPDATE_INTENT:
+		log.debug('got UPDATE_INTENT');
+		let newState = Object.assign({}, state, {
+			paymentIntent: action.paymentIntent
+		});
+		log.debug(newState);
+		return newState;
 	default:
 		return state;
 	}
 }
-
+/*
 function notifyReducer(state, action) {
 	switch (action.type) {
 	case NOTIFY:
@@ -68,6 +73,7 @@ function notifyReducer(state, action) {
 		return state;
 	}
 }
+*/
 function storageReducer(state, action) {
 	switch (action.type) {
 	case UPDATE_USER_SUBSCRIPTION:
@@ -112,6 +118,7 @@ function selectPlan(plan) {
 		}
 	};
 }
+/*
 function notify(type, message) {
 	return {
 		type: NOTIFY,
@@ -119,6 +126,7 @@ function notify(type, message) {
 		message
 	};
 }
+*/
 function renewNow(userSubscription) {
 	const storageLevel = userSubscription.storageLevel;
 	return {
@@ -129,14 +137,22 @@ function renewNow(userSubscription) {
 		}
 	};
 }
-function updatePayment() {
+function updatePayment(storageLevel) {
 	return {
 		type: UPDATE_PURCHASE,
 		purchase: {
-			type: 'individualPaymentUpdate'
+			type: 'individualPaymentUpdate',
+			storageLevel
 		}
 	};
 }
+function updateIntent(paymentIntent) {
+	return {
+		type: UPDATE_INTENT,
+		paymentIntent: paymentIntent
+	}
+}
+
 function cancelPurchase() {
 	return {
 		type: UPDATE_PURCHASE,
@@ -183,9 +199,10 @@ async function getUserCustomer(dispatch) {
 }
 
 /*
-async function beginPaymentIntent(dispatch, paymentState, description) {
+async function beginPaymentIntent(dispatch, amount, description) {
 	let resp;
 	try {
+		// resp = await postFormData('/storage/newstripeintent', { amount, description }, { withSession: true });
 		resp = await postFormData('/storage/newstripeintent', { amount, description }, { withSession: true });
 		log.debug(resp, 4);
 		let data = await resp.json();
@@ -209,15 +226,16 @@ function refresh(storageDispatch, paymentDispatch) {
 
 
 export {
-	NOTIFY,
+	// NOTIFY,
 	UPDATE_CUSTOMER,
-	START_OPERATION,
-	STOP_OPERATION,
+	// START_OPERATION,
+	// STOP_OPERATION,
 	UPDATE_USER_SUBSCRIPTION,
 	UPDATE_PURCHASE,
 	UPDATE_NAME,
 	SET_FTE,
 	SET_EMAILS,
+	UPDATE_INTENT,
 	refresh,
 	// beginPaymentIntent,
 	getUserCustomer,
@@ -225,16 +243,17 @@ export {
 	cancelPurchase,
 	setEmails,
 	updatePayment,
+	updateIntent,
 	renewNow,
-	notify,
+	// notify,
 	immediateCharge,
 	selectPlan,
-	notifyReducer,
+	// notifyReducer,
 	paymentReducer,
 	storageReducer,
 	labReducer,
 	StorageContext,
-	NotifierContext,
+	// NotifierContext,
 	PaymentContext,
 	LabContext
 };

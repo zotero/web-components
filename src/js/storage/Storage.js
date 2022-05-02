@@ -1,6 +1,8 @@
 /* eslint-disable no-duplicate-imports */
 /*
 TODO:
+ - make sure paid invoices can only be seen if logged in as invoiceUser or returning from successful charge
+ - always create a customer, even for invoices, so that a receipt gets sent from stripe
  - get rid of context/dispatch and just pass down functions a couple levels
  - reload after timer or poll since payment updates are now done in webhook
  - allow selection of payment type before starting intent so we can set up for future usage on payment methods that support it
@@ -34,7 +36,7 @@ Flows:
 import { log as logger } from '../Log.js';
 const log = logger.Logger('StorageComponent');
 
-import { useReducer, useEffect, useState, useContext } from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Row, Col, Progress, Button } from 'reactstrap';
 
@@ -43,11 +45,13 @@ import { Notifier } from '../Notifier.js';
 import { SubscriptionHandler } from './SubscriptionHandler.jsx';
 import { PaymentSource } from './PaymentSource.jsx';
 import { Invoices } from './Invoices.jsx';
+import { imminentExpiration, calculateNewExpiration, priceCents } from './calculations.js';
 
-import { StorageContext, PaymentContext, getUserCustomer, getSubscription, updatePayment, renewNow, selectPlan, notify } from './actions.js';
-import { storageReducer, paymentReducer } from './actions.js';
+import { chargeDefaultMethod, createInvoice } from './actions.js';
+// import { StorageContext, PaymentContext, getUserCustomer, getSubscription, updatePayment, renewNow, selectPlan, notify } from './actions.js';
+// import { storageReducer, paymentReducer } from './actions.js';
 
-import { postFormData } from '../ajax.js';
+import { ajax, postFormData } from '../ajax.js';
 import { LoadingSpinner } from '../LoadingSpinner.js';
 
 const dateFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -75,16 +79,54 @@ const plans = [
 	}
 ];
 
+const storageLevelDescriptions = {
+	2: '2 GB',
+	3: '6 GB',
+	6: 'Unlimited storage'
+};
+
+const overQuota = function (storageLevel, userSubscription) {
+	const planQuotas = window.zoteroData.planQuotas;
+	let planQuota = planQuotas[storageLevel];
+	if (userSubscription.usage.total > planQuota) {
+		return true;
+	}
+	return false;
+};
+
+const userSubscriptionShape = PropTypes.shape({
+	quota: PropTypes.string,
+	storageLevel: PropTypes.number,
+	usage: PropTypes.shape({
+		total: PropTypes.number
+	}),
+	institutionUnlimited: PropTypes.bool,
+	recur: PropTypes.bool,
+	expirationDate: PropTypes.number,
+}).isRequired;
+
 const storageUrl = window.zoteroConfig.baseWebsiteUrl ? `${window.zoteroConfig.baseWebsiteUrl}/storage` : '/settings/storage';
 
+function defaultPayment(stripeCustomer) {
+	let defaultPM = false;
+	if (stripeCustomer) {
+		if (stripeCustomer.default_source) {
+			defaultPM = stripeCustomer.default_source;
+		} else if(stripeCustomer.invoice_settings.default_payment_method) {
+			defaultPM = stripeCustomer.invoice_settings.default_payment_method;
+		}
+	}
+	return defaultPM;
+};
+
 function StoragePlanRow(props) {
-	const { plan } = props;
-	const { storageState } = useContext(StorageContext);
-	const { paymentDispatch } = useContext(PaymentContext);
-	const { userSubscription } = storageState;
+	const { plan, userSubscription, selectPlan } = props;
+	// const { storageState } = useContext(StorageContext);
+	// const { paymentDispatch } = useContext(PaymentContext);
+	// const { userSubscription } = storageState;
 	const current = plan.storageLevel == userSubscription.storageLevel;
 	let button = (
-		<Button onClick={() => { paymentDispatch(selectPlan(plan)); }}>Select Plan</Button>
+		<Button onClick={() => { selectPlan(plan); }}>Select Plan</Button>
 	);
 	
 	let rowClass = '';
@@ -112,6 +154,8 @@ StoragePlanRow.propTypes = {
 		description: PropTypes.string,
 		price: PropTypes.string
 	}).isRequired,
+	userSubscription: userSubscriptionShape,
+	selectPlan: PropTypes.func.isRequired,
 };
 
 function InstitutionProvides(props) {
@@ -161,9 +205,9 @@ InstitutionalRow.propTypes = {
 	institutions: PropTypes.arrayOf(PropTypes.object)
 };
 
-function StorageMeter() {
-	const { storageState } = useContext(StorageContext);
-	const { userSubscription } = storageState;
+function StorageMeter(props) {
+	// const { storageState } = useContext(StorageContext);
+	const { userSubscription } = props;
 	
 	let quota = userSubscription.quota;
 	if (quota == 1000000) {
@@ -195,6 +239,9 @@ function StorageMeter() {
 		</div>
 	);
 }
+StorageMeter.propTypes = {
+	userSubscription: userSubscriptionShape,
+}
 
 function GroupUsage(props) {
 	const { group, usage } = props;
@@ -217,17 +264,7 @@ GroupUsage.propTypes = {
 function PaymentRow(props) {
 	log.debug(PaymentRow);
 	log.debug(props);
-	const { defaultSource, defaultPaymentMethod } = props;
-	const { storageState } = useContext(StorageContext);
-	const { paymentDispatch } = useContext(PaymentContext);
-	const { userSubscription } = storageState;
-	
-	const updateCardHandler = () => {
-		paymentDispatch(updatePayment(userSubscription.storageLevel));
-	};
-	const renewHandler = () => {
-		paymentDispatch(renewNow(userSubscription));
-	};
+	const { defaultSource, defaultPaymentMethod, userSubscription, updateCardHandler, renewHandler } = props;
 	
 	let paymentMethod = defaultSource || defaultPaymentMethod;
 
@@ -296,13 +333,19 @@ PaymentRow.propTypes = {
 };
 
 function NextPaymentRow(props) {
-	const { userSubscription, cancelRecur } = props;
+	const { userSubscription, cancelRecur, stripeCustomer } = props;
 	const { institutionUnlimited } = userSubscription;
 	
 	let d = new Date(parseInt(userSubscription.expirationDate) * 1000);
 	let formattedExpirationDate = d.toLocaleDateString('en-US', dateFormatOptions);
+	const defaultPM = defaultPayment(stripeCustomer);
+	// log.debug("NextPaymentRow");
+	// log.debug(userSubscription.recur);
+	// log.debug(d > Date.now());
+	// log.debug(defaultPM);
+	// log.debug(stripeCustomer);
 	
-	if (userSubscription.recur && d > Date.now()) {
+	if (userSubscription.recur && (d > Date.now()) && defaultPM) {
 		// autorenew is enabled and set for sometime in the future
 		return (
 			<tr>
@@ -338,9 +381,14 @@ function NextPaymentRow(props) {
 	}
 }
 
-function StoragePlansSection() {
+function StoragePlansSection(props) {
 	let planRowNodes = plans.map((plan) => {
-		return <StoragePlanRow key={plan.storageLevel} plan={plan} />;
+		return <StoragePlanRow 
+			key={plan.storageLevel}
+			plan={plan}
+			userSubscription={props.userSubscription}
+			selectPlan={props.selectPlan}
+		/>;
 	});
 
 	return (
@@ -365,49 +413,223 @@ function StoragePlansSection() {
 }
 
 function Storage(props) {
-	const [storageState, storageDispatch] = useReducer(storageReducer, {
-		userSubscription: props.userSubscription,
-		storageGroups: props.storageGroups,
-		planQuotas: {},
-	});
-	const [paymentState, paymentDispatch] = useReducer(paymentReducer, {
-		stripeCustomer: props.stripeCustomer,
-	});
-
-	const { userSubscription, storageGroups } = storageState;
-	const { stripeCustomer, purchase } = paymentState;
-
+	log.debug(props);
+	// const {  } = props;
+	const [ userSubscription, setUserSubscription ] = useState(props.userSubscription);
+	const [ storageGroups, setStorageGroups ] = useState({});
+	// const [ planQuotas, setPlanQuotas ] = useState({});
+	const [ stripeCustomer, setStripeCustomer ] = useState(props.stripeCustomer);
+	const [ purchase, setPurchase ] = useState(null);
 	const [ notification, setNotification ] = useState(null);
 	const [ operationPending, setOperationPending ] = useState(false);
 
+	const [ editPayment, setEditPayment ] = useState((purchase && purchase.type == 'individualPaymentUpdate'));
+
+	// const [storageState, storageDispatch] = useReducer(storageReducer, {
+	// 	userSubscription: props.userSubscription,
+	// 	storageGroups: props.storageGroups,
+	// 	planQuotas: {},
+	// });
+	// const [paymentState, paymentDispatch] = useReducer(paymentReducer, {
+	// 	stripeCustomer: props.stripeCustomer,
+	// });
+
+	// const { userSubscription, storageGroups } = storageState;
+	// const { stripeCustomer, purchase } = paymentState;
+
+	const updateOperationPending = (nv) => {setOperationPending(nv);};
+	const updateStorageNotification = (nv) => {setNotification(nv);};
+	// const updatePurchase = (nv) => {setPurchase(nv);};
+
+	const choosePaymentType = (paymentType) => {
+		let nv = Object.assign({}, purchase, {paymentMethodType: paymentType})
+		setPurchase(nv);
+	}
+
+	const updateCardHandler = () => {
+		setPurchase({
+			type: 'individualPaymentUpdate',
+			storageLevel: userSubscription.storageLevel,
+		});
+		// paymentDispatch(updatePayment(userSubscription.storageLevel));
+	};
+	const renewHandler = () => {
+		setPurchase({
+			type: 'individualRenew',
+			storageLevel: userSubscription.storageLevel,
+		})
+		// paymentDispatch(renewNow(userSubscription));
+	};
+
 	useEffect(
 		() => {
-			if (!props.userSubscription) {
-				getSubscription(storageDispatch);
+			if (!userSubscription || !stripeCustomer) {
+				refresh();
 			}
-			if (!props.stripeCustomer) {
-				getUserCustomer(paymentDispatch);
-			}
+			// if (!props.userSubscription) {
+			// 	getSubscription(setUserSubscription);
+			// }
+			// if (!props.stripeCustomer) {
+			// 	getUserCustomer(setStripeCustomer);
+			// }
 		},
 		[props.userSubscription, props.stripeCustomer]
 	);
+
+	const cancelPurchase = () => {
+		setPurchase(null);
+	}
+
+	const selectPlan = (plan) => {
+		setPurchase({
+			type: 'individualChange',
+			storageLevel: plan.storageLevel
+		});
+	}
 	
+	const getSubscription = async () => {
+		log.debug('getSubscription', 4);
+		try {
+			let resp = await ajax({ url: '/storage/usersubscription' });
+			let data = await resp.json();
+			log.debug(data);
+			setUserSubscription(data.userSubscription);
+			setStorageGroups(data.storageGroups);
+			// setPlanQuotas(data.planQuotas);
+		} catch (e) {
+			log.debug('Error retrieving subscription data', 2);
+			log.debug(e, 2);
+			setNotification({type: 'error', message: 'There was an error retrieving your subscription data'});
+		}
+	}
+	const getUserCustomer = async () => {
+		log.debug('getUserCustomer', 4);
+		try {
+			let resp = await ajax({ url: '/storage/getusercustomer' });
+			log.debug(resp, 4);
+			let data = await resp.json();
+			setStripeCustomer(data);
+		} catch (e) {
+			log.debug('Error retrieving customer data', 2);
+			log.debug(e, 2);
+			setNotification({type: 'error', message: 'There was an error retrieving your subscription data'});
+		}
+	}
+	
+	const refresh = () => {
+		log.debug('refresh');
+		setOperationPending(true);
+		getSubscription();
+		getUserCustomer();
+		setOperationPending(false);
+	};
+
+	const delayedRefresh = () => {
+		log.debug('delayedRefresh');
+		setOperationPending(true);
+		setTimeout(() => {
+			refresh();
+		}, 3000);
+	}
+
 	const cancelRecur = async () => {
 		setOperationPending(true);
 
 		try {
 			let resp = await postFormData('/storage/cancelautorenew', undefined, { withSession: true });
 			log.debug(resp, 4);
-			notifyDispatch(notify('success', 'Automatic renewal disabled'));
+			setNotification({type: 'success', message: 'Automatic renewal disabled'});
 		} catch (e) {
 			log.debug(e);
-			notifyDispatch(notify('error', 'Error updating payment method. Please try again in a few minutes.'));
+			setNotification({type: 'error', message: 'Error updating payment method. Please try again in a few minutes.'});
 		} finally {
 			setOperationPending(false);
 		}
 
-		getUserCustomer(paymentDispatch);
-		getSubscription(storageDispatch);
+		refresh();
+	};
+
+	const handleConfirmPI = async (stripeIntent) => {
+		log.debug('handleConfirmPI');
+		log.debug(stripeIntent);
+		log.debug(purchase);
+		if (operationPending) {
+			log.debug('operation already pending');
+			return;
+		}
+		setOperationPending(true);
+
+		if (stripeIntent === false) {
+			log.debug('stripeIntent is false');
+			// no payment intent because we're using the payment method on file
+			// start an automatically confirmed payment intent or we are making a change
+			// that does not require payment
+			try {
+				let purchaseData = Object.assign({}, purchase);
+				switch (purchase.type) {
+					case 'individualChange':
+						log.debug('individualChange');
+						let response = await ajax({
+							type: 'POST',
+							withSession: true,
+							// url: '/storage/purchase',
+							url: '/storage/newstripeintent',
+							data: JSON.stringify(purchaseData),
+							throwOnError: false,
+						});
+						result = await response.json();
+						log.debug(result);
+						setNotification({type: result.type, message: result.message})
+						refresh();
+						break;
+					case 'individualRenew':
+						let result = await chargeDefaultMethod(purchaseData);
+						if (result.success) {
+							setNotification({type: 'success', message: 'Your payment has been processed.'});
+							// refresh storage and subscription again after 3 seconds
+							delayedRefresh();
+						}
+					default:
+						throw new Error("unexpected purchase.type");
+				}
+			} catch (err) {
+				log.debug(e);
+				log.error("UNEXPECTED THROWN RESPONSE WHEN ATTEMPTING PURCHASE OR CHANGE");
+				setNotification({type: 'error', message: "There was an error processing your request"});
+			} finally {
+				cancelPurchase();
+				setOperationPending(false);
+			}
+		} else {
+			log.debug("stripeIntent included in handleConfirmPI");
+			try {
+				let purchaseData = Object.assign({}, purchase);
+				switch (purchase.type) {
+					case 'individualPaymentUpdate':
+						break;
+					default:
+						throw new Error("unexpected purchase.type");
+				}
+			} catch (err) {
+				log.debug(e);
+				log.error("UNEXPECTED THROWN RESPONSE WHEN ATTEMPTING PURCHASE OR CHANGE");
+				setNotification({type: 'error', message: "There was an error processing your request"});
+			} finally {
+				cancelPurchase();
+				setOperationPending(false);
+			}
+			delayedRefresh();
+		}
+	};
+
+	const handleInvoiceRequest = async (evt) => {
+		evt.preventDefault();
+		setOperationPending(true);
+		let result = await createInvoice({ type: 'individual', storageLevel: purchase.storageLevel });
+		setNotification(result);
+		// notifyDispatch(notify(result.type, result.message));
+		cancelPurchase();
+		setOperationPending(false);
 	};
 	
 	if (userSubscription === null) {
@@ -451,29 +673,127 @@ function Storage(props) {
 
 	let paymentRow = null;
 	if (userSubscription.storageLevel != 1) {
+		let paymentRowProps = {
+			userSubscription,
+			updateCardHandler,
+			renewHandler,
+		};
 		if (stripeCustomer) {
-			paymentRow = (<PaymentRow
-				defaultSource={stripeCustomer.default_source}
-				defaultPaymentMethod={stripeCustomer.invoice_settings.default_payment_method}
-			/>);
-		} else {
-			paymentRow = <PaymentRow />;
+			paymentRowProps.defaultSource = stripeCustomer.default_source;
+			paymentRowProps.defaultPaymentMethod = stripeCustomer.invoice_settings.default_payment_method;
 		}
+		
+		paymentRow = (<PaymentRow {...paymentRowProps} />);
 	}
 	
 	let Payment = null;
-	if (purchase && !props.summary) {
-		Payment = (<SubscriptionHandler
-			{...{
-				purchase,
-				setNotification
-			}}
-			returnUrl={storageUrl}
-		/>);
+	if(purchase) {
+		// Determine requirements for current purchase
+		let description = [];
+		let chargeAmount = 0;
+		let error = null;
+		let paymentInfoRequired = false;
+		let immediateChargeRequired = imminentExpiration(userSubscription.expirationDate);
+		let invoicePossible = false;
+
+		const { type, storageLevel } = purchase;
+		switch (type) {
+		case 'individualChange':
+			log.debug('individualChange', 4);
+			log.debug(userSubscription, 4);
+			description.push(`Change storage plan to ${storageLevelDescriptions[storageLevel]}`);
+			if (immediateChargeRequired) {
+				log.debug('immediateCharge is requried', 4);
+				let newExp = calculateNewExpiration(userSubscription.expirationDate, userSubscription.storageLevel, storageLevel);
+				description.push(`Expiring on ${newExp.toLocaleDateString('en-US', dateFormatOptions)}.`);
+				description.push(`A charge will be made to your account once you confirm your order.`);
+				chargeAmount = priceCents[storageLevel];
+				invoicePossible = true;
+			} else {
+				let oldExp = new Date(parseInt(userSubscription.expirationDate) * 1000);
+				let newExp = calculateNewExpiration(userSubscription.expirationDate, userSubscription.storageLevel, storageLevel);
+				description.push(`Your current expiration date is ${oldExp.toLocaleDateString('en-US', dateFormatOptions)}.`);
+				description.push(`The time left on your current subscription will be applied to your new subscription. Your new expiration date will be ${newExp.toLocaleDateString('en-US', dateFormatOptions)}.`);
+				description.push(`A charge will not be made to your account until your new expiration date.`);
+			}
+			break;
+		case 'individualPaymentUpdate':
+			description.push(`Update your saved payment details for your next renewal. There will be no charge made until your expiration date.`);
+			paymentInfoRequired = true;
+			break;
+		case 'individualRenew':
+			description.push(`Renew your current ${storageLevelDescriptions[storageLevel]} subscription.`);
+			description.push(`Your card or bank account will be charged immediately after confirming.`);
+			chargeAmount = priceCents[storageLevel];
+			immediateChargeRequired = true;
+			invoicePossible = true;
+			break;
+		default:
+			throw new Error('Unknown purchase type');
+		}
+		if (type == 'individualChange' || type == 'individualRenew') {
+			if (overQuota(storageLevel, userSubscription)) {
+				error = <Alert color='error'>Current usage exceeds the chosen plan&apos;s quota. You&apos;ll need to choose a larger storage plan, or delete some files from your Zotero storage.</Alert>;
+				description = [];
+			}
+		}
+		
+		log.debug(`immediateChargeRequired: ${immediateChargeRequired}`);
+		log.debug(stripeCustomer);
+		let havePaymentMethod = false;
+		if (stripeCustomer && stripeCustomer.deleted !== true) {
+			if (stripeCustomer.default_source !== null || stripeCustomer.invoice_settings.default_payment_method !== null) {
+				havePaymentMethod = true;
+			}
+		}
+		// (stripeCustomer && (stripeCustomer.deleted !== true) && (stripeCustomer.default_source !== null || stripeCustomer.invoice_settings.default_payment_method !== null));
+		if ((immediateChargeRequired || paymentInfoRequired) && !havePaymentMethod && !editPayment) {
+			log.debug("setting editPayment to true");
+			setEditPayment(true);
+		} else if(purchase.type == 'individualPaymentUpdate' && !editPayment) {
+			log.debug("setting editPayment to true for individualPaymentUpdate");
+			setEditPayment(true);
+		} else {
+			log.debug("not setting editPayment to true");
+		}
+
+		if (immediateChargeRequired && !purchase.immediateCharge) {
+			setPurchase(Object.assign({}, purchase, {immediateCharge: true}));
+		}
+
+		let chargeDescription = storageLevel ? storageLevelDescriptions[storageLevel] : "Update payment method";
+
+		log.debug(`editPayment: ${editPayment}`);
+		if (!props.summary) {
+			Payment = (<SubscriptionHandler
+				{...{
+					description,
+					userSubscription,
+					stripeCustomer,
+					purchase,
+					// updatePurchase,
+					setNotification,
+					cancelPurchase,
+					handleConfirmPI,
+					handleInvoiceRequest,
+					invoicePossible,
+					chargeAmount,
+					error,
+					allowRenew: false,
+					editPayment,
+					setEditPayment,
+					operationPending,
+					setOperationPending,
+					chargeDescription,
+					choosePaymentType,
+				}}
+				returnUrl={storageUrl}
+			/>);
+		}
 	}
-	
+
 	return (
-		<ErrorWrapper><StorageContext.Provider value={{ storageDispatch, storageState }}><PaymentContext.Provider value={{ paymentDispatch, paymentState }}>
+		<ErrorWrapper>
 			<div className='storage-container'>
 				{Payment}
 				{operationPending
@@ -484,7 +804,7 @@ function Storage(props) {
 				<div className='user-storage'>
 					<Row className='my-3'>
 						<Col md='12'>
-							<Invoices invoices={props.userInvoices} setNotification={setNotification} type='individual' collapseLabel='Show Invoices' />
+							<Invoices invoices={props.userInvoices} setNotification={setNotification} type={['individual', 'individualRenew']} collapseLabel='Show Invoices' />
 							<Invoices invoices={props.userInvoices} setNotification={setNotification} type='contribution' collapseLabel='Show Contributions' />
 						</Col>
 					</Row>
@@ -511,11 +831,11 @@ function Storage(props) {
 													<p>My Library - {userSubscription.usage.library} MB</p>
 													{groupUsageNodes}
 													<p>Total - {userSubscription.usage.total} MB</p>
-													<StorageMeter />
+													<StorageMeter {...{userSubscription}} />
 												</td>
 											</tr>
 											{paymentRow}
-											<NextPaymentRow userSubscription={userSubscription} cancelRecur={cancelRecur} />
+											<NextPaymentRow {...{userSubscription, stripeCustomer, cancelRecur}} />
 											<InstitutionalRow institutions={userSubscription.institutions} />
 										</tbody>
 									</table>
@@ -523,12 +843,12 @@ function Storage(props) {
 							</div>
 						</Col>
 						<Col md='6'>
-							{userSubscription.institutionUnlimited ? null : <StoragePlansSection />}
+							{userSubscription.institutionUnlimited ? null : <StoragePlansSection {...{selectPlan, userSubscription}} />}
 						</Col>
 					</Row>
 				</div>
 			</div>
-		</PaymentContext.Provider></StorageContext.Provider></ErrorWrapper>
+		</ErrorWrapper>
 	);
 }
 Storage.propTypes = {
@@ -543,4 +863,4 @@ function StorageSummary(props) {
 	return <Storage summary={true} {...props} />;
 }
 
-export { Storage, StorageContext, StorageSummary };
+export { Storage, StorageSummary };

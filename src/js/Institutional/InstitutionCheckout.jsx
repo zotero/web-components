@@ -10,7 +10,7 @@ import { formatCurrency } from '../Utils.js';
 import { postFormData } from '../ajax.js';
 
 let institutionPrice = function (fte) {
-	return (200000 + ((Math.max(500, fte) - 500) * 40));
+	return (210000 + ((Math.max(500, fte) - 500) * 42));
 };
 
 function FormFieldErrorMessage(props) {

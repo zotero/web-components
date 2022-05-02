@@ -1,7 +1,7 @@
 import { log as logger } from '../Log.js';
-var log = logger.Logger('SubscriptionHandler', 1);
+var log = logger.Logger('InstitutionHandler', 1);
 
-import { useState, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Card, CardHeader, CardBody, FormGroup, Input, Modal, ModalBody, ModalHeader, Label, Row, Col, Button, Container } from 'reactstrap';
 
@@ -9,80 +9,39 @@ import { labPrice, labUserPrice } from './calculations.js';
 import { PaymentElementModal } from './PaymentElementModal.jsx';
 import { PaymentSource } from './PaymentSource.jsx';
 
-import { postFormData, ajax } from '../ajax.js';
+import { ajax } from '../ajax.js';
 import { buildUrl } from '../wwwroutes.js';
 import { LoadingSpinner } from '../LoadingSpinner.js';
 
-import { PaymentContext, NotifierContext, notify, cancelPurchase } from './actions.js';
+import { createInstitutionInvoice, beginStripeIntent } from './actions.js';
 
 import { formatCurrency } from '../Utils.js';
 
-async function createInvoice(type, fte, additionalFTE, name, institutionID) {
-	try {
-		let resp;
-		switch (type) {
-		case 'labRenew':
-			if (!fte) throw new Error('no fte set');
-			if (!institutionID) throw new Error('no institutionID set');
-			
-			resp = await postFormData('/settings/storage/createinvoice', { type: 'labRenew', numUsers: fte, institutionID }, { withSession: true });
-			break;
-		case 'lab':
-			if (!fte) throw new Error('no fte set');
-			
-			let params = { type: 'lab', numUsers: fte };
-			if (institutionID) params.institutionID = institutionID;
-			resp = await postFormData('/settings/storage/createinvoice', params, { withSession: true });
-			break;
-		case 'addLabUsers':
-			if (!institutionID) throw new Error('no institutionID set');
-			if (!additionalFTE) throw new Error('no additionalFTE set');
-			
-			resp = await postFormData('/settings/storage/createinvoice', { type: 'addLabUsers', numUsers: additionalFTE, institutionID }, { withSession: true });
-			break;
-		case 'institution':
-			// TODO
-			throw new Error('unimplemented invoice type');
-		default:
-			throw new Error('unrecognized type');
-		}
-		
-		if (resp.ok) {
-			const respData = await resp.json();
-			const { invoiceID } = respData;
-			return { type: 'success', message: <span>Invoice created. <a href={`/storage/invoice/${invoiceID}`}>View Invoice</a></span> };
-		} else {
-			throw resp;
-		}
-	} catch (e) {
-		log.error(e);
-		return { type: 'error', message: 'Error creating invoice. Please try again in a few minutes.' };
-	}
-}
 
 function InstitutionHandler(props) {
-	const { purchase, renew, institutionID } = props;
+	const { purchase, stripeCustomer, setPurchase, renew, institutionID, setNotification } = props;
 	const { type, fte, name, additionalFTE } = purchase;
-	const { paymentDispatch, paymentState } = useContext(PaymentContext);
-	const { notifyDispatch } = useContext(NotifierContext);
+	// const { paymentDispatch, paymentState } = useContext(PaymentContext);
 	
-	const { stripeCustomer } = paymentState;
+	// const { stripeCustomer } = paymentState;
 	
+	const [autorenew, setAutorenew] = useState(true);
+	const [editPayment, setEditPayment] = useState((type == 'paymentUpdate'));
+	const [operationPending, setOperationPending] = useState(false);
+	const [stripeIntent, setStripeIntent] = useState(false);
+
 	// clear the new subscription closing the Handler, because it is either complete, or canceled
 	const cancel = () => {
 		setOperationPending(false);
-		paymentDispatch(cancelPurchase());
+		setPurchase(null);
+		// paymentDispatch(cancelPurchase());
 	};
 	
 	let description = [];
 	let chargeAmount = false;
 	let error = null;
 	let immediateChargeRequired = true;
-	
-	const [autorenew, setAutorenew] = useState(true);
-	const [editPayment, setEditPayment] = useState((type == 'individualPaymentUpdate'));
-	const [operationPending, setOperationPending] = useState(false);
-	
+		
 	switch (type) {
 	case 'paymentUpdate':
 		description.push(`Update your saved payment details for your next renewal. There will be no charge made until your expiration date.`);
@@ -116,6 +75,28 @@ function InstitutionHandler(props) {
 		setEditPayment(true);
 	}
 	
+	useEffect(async () => {
+		log.debug("useEffect beginStripeIntent");
+		log.debug(purchase);
+		if (!stripeIntent) {
+			if (editPayment) {
+				setOperationPending(true);
+				let purchaseData = Object.assign({}, purchase);
+				if (purchase.fte) {
+					purchaseData.numUsers = purchase.fte;
+				} else if (purchase.additionalFTE) {
+					purchaseData.numUsers = purchase.additionalFTE;
+				}
+				if (purchase.name) {
+					purchaseData.institutionName = name;
+				}
+				
+				await beginStripeIntent(purchaseData, setStripeIntent);
+				setOperationPending(false);
+			}
+		}
+	}, [editPayment, chargeAmount]);
+
 	let descriptionPs = description.map((d, i) => {
 		return <p key={i}>{d}</p>;
 	});
@@ -210,7 +191,8 @@ function InstitutionHandler(props) {
 			}
 		}
 
-		notifyDispatch(notify(result.type, result.message));
+
+		setNotification(result);
 		cancel();
 	};
 	
@@ -250,34 +232,36 @@ function InstitutionHandler(props) {
 
 	const handleInvoiceRequest = async () => {
 		setOperationPending(true);
-		let result = await createInvoice(type, fte, additionalFTE, name, institutionID);
-		notifyDispatch(notify(result.type, result.message));
+		let result = await createInstitutionInvoice({type, fte, additionalFTE, name, institutionID});
+		setNotification(result);
 		cancel();
 	};
 	
-	let blabel = immediateChargeRequired ? `Pay ${formatCurrency(chargeAmount)}` : 'Confirm';
+	let buttonLabel = immediateChargeRequired ? `Pay ${formatCurrency(chargeAmount)}` : 'Confirm';
 	
 	let paymentSection = null;
 	if (editPayment) {
+		log.debug('editPayment - rendering PaymentElementModal');
+		log.debug(stripeIntent);
 		paymentSection = <PaymentElementModal
 			stripe={window.stripe}
 			{...{
-				immediateChargeRequired,
-				handleConfirm,
-				paymentIntent,
-				chargeAmount,
+				purchase,
+				stripeIntent,
 				operationPending,
 				setOperationPending,
+				setNotification,
 				buttonLabel,
 				useEmail: true,
+				returnUrl: window.location.toString(),
 			}}
 			chargeDescription="Charge"
 		/>;
-		paymentSection = <CardPaymentModal
-			stripe={window.stripe}
-			{...{ handleConfirm, chargeAmount, immediateChargeRequired, setOperationPending }}
-			buttonLabel={blabel}
-		/>;
+		// paymentSection = <CardPaymentModal
+		// 	stripe={window.stripe}
+		// 	{...{ handleConfirm, chargeAmount, immediateChargeRequired, setOperationPending }}
+		// 	buttonLabel={blabel}
+		// />;
 	} else if (stripeCustomer && immediateChargeRequired) {
 		const defaultSource = stripeCustomer.default_source || stripeCustomer.invoice_settings.default_payment_method;
 		if (defaultSource) {
@@ -293,7 +277,7 @@ function InstitutionHandler(props) {
 						</CardBody>
 					</Card>
 					<Row className='mt-2'>
-						<Col className='text-center'><Button className='m-auto' onClick={() => { handleConfirm(false); }}>{blabel}</Button></Col>
+						<Col className='text-center'><Button className='m-auto' onClick={() => { handleConfirm(false); }}>{buttonLabel}</Button></Col>
 						<Col className='text-center'><Button className='m-auto' onClick={cancel}>Cancel</Button></Col>
 					</Row>
 				</div>
@@ -303,7 +287,7 @@ function InstitutionHandler(props) {
 		paymentSection = (
 			<Container>
 				<Row>
-					<Col className='text-center'><Button className='m-auto' onClick={handleConfirm}>{blabel}</Button></Col>
+					<Col className='text-center'><Button className='m-auto' onClick={handleConfirm}>{buttonLabel}</Button></Col>
 					<Col className='text-center'><Button className='m-auto' onClick={cancel}>Cancel</Button></Col>
 				</Row>
 			</Container>

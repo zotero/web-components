@@ -14,28 +14,20 @@ Flows:
 */
 
 import { log as logger } from '../Log.js';
-var log = logger.Logger('SubscriptionHandler', 1);
+var log = logger.Logger('SubscriptionHandler');
 
 import { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { Alert, Card, CardHeader, CardBody, FormGroup, Input, Modal, ModalBody, ModalHeader, Label, Row, Col, Button, Container } from 'reactstrap';
 
-import { StorageContext, PaymentContext, refresh, cancelPurchase, immediateCharge, updateIntent } from './actions.js';
-import { imminentExpiration, calculateNewExpiration, priceCents } from './calculations.js';
+import { beginStripeIntent, chargeDefaultMethod, createInvoice, StorageContext, PaymentContext, refresh, cancelPurchase, immediateCharge, updateIntent } from './actions.js';
 import { PaymentElementModal } from './PaymentElementModal.jsx';
 import { PaymentSource } from './PaymentSource.jsx';
 
-import { postFormData, ajax } from '../ajax.js';
 import { LoadingSpinner } from '../LoadingSpinner.js';
 import { formatCurrency } from '../Utils.js';
 
 const dateFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-
-const storageLevelDescriptions = {
-	2: '2 GB',
-	3: '6 GB',
-	6: 'Unlimited storage'
-};
 
 /*
 const IndividualDescriptions = {
@@ -44,62 +36,6 @@ const IndividualDescriptions = {
 	6: 'Unlimited storage, 1 year'
 };
 */
-const overQuota = function (storageLevel, userSubscription) {
-	const planQuotas = window.zoteroData.planQuotas;
-	let planQuota = planQuotas[storageLevel];
-	if (userSubscription.usage.total > planQuota) {
-		return true;
-	}
-	return false;
-};
-
-// async function beginIntent(amount, description, storageLevel, immediateCharge) {
-async function beginIntent(purchase, paymentDispatch) {
-	log.debug(`beginIntent:`);
-	// log.debug(paymentDispatch);
-	log.debug(purchase);
-	// let args = { amount, description, storageLevel, immediateCharge };
-	let resp = await ajax({
-		url: '/storage/newstripeintent',
-		// url: '/storage/purchase',
-		type: 'POST',
-		withSession: true,
-		data: JSON.stringify(purchase),
-	});
-	// let resp = await postFormData('/storage/newstripeintent', args, { withSession: true });
-	log.debug(resp, 4);
-	let data = await resp.json();
-	log.debug(data);
-	if (data.success) {
-		log.debug('successful beginIntent: dispatching UPDATE_INTENT');
-		paymentDispatch(updateIntent(data));
-		// paymentDispatch({ type: UPDATE_INTENT, paymentIntent: { client_secret: data.client_secret } });
-		return data.client_secret;
-	} else {
-		throw data;
-	}
-}
-
-async function createInvoice(storageLevel = false) {
-	if (storageLevel === false) {
-		throw new Error('no storageLevel set for createInvoice');
-	}
-	
-	let resp;
-	try {
-		resp = await postFormData('/settings/storage/createinvoice', { type: 'individual', storageLevel: storageLevel }, { withSession: true });
-		if (resp.ok) {
-			const respData = await resp.json();
-			const { invoiceID } = respData;
-			return { type: 'success', message: <span>Invoice created. <a href={`/storage/invoice/${invoiceID}`}>View Invoice</a></span> };
-		} else {
-			throw resp;
-		}
-	} catch (e) {
-		log.error(e);
-		return { type: 'error', message: 'Error creating invoice. Please try again in a few minutes.' };
-	}
-}
 
 // component that handles a request for payment, presenting the PaymentModal and processing
 // the payment or saving the customer for future use as necessary
@@ -109,144 +45,59 @@ async function createInvoice(storageLevel = false) {
 // type is one of: individualChange, individualUpdate, individualRenew
 
 function SubscriptionHandler(props) {
-	const { purchase, renew, returnUrl, setNotification } = props;
+	const { userSubscription, choosePaymentType, chargeDescription, operationPending, setOperationPending, error, editPayment, setEditPayment, chargeAmount, description, stripeCustomer, purchase, allowRenew, returnUrl, setNotification, cancelPurchase, handleInvoiceRequest, handleConfirmPI } = props;
 	const { type, storageLevel } = purchase;
-	const { storageDispatch, storageState } = useContext(StorageContext);
-	// const { notifyDispatch } = useContext(NotifierContext);
-	const { paymentDispatch, paymentState } = useContext(PaymentContext);
+	log.debug(props);
+
+	const [ stripeIntent, setStripeIntent ] = useState(null);
+	const [autorenew, setAutorenew] = useState(true);
 	
-	const { userSubscription } = storageState;
-	const { stripeCustomer, paymentIntent } = paymentState;
+	// const { stripeCustomer } = paymentState;
 	log.debug(stripeCustomer, 4);
 	// clear the new subscription closing the Handler, because it is either complete, or canceled
 	const cancel = () => {
 		setOperationPending(false);
-		paymentDispatch(cancelPurchase());
+		cancelPurchase();
+		// paymentDispatch(cancelPurchase());
 	};
 	
-	let description = [];
-	let chargeAmount = 0;
-	let error = null;
-	// let paymentInfoRequired = false;
-	let immediateChargeRequired = imminentExpiration(userSubscription.expirationDate);
-	let invoicePossible = false;
-	
-	const [autorenew, setAutorenew] = useState(true);
-	const [editPayment, setEditPayment] = useState((type == 'individualPaymentUpdate'));
-	const [operationPending, setOperationPending] = useState(false);
-	
-	switch (type) {
-	case 'individualChange':
-		log.debug('individualChange', 4);
-		log.debug(userSubscription, 4);
-		description.push(`Change storage plan to ${storageLevelDescriptions[storageLevel]}`);
-		if (immediateChargeRequired) {
-			log.debug('immediateCharge is requried', 4);
-			let newExp = calculateNewExpiration(userSubscription.expirationDate, userSubscription.storageLevel, storageLevel);
-			description.push(`Expiring on ${newExp.toLocaleDateString('en-US', dateFormatOptions)}.`);
-			description.push(`A charge will be made to your account once you confirm your order.`);
-			chargeAmount = priceCents[storageLevel];
-			invoicePossible = true;
-		} else {
-			let oldExp = new Date(parseInt(userSubscription.expirationDate) * 1000);
-			let newExp = calculateNewExpiration(userSubscription.expirationDate, userSubscription.storageLevel, storageLevel);
-			description.push(`Your current expiration date is ${oldExp.toLocaleDateString('en-US', dateFormatOptions)}.`);
-			description.push(`The time left on your current subscription will be applied to your new subscription. Your new expiration date will be ${newExp.toLocaleDateString('en-US', dateFormatOptions)}.`);
-			description.push(`A charge will not be made to your account until your new expiration date.`);
-		}
-		break;
-	case 'individualPaymentUpdate':
-		description.push(`Update your saved payment details for your next renewal. There will be no charge made until your expiration date.`);
-		break;
-	case 'individualRenew':
-		description.push(`Renew your current ${storageLevelDescriptions[storageLevel]} subscription.`);
-		description.push(`Your card or bank account will be charged immediately after confirming.`);
-		chargeAmount = priceCents[storageLevel];
-		immediateChargeRequired = true;
-		invoicePossible = true;
-		break;
-	default:
-		throw new Error('Unknown purchase type');
-	}
-	if (type == 'individualChange' || type == 'individualRenew') {
-		if (overQuota(storageLevel, userSubscription)) {
-			error = <Alert color='error'>Current usage exceeds the chosen plan&apos;s quota. You&apos;ll need to choose a larger storage plan, or delete some files from your Zotero storage.</Alert>;
-			description = [];
-		}
-	}
-	
-	log.debug(`immediateChargeRequired: ${immediateChargeRequired}`);
-	log.debug(stripeCustomer);
-	let havePaymentMethod = false;
-	if (stripeCustomer && stripeCustomer.deleted !== true) {
-		if (stripeCustomer.default_source !== null || stripeCustomer.invoice_settings.default_payment_method !== null) {
-			havePaymentMethod = true;
-		}
-	}
-	// (stripeCustomer && (stripeCustomer.deleted !== true) && (stripeCustomer.default_source !== null || stripeCustomer.invoice_settings.default_payment_method !== null));
-	if (immediateChargeRequired && !havePaymentMethod && !editPayment) {
-		setEditPayment(true);
-	}
-
 	// update payment with immediateChargeRequired
-	useEffect(() => {
-		if (immediateChargeRequired) {
-			paymentDispatch(immediateCharge(immediateChargeRequired));
-		}
-	}, []);
+	// useEffect(() => {
+	// 	if (immediateChargeRequired) {
+	// 		setPurchase(Object.assign({}, purchase, {immediateCharge: true}));
+	// 		// paymentDispatch(immediateCharge(immediateChargeRequired));
+	// 	}
+	// }, []);
+	// if (immediateChargeRequired) {
+	// 	setPurchase(Object.assign({}, purchase, {immediateCharge: true}));
+	// }
 
 	useEffect(async () => {
-		log.debug("useEffect beginIntent");
-		log.debug(purchase);
-		if (!paymentIntent) {
-			if (purchase.immediateCharge || purchase.type=='individualPaymentUpdate') {
+		log.debug("useEffect beginStripeIntent");
+		// log.debug(purchase);
+		// log.debug(editPayment);
+		// log.debug(stripeIntent);
+		if (editPayment && !stripeIntent) {
+			if (purchase.immediateCharge || (purchase.type == 'individualPaymentUpdate') ) {
 				setOperationPending(true);
-				await beginIntent(purchase, paymentDispatch);
+				try {
+					await beginStripeIntent(purchase, setStripeIntent);
+				} catch (e) {
+					setNotification({type: "error", message: "There was an error with our payment processor. Please try again."});
+					cancel();
+				}
 				setOperationPending(false);
 			}
+		} else {
+			log.debug('not beginning intent');
 		}
-	}, [purchase, chargeAmount]);
+	}, [purchase, chargeAmount, editPayment]);
 
 	let descriptionPs = description.map((d, i) => {
 		return <p key={i}>{d}</p>;
 	});
 	
-	const handleConfirmPI = async (paymentIntent) => {
-		log.debug('handleConfirmPI');
-		log.debug(paymentItent);
-		if (operationPending) {
-			log.debug('operation already pending');
-			return;
-		}
-		let response;
-		let result;
-		setOperationPending(true);
-		let purchaseData = Object.assign({}, purchase, { paymentIntent });
-		log.debug(purchaseData);
-		try {
-			response = await ajax({
-				type: 'POST',
-				withSession: true,
-				url: '/storage/purchase',
-				data: JSON.stringify(purchaseData),
-				throwOnError: false,
-			});
-		} catch (unexpectedThrownResponse) {
-			log.error("UNEXPECTED THROWN RESPONSE WHEN ATTEMPTING PURCHASE");
-		} finally {
-			log.debug('got response from handleConfirmPI');
-			result = await response.json();
-			log.debug(result);
-			let notifyType = result.success ? 'success' : 'error';
-			let notifyMessage = result.message;
-
-			refresh(storageDispatch, paymentDispatch);
-			setNotification({type: notifyType, message: notifyMessage});
-			// notifyDispatch(notify(notifyType, notifyMessage));
-			cancel();
-		}
-		setOperationPending(true);
-	};
+	
 /*
 	const handleConfirm = async (paymentMethod) => {
 		log.debug('handleConfirm');
@@ -322,36 +173,30 @@ function SubscriptionHandler(props) {
 		}
 	};
 */	
-	const handleInvoiceRequest = async (evt) => {
-		evt.preventDefault();
-		setOperationPending(true);
-		let result = await createInvoice(storageLevel);
-		setNotification(result);
-		// notifyDispatch(notify(result.type, result.message));
-		cancel();
-	};
 	
-	let buttonLabel = immediateChargeRequired ? `Pay ${formatCurrency(chargeAmount)}` : 'Confirm';
+	let buttonLabel = purchase.immediateCharge ? `Pay ${formatCurrency(chargeAmount)}` : 'Confirm';
 	
 	let paymentSection = null;
 	if (editPayment) {
-		//
+		// allow entry of new payment details
 		paymentSection = <PaymentElementModal
 			stripe={window.stripe}
-			{...{ 
-				// immediateChargeRequired,
-				// handleConfirm: handleConfirmPI,
-				paymentIntent,
-				// chargeAmount,
+			{...{
+				purchase,
+				stripeIntent,
 				operationPending,
 				setOperationPending,
 				buttonLabel,
 				returnUrl,
 				setNotification,
+				cancel,
+				chargeDescription,
+				choosePaymentType,
+				handleConfirm: handleConfirmPI,
 			}}
-			chargeDescription={storageLevel ? storageLevelDescriptions[storageLevel] : "Update payment method"}
 		/>;
-	} else if (stripeCustomer && immediateChargeRequired) {
+	} else if (stripeCustomer && !editPayment && purchase.immediateCharge) {
+		// show existing payment method on file that will be charged, with link to change it if desired
 		const defaultSource = stripeCustomer.default_source || stripeCustomer.invoice_settings.default_payment_method;
 		if (defaultSource) {
 			paymentSection = (
@@ -366,17 +211,18 @@ function SubscriptionHandler(props) {
 						</CardBody>
 					</Card>
 					<Row className='mt-2'>
-						<Col className='text-center'><Button className='m-auto' onClick={() => { handleConfirm(false); }}>{buttonLabel}</Button></Col>
+						<Col className='text-center'><Button className='m-auto' onClick={() => { handleConfirmPI(false); }}>{buttonLabel}</Button></Col>
 						<Col className='text-center'><Button className='m-auto' onClick={cancel}>Cancel</Button></Col>
 					</Row>
 				</div>
 			);
 		}
 	} else {
+		// TODO: should we ever see this?
 		paymentSection = (
 			<Container>
 				<Row>
-					<Col className='text-center'><Button className='m-auto' onClick={handleConfirmPI}>{buttonLabel}</Button></Col>
+					<Col className='text-center'><Button className='m-auto' onClick={() => {handleConfirmPI(false);}}>{buttonLabel}</Button></Col>
 					<Col className='text-center'><Button className='m-auto' onClick={cancel}>Cancel</Button></Col>
 				</Row>
 			</Container>
@@ -384,7 +230,7 @@ function SubscriptionHandler(props) {
 	}
 	
 	let renewSection = null;
-	if (renew) {
+	if (allowRenew) {
 		renewSection = (
 			<Card className='mt-4'>
 				<CardBody>
@@ -404,7 +250,7 @@ function SubscriptionHandler(props) {
 	}
 	
 	let invoiceSection = null;
-	if (invoicePossible) {
+	if (props.invoicePossible) {
 		invoiceSection = (
 			<Container className='mt-4'>
 				<Row>
@@ -448,7 +294,7 @@ SubscriptionHandler.propTypes = {
 		type: PropTypes.string.isRequired,
 		storageLevel: PropTypes.number
 	}).isRequired,
-	renew: PropTypes.bool,
+	allowRenew: PropTypes.bool,
 	requestedStorageLevel: PropTypes.number,
 	labUsers: PropTypes.number
 };

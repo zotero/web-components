@@ -33,6 +33,9 @@ function Invoices(props) {
 	if (type) {
 		log.debug(`filtering by type ${type}`, 4);
 		invoices = invoices.filter((invoice) => {
+			if(Array.isArray(type)) {
+				return type.includes(invoice.invoiceType);
+			}
 			return invoice.invoiceType == type;
 		});
 	}
@@ -89,7 +92,10 @@ Invoices.defaultProps = {
 Invoices.propTypes = {
 	collapseLabel: PropTypes.string,
 	invoices: PropTypes.array,
-	type: PropTypes.oneOf(['individual', 'lab', 'institution', 'contribution'])
+	type: PropTypes.oneOfType([
+		PropTypes.arrayOf(PropTypes.string),
+		PropTypes.oneOf(['individual', 'individualRenew', 'lab', 'institution', 'contribution'])
+	])
 };
 
 export { Invoices };

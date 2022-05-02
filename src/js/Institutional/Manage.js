@@ -16,22 +16,22 @@ import { formatCurrency } from '../Utils.js';
 import { postFormData } from '../ajax.js';
 import { buildUrl } from '../wwwroutes.js';
 import { InstitutionHandler } from '../storage/InstitutionHandler.jsx';
-import { LabContext, labReducer, PaymentContext, paymentReducer, NotifierContext, notifyReducer, notify, setEmails, UPDATE_NAME, UPDATE_PURCHASE } from '../storage/actions.js';
+import { LabContext, labReducer, PaymentContext, paymentReducer, setEmails, UPDATE_NAME, UPDATE_PURCHASE } from '../storage/actions.js';
 import { Invoices } from '../storage/Invoices.jsx';
 
 
-function LabRenew(_props) {
+function LabRenew(props) {
 	const { labState } = useContext(LabContext);
 	const { paymentDispatch, paymentState } = useContext(PaymentContext);
-	const { notifyDispatch } = useContext(NotifierContext);
 	
+	const { setNotification } = props;
 	const { purchase } = paymentState;
 	const { fte, name, institutionID } = labState;
 	const [showRenew, setShowRenew] = useState(false);
 	const [showAddUsers, setShowAddUsers] = useState(false);
 	const [renewFTE, setRenewFTE] = useState(fte);
 	const [additionalFTE, setAdditionalFTE] = useState(1);
-
+	
 	const renewLab = () => {
 		let renewFTENum = parseInt(renewFTE);
 		if (renewFTENum < 15) {
@@ -48,7 +48,7 @@ function LabRenew(_props) {
 	const purchaseUsers = () => {
 		let addFTENum = parseInt(additionalFTE);
 		if (!(addFTENum > 0)) {
-			notifyDispatch(notify('error', 'Invalid number of additional users'));
+			setNotification({type:'error', message: 'Invalid number of additional users'})
 			return;
 		}
 		paymentDispatch({ type: UPDATE_PURCHASE, purchase: {
@@ -208,10 +208,7 @@ function Manage(props) {
 	const [paymentState, paymentDispatch] = useReducer(paymentReducer, {
 		stripeCustomer: props.stripeCustomer,
 	});
-	const [notifyState, notifyDispatch] = useReducer(notifyReducer, {
-		operationPending: false,
-		notification: null
-	});
+
 	const [labState, labDispatch] = useReducer(labReducer, {
 		institutionID,
 		name: props.name,
@@ -219,7 +216,7 @@ function Manage(props) {
 		fte: props.fte
 	});
 	
-	const { notification } = notifyState;
+	const [notification, setNotification] = useState(null);
 	const { name, emails, fte } = labState;
 	// update email list form
 	const handleEmailChange = (evt) => {
@@ -239,11 +236,11 @@ function Manage(props) {
 			}
 			let respData = await resp.json();
 			log.debug(respData, 4);
-			notifyDispatch(notify('success', (<p>Email list updated</p>)));
+			setNotification({type: 'success', message: (<p>Email list updated</p>)});
 			// labDispatch({type:SET_FTE, fte:emails.length});
 		} catch (e) {
 			log.debug(e);
-			notifyDispatch(notify('error', (<p>There was an error updating the email list</p>)));
+			setNotification({type: 'error', message: (<p>There was an error updating the email list</p>)});
 		}
 	};
 	
@@ -259,13 +256,13 @@ function Manage(props) {
 			let respData = await resp.json();
 			if (respData.success) {
 				labDispatch({ type: UPDATE_NAME, name });
-				notifyDispatch(notify('success', <p>Institution updated</p>));
+				setNotification({type: 'success', message:(<p>Institution updated</p>)});
 			} else {
 				throw new Error('Request failed');
 			}
 		} catch (e) {
 			log.debug(e);
-			notifyDispatch(notify('error', <p>There was an error updating the email list</p>));
+			setNotification({type: 'error', message: (<p>There was an error updating the email list</p>)});
 		}
 	};
 	
@@ -273,44 +270,42 @@ function Manage(props) {
 	return (
 		<LabContext.Provider value={{ labDispatch, labState }}>
 			<PaymentContext.Provider value={{ paymentDispatch, paymentState }}>
-				<NotifierContext.Provider value={{ notifyDispatch, notifyState }}>
-					<div className='manage-institution'>
-						<Notifier {...notification} />
-						<Row className='my-3'>
-							<Col md='12'>
-								<Invoices invoices={labInvoices} />
-								<ReceiptsTable labInvoices={labInvoices} charges={charges} />
-							</Col>
-						</Row>
-						<Row>
-							<Col md='6'>
-								<div className='email-list'>
-									<h3>Email List</h3>
-									<Input type='textarea'
-										className='email-list'
-										rows='10'
-										value={emailsText}
-										onChange={handleEmailChange}
-									/>
-									<FormText color='muted'>One email per line, no other separators</FormText>
-									<Button className='btn update-list-button' onClick={updateEmailList}>Update List</Button>
-								</div>
-							</Col>
-							<Col md='6'>
-								<div className='current-storage'>
-									<InstitutionData {...{
-										userEmails: emails,
-										fte,
-										name,
-										expirationDate,
-										institutionID,
-										saveInstitutionName
-									}} />
-								</div>
-							</Col>
-						</Row>
-					</div>
-				</NotifierContext.Provider>
+				<div className='manage-institution'>
+					<Notifier {...notification} />
+					<Row className='my-3'>
+						<Col md='12'>
+							<Invoices invoices={labInvoices} />
+							<ReceiptsTable labInvoices={labInvoices} charges={charges} />
+						</Col>
+					</Row>
+					<Row>
+						<Col md='6'>
+							<div className='email-list'>
+								<h3>Email List</h3>
+								<Input type='textarea'
+									className='email-list'
+									rows='10'
+									value={emailsText}
+									onChange={handleEmailChange}
+								/>
+								<FormText color='muted'>One email per line, no other separators</FormText>
+								<Button className='btn update-list-button' onClick={updateEmailList}>Update List</Button>
+							</div>
+						</Col>
+						<Col md='6'>
+							<div className='current-storage'>
+								<InstitutionData {...{
+									userEmails: emails,
+									fte,
+									name,
+									expirationDate,
+									institutionID,
+									saveInstitutionName
+								}} />
+							</div>
+						</Col>
+					</Row>
+				</div>
 			</PaymentContext.Provider>
 		</LabContext.Provider>
 	);

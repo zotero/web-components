@@ -1,20 +1,20 @@
 import { log as logger } from '../Log.js';
-var log = logger.Logger('SubscriptionHandler', 1);
+var log = logger.Logger('ContributionPaymentHandler', 1);
 
-import { useState, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Card, CardHeader, CardBody, Modal, ModalBody, ModalHeader, Row, Col, Button, Input } from 'reactstrap';
 
 import { PaymentElementModal } from '../storage/PaymentElementModal.jsx';
 import { PaymentSource } from '../storage/PaymentSource.jsx';
-import { PaymentContext, NotifierContext, notify, cancelPurchase } from '../storage/actions';
-
+// import { PaymentContext, NotifierContext, notify, cancelPurchase } from '../storage/actions';
+import { beginStripeIntent } from '../storage/actions.js';
 import { postFormData } from '../ajax.js';
 import { LoadingSpinner } from '../LoadingSpinner.js';
 
-
 import { formatCurrency } from '../Utils.js';
 
+/*
 async function chargeContribution(token = false, amount, period, email) {
 	log.debug(`charging stripe contribution. Amount:${amount} - token.id:${token.id}`, 4);
 	let resp;
@@ -57,9 +57,10 @@ async function chargeContribution(token = false, amount, period, email) {
 		}
 	}
 }
-
-async function updateContribution(token = false, amount, period) {
-	log.debug(`charging stripe contribution. Amount:${amount} - token.id:${token.id}`, 4);
+*/
+/*
+async function updateContribution(stripeIntent, purchase) {
+	log.debug(`charging stripe contribution. Amount:${purchase.amount} - ${stripeIntent.id}`, 4);
 	let resp;
 	try {
 		let args = {
@@ -99,44 +100,50 @@ async function updateContribution(token = false, amount, period) {
 		}
 	}
 }
+*/
 
 function ContributionPaymentHandler(props) {
-	const { purchase, currentUser } = props;
-	const { type, amount, period } = purchase;
-	const { paymentDispatch, paymentState } = useContext(PaymentContext);
-	const { notifyDispatch } = useContext(NotifierContext);
-	
-	const { stripeCustomer } = paymentState;
-	
-	// clear the new subscription closing the Handler, because it is either complete, or canceled
-	const cancel = () => {
-		setOperationPending(false);
-		paymentDispatch(cancelPurchase());
-	};
+	const { purchase, currentUser, setNotification, stripeCustomer, stripeIntent, setStripeIntent, cancelPurchase, handleConfirm } = props;
+	// const { type, amount, period } = purchase;
 	
 	let description = [];
-	let chargeAmount = amount;
+	// let chargeAmount = amount;
 	let error = null;
-	let immediateChargeRequired = true;
 	
 	const [editPayment, setEditPayment] = useState(false);
 	const [operationPending, setOperationPending] = useState(false);
 	const [email, setEmail] = useState('');
-	
-	switch (type) {
-	case 'paymentUpdate':
+
+	// clear the new subscription closing the Handler, because it is either complete, or canceled
+	const cancel = () => {
+		setOperationPending(false);
+		cancelPurchase();
+	};
+
+	useEffect(async () => {
+		log.debug("useEffect beginStripeIntent");
+		log.debug(purchase);
+		if (editPayment && !stripeIntent) {
+			if (purchase.immediateCharge || purchase.type=='contributionPaymentUpdate') {
+				setOperationPending(true);
+				let purchaseData = Object.assign({}, purchase);
+				await beginStripeIntent(purchaseData, setStripeIntent);
+				setOperationPending(false);
+			}
+		}
+	}, [purchase, editPayment]);
+
+	switch (purchase.type) {
+	case 'contributionPaymentUpdate':
 		description.push(`Update your saved payment details for your next contribution. There will be no charge made until your normally scheduled contribution.`);
-		immediateChargeRequired = false;
 		break;
 	case 'contribution':
 		description.push(`Make a one time contribution to support Zotero.`);
 		description.push(`Your card or bank account will be charged immediately after confirming.`);
-		immediateChargeRequired = true;
 		break;
 	case 'recurringContribution':
 		description.push(`Make a recurring contribution to support Zotero.`);
 		description.push(`Your card or bank account will be charged immediately after confirming.`);
-		immediateChargeRequired = true;
 		break;
 	default:
 		throw new Error('Unknown purchase type');
@@ -148,7 +155,7 @@ function ContributionPaymentHandler(props) {
 		description.push(`Receipts will be emailed to ${currentUser.email}`);
 	}
 	
-	if (immediateChargeRequired && !stripeCustomer && !editPayment) {
+	if ((purchase.immediateCharge || purchase.type == 'contributionPaymentUpdate') && !stripeCustomer && !editPayment) {
 		setEditPayment(true);
 	}
 	
@@ -156,13 +163,14 @@ function ContributionPaymentHandler(props) {
 		return <p key={i}>{d}</p>;
 	});
 	
-	const handleConfirm = async (token) => {
+	/*
+	const handleConfirm = async () => {
 		let result;
 		setOperationPending(true);
-		switch (type) {
+		switch (purchase.type) {
 		case 'paymentUpdate':
-			if (!token) {
-				throw new Error('Required token not passed');
+			if (!stripeIntent) {
+				throw new Error('Required stripe intent not passed');
 			}
 			result = await updateContribution(token, amount, period);
 			notify(result.type, result.message);
@@ -171,15 +179,16 @@ function ContributionPaymentHandler(props) {
 		case 'contribution':
 		case 'recurringContribution':
 			result = await chargeContribution(token, amount, period, email);
-			notifyDispatch(notify(result.type, result.message));
+			setNotification(result);
 			cancel();
 			break;
 		default:
 			throw new Error('Unknown purchase type');
 		}
 	};
+	*/
 	
-	let blabel = immediateChargeRequired ? `Pay US ${formatCurrency(chargeAmount)}` : 'Confirm';
+	let buttonLabel = purchase.immediateCharge ? `Pay US ${formatCurrency(purchase.amount)}` : 'Confirm';
 
 	// enable email section if we don't have a user so we can associate something with the contribution and email them a receipt
 	let emailSection = null;
@@ -195,10 +204,28 @@ function ContributionPaymentHandler(props) {
 	
 	let paymentSection = null;
 	if (editPayment) {
-		paymentSection = <PaymentElementModal stripe={window.stripe} handleToken={handleConfirm} chargeAmount={chargeAmount} buttonLabel={blabel} />;
+		paymentSection = <PaymentElementModal 
+			stripe={window.stripe}
+			{...{
+				purchase,
+				stripeIntent,
+				handleConfirm,
+				// chargeAmount,
+				operationPending,
+				setOperationPending,
+				setNotification,
+				buttonLabel,
+				useEmail: false,
+				cancelable: true,
+				cancel: cancelPurchase,
+				returnUrl: window.location.toString(),
+			}}
+		/>;
 	} else if (stripeCustomer) {
-		const defaultSource = stripeCustomer.default_source;
-		if (defaultSource) {
+		// const defaultSource = stripeCustomer.default_source;
+		// const defaultPaymentMethod = stripeCustomer.invoice_settings.default_payment_method;
+		const paymentDetails = stripeCustomer.default_source || stripeCustomer.invoice_settings.default_payment_method;
+		if (paymentDetails) {
 			paymentSection = (
 				<div className='currentPaymentSource'>
 					<Card>
@@ -206,12 +233,12 @@ function ContributionPaymentHandler(props) {
 							Payment Method
 						</CardHeader>
 						<CardBody>
-							<PaymentSource source={defaultSource} />
+							<PaymentSource source={paymentDetails} />
 							<Button color='link' onClick={() => { setEditPayment(true); }}>Change Payment Details</Button>
 						</CardBody>
 					</Card>
 					<Row className='mt-2'>
-						<Col className='text-center'><Button className='m-auto' onClick={() => { handleConfirm(false); }}>{blabel}</Button></Col>
+						<Col className='text-center'><Button className='m-auto' onClick={() => { handleConfirm(false); }}>{buttonLabel}</Button></Col>
 						<Col className='text-center'><Button className='m-auto' onClick={cancel}>Cancel</Button></Col>
 					</Row>
 				</div>
@@ -224,13 +251,13 @@ function ContributionPaymentHandler(props) {
 			<Modal isOpen={true} toggle={cancel} className='payment-modal'>
 				<ModalHeader>Contribute to Zotero</ModalHeader>
 				<ModalBody>
-					<LoadingSpinner className='m-auto' loading={operationPending} />
 					<Card className='mb-4'>
 						<CardBody>
 							{error}
 							{descriptionPs}
 						</CardBody>
 					</Card>
+					<LoadingSpinner className='m-auto' loading={operationPending} />
 					{emailSection}
 					{paymentSection}
 				</ModalBody>

@@ -1,13 +1,13 @@
-// import { log as logger } from '../Log.js';
-// let log = logger.Logger('Contribute');
+import { log as logger } from '../Log.js';
+let log = logger.Logger('Contribute');
 
-import { useState, useEffect, useReducer, useContext } from 'react';
+import { useState, useEffect } from 'react';
 
 import { Button, Row, Col, Input, InputGroup, InputGroupAddon, Card, CardBody } from 'reactstrap';
 import { Notifier } from '../Notifier.js';
 import PropTypes from 'prop-types';
 
-import { PaymentContext, paymentReducer, NotifierContext, notifyReducer, notify, UPDATE_PURCHASE, UPDATE_CUSTOMER } from '../storage/actions.js';
+// import { PaymentContext, paymentReducer, NotifierContext, notifyReducer, notify, UPDATE_PURCHASE, UPDATE_CUSTOMER } from '../storage/actions.js';
 import { Invoices } from '../storage/Invoices.jsx';
 import { ContributionPaymentHandler } from './ContributionPaymentHandler.jsx';
 import { postFormData } from '../ajax.js';
@@ -89,15 +89,14 @@ PeriodCell.propTypes = {
 };
 
 function Contribute(props) {
-	const { paymentDispatch, paymentState } = useContext(PaymentContext);
-	const { notifyDispatch } = useContext(NotifierContext);
-	
-	const { currentUser } = props;
-	const { purchase } = paymentState;
+	const { setNotification, currentUser } = props;
+	const [ stripeIntent, setStripeIntent ] = useState(null);
+	const [ purchase, setPurchase ] = useState(null);
 	const [period, setPeriod] = useState('once');
 	const [amount, setAmount] = useState(3000);
 	const [custom, setCustom] = useState(false);
 	const [currentContribution, setCurrentContribution] = useState(props.currentContribution);
+	const [stripeCustomer, setStripeCustomer] = useState(props.stripeCustomer);
 
 	// set values if contribution already in effect
 	useEffect(() => {
@@ -110,13 +109,21 @@ function Contribute(props) {
 		}
 	}, [currentContribution]);
 
+	const handleConfirm = (stripeIntent) => {
+		log.debug(stripeIntent);
+		setNotification({type: 'success', message: "Contribution Submitted. Thanks for supporting Zotero!"})
+	}
+	const cancelPurchase = () => {
+		setPurchase(null);
+	};
+
 	// don't allow altering amount or period for existing contribution
 	// it might be slightly more intuitive, but it's confusing to figure out exactly when to charge then
 	// and leaving a proper trail of changes is much harder then
 	const handleAmount = (newAmount) => {
 		if (currentContribution) {
 			if (newAmount != currentContribution.amount) {
-				notifyDispatch(notify('error', "If you'd like to modify the amount or frequency of your contribution, please stop your current contribution and create a new one. Thanks for supporting Zotero!"));
+				setNotification({type: 'error', message: "If you'd like to modify the amount or frequency of your contribution, please stop your current contribution and create a new one. Thanks for supporting Zotero!"});
 				return;
 			}
 		}
@@ -126,7 +133,7 @@ function Contribute(props) {
 	const handlePeriod = (newPeriod) => {
 		if (currentContribution) {
 			if (newPeriod != currentContribution.period) {
-				notifyDispatch(notify('error', "If you'd like to modify the amount or frequency of your contribution, please stop your current contribution and create a new one. Thanks for supporting Zotero!"));
+				setNotification({type: 'error', message: "If you'd like to modify the amount or frequency of your contribution, please stop your current contribution and create a new one. Thanks for supporting Zotero!"});
 				return;
 			}
 		}
@@ -135,46 +142,48 @@ function Contribute(props) {
 
 	const contribute = () => {
 		if (amount == 0) {
-			notifyDispatch(notify('error', 'No amount selected for contribution.'));
+			setNotification({type: 'error', message: 'No amount selected for contribution.'});
 			throw new Error('No amount selected for contribution.');
 		}
 		if (amount < 500) {
-			notifyDispatch(notify('error', 'Due to the cost of processing payments, we do not currently accept contributions under $5.00'));
+			setNotification({type: 'error', message: 'Due to the cost of processing payments, we do not currently accept contributions under $5.00'});
 			throw new Error('Disallowed amount specified for contribution.');
 		}
 		
-		let purchase = { amount, period };
+		let newPurchase = { amount, period, immediateCharge:true };
 		
 		// if details are the same, just update payment details
 		if (currentContribution) {
 			if (amount == currentContribution.amount && period == currentContribution.period) {
-				purchase.type = 'paymentUpdate';
+				newPurchase.type = 'contributionPaymentUpdate';
+				newPurchase.immediateCharge = false;
 			} else {
 				throw new Error('Attempting to change non-payment details on an existing contribution');
 			}
 		} else {
 			switch (period) {
 			case 'once':
-				purchase.type = 'contribution';
+				newPurchase.type = 'contribution';
 				break;
 			case 'month':
 			case 'year':
-				purchase.type = 'recurringContribution';
+				newPurchase.type = 'recurringContribution';
 				break;
 			default:
-				notifyDispatch(notify('error', 'There was an error processing your contribution'));
+				setNotification({type: 'error', message: 'There was an error processing your contribution'});
 				throw new Error('Unrecognized period for contribution');
 			}
 
-			if (purchase.type == 'recurringContribution') {
+			if (newPurchase.type == 'recurringContribution') {
 				if (!currentUser) {
-					notifyDispatch(notify('error', <p>Please <a href='/user/login'>log in</a> to make a recurring contribution.</p>));
-					throw new Error('No logged in user for recurring contribution');
+					setNotification({type: 'error', message: <p>Please <a href='/user/login'>log in</a> to make a recurring contribution.</p>});
+					newPurchase = null;
+					// throw new Error('No logged in user for recurring contribution');
 				}
 			}
 		}
 		
-		paymentDispatch({ type: UPDATE_PURCHASE, purchase });
+		setPurchase(newPurchase);
 	};
 
 	const stopContribution = async () => {
@@ -186,15 +195,16 @@ function Contribute(props) {
 			}
 			let respData = await resp.json();
 			if (respData.success) {
-				notifyDispatch(notify('success', 'Your recurring contribution has been stopped'));
-				paymentDispatch({ type: UPDATE_CUSTOMER, stripeCustomer: false });
+				setNotification({type: 'success', message: 'Your recurring contribution has been stopped'});
+				setStripeCustomer(false);
+				// paymentDispatch({ type: UPDATE_CUSTOMER, stripeCustomer: false });
 				// paymentDispatch()
 				setCurrentContribution(false);
 			} else {
-				notifyDispatch(notify('error', 'There was an error updating your contribution'));
+				setNotification({type: 'error', message: 'There was an error updating your contribution'});
 			}
 		} catch (resp) {
-			notifyDispatch(notify('error', 'There was an error updating your contribution'));
+			setNotification({type: 'error', message: 'There was an error updating your contribution'});
 		}
 	};
 
@@ -211,7 +221,7 @@ function Contribute(props) {
 		
 		if (currentContribution) {
 			if (nv != currentContribution.amount) {
-				notifyDispatch(notify('error', "If you'd like to modify the amount or frequency of your contribution, please stop your current contribution and create a new one. Thanks for supporting Zotero!"));
+				setNotification({type: 'error', message: "If you'd like to modify the amount or frequency of your contribution, please stop your current contribution and create a new one. Thanks for supporting Zotero!"});
 				return;
 			}
 		}
@@ -222,9 +232,17 @@ function Contribute(props) {
 	let Payment = null;
 	if (purchase) {
 		Payment = (<ContributionPaymentHandler
-			purchase={purchase}
-			currentContribution={currentContribution}
-			currentUser={currentUser}
+			{...{
+				purchase,
+				currentContribution,
+				currentUser,
+				stripeCustomer,
+				stripeIntent,
+				setStripeIntent,
+				setNotification,
+				cancelPurchase,
+				handleConfirm,
+			}}
 		/>);
 	}
 
@@ -269,7 +287,9 @@ function Contribute(props) {
 		contributionNode = (
 			<Row>
 				<Col>
-					<Button block onClick={contribute}>Contribute</Button>
+					<Button
+						disabled={currentUser ? false : true}
+					 	block onClick={contribute}>Contribute</Button>
 				</Col>
 			</Row>
 		);
@@ -302,6 +322,12 @@ function Contribute(props) {
 			</Row>
 			{customNode}
 			{contributionNode}
+			{!currentUser && 
+			<Row>
+				<Col>
+					<p className='text-center'>Please <a href='/user/login'>log in</a> to make a contribution</p>
+				</Col>
+			</Row>}
 		</div>
 	);
 }
@@ -311,30 +337,27 @@ Contribute.propTypes = {
 };
 
 function ManageContribution(props) {
-	const [paymentState, paymentDispatch] = useReducer(paymentReducer, {
-		stripeCustomer: props.stripeCustomer,
-	});
-	const [notifyState, notifyDispatch] = useReducer(notifyReducer, {
-		operationPending: false,
-		notification: null
-	});
-	const { currentUser, currentContribution } = props;
-	const { notification } = notifyState;
+	const [notification, setNotification] = useState(null);
+	const { currentUser, currentContribution, stripeCustomer } = props;
 	
 	return (
-		<PaymentContext.Provider value={{ paymentDispatch, paymentState }}>
-			<NotifierContext.Provider value={{ notifyDispatch, notifyState }}>
-				<div className='manage-contribution'>
-					<Notifier {...notification} />
-					<Row>
-						<Col>
-							<Contribute currentUser={currentUser} currentContribution={currentContribution} />
-							<Invoices invoices={props.userInvoices} type='contribution' collapseLabel='Show Contribution Receipts' />
-						</Col>
-					</Row>
-				</div>
-			</NotifierContext.Provider>
-		</PaymentContext.Provider>
+		<div className='manage-contribution'>
+			<Notifier {...notification} />
+			<Row>
+				<Col>
+					<Contribute {...{
+						currentUser,
+						currentContribution,
+						stripeCustomer,
+						setNotification,
+					 	}}
+					/>
+					<div className='mt-4'>
+						<Invoices invoices={props.userInvoices} type='contribution' collapseLabel='Show Contribution Receipts' />
+					</div>
+				</Col>
+			</Row>
+		</div>
 	);
 }
 ManageContribution.propTypes = {

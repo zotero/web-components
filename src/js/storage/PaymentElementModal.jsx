@@ -7,14 +7,12 @@ import { Elements, useElements, PaymentElement } from '@stripe/react-stripe-js';
 import { Button, CardGroup, CardText, Card, CardHeader, CardBody, TabContent, TabPane, Nav, NavItem, NavLink, Row, Col, Input, Form, FormGroup } from 'reactstrap';
 import { Notifier } from '../Notifier.js';
 import PropTypes from 'prop-types';
-// import { PaymentContext, cancelPurchase, updateIntent } from './actions.js';
 import { LoadingSpinner } from '../LoadingSpinner.js';
-import { postFormData } from '../ajax.js';
 
 function PECheckoutForm(props) {
-	// if (typeof props.handleConfirm != 'function') {
-	// 	log.error('props error in PECheckoutForm: handleConfirm must be function');
-	// }
+	if (typeof props.handleConfirm != 'function') {
+		log.error('props error in PECheckoutForm: handleConfirm must be function');
+	}
 	const { purchase, buttonLabel, returnUrl, cancelable, cancel, operationPending, setOperationPending, handleConfirm, stripeIntent } = props;
 	const stripe = window.stripe;// useStripe();
 	const elements = useElements();
@@ -34,8 +32,6 @@ function PECheckoutForm(props) {
 		// We don't want to let default form submission happen here,
 		// which would refresh the page.
 		evt.preventDefault();
-
-		log.debug(evt);
 
 		if (!stripe || !elements) {
 			// Stripe.js has not yet loaded.
@@ -61,23 +57,6 @@ function PECheckoutForm(props) {
 				state: state,
 			};
 		}
-		/*
-		//try to update intent with setup_future_usage for cards which support it
-		if (['card'].includes(evt.value.type)) {
-			let response = await postFormData({
-				type: 'POST',
-				withSession: true,
-				// url: '/storage/purchase',
-				url: '/storage/updatestripeintentoffsession',
-				data: {paymentIntentID: stripeIntent.id},
-				throwOnError: false,
-			});
-			let result = await response.json();
-			if (!result.success) {
-				setNotification({ type: 'failure', message: 'Could not set up recurring payment'})
-			}
-		}
-		*/
 
 		if (['individualPaymentUpdate'].includes(purchase.type)) {
 			log.debug("confirming setupIntent");
@@ -102,7 +81,6 @@ function PECheckoutForm(props) {
 					payment_method_data: {
 						billing_details: billingDetails
 					},
-					// setup_future_usage: 'off_session',
 				},
 				redirect: 'if_required',			
 			});
@@ -187,8 +165,6 @@ function PECheckoutForm(props) {
 					<Button type='button' color='link' className='w-100 mt-3' onClick={props.onClose}>Cancel</Button> : null
 				}
 			</FormGroup>
-			{/* <button disabled={!stripe}>Submit</button> */}
-			{/* Show error message to your customers */}
 			{errorMessage && <div>{errorMessage}</div>}
 			<Notifier {...paymentNotification} />
 		</Form>
@@ -196,11 +172,7 @@ function PECheckoutForm(props) {
 }
 PECheckoutForm.propTypes = {
 	setOperationPending: PropTypes.func.isRequired,
-	// chargeAmount: PropTypes.number.isRequired,
-	// chargeDescription: PropTypes.string.isRequired,
-	// handleToken: PropTypes.func.isRequired,
 	handleConfirm: PropTypes.func.isRequired,
-	// immediateChargeRequired: PropTypes.bool.isRequired,
 	buttonLabel: PropTypes.string,
 	onClose: PropTypes.func.isRequired,
 	useEmail: PropTypes.bool,
@@ -215,11 +187,9 @@ PECheckoutForm.defaultProps = {
 };
 
 function PaymentElementModal(props) {
-	const { stripe, purchase, choosePaymentType, stripeIntent, cancel, buttonLabel, useEmail, useAddress } = props;
+	const { stripe, stripeIntent, cancel } = props;
+	log.debug('PaymentElementModal render');
 
-	// const { paymentDispatch, paymentState } = useContext(PaymentContext);
-	// const { purchase, stripeIntent } = paymentState;
-	
 	const handleClose = () => {
 		cancel();
 	};
@@ -229,7 +199,8 @@ function PaymentElementModal(props) {
 		return null;
 	}
 
-	console.log(stripeIntent);
+	log.debug(stripeIntent);
+	log.debug(stripeIntent.client_secret);
 
 	const options = {
 		// passing the client secret obtained in step 2
@@ -240,11 +211,14 @@ function PaymentElementModal(props) {
 		},
 	};
 
+	//add a key for Elements so we can update it when the paymentIntent changes
+	const key = stripeIntent.client_secret;
+
 	return (
 		<div className='payment-chooser'>
 			<Card>
 				<CardBody>
-					<Elements stripe={stripe} options={options}>
+					<Elements {...{stripe, options, key}}>
 						<PECheckoutForm
 							{...props}
 							onClose={handleClose}
@@ -260,10 +234,7 @@ PaymentElementModal.propTypes = {
 	operationPending: PropTypes.bool.isRequired,
 	setOperationPending: PropTypes.func.isRequired,
 	setNotification: PropTypes.func.isRequired,
-	// chargeAmount: PropTypes.number.isRequired,
 	buttonLabel: PropTypes.string,
-	// immediateChargeRequired: PropTypes.bool.isRequired,
-	// stripe: PropTypes.object.isRequired,
 	cancelable: PropTypes.bool,
 	returnUrl: PropTypes.string.isRequired,
 };

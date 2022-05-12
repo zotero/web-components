@@ -4,10 +4,10 @@ const log = logger.Logger('storage/actions.js');
 import { createContext } from 'react';
 import { ajax, postFormData } from '../ajax.js';
 
-const StorageContext = createContext(null);
+// const StorageContext = createContext(null);
 // const NotifierContext = createContext(null);
-const PaymentContext = createContext(null);
-const LabContext = createContext(null);
+// const PaymentContext = createContext(null);
+// const LabContext = createContext(null);
 
 // notifyReducer actions
 // const NOTIFY = 'notify';
@@ -15,19 +15,19 @@ const LabContext = createContext(null);
 // const STOP_OPERATION = 'stopOperation';
 
 // paymentReducer actions
-const UPDATE_CUSTOMER = 'updateCustomer';
-const UPDATE_PURCHASE = 'updatePurchase';
-const UPDATE_PURCHASE_IMMEDIATE = 'updatePurchaseImmediate';
-const UPDATE_INTENT = 'updateIntent';
+// const UPDATE_CUSTOMER = 'updateCustomer';
+// const UPDATE_PURCHASE = 'updatePurchase';
+// const UPDATE_PURCHASE_IMMEDIATE = 'updatePurchaseImmediate';
+// const UPDATE_INTENT = 'updateIntent';
 
 // storageReducer actions
-const UPDATE_USER_SUBSCRIPTION = 'updateUserSubscription';
+// const UPDATE_USER_SUBSCRIPTION = 'updateUserSubscription';
 
 // labReducer actions
-const UPDATE_NAME = 'updateName';
-const SET_FTE = 'setFTE';
-const SET_EMAILS = 'setEmails';
-
+// const UPDATE_NAME = 'updateName';
+// const SET_FTE = 'setFTE';
+// const SET_EMAILS = 'setEmails';
+/*
 function paymentReducer(state, action) {
 	log.debug('paymentReducer');
 	log.debug(action);
@@ -55,6 +55,7 @@ function paymentReducer(state, action) {
 		return state;
 	}
 }
+*/
 /*
 function notifyReducer(state, action) {
 	switch (action.type) {
@@ -74,6 +75,7 @@ function notifyReducer(state, action) {
 	}
 }
 */
+/*
 function storageReducer(state, action) {
 	switch (action.type) {
 	case UPDATE_USER_SUBSCRIPTION:
@@ -118,6 +120,7 @@ function selectPlan(plan) {
 		}
 	};
 }
+*/
 /*
 function notify(type, message) {
 	return {
@@ -127,6 +130,7 @@ function notify(type, message) {
 	};
 }
 */
+/*
 function renewNow(userSubscription) {
 	const storageLevel = userSubscription.storageLevel;
 	return {
@@ -166,6 +170,7 @@ function setEmails(emails) {
 		emails: emails
 	};
 }
+*/
 
 // async function beginIntent(amount, description, storageLevel, immediateCharge) {
 async function beginStripeIntent(purchase, setIntent) {
@@ -306,34 +311,34 @@ async function beginPaymentIntent(dispatch, amount, description) {
 
 export {
 	// NOTIFY,
-	UPDATE_CUSTOMER,
+	// UPDATE_CUSTOMER,
 	// START_OPERATION,
 	// STOP_OPERATION,
-	UPDATE_USER_SUBSCRIPTION,
-	UPDATE_PURCHASE,
-	UPDATE_NAME,
-	SET_FTE,
-	SET_EMAILS,
-	UPDATE_INTENT,
+	// UPDATE_USER_SUBSCRIPTION,
+	// UPDATE_PURCHASE,
+	// UPDATE_NAME,
+	// SET_FTE,
+	// SET_EMAILS,
+	// UPDATE_INTENT,
 	// beginPaymentIntent,
 	// getUserCustomer,
 	// getSubscription,
-	cancelPurchase,
-	setEmails,
-	updatePayment,
-	updateIntent,
-	renewNow,
+	// cancelPurchase,
+	// setEmails,
+	// updatePayment,
+	// updateIntent,
+	// renewNow,
 	// notify,
-	immediateCharge,
-	selectPlan,
+	// immediateCharge,
+	// selectPlan,
 	// notifyReducer,
-	paymentReducer,
-	storageReducer,
-	labReducer,
-	StorageContext,
+	// paymentReducer,
+	// storageReducer,
+	// labReducer,
+	// StorageContext,
 	// NotifierContext,
-	PaymentContext,
-	LabContext,
+	// PaymentContext,
+	// LabContext,
 	beginStripeIntent,
 	chargeDefaultMethod,
 	createInvoice,

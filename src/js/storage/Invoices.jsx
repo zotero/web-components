@@ -1,7 +1,7 @@
 import { log as logger } from '../Log.js';
 var log = logger.Logger('Invoices.jsx', 3);
 
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Table, Collapse } from 'reactstrap';
 import { postFormData } from '../ajax.js';
@@ -20,6 +20,7 @@ const deleteInvoice = async (invoiceID) => {
 };
 
 function Invoices(props) {
+	log.debug(props);
 	let { invoices, type, collapseLabel, setNotification } = props;
 	const [isOpen, setIsOpen] = useState(false);
 

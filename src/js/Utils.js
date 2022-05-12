@@ -334,12 +334,17 @@ let formatItemField = function(field, item, trim=false){
 	}
 };
 
-let formatCurrency = function(cents){
+let formatCurrency = function(cents, currency = 'USD'){
+	currency = currency.toUpperCase();
 	let d = cents / 100;
 	if(typeof(Intl) !== 'undefined') {
-		return new Intl.NumberFormat('en-US', {style:'currency', currency:'USD'}).format(d);
+		return new Intl.NumberFormat('en-US', {style:'currency', currency}).format(d);
 	} else {
-		return `$${d.toFixed(2)}`;
+		if (currency == 'USD') {
+			return `$${d.toFixed(2)}`;
+		} else if (currency == 'EUR') {
+			return `€${d.toFixed(2)}`;
+		}
 	}
 };
 

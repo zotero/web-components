@@ -21,9 +21,6 @@ import { formatCurrency } from '../Utils.js';
 function InstitutionHandler(props) {
 	const { purchase, stripeCustomer, setPurchase, renew, institutionID, setNotification } = props;
 	const { type, fte, name, additionalFTE } = purchase;
-	// const { paymentDispatch, paymentState } = useContext(PaymentContext);
-	
-	// const { stripeCustomer } = paymentState;
 	
 	const [autorenew, setAutorenew] = useState(true);
 	const [editPayment, setEditPayment] = useState((type == 'paymentUpdate'));
@@ -34,7 +31,6 @@ function InstitutionHandler(props) {
 	const cancel = () => {
 		setOperationPending(false);
 		setPurchase(null);
-		// paymentDispatch(cancelPurchase());
 	};
 	
 	let description = [];
@@ -81,7 +77,7 @@ function InstitutionHandler(props) {
 		if (!stripeIntent) {
 			if (editPayment) {
 				setOperationPending(true);
-				let purchaseData = Object.assign({}, purchase);
+				let purchaseData = Object.assign({}, purchase, {immediateCharge: immediateChargeRequired});
 				if (purchase.fte) {
 					purchaseData.numUsers = purchase.fte;
 				} else if (purchase.additionalFTE) {
@@ -102,6 +98,7 @@ function InstitutionHandler(props) {
 	});
 	
 	const handleConfirm = async (paymentMethod) => {
+		return;
 		log.debug('handleConfirm');
 		log.debug(paymentMethod);
 		if (operationPending) {
@@ -246,6 +243,7 @@ function InstitutionHandler(props) {
 		paymentSection = <PaymentElementModal
 			stripe={window.stripe}
 			{...{
+				setNotification,
 				purchase,
 				stripeIntent,
 				operationPending,
@@ -254,6 +252,8 @@ function InstitutionHandler(props) {
 				buttonLabel,
 				useEmail: true,
 				returnUrl: window.location.toString(),
+				handleConfirm,
+				cancel,
 			}}
 			chargeDescription="Charge"
 		/>;

@@ -16,11 +16,11 @@ Flows:
 import { log as logger } from '../Log.js';
 var log = logger.Logger('SubscriptionHandler');
 
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Alert, Card, CardHeader, CardBody, FormGroup, Input, Modal, ModalBody, ModalHeader, Label, Row, Col, Button, Container } from 'reactstrap';
 
-import { beginStripeIntent, chargeDefaultMethod, createInvoice, StorageContext, PaymentContext, refresh, cancelPurchase, immediateCharge, updateIntent } from './actions.js';
+import { beginStripeIntent } from './actions.js';
 import { PaymentElementModal } from './PaymentElementModal.jsx';
 import { PaymentSource } from './PaymentSource.jsx';
 
@@ -45,39 +45,27 @@ const IndividualDescriptions = {
 // type is one of: individualChange, individualUpdate, individualRenew
 
 function SubscriptionHandler(props) {
-	const { userSubscription, choosePaymentType, chargeDescription, operationPending, setOperationPending, error, editPayment, setEditPayment, chargeAmount, description, stripeCustomer, purchase, allowRenew, returnUrl, setNotification, cancelPurchase, handleInvoiceRequest, handleConfirmPI } = props;
-	const { type, storageLevel } = purchase;
+	const { chargeDescription, operationPending, setOperationPending, error, editPayment, setEditPayment, chargeAmount, description, stripeCustomer, purchase, allowRenew, returnUrl, setNotification, cancelPurchase, handleInvoiceRequest, handleConfirm, setCurrency } = props;
 	log.debug(props);
 
 	const [ stripeIntent, setStripeIntent ] = useState(null);
 	const [autorenew, setAutorenew] = useState(true);
 	
-	// const { stripeCustomer } = paymentState;
 	log.debug(stripeCustomer, 4);
 	// clear the new subscription closing the Handler, because it is either complete, or canceled
 	const cancel = () => {
 		setOperationPending(false);
 		cancelPurchase();
-		// paymentDispatch(cancelPurchase());
 	};
 	
-	// update payment with immediateChargeRequired
-	// useEffect(() => {
-	// 	if (immediateChargeRequired) {
-	// 		setPurchase(Object.assign({}, purchase, {immediateCharge: true}));
-	// 		// paymentDispatch(immediateCharge(immediateChargeRequired));
-	// 	}
-	// }, []);
-	// if (immediateChargeRequired) {
-	// 	setPurchase(Object.assign({}, purchase, {immediateCharge: true}));
-	// }
-
 	useEffect(async () => {
 		log.debug("useEffect beginStripeIntent");
-		// log.debug(purchase);
-		// log.debug(editPayment);
 		// log.debug(stripeIntent);
-		if (editPayment && !stripeIntent) {
+		let validStripeIntent = stripeIntent;
+		if (stripeIntent && stripeIntent.intent.currency != purchase.currency) {
+			validStripeIntent = false;
+		}
+		if (editPayment && !validStripeIntent) {
 			if (purchase.immediateCharge || (purchase.type == 'individualPaymentUpdate') ) {
 				setOperationPending(true);
 				try {
@@ -97,84 +85,7 @@ function SubscriptionHandler(props) {
 		return <p key={i}>{d}</p>;
 	});
 	
-	
-/*
-	const handleConfirm = async (paymentMethod) => {
-		log.debug('handleConfirm');
-		log.debug(paymentMethod);
-		if (operationPending) {
-			log.debug('operation already pending');
-			return;
-		}
-		let response;
-		let result;
-		setOperationPending(true);
-		let purchaseData = Object.assign({}, purchase, { paymentMethod: paymentMethod.id, paymentMethodType: paymentMethod.type });
-		log.debug(purchaseData);
-		try {
-			response = await ajax({
-				type: 'POST',
-				withSession: true,
-				url: '/storage/purchase',
-				data: JSON.stringify(purchaseData),
-				throwOnError: false,
-			});
-		} catch (unexpectedThrownResponse) {
-			log.error("UNEXPECTED THROWN RESPONSE WHEN ATTEMPTING PURCHASE");
-		} finally {
-			log.debug('got response from handleConfirm');
-			result = await response.json();
-			log.debug(result);
-			let notifyType = result.success ? 'success' : 'error';
-			let notifyMessage = result.message;
-
-			if (!result.success && result.requires_action) {
-				const stripe = window.stripe;
-				let confirmResult;
-				if (paymentMethod.type == 'card') {
-					if (immediateChargeRequired) {
-						confirmResult = await stripe.confirmCardPayment(result.client_secret);
-					} else {
-						confirmResult = await stripe.confirmCardSetup(result.client_secret);
-					}
-				} else if (paymentMethod.type == 'sepa_debit') {
-					if (immediateChargeRequired) {
-						confirmResult = await stripe.confirmSepaDebitPayment(result.client_secret);
-					} else {
-						confirmResult = await stripe.confirmSepaDebitSetup(result.client_secret);
-					}
-				}
-				log.debug(confirmResult);
-				if (confirmResult.error) {
-					log.debug('confirmResult error');
-					notifyType = 'error';
-				} else if (confirmResult.paymentIntent) {
-					log.debug('confirmResult paymentIntent');
-					// resumbmit the purchase with the paymentIntent so the subscription gets updated
-					let resubPurchaseData = Object.assign({}, purchaseData, { paymentIntentID: confirmResult.paymentIntent.id });
-					response = await ajax({
-						type: 'POST',
-						withSession: true,
-						url: '/storage/purchase',
-						data: JSON.stringify(resubPurchaseData),
-						throwOnError: false,
-					});
-					log.debug('got response from resubmitted handleConfirm');
-					result = await response.json();
-					log.debug(result);
-					notifyType = result.success ? 'success' : 'error';
-					notifyMessage = result.message;
-				}
-			}
-
-			refresh(storageDispatch, paymentDispatch);
-			notifyDispatch(notify(notifyType, notifyMessage));
-			cancel();
-		}
-	};
-*/	
-	
-	let buttonLabel = purchase.immediateCharge ? `Pay ${formatCurrency(chargeAmount)}` : 'Confirm';
+	let buttonLabel = purchase.immediateCharge ? `Pay ${formatCurrency(chargeAmount, purchase.currency)}` : 'Confirm';
 	
 	let paymentSection = null;
 	if (editPayment) {
@@ -191,8 +102,7 @@ function SubscriptionHandler(props) {
 				setNotification,
 				cancel,
 				chargeDescription,
-				choosePaymentType,
-				handleConfirm: handleConfirmPI,
+				handleConfirm,
 			}}
 		/>;
 	} else if (stripeCustomer && !editPayment && purchase.immediateCharge) {
@@ -211,7 +121,7 @@ function SubscriptionHandler(props) {
 						</CardBody>
 					</Card>
 					<Row className='mt-2'>
-						<Col className='text-center'><Button className='m-auto' onClick={() => { handleConfirmPI(false); }}>{buttonLabel}</Button></Col>
+						<Col className='text-center'><Button className='m-auto' onClick={() => { handleConfirm(false); }}>{buttonLabel}</Button></Col>
 						<Col className='text-center'><Button className='m-auto' onClick={cancel}>Cancel</Button></Col>
 					</Row>
 				</div>
@@ -222,7 +132,7 @@ function SubscriptionHandler(props) {
 		paymentSection = (
 			<Container>
 				<Row>
-					<Col className='text-center'><Button className='m-auto' onClick={() => {handleConfirmPI(false);}}>{buttonLabel}</Button></Col>
+					<Col className='text-center'><Button className='m-auto' onClick={() => {handleConfirm(false);}}>{buttonLabel}</Button></Col>
 					<Col className='text-center'><Button className='m-auto' onClick={cancel}>Cancel</Button></Col>
 				</Row>
 			</Container>
@@ -256,6 +166,14 @@ function SubscriptionHandler(props) {
 				<Row>
 					<Col className='text-center'>
 						<p><a href='#' onClick={handleInvoiceRequest}>Create invoice payable by third party</a></p>
+					</Col>
+				</Row>
+				<Row>
+					<Col className='text-center'>
+						{purchase.currency == 'eur' ? 
+							<p><a href='#' onClick={()=>{setCurrency('usd');}}>Make payment in USD</a></p> :
+							<p><a href='#' onClick={()=>{setCurrency('eur');}}>Make payment in Euro</a></p> 
+						}
 					</Col>
 				</Row>
 			</Container>

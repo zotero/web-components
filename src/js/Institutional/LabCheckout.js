@@ -10,7 +10,6 @@ import { Notifier } from '../Notifier.js';
 import { getCurrentUser, formatCurrency } from '../Utils.js';
 import { InstitutionHandler } from '../storage/InstitutionHandler.jsx';
 import { labPrice } from '../storage/calculations.js';
-// import { labReducer, paymentReducer, PaymentContext, LabContext, SET_FTE, UPDATE_PURCHASE, UPDATE_NAME } from '../storage/actions.js';
 
 const currentUser = getCurrentUser();
 
@@ -20,19 +19,8 @@ function LabCheckout(props) {
 	const [purchase, setPurchase] = useState(null);
 	const [stripeCustomer, setStripeCustomer] = useState(props.stripeCustomer);
 
-	// const [paymentState, paymentDispatch] = useReducer(paymentReducer, {
-	// 	stripeCustomer: props.stripeCustomer,
-	// 	purchase: null
-	// });
 	const [labName, setLabName] = useState('');
 	const [fte, setFte] = useState(15);
-	// const [labState, labDispatch] = useReducer(labReducer, {
-	// 	fte: 15,
-	// 	name: '',
-	// });
-	
-	// const { purchase } = paymentState;
-	// const { fte, name } = labState;
 	
 	const handleFTEChange = (evt) => {
 		let nv = evt.target.value;
@@ -44,24 +32,14 @@ function LabCheckout(props) {
 			}
 		}
 		setFte(nv);
-		// labDispatch({ type: SET_FTE, fte: nv });
 	};
 	const handlePurchase = () => {
 		setPurchase({
 			type: 'lab',
 			fte,
-			name: labName
+			name: labName,
 		});
-		// paymentDispatch({ type: UPDATE_PURCHASE, purchase: {
-		// 	type: 'lab',
-		// 	fte,
-		// 	name
-		// } });
 	};
-	
-	// const setName = (name) => {
-	// 	labDispatch({ type: UPDATE_NAME, name });
-	// };
 	
 	// Only allow purchase if the user is logged in so the lab will have a managing account. Otherwise provide quote but don't allow purchase
 	let completeAction = null;

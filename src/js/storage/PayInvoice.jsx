@@ -107,8 +107,10 @@ function PayInvoice(props) {
 	
 	// processing is done in webhook and payment confirmation in PaymentElement.
 	// No payment modal here or subscription details, so do nothing.
-	const handleConfirm = async () => {
+	const handleConfirm = async (stripeIntent) => {
 		log.debug('handleConfirm - noop');
+		log.debug(stripeIntent);
+		setPurchase(null);
 		return;
 		//TODO: get charge details and update so we display paid invoice?
 	};
@@ -119,17 +121,21 @@ function PayInvoice(props) {
 	if (!invoicePaid) {
 		log.debug(description);
 		
+		const callbacks = {
+			handleConfirm,
+			setOperationPending,
+			setNotification,
+		};
+
 		paymentSection = <PaymentElementModal
 			stripe={window.stripe}
 			{...{
+				callbacks,
 				purchase,
 				stripeIntent,
 				immediateChargeRequired: true,
-				handleConfirm,
 				chargeAmount,
 				operationPending,
-				setOperationPending,
-				setNotification,
 				buttonLabel,
 				useEmail: true,
 				cancelable: false,

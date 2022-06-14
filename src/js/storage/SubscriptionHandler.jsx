@@ -45,7 +45,8 @@ const IndividualDescriptions = {
 // type is one of: individualChange, individualUpdate, individualRenew
 
 function SubscriptionHandler(props) {
-	const { chargeDescription, operationPending, setOperationPending, error, editPayment, setEditPayment, chargeAmount, description, stripeCustomer, purchase, allowRenew, returnUrl, setNotification, cancelPurchase, handleInvoiceRequest, handleConfirm, setCurrency } = props;
+	const { callbacks, operationPending, error, editPayment, chargeAmount, description, stripeCustomer, purchase, allowRenew, returnUrl } = props;
+	const { setOperationPending, setEditPayment, setNotification, cancelPurchase, handleInvoiceRequest, handleConfirm, setCurrency } = callbacks;
 	log.debug(props);
 
 	const [ stripeIntent, setStripeIntent ] = useState(null);
@@ -93,16 +94,16 @@ function SubscriptionHandler(props) {
 		paymentSection = <PaymentElementModal
 			stripe={window.stripe}
 			{...{
+				callbacks,
 				purchase,
 				stripeIntent,
 				operationPending,
-				setOperationPending,
+				// setOperationPending,
 				buttonLabel,
 				returnUrl,
-				setNotification,
+				// setNotification,
 				cancel,
-				chargeDescription,
-				handleConfirm,
+				// handleConfirm,
 			}}
 		/>;
 	} else if (stripeCustomer && !editPayment && purchase.immediateCharge) {
@@ -215,6 +216,9 @@ SubscriptionHandler.propTypes = {
 	allowRenew: PropTypes.bool,
 	requestedStorageLevel: PropTypes.number,
 	labUsers: PropTypes.number
+};
+SubscriptionHandler.defaultProps = {
+	allowRenew: false,
 };
 
 export { SubscriptionHandler };

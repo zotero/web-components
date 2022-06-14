@@ -1,6 +1,7 @@
 /* eslint-disable no-duplicate-imports */
 /*
 TODO:
+ - expire unpaid invoice after 30 days?
  - show primary email in dialog unless invoice
  - make sure paid invoices can only be seen if logged in as invoiceUser or returning from successful charge
  - always create a customer, even for invoices, so that a receipt gets sent from stripe
@@ -412,7 +413,6 @@ function Storage(props) {
 	const [ purchase, setPurchase ] = useState(null);
 	const [ notification, setNotification ] = useState(null);
 	const [ operationPending, setOperationPending ] = useState(false);
-
 	const [ editPayment, setEditPayment ] = useState((purchase && purchase.type == 'individualPaymentUpdate'));
 
 	const choosePaymentType = (paymentType) => {
@@ -698,7 +698,7 @@ function Storage(props) {
 			break;
 		case 'individualRenew':
 			description.push(`Renew your current ${storageLevelDescriptions[storageLevel]} subscription.`);
-			description.push(`Your card or bank account will be charged immediately after confirming.`);
+			description.push(`Your account will be charged immediately after confirming.`);
 			chargeAmount = priceCents[storageLevel];
 			immediateChargeRequired = true;
 			invoicePossible = true;
@@ -736,31 +736,34 @@ function Storage(props) {
 			setPurchase(Object.assign({}, purchase, {immediateCharge: true}));
 		}
 
-		let chargeDescription = storageLevel ? storageLevelDescriptions[storageLevel] : "Update payment method";
+		// let chargeDescription = storageLevel ? storageLevelDescriptions[storageLevel] : "Update payment method";
+
+		let storageCallbacks = {
+			setNotification,
+			cancelPurchase,
+			handleConfirm,
+			handleInvoiceRequest,
+			setEditPayment,
+			setOperationPending,
+			choosePaymentType,
+			setCurrency
+		};
 
 		log.debug(`editPayment: ${editPayment}`);
 		if (!props.summary) {
 			Payment = (<SubscriptionHandler
 				{...{
-					description,
-					userSubscription,
-					stripeCustomer,
+					description,//multi-para description of update, whether charge or not
+					// chargeDescription,//description for stripe charge
+					// userSubscription,
+					// stripeCustomer,
 					purchase,
-					setNotification,
-					cancelPurchase,
-					handleConfirm,
-					handleInvoiceRequest,
-					invoicePossible,
+					invoicePossible,//whether it's allowed to create an invoice for this purchase
 					chargeAmount,
 					error,
-					allowRenew: false,
 					editPayment,
-					setEditPayment,
 					operationPending,
-					setOperationPending,
-					chargeDescription,
-					choosePaymentType,
-					setCurrency,
+					callbacks: storageCallbacks,
 				}}
 				returnUrl={storageUrl}
 			/>);

@@ -1,19 +1,19 @@
 import { log as logger } from '../Log.js';
 var log = logger.Logger('PaymentElementModal', 1);
 
-// CheckoutForm.js
 import { useState } from 'react';
 import { Elements, useElements, PaymentElement } from '@stripe/react-stripe-js';
-import { Button, CardGroup, CardText, Card, CardHeader, CardBody, TabContent, TabPane, Nav, NavItem, NavLink, Row, Col, Input, Form, FormGroup } from 'reactstrap';
+import { Button, Card, CardBody, Input, Form, FormGroup } from 'reactstrap';
 import { Notifier } from '../Notifier.js';
 import PropTypes from 'prop-types';
 import { LoadingSpinner } from '../LoadingSpinner.js';
 
 function PECheckoutForm(props) {
-	if (typeof props.handleConfirm != 'function') {
+	if (typeof props.callbacks.handleConfirm != 'function') {
 		log.error('props error in PECheckoutForm: handleConfirm must be function');
 	}
-	const { purchase, buttonLabel, returnUrl, cancelable, cancel, operationPending, setOperationPending, handleConfirm, stripeIntent } = props;
+	const { callbacks, purchase, buttonLabel, returnUrl, cancelable, cancel, operationPending, stripeIntent } = props;
+	const { setOperationPending, setNotification, handleConfirm } = callbacks;
 	const stripe = window.stripe;// useStripe();
 	const elements = useElements();
 
@@ -39,7 +39,7 @@ function PECheckoutForm(props) {
 			return;
 		}
 	
-		setOperationPending(true);
+		callbacks.setOperationPending(true);
 
 		let billingDetails = {
 			name,
@@ -60,7 +60,7 @@ function PECheckoutForm(props) {
 
 		if (['individualPaymentUpdate'].includes(purchase.type)) {
 			log.debug("confirming setupIntent");
-			var {error} = await stripe.confirmSetup({
+			var confirmResult = await stripe.confirmSetup({
 				//`Elements` instance that was used to create the Payment Element
 				elements,
 				confirmParams: {
@@ -73,7 +73,7 @@ function PECheckoutForm(props) {
 			});
 		} else {
 			log.debug("confirming paymentIntent");
-			var {error} = await stripe.confirmPayment({
+			var confirmResult = await stripe.confirmPayment({
 				//`Elements` instance that was used to create the Payment Element
 				elements,
 				confirmParams: {
@@ -85,7 +85,8 @@ function PECheckoutForm(props) {
 				redirect: 'if_required',			
 			});
 		}
-		
+		log.debug(confirmResult);
+		var { error } = confirmResult;
 		
 		if (error) {
 			// This point will only be reached if there is an immediate error when
@@ -99,10 +100,14 @@ function PECheckoutForm(props) {
 			// site first to authorize the payment, then redirected to the `return_url`.
 
 			//show success dialog which user will see unless they got redirected
-			props.setNotification({ type: 'success', message: 'Payment Submitted'});
+			setNotification({ type: 'success', message: 'Payment Submitted'});
 			// close dialog
 			handleConfirm(stripeIntent);
-			cancel();
+			if (cancelable) {
+				if (cancel) {
+					cancel();
+				}
+			}
 		}
 		setOperationPending(false);
 	};
@@ -171,10 +176,12 @@ function PECheckoutForm(props) {
 	)
 }
 PECheckoutForm.propTypes = {
-	setOperationPending: PropTypes.func.isRequired,
-	handleConfirm: PropTypes.func.isRequired,
-	buttonLabel: PropTypes.string,
+	callbacks: PropTypes.shape({
+		setOperationPending: PropTypes.func.isRequired,
+		handleConfirm: PropTypes.func.isRequired,
+	}),
 	onClose: PropTypes.func.isRequired,
+	buttonLabel: PropTypes.string,
 	useEmail: PropTypes.bool,
 	useAddress: PropTypes.bool,
 	stripeIntent: PropTypes.object,
@@ -230,10 +237,12 @@ function PaymentElementModal(props) {
 	);
 }
 PaymentElementModal.propTypes = {
-	handleConfirm: PropTypes.func.isRequired,
+	callbacks: PropTypes.shape({
+		setOperationPending: PropTypes.func.isRequired,
+		setNotification: PropTypes.func.isRequired,
+		handleConfirm: PropTypes.func.isRequired,
+	}),
 	operationPending: PropTypes.bool.isRequired,
-	setOperationPending: PropTypes.func.isRequired,
-	setNotification: PropTypes.func.isRequired,
 	buttonLabel: PropTypes.string,
 	cancelable: PropTypes.bool,
 	returnUrl: PropTypes.string.isRequired,

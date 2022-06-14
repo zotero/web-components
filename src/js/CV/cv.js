@@ -16,6 +16,7 @@ import { StyleChooser } from './styleChooser.js';
 import Section from './section.js';
 import { apiRequestString } from '../ApiRouter.js';
 import { Button, Row, Col } from 'reactstrap';
+import { Notifier } from '../Notifier.js';
 
 const currentUser = getCurrentUser();
 
@@ -48,6 +49,7 @@ let CVEntryMap = {};
 function CVEditor(props) {
 	const { entries } = props;
 
+	const [notification, setNotification] = useState(null);
 	const [collections, setCollections] = useState([]);
 	const [collectionPreviews, setCollectionPreviews] = useState({});
 	const [previewsLoading, setPreviewsLoading] = useState(false);
@@ -275,7 +277,10 @@ function CVEditor(props) {
 			let resp = await postFormData(buildUrl('updateCv'), { json_cv: savestr }, { withSession: true });
 			let respData = await resp.json();
 			if (respData.success) {
-				// log.debug('saved');
+				setNotification({type:'success', message: <span>Changes saved! You can view the changes on your <a href={buildUrl('profileCv', {slug: currentUser.slug})} target='_blank'>Curriculum Vitae</a></span>});
+			} else {
+				log.error(respData.error);
+				setNotification({type:'error', message:"There was an error saving your CV."});
 			}
 		} catch (e) {
 			log.error('error saving');
@@ -308,6 +313,7 @@ function CVEditor(props) {
 	});
 	return (
 		<div className='CVEditor'>
+			<Notifier {...notification} />
 			<DndProvider backend={Backend}>
 				<Row>
 					<Col xs='12'>

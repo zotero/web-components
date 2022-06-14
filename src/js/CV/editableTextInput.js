@@ -93,7 +93,8 @@ function EditableRichText(props) {
 		if (editing) {
 			tinymce.init({
 				selector: `textarea.rte`,
-				toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignright | subscript superscript blockquote',
+				plugins: 'lists',
+				toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignright | subscript superscript blockquote | bullist numlist',
 				branding: false,
 				menubar: false,
 				statusbar: true,

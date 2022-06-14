@@ -103,6 +103,8 @@ let buildUrl = function (name, params) {
 		return '/user/registerasync';
 	case 'profileUrl':
 		return `${baseZoteroWebsiteUrl}/${params.slug}`;
+	case 'profileCv':
+		return `${baseZoteroWebsiteUrl}/${params.slug}/cv`;
 	case 'quickstartGuide':
 		return '/support/quickstartguide';
 	case 'pluginSupport':

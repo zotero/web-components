@@ -206,6 +206,19 @@
     }
   }
 
+  .static-collect-animation {
+    display:none;
+  }
+  
+  @media (prefers-reduced-motion) {
+    .collect-animation {
+      display:none;
+    }
+    .static-collect-animation {
+      display:block;
+    }
+  }
+
   .illu-sync {
     img {
       width: rem(336);

@@ -51,6 +51,7 @@ import { imminentExpiration, calculateNewExpiration, priceCents } from './calcul
 
 import { chargeDefaultMethod, createInvoice } from './actions.js';
 
+import { LastSync } from './LastSync.jsx';
 import { ajax, postFormData } from '../ajax.js';
 import { LoadingSpinner } from '../LoadingSpinner.js';
 
@@ -773,6 +774,7 @@ function Storage(props) {
 	return (
 		<ErrorWrapper>
 			<div className='storage-container'>
+				<LastSync />
 				{Payment}
 				{operationPending
 					? <div className='modal'><div className='modal-text'><p className='modal-text'>Updating...</p></div></div>

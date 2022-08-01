@@ -24,7 +24,8 @@ const safariDownload = installData.oldSafari
 function InstallFirefoxButton(props) {
 	const { label, type } = props;
 	const installFirefox = (evt) => {
-		if (typeof InstallTrigger == 'undefined') {
+		if (typeof window.InstallTrigger == 'undefined' || window.InstallTrigger === null) {
+			// log.debug("InstallTrigger is null");
 			return true;
 		}
 		evt.preventDefault();

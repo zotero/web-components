@@ -2,6 +2,7 @@ import {log as logger} from '../Log.js';
 var log = logger.Logger('PaymentSource');
 
 import {Row, Col} from 'reactstrap';
+import { getFlagEmoji } from '../Utils.js';
 import PropTypes from 'prop-types';
 
 function Card(props) {
@@ -19,6 +20,11 @@ function Card(props) {
 					Exp: <b>{card.exp_year}-{card.exp_month}</b>
 				</Col>
 			</Row>
+			<Row>
+				<Col>
+					Country: <b>{getFlagEmoji(card.country)} {card.country}</b>
+				</Col>
+			</Row>
 		</div>
 	);
 }
@@ -34,7 +40,7 @@ function Iban(props) {
 		<div className='stripe-iban'>
 			<Row>
 				<Col>
-					<b>{iban.country} ****-****-**** {iban.last4}</b>
+					<b>{getFlagEmoji(iban.country)} {iban.country} ****-****-**** {iban.last4}</b>
 				</Col>
 			</Row>
 		</div>
@@ -47,7 +53,7 @@ Iban.propTypes = {
 function PaymentSource(props) {
 	const { source } = props;
 	if (!source) {
-		return null;
+		return <p>No payment method saved</p>;
 	}
 	
 	let type = source.type;

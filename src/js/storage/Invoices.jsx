@@ -20,7 +20,7 @@ const deleteInvoice = async (invoiceID) => {
 };
 
 function Invoices(props) {
-	log.debug(props);
+	log.debug(props, 4);
 	let { invoices, type, collapseLabel, setNotification } = props;
 	const [isOpen, setIsOpen] = useState(false);
 

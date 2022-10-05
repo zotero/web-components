@@ -419,5 +419,32 @@ let relativeTime = function(timestampSeconds){
 	return `${difference} ${periods[j]} ${ending}`;
 };
 
+function getFlagEmoji(countryCode) {
+	const codePoints = countryCode
+		.toUpperCase()
+		.split('')
+		.map(char =>  127397 + char.charCodeAt());
+	return String.fromCodePoint(...codePoints);
+};
 
-export {slugify, parseQuery, buildQuery, querystring, parseSearchString, readCookie, loadInitialState, pageReady, jsError, jsSuccess, Delay, formatItemField, formatCurrency, getCurrentUser, randomString, chunkArray, relativeTime};
+
+export {
+	slugify,
+	parseQuery,
+	buildQuery,
+	querystring,
+	parseSearchString,
+	readCookie,
+	loadInitialState,
+	pageReady,
+	jsError,
+	jsSuccess,
+	Delay,
+	formatItemField,
+	formatCurrency,
+	getCurrentUser,
+	randomString,
+	chunkArray,
+	relativeTime,
+	getFlagEmoji,
+};

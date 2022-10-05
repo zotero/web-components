@@ -1,7 +1,7 @@
 import {log as logger} from '../Log.js';
 var log = logger.Logger('storage/calculations');
 
-const priceCents = {1: 0, 2: 2000, 3: 6000, 4: 10000, 5: 24000, 6: 12000};
+import { priceCents, discountTiers, discountedCountries, storagePlans, discountedPriceStrings } from './constants.js';
 
 // return bool whether a charge for a changed subscription should be made immediately
 const imminentExpiration = function (expiration = 0) {
@@ -63,4 +63,26 @@ const labUserPrice = function (fte = 0) {
 	return (fte * 3000);
 };
 
-export {calculateRemainingValue, calculateNewExpiration, imminentExpiration, priceCents, labPrice, labUserPrice};
+const getPriceCents = function(location) {
+	if (Object.keys(discountedCountries).includes(location)) {
+		let discountLevel = discountedCountries[location];
+		return discountTiers[discountLevel];
+	}
+	return priceCents;
+};
+
+const getStoragePlans = function(location) {
+	const basePlans = storagePlans;
+	if (Object.keys(discountedCountries).includes(location)) {
+		let discountLevel = discountedCountries[location];
+		let discountedPlans = basePlans.map((plan) => {
+			let nplan = Object.assign({}, plan);
+			nplan.priceString = discountedPriceStrings[discountLevel][plan.storageLevel];
+			return nplan;
+		});
+		return discountedPlans;
+	}
+	return basePlans;
+};
+
+export {calculateRemainingValue, calculateNewExpiration, imminentExpiration, labPrice, labUserPrice, getPriceCents, getStoragePlans};

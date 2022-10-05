@@ -47,7 +47,8 @@ import { Notifier } from '../Notifier.js';
 import { SubscriptionHandler } from './SubscriptionHandler.jsx';
 import { PaymentSource } from './PaymentSource.jsx';
 import { Invoices } from './Invoices.jsx';
-import { imminentExpiration, calculateNewExpiration, priceCents } from './calculations.js';
+import { LocationSelector } from './LocationSelector.jsx';
+import { imminentExpiration, calculateNewExpiration, getPriceCents, getStoragePlans } from './calculations.js';
 
 import { chargeDefaultMethod, createInvoice } from './actions.js';
 
@@ -55,36 +56,9 @@ import { LastSync } from './LastSync.jsx';
 import { ajax, postFormData } from '../ajax.js';
 import { LoadingSpinner } from '../LoadingSpinner.js';
 
+import { storageLevelDescriptions, discountedCountries } from './constants.js';
+
 const dateFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-
-const plans = [
-	{
-		storageLevel: 1,
-		description: '300 MB',
-		price: 'Free',
-	},
-	{
-		storageLevel: 2,
-		description: '2 GB',
-		price: '$20',
-	},
-	{
-		storageLevel: 3,
-		description: '6 GB',
-		price: '$60',
-	},
-	{
-		storageLevel: 6,
-		description: 'Unlimited',
-		price: '$120',
-	}
-];
-
-const storageLevelDescriptions = {
-	2: '2 GB',
-	3: '6 GB',
-	6: 'Unlimited storage'
-};
 
 const overQuota = function (storageLevel, userSubscription) {
 	const planQuotas = window.zoteroData.planQuotas;
@@ -96,7 +70,7 @@ const overQuota = function (storageLevel, userSubscription) {
 };
 
 const userSubscriptionShape = PropTypes.shape({
-	quota: PropTypes.string,
+	quota: PropTypes.number,
 	storageLevel: PropTypes.number,
 	usage: PropTypes.shape({
 		total: PropTypes.number
@@ -104,7 +78,7 @@ const userSubscriptionShape = PropTypes.shape({
 	institutionUnlimited: PropTypes.bool,
 	recur: PropTypes.bool,
 	expirationDate: PropTypes.number,
-}).isRequired;
+});
 
 const storageUrl = window.zoteroConfig.baseWebsiteUrl ? `${window.zoteroConfig.baseWebsiteUrl}/settings/storage` : '/settings/storage';
 
@@ -139,7 +113,7 @@ function StoragePlanRow(props) {
 	return (
 		<tr key={plan.storageLevel} className={rowClass}>
 			<td>{plan.description}</td>
-			<td>{plan.price}</td>
+			<td>{plan.priceString}</td>
 			<td>
 				{button}
 			</td>
@@ -208,7 +182,7 @@ function StorageMeter(props) {
 	const { userSubscription } = props;
 	
 	let quota = userSubscription.quota;
-	if (quota == 1000000) {
+	if (quota >= 1000000) {
 		return null;
 	}
 
@@ -260,7 +234,7 @@ GroupUsage.propTypes = {
 // Row that shows user's payment method and allows updating the method that will be used
 // or forcing an immediate renewal charge regardless of scheduled automatic renewal
 function PaymentRow(props) {
-	const { defaultSource, defaultPaymentMethod, userSubscription, updateCardHandler, renewHandler } = props;
+	const { defaultSource, defaultPaymentMethod, userSubscription, updateCardHandler, renewHandler, removePayment } = props;
 	
 	let paymentMethod = defaultSource || defaultPaymentMethod;
 
@@ -283,6 +257,7 @@ function PaymentRow(props) {
 	}
 	if (!paymentMethod || !userSubscription.recur) {
 		let autoRenewButton = <Button color='secondary' size='sm' className='m-1' onClick={updateCardHandler}>Enable Automatic Renewal</Button>;
+		let removePaymentButton = <Button color='secondary' size='sm' className='m-1' onClick={removePayment}>Remove Payment Details</Button>;
 		let renewButton = null;
 		
 		//show either "Renew Now" or both "Renew Now" and "Enable AutoRenew"
@@ -297,9 +272,11 @@ function PaymentRow(props) {
 			<tr>
 				<th>Payment</th>
 				<td>
+					<PaymentSource source={paymentMethod} />
 					<Row className='mt-2'>
 						<Col>
-							{autoRenewButton}
+							{paymentMethod ? removePaymentButton : null}
+							{!userSubscription.recur ? autoRenewButton : null}
 							{renewButton}
 						</Col>
 					</Row>
@@ -376,7 +353,8 @@ function NextPaymentRow(props) {
 }
 
 function StoragePlansSection(props) {
-	let planRowNodes = plans.map((plan) => {
+	const { location, setLocation, storagePlans } = props;
+	let planRowNodes = storagePlans.map((plan) => {
 		return <StoragePlanRow 
 			key={plan.storageLevel}
 			plan={plan}
@@ -384,6 +362,19 @@ function StoragePlansSection(props) {
 			selectPlan={props.selectPlan}
 		/>;
 	});
+
+	let locationFooter = null;
+	if (props.showLocation) {
+		locationFooter = (
+			<div className='section-footer'>
+				<LocationSelector {...{
+					location,
+					setLocation,
+				}} />
+				<p>Prices shown require that the payment card address matches the selected country.</p>
+			</div>
+		);
+	}
 
 	return (
 		<div className='change-storage-plan'>
@@ -402,6 +393,7 @@ function StoragePlansSection(props) {
 					</tbody>
 				</table>
 			</div>
+			{locationFooter}
 		</div>
 	);
 }
@@ -415,6 +407,12 @@ function Storage(props) {
 	const [ notification, setNotification ] = useState(null);
 	const [ operationPending, setOperationPending ] = useState(false);
 	const [ editPayment, setEditPayment ] = useState((purchase && purchase.type == 'individualPaymentUpdate'));
+	const [ location, setLocation ] = useState(props.detectedLocation.country);
+	const [ showLocation, setShowLocation ] = useState(props.detectedLocation.country != 'US');
+	const [ priceCents, setPriceCents ] = useState(null);
+	const [ previewPrice, setPreviewPrice ] = useState(null);
+	const [ storagePlans, setStoragePlans ] = useState([]);
+	const [ awaitingFinalConfirm, setAwaitingFinalConfirm ] = useState(false);
 
 	const choosePaymentType = (paymentType) => {
 		let nv = Object.assign({}, purchase, {paymentMethodType: paymentType})
@@ -449,11 +447,22 @@ function Storage(props) {
 		[props.userSubscription, props.stripeCustomer]
 	);
 
+	useEffect(
+		() => {
+			setPriceCents(getPriceCents(location));
+			let plans = getStoragePlans(location);
+			setStoragePlans(plans);
+		},
+		[location]
+	);
+
 	const cancelPurchase = () => {
 		setPurchase(null);
 	}
 
 	const selectPlan = (plan) => {
+		let price = getPriceCents(location)[plan.storageLevel];
+		setPreviewPrice(price);
 		setPurchase({
 			type: 'individualChange',
 			storageLevel: plan.storageLevel
@@ -481,6 +490,18 @@ function Storage(props) {
 			log.debug(resp, 4);
 			let data = await resp.json();
 			setStripeCustomer(data);
+			// set location to country on card
+			if (data.invoice_settings.default_payment_method) {
+				let dpm = data.invoice_settings.default_payment_method;
+				if (dpm.card && dpm.card.country) {
+					setLocation(dpm.card.country);
+					if (!Object.keys(discountedCountries).includes(dpm.card.country)) {
+						setShowLocation(false);
+					} else {
+						setShowLocation(true);
+					}
+				}
+			}
 		} catch (e) {
 			log.debug('Error retrieving customer data', 2);
 			log.debug(e, 2);
@@ -521,6 +542,23 @@ function Storage(props) {
 		refresh();
 	};
 
+	const removePayment = async () => {
+		setOperationPending(true);
+
+		try {
+			let resp = await postFormData('/storage/removepayment', undefined, { withSession: true });
+			log.debug(resp, 4);
+			setNotification({type: 'success', message: 'Removed payment method'});
+		} catch (e) {
+			log.error(e);
+			setNotification({type: 'error', message: 'Error updating payment method. Please try again in a few minutes.'});
+		} finally {
+			setOperationPending(false);
+		}
+
+		refresh();
+	};
+
 	// callback after PaymentElement confirms intent, or user confirms action that does not require intent
 	// if caller has no intent, argument should be false
 	// individualChange: no intent, just changing the plan
@@ -542,7 +580,7 @@ function Storage(props) {
 			// start an automatically confirmed payment intent or we are making a change
 			// that does not require payment
 			try {
-				let purchaseData = Object.assign({}, purchase);
+				let purchaseData = Object.assign({}, purchase, {location});
 				switch (purchase.type) {
 					case 'individualChange':
 						log.debug('individualChange');
@@ -555,10 +593,12 @@ function Storage(props) {
 							throwOnError: false,
 						});
 						result = await response.json();
-						log.debug(result);
+						log.debug(result, 3);
 						setNotification({type: result.type, message: result.message})
 						refresh();
 						break;
+					case 'individual':
+					case 'individualCharge':
 					case 'individualRenew':
 						let result = await chargeDefaultMethod(purchaseData);
 						if (result.success) {
@@ -566,13 +606,18 @@ function Storage(props) {
 							// refresh storage and subscription again after 3 seconds
 							delayedRefresh();
 						}
+						break;
 					default:
-						throw new Error("unexpected purchase.type");
+						throw new Error(`unexpected purchase.type: ${purchase.type}`);
 				}
 			} catch (err) {
-				log.debug(e);
-				log.error("UNEXPECTED THROWN RESPONSE WHEN ATTEMPTING PURCHASE OR CHANGE");
-				setNotification({type: 'error', message: "There was an error processing your request"});
+				log.error(err);
+				if (err.success === false && err.message) {
+					setNotification({type: 'error', message: err.message});
+				} else {
+					log.error("UNEXPECTED THROWN RESPONSE WHEN ATTEMPTING PURCHASE OR CHANGE");
+					setNotification({type: 'error', message: "There was an error processing your request"});
+				}
 			} finally {
 				cancelPurchase();
 				setOperationPending(false);
@@ -582,19 +627,32 @@ function Storage(props) {
 			try {
 				switch (purchase.type) {
 					case 'individualPaymentUpdate':
+						// payment added to customer on server, no action needed, just allow reload of data
+						cancelPurchase();
+						setOperationPending(false);
+						delayedRefresh();
+						return;
+					case 'individual':
+					case 'individualCharge':
+					case 'individualRenew':
+						// payment method added, now user must confirm charge
+						setAwaitingFinalConfirm(true);
+						setEditPayment(false);
+						// delayed fetch customer so we have payment details from server
+						log.debug("getting customer with updated payment");
+						setOperationPending(true);
+						setTimeout(() => {
+							getUserCustomer();
+						}, 1000);
 						break;
 					default:
 						throw new Error("unexpected purchase.type");
 				}
 			} catch (err) {
-				log.debug(err);
+				log.error(err);
 				log.error("UNEXPECTED THROWN RESPONSE WHEN ATTEMPTING PURCHASE OR CHANGE");
 				setNotification({type: 'error', message: "There was an error processing your request"});
-			} finally {
-				cancelPurchase();
-				setOperationPending(false);
 			}
-			delayedRefresh();
 		}
 	};
 
@@ -637,7 +695,7 @@ function Storage(props) {
 	}
 
 	let quotaDescription = userSubscription.quota + ' MB';
-	if (userSubscription.quota == 1000000) {
+	if (userSubscription.quota >= 1000000) {
 		quotaDescription = 'Unlimited';
 	}
 
@@ -648,11 +706,12 @@ function Storage(props) {
 	}
 
 	let paymentRow = null;
-	if (userSubscription.storageLevel != 1) {
+	if (userSubscription.storageLevel != 1 || stripeCustomer) {
 		let paymentRowProps = {
 			userSubscription,
 			updateCardHandler,
 			renewHandler,
+			removePayment,
 		};
 		if (stripeCustomer) {
 			paymentRowProps.defaultSource = stripeCustomer.default_source;
@@ -723,14 +782,14 @@ function Storage(props) {
 			}
 		}
 		// (stripeCustomer && (stripeCustomer.deleted !== true) && (stripeCustomer.default_source !== null || stripeCustomer.invoice_settings.default_payment_method !== null));
-		if ((immediateChargeRequired || paymentInfoRequired) && !havePaymentMethod && !editPayment) {
-			log.debug("setting editPayment to true");
-			setEditPayment(true);
-		} else if(purchase.type == 'individualPaymentUpdate' && !editPayment) {
-			log.debug("setting editPayment to true for individualPaymentUpdate");
-			setEditPayment(true);
-		} else {
-			log.debug("not setting editPayment to true");
+		if (!awaitingFinalConfirm && !editPayment) {
+			if ((immediateChargeRequired || paymentInfoRequired) && !havePaymentMethod && !editPayment) {
+				setEditPayment(true);
+			} else if(purchase.type == 'individualPaymentUpdate' && !editPayment) {
+				setEditPayment(true);
+			}/* else {
+				log.debug("not setting editPayment to true", 4);
+			}*/
 		}
 
 		if (immediateChargeRequired && !purchase.immediateCharge) {
@@ -747,7 +806,8 @@ function Storage(props) {
 			setEditPayment,
 			setOperationPending,
 			choosePaymentType,
-			setCurrency
+			setCurrency,
+			setLocation,
 		};
 
 		log.debug(`editPayment: ${editPayment}`);
@@ -757,10 +817,14 @@ function Storage(props) {
 					description,//multi-para description of update, whether charge or not
 					// chargeDescription,//description for stripe charge
 					// userSubscription,
-					// stripeCustomer,
+					stripeCustomer,
+					allowEuro: props.detectedLocation.continent == 'EU',
+					awaitingFinalConfirm,
 					purchase,
+					location,
 					invoicePossible,//whether it's allowed to create an invoice for this purchase
 					chargeAmount,
+					previewPriceMismatch: (chargeAmount != previewPrice),
 					error,
 					editPayment,
 					operationPending,
@@ -823,7 +887,14 @@ function Storage(props) {
 							</div>
 						</Col>
 						<Col md='6'>
-							{userSubscription.institutionUnlimited ? null : <StoragePlansSection {...{selectPlan, userSubscription}} />}
+							{userSubscription.institutionUnlimited ? null : <StoragePlansSection {...{
+								storagePlans,
+								selectPlan,
+								userSubscription,
+								location,
+								setLocation,
+								showLocation,
+							}} />}
 						</Col>
 					</Row>
 				</div>
@@ -832,7 +903,7 @@ function Storage(props) {
 	);
 }
 Storage.propTypes = {
-	userSubscription: PropTypes.object,
+	userSubscription: userSubscriptionShape,
 	stripeCustomer: PropTypes.object,
 	storageGroups: PropTypes.object,
 	summary: PropTypes.bool,

@@ -58,7 +58,7 @@ function PECheckoutForm(props) {
 			};
 		}
 
-		if (['individualPaymentUpdate'].includes(purchase.type)) {
+		if (stripeIntent.intent.object == 'setup_intent') {
 			log.debug("confirming setupIntent");
 			var confirmResult = await stripe.confirmSetup({
 				//`Elements` instance that was used to create the Payment Element
@@ -101,13 +101,8 @@ function PECheckoutForm(props) {
 
 			//show success dialog which user will see unless they got redirected
 			setNotification({ type: 'success', message: 'Payment Submitted'});
-			// close dialog
+			//handleConfirm will close dialog by removing purchase if necessary
 			handleConfirm(stripeIntent);
-			if (cancelable) {
-				if (cancel) {
-					cancel();
-				}
-			}
 		}
 		setOperationPending(false);
 	};

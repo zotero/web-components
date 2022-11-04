@@ -22,10 +22,9 @@ import { Card, CardHeader, CardBody, FormGroup, Input, Modal, ModalBody, ModalHe
 
 import { beginStripeIntent } from './actions.js';
 import { PaymentElementModal } from './PaymentElementModal.jsx';
-import { PaymentSource } from './PaymentSource.jsx';
+import { PaymentDetails } from './PaymentDetails.jsx';
 
 import { LoadingSpinner } from '../LoadingSpinner.js';
-import { formatCurrency } from '../Utils.js';
 
 // component that handles a request for payment, presenting the PaymentModal and processing
 // the payment or saving the customer for future use as necessary
@@ -36,8 +35,8 @@ import { formatCurrency } from '../Utils.js';
 
 function SubscriptionHandler(props) {
 	const { callbacks, operationPending, error, editPayment, chargeAmount, previewPriceMismatch, awaitingFinalConfirm, description, stripeCustomer, purchase, allowRenew, returnUrl, location } = props;
-	const { setOperationPending, setEditPayment, setNotification, cancelPurchase, handleInvoiceRequest, handleConfirm, setCurrency, setLocation } = callbacks;
-	log.debug(props, 4);
+	const { setOperationPending, setNotification, cancelPurchase, handleInvoiceRequest, handleConfirmPurchase, handleConfirmIntent, setCurrency, setLocation } = callbacks;
+	log.debug(props, 2);
 
 	const [ stripeIntent, setStripeIntent ] = useState(null);
 	const [ autorenew, setAutorenew ] = useState(true);
@@ -90,17 +89,32 @@ function SubscriptionHandler(props) {
 				callbacks,
 				purchase,
 				stripeIntent,
-				awaitingFinalConfirm,
+				// awaitingFinalConfirm,
 				operationPending,
-				buttonLabel: 'Add Payment',
+				buttonLabel: 'Submit',
 				returnUrl,
 				cancel,
 			}}
 		/>;
-	} else {
+	} else if (chargeAmount) {
 		paymentSection = <PaymentDetails 
-			{...{ purchase, stripeCustomer, defaultSource, chargeAmount, previewPriceMismatch, handleConfirm, cancel }}
+			{...{
+				callbacks,
+				purchase,
+				stripeCustomer,
+				defaultSource,
+				chargeAmount,
+			}}
 		/>;
+	} else {
+		paymentSection = (
+			<div className='confirmChange'>
+				<Row className='mt-2'>
+					<Col className='text-center'><Button className='m-auto' onClick={() => { handleConfirmPurchase(); }}>Confirm Change</Button></Col>
+					<Col className='text-center'><Button className='m-auto' onClick={cancel}>Cancel</Button></Col>
+				</Row>
+			</div>
+		);
 	}
 
 	let renewSection = null;
@@ -185,55 +199,5 @@ SubscriptionHandler.propTypes = {
 SubscriptionHandler.defaultProps = {
 	allowRenew: false,
 };
-
-function PaymentDetails(props) {
-	const { purchase, stripeCustomer, defaultSource, chargeAmount, previewPriceMismatch, handleConfirm, setEditPayment, cancel } = props;
-	log.debug("PaymentSection");
-	log.debug(props);
-	let buttonLabel = `Pay ${formatCurrency(chargeAmount, purchase.currency)}`;
-
-	if (stripeCustomer) {
-		// show existing payment method on file that will be charged, with link to change it if desired
-		if (defaultSource) {
-			return (
-				<div className='currentPaymentSource'>
-					<Card>
-						<CardHeader>
-							Payment Method
-						</CardHeader>
-						<CardBody>
-							<PaymentSource source={defaultSource} />
-							<Button color='link' onClick={() => { setEditPayment(true); }}>Change Payment Details</Button>
-						</CardBody>
-					</Card>
-					{previewPriceMismatch ? 
-					<Row className='mt-2'>
-						<Col><p className='text-danger'>Note that the price has updated. The price charged is based on the payment method's country.</p></Col>
-					</Row>
-				: null}
-					<Row className='mt-2'>
-						<Col className='text-center'><Button className='m-auto' onClick={() => { handleConfirm(false); }}>{buttonLabel}</Button></Col>
-						<Col className='text-center'><Button className='m-auto' onClick={cancel}>Cancel</Button></Col>
-					</Row>
-				</div>
-			);
-		} else {
-			return (
-				<div className='paymentSourcePending'>
-					<Card>
-						<CardHeader>
-							Payment Method
-						</CardHeader>
-						<CardBody>
-							<LoadingSpinner className='m-auto' loading={true} />
-							<p>Adding payment method...</p>
-						</CardBody>
-					</Card>
-				</div>
-			);
-		}
-	}
-	return <p>There was an error showing payment details</p>;
-}
 
 export { SubscriptionHandler };

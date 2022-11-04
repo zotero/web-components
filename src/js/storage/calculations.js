@@ -1,7 +1,7 @@
 import {log as logger} from '../Log.js';
 var log = logger.Logger('storage/calculations');
 
-import { priceCents, discountTiers, discountedCountries, storagePlans, discountedPriceStrings } from './constants.js';
+import { priceCents, discountTiers, discountLabTiers, discountedCountries, storagePlans, discountedPriceStrings } from './constants.js';
 
 // return bool whether a charge for a changed subscription should be made immediately
 const imminentExpiration = function (expiration = 0) {
@@ -63,6 +63,23 @@ const labUserPrice = function (fte = 0) {
 	return (fte * 3000);
 };
 
+//lab price for a given number of users, based on location's discount tier
+const locationLabPrice = function(fte=0, location='US') {
+	if (Object.keys(discountedCountries).includes(location)) {
+		let discountLevel = discountedCountries[location];
+		return Math.max(15, fte) * discountLabTiers[discountLevel];
+	}
+	return labPrice(fte);
+}
+
+const locationLabUserPrice = function (fte = 0, location='US') {
+	if (Object.keys(discountedCountries).includes(location)) {
+		let discountLevel = discountedCountries[location];
+		return fte * discountLabTiers[discountLevel];
+	}
+	return labUserPrice(fte);
+}
+
 const getPriceCents = function(location) {
 	if (Object.keys(discountedCountries).includes(location)) {
 		let discountLevel = discountedCountries[location];
@@ -85,4 +102,18 @@ const getStoragePlans = function(location) {
 	return basePlans;
 };
 
-export {calculateRemainingValue, calculateNewExpiration, imminentExpiration, labPrice, labUserPrice, getPriceCents, getStoragePlans};
+const getCustomerPaymentCountry = function(stripeCustomer) {
+	if (stripeCustomer && stripeCustomer.invoice_settings.default_payment_method) {
+		let dpm = stripeCustomer.invoice_settings.default_payment_method;
+		if (dpm.card && dpm.card.country) {
+			return (dpm.card.country);
+		}
+	}
+	return false;
+};
+
+const isDiscounted = function(country) {
+	return Object.keys(discountedCountries).includes(country);
+};
+
+export {calculateRemainingValue, calculateNewExpiration, imminentExpiration, labPrice, labUserPrice, locationLabPrice, locationLabUserPrice, getPriceCents, getStoragePlans, getCustomerPaymentCountry, isDiscounted};

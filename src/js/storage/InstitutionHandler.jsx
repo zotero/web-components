@@ -5,11 +5,10 @@ import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Card, CardHeader, CardBody, FormGroup, Input, Modal, ModalBody, ModalHeader, Label, Row, Col, Button, Container } from 'reactstrap';
 
-import { labPrice, labUserPrice } from './calculations.js';
 import { PaymentElementModal } from './PaymentElementModal.jsx';
 import { PaymentSource } from './PaymentSource.jsx';
+import { PaymentDetails } from './PaymentDetails.jsx';
 
-import { ajax } from '../ajax.js';
 import { buildUrl } from '../wwwroutes.js';
 import { LoadingSpinner } from '../LoadingSpinner.js';
 
@@ -17,58 +16,18 @@ import { createInstitutionInvoice, beginStripeIntent } from './actions.js';
 
 import { formatCurrency } from '../Utils.js';
 
-
+// handle request to purchase Lab or Institution subscription
+// 
 function InstitutionHandler(props) {
-	const { purchase, stripeCustomer, setPurchase, renew, institutionID, setNotification } = props;
-	const { type, fte, name, additionalFTE } = purchase;
+	const { purchase, chargeAmount, renew, editPayment, institutionID, location, stripeCustomer, previewPriceMismatch, immediateChargeRequired, awaitingFinalConfirm, description, operationPending, callbacks } = props;
+	const { setPurchase, setEditPayment, setOperationPending } = callbacks;
 	
 	const [autorenew, setAutorenew] = useState(true);
-	const [editPayment, setEditPayment] = useState((type == 'paymentUpdate'));
-	const [operationPending, setOperationPending] = useState(false);
 	const [stripeIntent, setStripeIntent] = useState(false);
 
-	// clear the new subscription closing the Handler, because it is either complete, or canceled
 	const cancel = () => {
-		setOperationPending(false);
 		setPurchase(null);
-	};
-	
-	let description = [];
-	let chargeAmount = false;
-	let error = null;
-	let immediateChargeRequired = true;
-		
-	switch (type) {
-	case 'paymentUpdate':
-		description.push(`Update your saved payment details for your next renewal. There will be no charge made until your expiration date.`);
-		break;
-	case 'labRenew':
-		description.push(`Renew your current subscription. Zotero Lab for ${fte} users.`);
-		description.push(`Your card or bank account will be charged immediately after confirming.`);
-		chargeAmount = labPrice(fte);
-		immediateChargeRequired = true;
-		break;
-	case 'lab':
-		description.push(`Purchase 1 year of Zotero Lab for ${fte} users.`);
-		description.push(`Lab Name: ${name}`);
-		chargeAmount = labPrice(fte);
-		immediateChargeRequired = true;
-		break;
-	case 'addLabUsers':
-		description.push(`Add ${additionalFTE} users to your current subscription.`);
-		description.push(`Your card or bank account will be charged immediately after confirming.`);
-		chargeAmount = labUserPrice(additionalFTE);
-		immediateChargeRequired = true;
-		break;
-	case 'institution':
-		// TODO
-		break;
-	default:
-		throw new Error('Unknown purchase type');
-	}
-	
-	if (immediateChargeRequired && !stripeCustomer && !editPayment) {
-		setEditPayment(true);
+		setOperationPending(false);
 	}
 	
 	useEffect(async () => {
@@ -84,10 +43,11 @@ function InstitutionHandler(props) {
 					purchaseData.numUsers = purchase.additionalFTE;
 				}
 				if (purchase.name) {
-					purchaseData.institutionName = name;
+					purchaseData.institutionName = purchase.name;
 				}
 				
-				await beginStripeIntent(purchaseData, setStripeIntent);
+				let locationPurchaseData = Object.assign({}, purchaseData, {location});
+				await beginStripeIntent(locationPurchaseData, setStripeIntent);
 				setOperationPending(false);
 			}
 		}
@@ -97,6 +57,8 @@ function InstitutionHandler(props) {
 		return <p key={i}>{d}</p>;
 	});
 	
+
+	/*
 	const handleConfirm = async (paymentMethod) => {
 		return;
 		log.debug('handleConfirm');
@@ -192,6 +154,7 @@ function InstitutionHandler(props) {
 		setNotification(result);
 		cancel();
 	};
+	*/
 	
 	/*
 	const handleConfirm = async (paymentMethod) => {
@@ -227,35 +190,31 @@ function InstitutionHandler(props) {
 	};
 	*/
 
-	const handleInvoiceRequest = async () => {
-		setOperationPending(true);
-		let result = await createInstitutionInvoice({type, fte, additionalFTE, name, institutionID});
-		setNotification(result);
-		cancel();
-	};
 	
 	let buttonLabel = immediateChargeRequired ? `Pay ${formatCurrency(chargeAmount)}` : 'Confirm';
 	
+	let defaultSource = false;
+	if (stripeCustomer) {
+		defaultSource = stripeCustomer.default_source || stripeCustomer.invoice_settings.default_payment_method;
+	}
 	let paymentSection = null;
-	if (editPayment) {
+	if (editPayment && !awaitingFinalConfirm) {
 		log.debug('editPayment - rendering PaymentElementModal');
 		log.debug(stripeIntent);
+		let peCallbacks = {...callbacks, setOperationPending }
 		paymentSection = <PaymentElementModal
 			stripe={window.stripe}
 			{...{
-				setNotification,
+				callbacks: peCallbacks,
 				purchase,
 				stripeIntent,
+				awaitingFinalConfirm,
 				operationPending,
-				setOperationPending,
-				setNotification,
 				buttonLabel,
 				useEmail: true,
 				returnUrl: window.location.toString(),
-				handleConfirm,
 				cancel,
 			}}
-			chargeDescription="Charge"
 		/>;
 		// paymentSection = <CardPaymentModal
 		// 	stripe={window.stripe}
@@ -263,7 +222,11 @@ function InstitutionHandler(props) {
 		// 	buttonLabel={blabel}
 		// />;
 	} else if (stripeCustomer && immediateChargeRequired) {
-		const defaultSource = stripeCustomer.default_source || stripeCustomer.invoice_settings.default_payment_method;
+
+		paymentSection = <PaymentDetails
+			{...{ purchase, stripeCustomer, defaultSource, chargeAmount, previewPriceMismatch, handleConfirm: callbacks.handleConfirmPurchase, cancel }}
+		/>;
+
 		if (defaultSource) {
 			paymentSection = (
 				<div className='currentPaymentSource'>
@@ -277,7 +240,7 @@ function InstitutionHandler(props) {
 						</CardBody>
 					</Card>
 					<Row className='mt-2'>
-						<Col className='text-center'><Button className='m-auto' onClick={() => { handleConfirm(false); }}>{buttonLabel}</Button></Col>
+						<Col className='text-center'><Button className='m-auto' onClick={() => { callbacks.handleConfirm(false); }}>{buttonLabel}</Button></Col>
 						<Col className='text-center'><Button className='m-auto' onClick={cancel}>Cancel</Button></Col>
 					</Row>
 				</div>
@@ -287,7 +250,7 @@ function InstitutionHandler(props) {
 		paymentSection = (
 			<Container>
 				<Row>
-					<Col className='text-center'><Button className='m-auto' onClick={handleConfirm}>{buttonLabel}</Button></Col>
+					<Col className='text-center'><Button className='m-auto' onClick={callbacks.handleConfirm}>{buttonLabel}</Button></Col>
 					<Col className='text-center'><Button className='m-auto' onClick={cancel}>Cancel</Button></Col>
 				</Row>
 			</Container>
@@ -318,7 +281,7 @@ function InstitutionHandler(props) {
 		<Container className='mt-4'>
 			<Row>
 				<Col className='text-center'>
-					<p><a href='#' onClick={handleInvoiceRequest}>Create invoice payable by third party</a></p>
+					<p><a href='#' onClick={callbacks.handleInvoiceRequest}>Create invoice payable by third party</a></p>
 				</Col>
 			</Row>
 		</Container>
@@ -332,7 +295,7 @@ function InstitutionHandler(props) {
 					<LoadingSpinner className='m-auto' loading={operationPending} />
 					<Card className='mb-4'>
 						<CardBody>
-							{error}
+							{props.error}
 							{descriptionPs}
 						</CardBody>
 					</Card>

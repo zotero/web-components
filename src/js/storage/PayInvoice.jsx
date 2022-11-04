@@ -7,7 +7,7 @@ import { Alert, Card, CardHeader, CardBody, Row, Col } from 'reactstrap';
 
 import { ErrorWrapper } from '../components/ErrorWrapper.jsx';
 import { Notifier } from '../Notifier.js';
-import { priceCents, labPrice, labUserPrice } from './calculations.js';
+import { getPriceCents, labPrice, labUserPrice } from './calculations.js';
 import { PaymentElementModal } from './PaymentElementModal.jsx';
 import { PaymentSource } from './PaymentSource.jsx';
 import { beginStripeIntent } from './actions.js';
@@ -60,7 +60,7 @@ function PayInvoice(props) {
 	case 'individual':
 		description.push(`Zotero Storage subscription for user ${invoiceUser.username} - ${invoiceUser.email}`);
 		description.push(`1 year of Zotero file storage: ${storageLevelDescriptions[storageLevel]}`);
-		chargeAmount = priceCents[storageLevel];
+		chargeAmount = getPriceCents('US')[storageLevel];
 		break;
 	case 'lab':
 		if (institutionName) {

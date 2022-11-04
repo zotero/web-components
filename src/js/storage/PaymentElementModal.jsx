@@ -9,11 +9,11 @@ import PropTypes from 'prop-types';
 import { LoadingSpinner } from '../LoadingSpinner.js';
 
 function PECheckoutForm(props) {
-	if (typeof props.callbacks.handleConfirm != 'function') {
-		log.error('props error in PECheckoutForm: handleConfirm must be function');
+	if (typeof props.callbacks.handleConfirmIntent != 'function') {
+		log.error('props error in PECheckoutForm: handleConfirmIntent must be function');
 	}
 	const { callbacks, purchase, buttonLabel, returnUrl, cancelable, cancel, operationPending, stripeIntent } = props;
-	const { setOperationPending, setNotification, handleConfirm } = callbacks;
+	const { setOperationPending, setNotification, handleConfirmIntent } = callbacks;
 	const stripe = window.stripe;// useStripe();
 	const elements = useElements();
 
@@ -40,6 +40,7 @@ function PECheckoutForm(props) {
 		}
 	
 		callbacks.setOperationPending(true);
+		let successMessage = "Payment Submitted";
 
 		let billingDetails = {
 			name,
@@ -71,6 +72,7 @@ function PECheckoutForm(props) {
 				},
 				redirect: 'if_required',			
 			});
+			successMessage = "Payment Saved";
 		} else {
 			log.debug("confirming paymentIntent");
 			var confirmResult = await stripe.confirmPayment({
@@ -100,9 +102,9 @@ function PECheckoutForm(props) {
 			// site first to authorize the payment, then redirected to the `return_url`.
 
 			//show success dialog which user will see unless they got redirected
-			setNotification({ type: 'success', message: 'Payment Submitted'});
-			//handleConfirm will close dialog by removing purchase if necessary
-			handleConfirm(stripeIntent);
+			setNotification({ type: 'success', message: successMessage});
+			//handleConfirmIntent will close dialog by removing purchase if necessary
+			handleConfirmIntent(stripeIntent);
 		}
 		setOperationPending(false);
 	};
@@ -119,7 +121,7 @@ function PECheckoutForm(props) {
 	if (props.useEmail) {
 		emailSection = (
 			<FormGroup>
-				<Input type='email' placeholder='Email' value={email}
+				<Input type='email' placeholder='Email' value={email} autoFocus
 					onChange={(evt) => { setEmail(evt.target.value); }}
 				/>
 			</FormGroup>
@@ -130,7 +132,7 @@ function PECheckoutForm(props) {
 	if (props.useAddress) {
 		addressSection = (
 			<FormGroup>
-				<Input type='address' placeholder='Address' value={address1}
+				<Input type='address' placeholder='Address' value={address1} autoFocus={!props.useEmail}
 					onChange={(evt) => { setAddress1(evt.target.value); }}
 				/>
 				<Input type='address' placeholder='Address 2' value={address2}
@@ -151,7 +153,7 @@ function PECheckoutForm(props) {
 		<Form onSubmit={handleSubmit}>
 			{emailSection}
 			<FormGroup>
-				<Input type='text' placeholder='Name' value={name}
+				<Input type='text' placeholder='Name' value={name} autoFocus={!props.useEmail && !props.useAddress}
 					onChange={(evt) => { setName(evt.target.value); }}
 				/>
 			</FormGroup>
@@ -173,7 +175,7 @@ function PECheckoutForm(props) {
 PECheckoutForm.propTypes = {
 	callbacks: PropTypes.shape({
 		setOperationPending: PropTypes.func.isRequired,
-		handleConfirm: PropTypes.func.isRequired,
+		handleConfirmIntent: PropTypes.func.isRequired,
 	}),
 	onClose: PropTypes.func.isRequired,
 	buttonLabel: PropTypes.string,
@@ -235,7 +237,7 @@ PaymentElementModal.propTypes = {
 	callbacks: PropTypes.shape({
 		setOperationPending: PropTypes.func.isRequired,
 		setNotification: PropTypes.func.isRequired,
-		handleConfirm: PropTypes.func.isRequired,
+		handleConfirmIntent: PropTypes.func.isRequired,
 	}),
 	operationPending: PropTypes.bool.isRequired,
 	buttonLabel: PropTypes.string,

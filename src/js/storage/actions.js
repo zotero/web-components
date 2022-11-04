@@ -2,7 +2,7 @@ import { log as logger } from '../Log.js';
 const log = logger.Logger('storage/actions.js');
 
 import { ajax, postFormData } from '../ajax.js';
-
+import { discountedCountries } from './constants.js';
 
 // async function beginIntent(amount, description, storageLevel, immediateCharge) {
 async function beginStripeIntent(purchase, setIntent) {
@@ -119,9 +119,24 @@ async function createInstitutionInvoice(invoiceData) {
 	}
 }
 
+async function getUserCustomer (setStripeCustomer, setLocation, setShowLocation, setNotification) {
+    log.debug('getUserCustomer', 4);
+    try {
+        let resp = await ajax({ url: '/storage/getusercustomer' });
+        log.debug(resp, 4);
+        let data = await resp.json();
+        return {type: 'sucess', success:true, stripeCustomer: data};
+    } catch (e) {
+        log.debug('Error retrieving customer data', 2);
+        log.debug(e, 2);
+        return {success:false, type: 'error', message: 'There was an error retrieving your payment or subscription data'};
+    }
+}
+
 export {
 	beginStripeIntent,
 	chargeDefaultMethod,
 	createInvoice,
 	createInstitutionInvoice,
+	getUserCustomer,
 };

@@ -12,7 +12,8 @@ import { InstitutionCheckout } from './InstitutionCheckout.jsx';
 
 // Checkout is a component that allows a user to enter a number of FTE for their institution and preview
 // the price for an institutional plan with that many users, then make the purchase or request an invoice
-function Checkout() {
+function Checkout(props) {
+	// const { stripeCustomer, detectedLocation } = props;
 	const [activeTab, setActiveTab] = useState('Lab');
 
 	return (
@@ -31,7 +32,7 @@ function Checkout() {
 			<div className='m-8'>
 				<TabContent activeTab={activeTab} className='text-left'>
 					<TabPane tabId='Lab'>
-						<LabCheckout />
+						<LabCheckout {...props} />
 					</TabPane>
 					<TabPane tabId='Institution'>
 						<InstitutionCheckout />

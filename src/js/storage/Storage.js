@@ -19,7 +19,10 @@ TODO:
  - whether payment/recur is enabled not always detected correctly (Enable automatic renewal and Disable autorenew both shown)
  - make sure invoices always show the information we have for whatever payment method/charge object
  - show link to receipt/invoice immediately after processing payment
- -
+ - update list of invoices after delete
+ - only show list of invoices or receipts, don't duplicate
+ - reload invoice after payment
+ - update stripe customer email when primary email updated, or expose separately?
 
 
 Flows:
@@ -48,9 +51,9 @@ import { SubscriptionHandler } from './SubscriptionHandler.jsx';
 import { PaymentSource } from './PaymentSource.jsx';
 import { Invoices } from './Invoices.jsx';
 import { LocationSelector } from './LocationSelector.jsx';
-import { imminentExpiration, calculateNewExpiration, getPriceCents, getStoragePlans } from './calculations.js';
+import { imminentExpiration, calculateNewExpiration, getPriceCents, getStoragePlans, getCustomerPaymentCountry, isDiscounted } from './calculations.js';
 
-import { chargeDefaultMethod, createInvoice } from './actions.js';
+import { chargeDefaultMethod, createInvoice, getUserCustomer } from './actions.js';
 
 import { LastSync } from './LastSync.jsx';
 import { ajax, postFormData } from '../ajax.js';
@@ -399,7 +402,7 @@ function StoragePlansSection(props) {
 }
 
 function Storage(props) {
-	log.debug(props);
+	// log.debug(props);
 	const [ userSubscription, setUserSubscription ] = useState(props.userSubscription);
 	const [ storageGroups, setStorageGroups ] = useState({});
 	const [ stripeCustomer, setStripeCustomer ] = useState(props.stripeCustomer);
@@ -414,6 +417,7 @@ function Storage(props) {
 	const [ storagePlans, setStoragePlans ] = useState([]);
 	const [ awaitingFinalConfirm, setAwaitingFinalConfirm ] = useState(false);
 
+	log.debug({userSubscription, stripeCustomer, purchase, previewPrice});
 	const choosePaymentType = (paymentType) => {
 		let nv = Object.assign({}, purchase, {paymentMethodType: paymentType})
 		setPurchase(nv);
@@ -432,6 +436,9 @@ function Storage(props) {
 		});
 	};
 	const renewHandler = () => {
+		log.debug('renewHandler');
+		let price = getPriceCents(location)[userSubscription.storageLevel];
+		setPreviewPrice(price);
 		setPurchase({
 			type: 'individualRenew',
 			storageLevel: userSubscription.storageLevel,
@@ -461,6 +468,7 @@ function Storage(props) {
 	}
 
 	const selectPlan = (plan) => {
+		log.debug('selectPlan');
 		let price = getPriceCents(location)[plan.storageLevel];
 		setPreviewPrice(price);
 		setPurchase({
@@ -483,6 +491,7 @@ function Storage(props) {
 			setNotification({type: 'error', message: 'There was an error retrieving your subscription data'});
 		}
 	}
+	/*
 	const getUserCustomer = async () => {
 		log.debug('getUserCustomer', 4);
 		try {
@@ -491,7 +500,7 @@ function Storage(props) {
 			let data = await resp.json();
 			setStripeCustomer(data);
 			// set location to country on card
-			if (data.invoice_settings.default_payment_method) {
+			if (data && data.invoice_settings.default_payment_method) {
 				let dpm = data.invoice_settings.default_payment_method;
 				if (dpm.card && dpm.card.country) {
 					setLocation(dpm.card.country);
@@ -508,12 +517,29 @@ function Storage(props) {
 			setNotification({type: 'error', message: 'There was an error retrieving your subscription data'});
 		}
 	}
-	
-	const refresh = () => {
+	*/
+	const refresh = async () => {
 		log.debug('refresh');
 		setOperationPending(true);
 		getSubscription();
-		getUserCustomer();
+
+		let customerResponse = await getUserCustomer();
+		if(!customerResponse.success) {
+			setStripeCustomer(null);
+			setNotification(customerResponse);
+		} else {
+			setStripeCustomer(customerResponse.stripeCustomer);
+			let paymentCountry = getCustomerPaymentCountry(customerResponse.stripeCustomer);
+			if (paymentCountry) {
+				setLocation(paymentCountry);
+				if (isDiscounted(paymentCountry)) {
+					setShowLocation(true);
+				} else {
+					setShowLocation(false);
+				}
+			}
+		}
+		// getUserCustomer(setStripeCustomer, setLocation, setShowLocation, setNotification);
 		setOperationPending(false);
 	};
 
@@ -559,13 +585,70 @@ function Storage(props) {
 		refresh();
 	};
 
+	const handleConfirmPurchase = async () => {
+		log.debug('handleConfirmPurchase');
+		log.debug(purchase);
+		if (operationPending) {
+			log.debug('operation already pending');
+			return;
+		}
+		setOperationPending(true);
+
+		// no payment intent because we're using the payment method on file
+		// start an automatically confirmed payment intent or we are making a change
+		// that does not require payment
+		try {
+			let purchaseData = Object.assign({}, purchase, {location});
+			switch (purchase.type) {
+				case 'individualChange':
+					log.debug('individualChange');
+					let response = await ajax({
+						type: 'POST',
+						withSession: true,
+						// url: '/storage/purchase',
+						url: '/storage/newstripeintent',
+						data: JSON.stringify(purchaseData),
+						throwOnError: false,
+					});
+					result = await response.json();
+					log.debug(result, 3);
+					setNotification({type: result.type, message: result.message})
+					refresh();
+					break;
+				case 'individual':
+				case 'individualCharge':
+				case 'individualRenew':
+					let result = await chargeDefaultMethod(purchaseData);
+					if (result.success) {
+						setNotification({type: 'success', message: 'Your payment has been processed.'});
+						// refresh storage and subscription again after 3 seconds
+						delayedRefresh();
+					}
+					break;
+				default:
+					throw new Error(`unexpected purchase.type: ${purchase.type}`);
+			}
+		} catch (err) {
+			log.error(err);
+			if (err.success === false && err.message) {
+				setNotification({type: 'error', message: err.message});
+			} else {
+				log.error("UNEXPECTED THROWN RESPONSE WHEN ATTEMPTING PURCHASE OR CHANGE");
+				setNotification({type: 'error', message: "There was an error processing your request"});
+			}
+		} finally {
+			cancelPurchase();
+			setOperationPending(false);
+		}
+	}
+
 	// callback after PaymentElement confirms intent, or user confirms action that does not require intent
 	// if caller has no intent, argument should be false
 	// individualChange: no intent, just changing the plan
 	// individualRenew: No intent if charging the existing PaymentMethod on file (if user doesn't choose to edit them)
 	// individualPaymentUpdate: intent used to update user's default PaymentMethod
-	const handleConfirm = async (stripeIntent) => {
-		log.debug('handleConfirm');
+	const handleConfirmIntent = async (stripeIntent) => {
+		log.debug('handleConfirmIntent');
 		log.debug(stripeIntent);
 		log.debug(purchase);
 		if (operationPending) {
@@ -574,85 +657,34 @@ function Storage(props) {
 		}
 		setOperationPending(true);
 
-		if (stripeIntent === false) {
-			log.debug('stripeIntent is false');
-			// no payment intent because we're using the payment method on file
-			// start an automatically confirmed payment intent or we are making a change
-			// that does not require payment
-			try {
-				let purchaseData = Object.assign({}, purchase, {location});
-				switch (purchase.type) {
-					case 'individualChange':
-						log.debug('individualChange');
-						let response = await ajax({
-							type: 'POST',
-							withSession: true,
-							// url: '/storage/purchase',
-							url: '/storage/newstripeintent',
-							data: JSON.stringify(purchaseData),
-							throwOnError: false,
-						});
-						result = await response.json();
-						log.debug(result, 3);
-						setNotification({type: result.type, message: result.message})
-						refresh();
-						break;
-					case 'individual':
-					case 'individualCharge':
-					case 'individualRenew':
-						let result = await chargeDefaultMethod(purchaseData);
-						if (result.success) {
-							setNotification({type: 'success', message: 'Your payment has been processed.'});
-							// refresh storage and subscription again after 3 seconds
-							delayedRefresh();
-						}
-						break;
-					default:
-						throw new Error(`unexpected purchase.type: ${purchase.type}`);
-				}
-			} catch (err) {
-				log.error(err);
-				if (err.success === false && err.message) {
-					setNotification({type: 'error', message: err.message});
-				} else {
-					log.error("UNEXPECTED THROWN RESPONSE WHEN ATTEMPTING PURCHASE OR CHANGE");
-					setNotification({type: 'error', message: "There was an error processing your request"});
-				}
-			} finally {
-				cancelPurchase();
-				setOperationPending(false);
+		try {
+			switch (purchase.type) {
+				case 'individualPaymentUpdate':
+					// payment added to customer on server, no action needed, just allow reload of data
+					cancelPurchase();
+					setOperationPending(false);
+					delayedRefresh();
+					return;
+				case 'individual':
+				case 'individualCharge':
+				case 'individualRenew':
+					// payment method added, now user must confirm charge
+					setAwaitingFinalConfirm(true);
+					setEditPayment(false);
+					// delayed fetch customer so we have payment details from server
+					log.debug("getting customer with updated payment");
+					setOperationPending(true);
+					setTimeout(() => {
+						getUserCustomer(setStripeCustomer, setLocation, setShowLocation, setNotification);
+					}, 1000);
+					break;
+				default:
+					throw new Error("unexpected purchase.type");
 			}
-		} else {
-			log.debug("stripeIntent included in handleConfirm");
-			try {
-				switch (purchase.type) {
-					case 'individualPaymentUpdate':
-						// payment added to customer on server, no action needed, just allow reload of data
-						cancelPurchase();
-						setOperationPending(false);
-						delayedRefresh();
-						return;
-					case 'individual':
-					case 'individualCharge':
-					case 'individualRenew':
-						// payment method added, now user must confirm charge
-						setAwaitingFinalConfirm(true);
-						setEditPayment(false);
-						// delayed fetch customer so we have payment details from server
-						log.debug("getting customer with updated payment");
-						setOperationPending(true);
-						setTimeout(() => {
-							getUserCustomer();
-						}, 1000);
-						break;
-					default:
-						throw new Error("unexpected purchase.type");
-				}
-			} catch (err) {
-				log.error(err);
-				log.error("UNEXPECTED THROWN RESPONSE WHEN ATTEMPTING PURCHASE OR CHANGE");
-				setNotification({type: 'error', message: "There was an error processing your request"});
-			}
+		} catch (err) {
+			log.error(err);
+			log.error("UNEXPECTED THROWN RESPONSE WHEN ATTEMPTING PURCHASE OR CHANGE");
+			setNotification({type: 'error', message: "There was an error processing your request"});
 		}
 	};
 
@@ -801,7 +833,8 @@ function Storage(props) {
 		let storageCallbacks = {
 			setNotification,
 			cancelPurchase,
-			handleConfirm,
+			handleConfirmPurchase,
+			handleConfirmIntent,
 			handleInvoiceRequest,
 			setEditPayment,
 			setOperationPending,
@@ -824,7 +857,7 @@ function Storage(props) {
 					location,
 					invoicePossible,//whether it's allowed to create an invoice for this purchase
 					chargeAmount,
-					previewPriceMismatch: (chargeAmount != previewPrice),
+					previewPriceMismatch: !!(chargeAmount && (chargeAmount != previewPrice)),
 					error,
 					editPayment,
 					operationPending,

@@ -23,6 +23,17 @@ const discountedPriceStrings = {
 	'50': { 1: 'Free', 2: '$10', 3: '$30', 6: '$60' },
 };
 
+const discountedLabPriceStrings = {
+
+};
+
+//price per user for different lab discount tiers
+const discountLabTiers = {
+	'10': 300,
+	'25': 750,
+	'50': 1500,
+};
+
 const storagePlans = [
 	{
 		storageLevel: 1,
@@ -58,6 +69,7 @@ export {
     discountTiers,
 	discountedCountries,
     discountedPriceStrings,
+	discountLabTiers,
     storagePlans,
     storageLevelDescriptions,
 };

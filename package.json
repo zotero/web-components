@@ -13,10 +13,10 @@
     "build": "rimraf lib/* && rimraf build/* && run-p browserify build:node build:scss && npm run build:postprocess",
     "build:node": "mkdir -p lib/ && cd src/js && babel *.js -d ../lib",
     "build:postprocess": "postcss build/web-components.css --use autoprefixer --no-map -r",
-    "browserify": "mkdir -p build/ && NODE_ENV=production browserify --extension=.jsx -d src/js/web-components.js -v -t [babelify] -g [ envify --NODE_ENV production ] -g uglifyify | uglifyjs --compress --mangle > build/web-components.js",
+    "browserify": "mkdir -p build/ && NODE_ENV=production browserify --extension=.jsx -d src/js/web-components.js -v -t [babelify] -p mapstraction -g [ envify --NODE_ENV production ] -g uglifyify | uglifyjs --compress --mangle > build/web-components.js",
     "build:scss": "sass --style compressed src/scss/entry_build.scss build/web-components.css",
     "devbuild:scss": "run-s devbuild:scss:build devbuild:scss:post",
-    "devbuild:scss:build": "sass --style compressed src/scss/entry_dev.scss build/web-components.css",
+    "devbuild:scss:build": "sass --style compressed src/scss/entry_build.scss build/web-components.css",
     "devbuild:scss:post": "postcss build/*.css --use autoprefixer -r",
     "watch:scss": "nodemon -q -w src/scss --ext 'scss' --exec 'npm run devbuild:scss'",
     "eslint": "eslint \"src/js/**/*.+(js|jsx)\" || true",
@@ -75,7 +75,7 @@
     "stylelint-config-standard": "^20.0.0",
     "stylelint-scss": "^3.19.0",
     "uglify-js": "^3.13.9",
-    "uglifyify": "^5.0.2",
+    "uglifyify": "^5.0.0",
     "watchify": "^4.0.0"
   },
   "dependencies": {
@@ -83,6 +83,7 @@
     "@babel/runtime": "^7.14.0",
     "@stripe/react-stripe-js": "^1.4.1",
     "@stripe/stripe-js": "^1.15.0",
+    "@tinymce/tinymce-react": "^4.1.0",
     "@tweenjs/tween.js": "^17.6.0",
     "@webscopeio/react-textarea-autocomplete": "^4.7.3",
     "bezier-easing": "^2.1.0",
@@ -100,7 +101,7 @@
     "react-image-crop": "^9.0.5",
     "react-tabs": "^3.2.3",
     "reactstrap": "^8.9.0",
-    "striptags": "^2.2.1",
+    "striptags": "^3.2.0",
     "webfontloader": "^1.6.28",
     "whatwg-fetch": "^2.0.4",
     "zotero-publications": "^0.6.2"

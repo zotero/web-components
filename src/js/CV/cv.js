@@ -1,5 +1,11 @@
 /* global tinymce */
 
+//TODO:
+// make save actually work.
+// fix clicking around tinymce not placing cursor
+// preview collection section after selection
+
+
 import { log as logger } from '../Log.js';
 let log = logger.Logger('CVEditor');
 
@@ -59,6 +65,7 @@ function CVEditor(props) {
 	const [editing, setEditing] = useState(false);
 	
 	useEffect(() => {
+		log.debug('effect 1 firing');
 		let newEntryMap = {};
 		let newEntryOrder = [];
 		entries.forEach(function (entry) {
@@ -91,6 +98,7 @@ function CVEditor(props) {
 				style,
 				linkwrap: 1,
 				target: 'items',
+				targetModifier: 'top',
 				collectionKey,
 				libraryType: 'user',
 				libraryID: userID
@@ -106,6 +114,7 @@ function CVEditor(props) {
 
 	// load previews when entryMap or style change
 	useEffect(() => {
+		log.debug('effect 2 firing');
 		const loadPreviews = async (entryMap) => {
 			setPreviewsLoading(true);
 			try {
@@ -132,7 +141,8 @@ function CVEditor(props) {
 	// activate editors when entries are updated
 	// this is necessary to reactivate the editor if it has been removed to move a section
 	useEffect(() => {
-		activateEditors();
+		log.debug('effect 3 firing');
+		// activateEditors();
 	}, [entryMap, entryOrder, editing]);
 
 	const loadCollections = useCallback(async () => {
@@ -222,7 +232,8 @@ function CVEditor(props) {
 	const activateEditors = () => {
 		tinymce.init({
 			selector: `textarea.rte`,
-			toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignright | subscript superscript blockquote',
+			plugins: 'lists advlist autoresize',
+			toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignright | subscript superscript blockquote | bullist numlist',
 			branding: false,
 			menubar: false,
 			statusbar: true
@@ -230,14 +241,20 @@ function CVEditor(props) {
 	};
 
 	const updateEntry = async (tracking, field, value) => {
-		// log.debug('updateEntry');
+		log.debug('updateEntry');
+		log.debug(tracking);
+		log.debug(field);
+		log.debug(value);
+		log.debug(CVEntryMap);
 		CVEntryMap[tracking][field] = value;
+		log.debug('set value on field in CVEntryMap');
 		if (CVEntryMap[tracking].type == 'collection') {
 			let newCollectionPreviews = Object.assign({}, collectionPreviews);
 			let preview = await previewCollection(CVEntryMap[tracking].value, style);
 			newCollectionPreviews[CVEntryMap[tracking].value] = preview;
 			setCollectionPreviews(newCollectionPreviews);
 		}
+		log.debug('setting EntryMap state');
 		setEntryMap(CVEntryMap);
 	};
 
@@ -246,6 +263,7 @@ function CVEditor(props) {
 	};
 
 	const save = async () => {
+		log.debug('CVEditor save');
 		let cventries = [];
 		entryOrder.forEach((tracking) => {
 			let entry = CVEntryMap[tracking];
@@ -272,7 +290,9 @@ function CVEditor(props) {
 			entries: cleancventries
 		};
 		let savestr = JSON.stringify(saveObj);
+		log.debug(savestr);
 		try {
+			log.debug('posting CV');
 			// eslint-disable-next-line camelcase
 			let resp = await postFormData(buildUrl('updateCv'), { json_cv: savestr }, { withSession: true });
 			let respData = await resp.json();
@@ -317,12 +337,18 @@ function CVEditor(props) {
 			<DndProvider backend={Backend}>
 				<Row>
 					<Col xs='12'>
-						<StyleChooser style={style} changeStyle={(newStyle) => { setStyle(newStyle); }}/>
+						<div className='cv-outer-section'>
+							<StyleChooser style={style} changeStyle={(newStyle) => { setStyle(newStyle); }}/>
+						</div>
 						{sections}
-						<a href='#' onClick={insertTextSection}>Insert a new text section</a>
-						{' | '}
-						<a href='#' onClick={insertCollection}>Insert a new collection from library</a>
-						<p><Button onClick={save}>Save C.V.</Button></p>
+						<hr />
+						<div className='cv-outer-section'>
+							<Button onClick={insertTextSection}>Insert a new text section</Button>
+							<Button onClick={insertCollection}>Insert a new collection from library</Button>
+						</div>
+						<div className='cv-outer-section'>
+							<p><Button onClick={save}>Save C.V.</Button></p>
+						</div>
 					</Col>
 				</Row>
 			</DndProvider>

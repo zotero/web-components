@@ -28,6 +28,8 @@ function StyleChooser(props) {
 	});
 	return (
 		<div>
+			<p className='hint'>Style for bibliography sections</p>
+
 			<CustomInput
 				type='select'
 				onChange={(evt) => {
@@ -36,10 +38,10 @@ function StyleChooser(props) {
 				value={props.style}
 				id='cv-style-chooser'
 				clearable='false'
+				className='mb-2'
 			>
 				{options}
 			</CustomInput>
-			<p className='hint'>Style for bibliography sections</p>
 		</div>
 	);
 }

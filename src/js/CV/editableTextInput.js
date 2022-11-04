@@ -73,24 +73,37 @@ function EditableRichText(props) {
 	const [editing, setEditing] = useState(props.editing);
 	const [value, setValue] = useState(props.value);
 
+	const blurSave = (evt) => {
+		log.debug('blurSave');
+		// let id = evt.target.id;
+		let content = value;
+		let tinyInstance = tinymce.get(id);
+		if (tinyInstance !== null) {
+			log.debug('removing tinyInstance');
+			content = tinyInstance.getContent();
+			setValue(content);
+			save(content);
+			tinyInstance.remove();
+			// tinymce.remove('textarea');
+		} else {
+			log.debug('tinyInstance is null');
+		}
+		log.debug('setting editing to false');
+		setEditing(false);
+	};
+
+	const startEdit = () => {
+		log.debug('startEdit');
+		setEditing(true);
+	};
+
 	// initialize tinyMCE on the textarea when editing changes to true
 	useEffect(() => {
-		const blurSave = (evt) => {
-			log.debug('blurSave');
-			let id = evt.target.id;
-			let content = value;
-			let tinyInstance = tinymce.get(id);
-			if (tinyInstance !== null) {
-				content = tinyInstance.getContent();
-				tinyInstance.remove();
-				// tinymce.remove('textarea');
-				save(content);
-			}
-			setValue(content);
-			setEditing(false);
-		};
+		log.debug('EditableRichText effect 1 firing');
 
+		log.debug(`editing: ${editing}`);
 		if (editing) {
+			log.debug('calling tinymce.init');
 			tinymce.init({
 				selector: `textarea.rte`,
 				plugins: 'lists',
@@ -100,17 +113,15 @@ function EditableRichText(props) {
 				statusbar: true,
 				// eslint-disable-next-line camelcase
 				auto_focus: id,
-				setup: (ed) => {
-					ed.on('blur', blurSave);
-				}
+				onBlur: {blurSave},
+				// setup: (ed) => {
+					// ed.on('blur', blurSave);
+				// }
 			});
+			log.debug('done with init');
 		}
-	}, [editing, id, save, value]);
-
-	const startEdit = () => {
-		log.debug('startEdit');
-		setEditing(true);
-	};
+		log.debug('exiting effect1');
+	}, [editing]);
 
 	if (editing) {
 		return (
@@ -120,6 +131,7 @@ function EditableRichText(props) {
 					defaultValue={value}
 					className='rte'
 				/>
+				<button onClick={blurSave}>Save</button>
 			</div>
 		);
 	} else {
@@ -128,7 +140,7 @@ function EditableRichText(props) {
 				id={id}
 				className='editable'
 				tabIndex='0'
-				onFocus={startEdit}
+				// onFocus={startEdit}
 				onClick={startEdit}
 				dangerouslySetInnerHTML={value ? { __html: value } : null}>
 				{value

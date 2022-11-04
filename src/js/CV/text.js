@@ -1,5 +1,5 @@
-// import {log as logger} from '../Log.js';
-// let log = logger.Logger('Text');
+import {log as logger} from '../Log.js';
+let log = logger.Logger('Text');
 
 import { EditableRichText } from './editableTextInput.js';
 import { PropTypes } from 'prop-types';
@@ -8,6 +8,7 @@ function RTE(props) {
 	const { id, updateEntry, section } = props;
 	
 	const editorChange = (content) => {
+		log.debug('editorChange - calling updateEntry');
 		updateEntry(section.tracking, 'value', content);
 	};
 

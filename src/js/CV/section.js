@@ -96,13 +96,13 @@ const Section = (props) => {
 	}
 	return (
 		<div className='cv_section m-3' ref={ref} >
+			<div className='vert_drag_handle'></div>
 			<Card>
-				<div className='drag_handle' ref={drag}></div>
 				<CardBody>
-					<ButtonGroup className='mb-2'>
-						<Button outline onClick={moveUp} title='Move Up'>▲</Button>
-						<Button outline onClick={moveDown} title='Move Down'>▼</Button>
-						<Button outline onClick={remove} title='Remove Section'>x</Button>
+					<ButtonGroup className='mb-2 cv-section-controls'>
+						<Button outline color="dark" onClick={moveUp} title='Move Section Up'>▲</Button>
+						<Button outline color="dark" onClick={moveDown} title='Move Section Down'>▼</Button>
+						<Button outline color="dark" onClick={remove} title='Remove Section'>x</Button>
 						{/* <Button outline onClick={this.edit} title='Edit Section'>Edit</Button>*/}
 					</ButtonGroup>
 					<h2 className='profile_cvHead'>

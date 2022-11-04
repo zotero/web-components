@@ -1,9 +1,50 @@
 div.CVEditor {
+	div.cv_section {
+		display: flex;
+		flex-direction: row;
+		align-items: stretch;
+		min-height: 60px;
+	}
+
+	div.card {
+		flex: 1;
+		border-radius: 0;
+	}
+
+	div.vert_drag_handle {
+		background-image: radial-gradient(rgb(120,120,120) 20%, white 20%);
+		background-position: 0 0;
+		background-size: 10px 10px;
+		width: 20px;
+		margin-right: 10px;
+		background-color: white;
+		cursor: move;
+		min-height:60px;
+	}
+
+	div.cv-outer-section {
+		// margin-top: 1rem;
+		// margin-bottom: 1rem;
+		padding: 1rem;
+		border-bottom: 1px solid #e6e6e6;
+
+		button {
+			margin-left: 1rem;
+		}
+	}
+	div.cv-outer-section:last-of-type {
+		border-bottom: none;
+	}
+
+	.cv-section-controls {
+
+	}
+
 	h2.profile_cvHead {
 		display:flex;
 	}
 	span.editable, input.editable, div.editable {
-		border-radius:3px;
+		// border-radius:3px;
 		padding:3px;
 		//flex:1 1 auto;
 		width:100%;
@@ -14,11 +55,21 @@ div.CVEditor {
 		}
 		min-height:2rem;
 	}
-	
+
 	div.drag_handle {
 		background-color:rgba(0,0,0,.1);
 		cursor: move;
 		min-height:20px;
 		margin-bottom:8px;
 	}
+	// div.vert_drag_handle {
+	// 	box-sizing:border-box;
+	// 	display:inline-block;
+	// 	height: 100%;
+	// 	width: 20px;
+	// 	background-color:rgba(0,200,0,.1);
+	// 	cursor: move;
+	// 	min-height:20px;
+	// 	// margin-bottom:8px;
+	// }
 }

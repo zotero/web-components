@@ -10,6 +10,8 @@ import cx from 'classnames';
 import { LabCheckout } from './LabCheckout.js';
 import { InstitutionCheckout } from './InstitutionCheckout.jsx';
 
+import { getUserCustomer } from '../storage/actions.js';
+
 // Checkout is a component that allows a user to enter a number of FTE for their institution and preview
 // the price for an institutional plan with that many users, then make the purchase or request an invoice
 function Checkout(props) {

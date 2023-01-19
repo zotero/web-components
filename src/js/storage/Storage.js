@@ -675,7 +675,8 @@ function Storage(props) {
 					log.debug("getting customer with updated payment");
 					setOperationPending(true);
 					setTimeout(() => {
-						getUserCustomer(setStripeCustomer, setLocation, setShowLocation, setNotification);
+						refresh();
+						// getUserCustomer(setStripeCustomer, setLocation, setShowLocation, setNotification);
 					}, 1000);
 					break;
 				default:

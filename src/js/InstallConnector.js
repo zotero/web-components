@@ -112,7 +112,7 @@ function InstallSafariButton(props) {
 	const { type, label } = props;
 	if (type == 'button') {
 		return (
-			<p id="safari-download-text">The Zotero Connector for Safari is bundled with Zotero. You can enable it from the Extensions pane of the Safari preferences.</p>
+			<p id="safari-download-text">The Zotero Connector for Safari is bundled with Zotero. You can enable it from the Extensions pane in the Safari settings.</p>
 		);
 	} else if (type == 'image') {
 		return (
@@ -123,7 +123,7 @@ function InstallSafariButton(props) {
 			<div className='download-full'>
 				<div className='browser-image'><BrowserIcon browser='safari' /></div>
 				<h3>Safari connector</h3>
-				<p id="safari-download-text-small">The Zotero Connector for Safari is bundled with Zotero. You can enable it from the Extensions pane of the Safari preferences.</p>
+				<p id="safari-download-text-small">The Zotero Connector for Safari is bundled with Zotero. You can enable it from the Extensions pane in the Safari settings.</p>
 			</div>
 		);
 	}

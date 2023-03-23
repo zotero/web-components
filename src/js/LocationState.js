@@ -3,7 +3,7 @@
 import {log as logger} from './Log.js';
 var log = logger.Logger('LocationState');
 
-var utils = require('./Utils');
+import * as utils from './Utils';
 
 var useLocation = true;
 

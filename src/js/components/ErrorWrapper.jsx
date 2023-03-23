@@ -1,7 +1,7 @@
 import { log as logger } from '../Log.js';
 var log = logger.Logger('ErrorWrapper');
 
-const React = require('react');
+import React from 'react';
 
 class ErrorWrapper extends React.Component {
 	constructor(props) {

@@ -1,7 +1,7 @@
 import { log as logger } from '../Log.js';
 let log = logger.Logger('UserList');
 
-const React = require('react');
+import React from 'react';
 import { PropTypes } from 'prop-types';
 import { buildUrl } from '../wwwroutes.js';
 

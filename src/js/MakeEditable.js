@@ -3,7 +3,7 @@
 //import {log as logger} from './Log.js';
 //var log = logger.Logger('MakeEditable');
 
-const React = require('react');
+import React from 'react';
 const {Component} = React;
 
 class MakeEditable extends Component {

@@ -1,11 +1,7 @@
 
 
-import '@babel/polyfill';
-import 'whatwg-fetch';
-import 'picturefill';
-import 'picturefill/dist/plugins/mutation/pf.mutation.min';
 import { init } from './Theme.js';
-var WebFont = require('webfontloader');
+import WebFont from 'webfontloader';
 // import {log as logger} from './Log.js';
 // var log = logger.Logger('WebComponents');
 
@@ -17,27 +13,26 @@ if (typeof window === 'undefined') {
 	init();
 }
 
-const React = require('react');
-const ReactDOM = require('react-dom');
-
-let jQuery = require('jquery');
+import React from 'react';
+import ReactDOM from 'react-dom';
+import jQuery from 'jquery';
+import Popper from 'popper.js';
+import { TweenMax } from 'gsap';
+import TWEEN from '@tweenjs/tween.js';
+import BezierEasing from 'bezier-easing';
 
 globalScope.ReactDOM = ReactDOM;
 globalScope.React = React;
 globalScope.jQuery = jQuery;
 globalScope.$ = jQuery;
-globalScope.Popper = require('popper.js');
+globalScope.Popper = Popper;
 globalScope.WebFont = WebFont;
-require('bootstrap');
-
-import { TweenMax } from 'gsap';
 globalScope.TweenMax = TweenMax;
-
-const TWEEN = require('@tweenjs/tween.js');
 globalScope.TWEEN = TWEEN;
-
-const BezierEasing = require('bezier-easing');
 globalScope.BezierEasing = BezierEasing;
+
+import * as bootstrap from 'bootstrap';
+globalScope.bootstrap = bootstrap;
 
 import { Storage, StorageSummary } from './storage/Storage.js';
 import { MakeEditable } from './MakeEditable.js';

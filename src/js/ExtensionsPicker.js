@@ -3,7 +3,7 @@
 //import {log as logger} from './Log.js';
 //let log = logger.Logger('ExtensionsPicker');
 
-const React = require('react');
+import React from 'react';
 const {Component} = React;
 
 import {InstallConnectorPrompt} from './InstallConnector.js';

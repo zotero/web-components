@@ -3,7 +3,7 @@
 // import {log as logger} from './Log.js';
 // let log = logger.Logger('AddViaEmail');
 
-const React = require('react');
+import React from 'react';
 const {Component, PureComponent} = React;
 import PropTypes from 'prop-types';
 

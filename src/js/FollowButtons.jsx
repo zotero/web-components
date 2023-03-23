@@ -3,7 +3,7 @@
 // import {log as logger} from './Log.js';
 // let log = logger.Logger('FollowButtons');
 
-const React = require('react');
+import React from 'react';
 const {Component} = React;
 import {PropTypes} from 'prop-types';
 import {getCurrentUser} from './Utils.js';

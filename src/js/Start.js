@@ -3,7 +3,7 @@
 import {log as logger} from './Log.js';
 let log = logger.Logger('StartComponent');
 
-const React = require('react');
+import React from 'react';
 const {Component} = React;
 
 const config = window.zoteroConfig;

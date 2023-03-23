@@ -3,7 +3,7 @@
 //import {log as logger} from './Log.js';
 //let log = logger.Logger('Downloads');
 
-const React = require('react');
+import React from 'react';
 const {Component} = React;
 
 import {ZoteroIcon, PluginsIcon} from './Icons.js';

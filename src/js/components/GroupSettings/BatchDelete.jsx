@@ -9,7 +9,7 @@ import {loadAttachmentItems, deleteSlice} from '../../ajaxHelpers.js';
 import { Notifier } from '../../Notifier.js';
 import {Button, Card, CardBody, Progress} from 'reactstrap';
 
-let React = require('react');
+import React from 'react';
 
 class ProgressCard extends React.PureComponent {
 	render() {

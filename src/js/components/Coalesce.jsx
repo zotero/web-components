@@ -3,7 +3,7 @@
 //import {log as logger} from '../Log.js';
 //let log = logger.Logger('Coalesce');
 
-const React = require('react');
+import React from 'react';
 const {Component} = React;
 
 class Coalesce extends Component{

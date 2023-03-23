@@ -91,7 +91,6 @@
     "bootstrap": "^4.6.2",
     "classnames": "^2.3.1",
     "core-js": "^3.29.1",
-    "gsap": "^3.6.1",
     "jquery": "^3.6.4",
     "popper.js": "^1.16.1",
     "prop-types": "^15.7.2",

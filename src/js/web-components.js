@@ -17,7 +17,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import jQuery from 'jquery';
 import Popper from 'popper.js';
-import { TweenMax } from 'gsap';
 import TWEEN from '@tweenjs/tween.js';
 import BezierEasing from 'bezier-easing';
 
@@ -27,7 +26,6 @@ globalScope.jQuery = jQuery;
 globalScope.$ = jQuery;
 globalScope.Popper = Popper;
 globalScope.WebFont = WebFont;
-globalScope.TweenMax = TweenMax;
 globalScope.TWEEN = TWEEN;
 globalScope.BezierEasing = BezierEasing;
 

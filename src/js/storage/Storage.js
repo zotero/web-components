@@ -23,7 +23,20 @@ TODO:
  - only show list of invoices or receipts, don't duplicate
  - reload invoice after payment
  - update stripe customer email when primary email updated, or expose separately?
-
+ - fix showing notification behind modal that can't be seen
+ - after paying with/adding a saved payment method, "Renew Now" button does not recognize saved payment method until page refresh
+ - with saved card payment method, switching to Euro does not set editPayment to true
+ - immediate payment in euro did not reflect updated storage quota, took too long to process upgrade and the delayed refresh missed it?
+ - if saved payment method is EU bank account for SEPA, "Renew Now" still starts as USD instead of EUR
+ x properly show paid invoice/receipt was paid in Euro if it was
+ x fix invoice layout at various sizes
+ - handleConfirmPurchase is creating an intent for no reason on an individual change?
+ - testcases that create old style stripe customer with old card method and tests that everything still shows up and works as expected
+  with the new payment intent flow
+  - "Renew Now" after adding payment method on same load does not know about the payment method
+ - check for redirect with payment intent query param and check/report status.
+ - check if we should combine useEffect initiatePurchase from the various components or they need to be differe
+ 
 
 Flows:
  - First time subscription
@@ -35,7 +48,8 @@ Flows:
  - Lab Payment
  - Lab Renewal
  - Lab receipt
- - allow payments for third parties
+ - create invoice for any type of payment:
+  - allow payments for third parties without Zotero account, needs to be limited to prevent card-testing
 */
 
 import { log as logger } from '../Log.js';
@@ -59,9 +73,8 @@ import { LastSync } from './LastSync.jsx';
 import { ajax, postFormData } from '../ajax.js';
 import { LoadingSpinner } from '../LoadingSpinner.js';
 
-import { storageLevelDescriptions, discountedCountries } from './constants.js';
-
-const dateFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+import { storageLevelDescriptions, euroPaymentMethods, dateFormatOptions } from './constants.js';
+import { defaultPayment } from './storage_util.js';
 
 const overQuota = function (storageLevel, userSubscription) {
 	const planQuotas = window.zoteroData.planQuotas;
@@ -85,24 +98,13 @@ const userSubscriptionShape = PropTypes.shape({
 
 const storageUrl = window.zoteroConfig.baseWebsiteUrl ? `${window.zoteroConfig.baseWebsiteUrl}/settings/storage` : '/settings/storage';
 
-function defaultPayment(stripeCustomer) {
-	let defaultPM = false;
-	if (stripeCustomer) {
-		if (stripeCustomer.default_source) {
-			defaultPM = stripeCustomer.default_source;
-		} else if(stripeCustomer.invoice_settings.default_payment_method) {
-			defaultPM = stripeCustomer.invoice_settings.default_payment_method;
-		}
-	}
-	return defaultPM;
-};
-
+//Row to select the corresponding storage plan
 function StoragePlanRow(props) {
 	const { plan, userSubscription, selectPlan } = props;
 
 	const current = plan.storageLevel == userSubscription.storageLevel;
 	let button = (
-		<Button onClick={() => { selectPlan(plan); }}>Select Plan</Button>
+		<Button color='secondary' size='sm' onClick={() => { selectPlan(plan); }}>Select Plan</Button>
 	);
 	
 	let rowClass = '';
@@ -134,6 +136,7 @@ StoragePlanRow.propTypes = {
 	selectPlan: PropTypes.func.isRequired,
 };
 
+//row showing a single institution subscription note and asking user to verify email if not already done
 function InstitutionProvides(props) {
 	const { institution } = props;
 	let quotaDescription = `${institution.storageQuota} MB of storage`;
@@ -159,6 +162,7 @@ InstitutionProvides.propTypes = {
 	})
 };
 
+//the row in storage settings listing all institution provided storage
 function InstitutionalRow(props) {
 	const { institutions } = props;
 	if (!institutions) {
@@ -166,7 +170,7 @@ function InstitutionalRow(props) {
 	}
 	if (institutions.length > 0) {
 		let instNodes = institutions.map(function (institution) {
-			return <InstitutionProvides key={institution.name} institution={institution} />;
+			return <InstitutionProvides key={`${institution.name}_${institution.expiration}`} institution={institution} />;
 		});
 		return (
 			<tr>
@@ -181,6 +185,7 @@ InstitutionalRow.propTypes = {
 	institutions: PropTypes.arrayOf(PropTypes.object)
 };
 
+//usage meter showing proportion of storage quota being currently used
 function StorageMeter(props) {
 	const { userSubscription } = props;
 	
@@ -218,6 +223,7 @@ StorageMeter.propTypes = {
 	userSubscription: userSubscriptionShape,
 }
 
+//text saying how much storage the given group is using
 function GroupUsage(props) {
 	const { group, usage } = props;
 	if (!group) {
@@ -237,9 +243,10 @@ GroupUsage.propTypes = {
 // Row that shows user's payment method and allows updating the method that will be used
 // or forcing an immediate renewal charge regardless of scheduled automatic renewal
 function PaymentRow(props) {
-	const { defaultSource, defaultPaymentMethod, userSubscription, updateCardHandler, renewHandler, removePayment } = props;
-	
-	let paymentMethod = defaultSource || defaultPaymentMethod;
+	log.debug('PaymentRow', 4);
+	log.debug(props, 4);
+	const { defaultPaymentMethod, userSubscription, updateCardHandler, renewHandler, removePayment } = props;
+	const paymentMethod = defaultPaymentMethod;
 
 	const renewNowButton = <Button color='secondary' size='sm' className='m-1' onClick={renewHandler}>Renew Now</Button>;
 	if (userSubscription.institutionUnlimited) {
@@ -264,6 +271,8 @@ function PaymentRow(props) {
 		let renewButton = null;
 		
 		//show either "Renew Now" or both "Renew Now" and "Enable AutoRenew"
+		//depending on expiration date. Always allow charging early, but only allow
+		//delaying charge if expiration is at least 2 weeks away
 		let expiration = new Date(userSubscription.expirationDate * 1000);
 		if (expiration < (Date.now() + (1000 * 60 * 60 * 24 * 15))) {
 			// expiration less than 2 weeks away, charge card now
@@ -279,8 +288,8 @@ function PaymentRow(props) {
 					<Row className='mt-2'>
 						<Col>
 							{paymentMethod ? removePaymentButton : null}
-							{!userSubscription.recur ? autoRenewButton : null}
-							{renewButton}
+							{!userSubscription.recur && (userSubscription.storageLevel > 1) ? autoRenewButton : null}
+							{userSubscription.storageLevel > 1 ? renewButton : null}
 						</Col>
 					</Row>
 				</td>
@@ -297,7 +306,7 @@ function PaymentRow(props) {
 						<Button color='secondary' size='sm' className='m-1' onClick={updateCardHandler}>Update Payment</Button>
 					</Col>
 					<Col>
-						{renewNowButton}
+						{userSubscription.storageLevel > 1 ? renewNowButton : null}
 					</Col>
 				</Row>
 			</td>
@@ -305,8 +314,8 @@ function PaymentRow(props) {
 	);
 }
 PaymentRow.propTypes = {
-	defaultSource: PropTypes.object,
 	defaultPaymentMethod: PropTypes.object,
+	userSubscription: userSubscriptionShape,
 };
 
 // show when the next automatic payment will be made, or plan will expire,
@@ -330,7 +339,7 @@ function NextPaymentRow(props) {
 					</Row>
 					<Row>
 						<Col>
-							<Button color='secondary' size='small' onClick={cancelRecur}>Disable Autorenew</Button>
+							<Button color='secondary' size='sm' onClick={cancelRecur}>Disable Automatic Renewal</Button>
 						</Col>
 					</Row>
 				</td>
@@ -410,41 +419,17 @@ function Storage(props) {
 	const [ notification, setNotification ] = useState(null);
 	const [ operationPending, setOperationPending ] = useState(false);
 	const [ editPayment, setEditPayment ] = useState((purchase && purchase.type == 'individualPaymentUpdate'));
-	const [ location, setLocation ] = useState(props.detectedLocation.country);
+	const [ location, setLocation ] = useState(props.detectedLocation ? props.detectedLocation.country : null);
 	const [ showLocation, setShowLocation ] = useState(props.detectedLocation.country != 'US');
+	const [ currency, setCurrency ] = useState('usd');
 	const [ priceCents, setPriceCents ] = useState(null);
 	const [ previewPrice, setPreviewPrice ] = useState(null);
 	const [ storagePlans, setStoragePlans ] = useState([]);
 	const [ awaitingFinalConfirm, setAwaitingFinalConfirm ] = useState(false);
 
-	log.debug({userSubscription, stripeCustomer, purchase, previewPrice});
-	const choosePaymentType = (paymentType) => {
-		let nv = Object.assign({}, purchase, {paymentMethodType: paymentType})
-		setPurchase(nv);
-	}
+	log.debug({userSubscription, stripeCustomer, purchase, previewPrice}, 4);
 
-	const setCurrency = (currency) => {
-		let newPurchase = Object.assign({}, purchase, {currency});
-		cancelPurchase();
-		setPurchase(newPurchase);
-	}
-
-	const updateCardHandler = () => {
-		setPurchase({
-			type: 'individualPaymentUpdate',
-			storageLevel: userSubscription.storageLevel,
-		});
-	};
-	const renewHandler = () => {
-		log.debug('renewHandler');
-		let price = getPriceCents(location)[userSubscription.storageLevel];
-		setPreviewPrice(price);
-		setPurchase({
-			type: 'individualRenew',
-			storageLevel: userSubscription.storageLevel,
-		})
-	};
-
+	//fetch userSubscription and stripeCustomer if either not included in props
 	useEffect(
 		() => {
 			if (!userSubscription || !stripeCustomer) {
@@ -454,6 +439,7 @@ function Storage(props) {
 		[props.userSubscription, props.stripeCustomer]
 	);
 
+	//update prices when the user's location changes
 	useEffect(
 		() => {
 			setPriceCents(getPriceCents(location));
@@ -463,20 +449,53 @@ function Storage(props) {
 		[location]
 	);
 
+	//callback for "Update Payment Details" button
+	const updateCardHandler = () => {
+		const nv = Object.assign({}, {
+			type: 'individualPaymentUpdate',
+			storageLevel: userSubscription.storageLevel,
+		});
+		setPurchase(nv);
+	};
+
+	//callback for "Renew  Now" button
+	const renewHandler = () => {
+		log.debug('renewHandler', 4);
+		setEditPayment(false);
+		const price = getPriceCents(location)[userSubscription.storageLevel];
+		setPreviewPrice(price);
+		const nv = Object.assign({}, {
+			type: 'individualRenew',
+			storageLevel: userSubscription.storageLevel,
+		});
+		setPurchase(nv);
+	};
+
+	//remove any in-progress purchase, which will close modal
 	const cancelPurchase = () => {
+		log.debug('cancelling purchase', 4);
+		setEditPayment(false);
 		setPurchase(null);
 	}
 
+	//callback for choosing a storage plan
+	// editPayment to false so that it can be decided if it's necessary
+	// based on the new purchase. Set the preview price from when the user clicked
+	// so that we can notify them if it changes once they add a payment method and we
+	// tie any discount to their location
 	const selectPlan = (plan) => {
-		log.debug('selectPlan');
+		log.debug('selectPlan', 4);
+		setEditPayment(false);
 		let price = getPriceCents(location)[plan.storageLevel];
 		setPreviewPrice(price);
-		setPurchase({
+		const nv = Object.assign({}, {
 			type: 'individualChange',
-			storageLevel: plan.storageLevel
+			storageLevel: plan.storageLevel,
 		});
+		setPurchase(nv);
 	}
 	
+	//make request to server to get the user's subscription
 	const getSubscription = async () => {
 		log.debug('getSubscription', 4);
 		try {
@@ -491,33 +510,11 @@ function Storage(props) {
 			setNotification({type: 'error', message: 'There was an error retrieving your subscription data'});
 		}
 	}
-	/*
-	const getUserCustomer = async () => {
-		log.debug('getUserCustomer', 4);
-		try {
-			let resp = await ajax({ url: '/storage/getusercustomer' });
-			log.debug(resp, 4);
-			let data = await resp.json();
-			setStripeCustomer(data);
-			// set location to country on card
-			if (data && data.invoice_settings.default_payment_method) {
-				let dpm = data.invoice_settings.default_payment_method;
-				if (dpm.card && dpm.card.country) {
-					setLocation(dpm.card.country);
-					if (!Object.keys(discountedCountries).includes(dpm.card.country)) {
-						setShowLocation(false);
-					} else {
-						setShowLocation(true);
-					}
-				}
-			}
-		} catch (e) {
-			log.debug('Error retrieving customer data', 2);
-			log.debug(e, 2);
-			setNotification({type: 'error', message: 'There was an error retrieving your subscription data'});
-		}
-	}
-	*/
+
+	// refresh the user subscription and stripe customer in order to update
+	// after changes that may have been processed on Z or stripe server.
+	// Includes setting payment country based on the country of the payment card,
+	// and setting currency to euro if the payment method calls for it.
 	const refresh = async () => {
 		log.debug('refresh');
 		setOperationPending(true);
@@ -538,19 +535,33 @@ function Storage(props) {
 					setShowLocation(false);
 				}
 			}
+			log.debug('got stripeCustomer, setting defaultPaymentMethod');
+			const defaultPaymentMethod = defaultPayment(customerResponse.stripeCustomer);
+			if (defaultPaymentMethod && euroPaymentMethods.includes(defaultPaymentMethod.type) && currency != 'eur') {
+				setCurrency('eur');
+			}
 		}
-		// getUserCustomer(setStripeCustomer, setLocation, setShowLocation, setNotification);
+
 		setOperationPending(false);
 	};
 
-	const delayedRefresh = () => {
-		log.debug('delayedRefresh');
+	// call refresh after a delay to give server actions time to process
+	const delayedRefresh = (ms = 3000) => {
+		log.debug('delayedRefresh', 4);
 		setOperationPending(true);
 		setTimeout(() => {
 			refresh();
-		}, 3000);
+		}, ms);
 	}
 
+	// clear notification message after a given time, default to 10 seconds
+	const delayedClearNotification = (ms = 10000) => {
+		setTimeout(() => {
+			setNotification(null);
+		}, ms);
+	}
+
+	// disable automatic renewal for logged-in user's subscription
 	const cancelRecur = async () => {
 		setOperationPending(true);
 
@@ -558,6 +569,7 @@ function Storage(props) {
 			let resp = await postFormData('/storage/cancelautorenew', undefined, { withSession: true });
 			log.debug(resp, 4);
 			setNotification({type: 'success', message: 'Automatic renewal disabled'});
+			delayedClearNotification();
 		} catch (e) {
 			log.debug(e);
 			setNotification({type: 'error', message: 'Error updating payment method. Please try again in a few minutes.'});
@@ -568,6 +580,8 @@ function Storage(props) {
 		refresh();
 	};
 
+	//remove all payment methods and delete stripe customer. This will disable further charges
+	//unless new payment details are entered.
 	const removePayment = async () => {
 		setOperationPending(true);
 
@@ -585,11 +599,13 @@ function Storage(props) {
 		refresh();
 	};
 
+	//handler for confirming a "purchase" action, which can also be a change in storage subscription
+	//that does not involve immediate payment or a change in payment details
 	const handleConfirmPurchase = async () => {
-		log.debug('handleConfirmPurchase');
-		log.debug(purchase);
+		log.debug('handleConfirmPurchase', 4);
+		log.debug(purchase, 4);
 		if (operationPending) {
-			log.debug('operation already pending');
+			log.debug('operation already pending', 4);
 			return;
 		}
 		setOperationPending(true);
@@ -601,7 +617,7 @@ function Storage(props) {
 			let purchaseData = Object.assign({}, purchase, {location});
 			switch (purchase.type) {
 				case 'individualChange':
-					log.debug('individualChange');
+					log.debug('individualChange', 4);
 					let response = await ajax({
 						type: 'POST',
 						withSession: true,
@@ -616,11 +632,13 @@ function Storage(props) {
 					refresh();
 					break;
 				case 'individual':
-				case 'individualCharge':
+				case 'individualChange':
 				case 'individualRenew':
 					let result = await chargeDefaultMethod(purchaseData);
 					if (result.success) {
 						setNotification({type: 'success', message: 'Your payment has been processed.'});
+						//clear notification after 10 seconds
+						delayedClearNotification();
 						// refresh storage and subscription again after 3 seconds
 						delayedRefresh();
 					}
@@ -644,15 +662,16 @@ function Storage(props) {
 
 	// callback after PaymentElement confirms intent, or user confirms action that does not require intent
 	// if caller has no intent, argument should be false
+	// individual: paying for user via invoice, intent charged
 	// individualChange: no intent, just changing the plan
 	// individualRenew: No intent if charging the existing PaymentMethod on file (if user doesn't choose to edit them)
 	// individualPaymentUpdate: intent used to update user's default PaymentMethod
 	const handleConfirmIntent = async (stripeIntent) => {
-		log.debug('handleConfirmIntent');
-		log.debug(stripeIntent);
-		log.debug(purchase);
+		log.debug('handleConfirmIntent', 4);
+		log.debug(stripeIntent, 4);
+		log.debug(purchase, 4);
 		if (operationPending) {
-			log.debug('operation already pending');
+			log.debug('operation already pending', 4);
 			return;
 		}
 		setOperationPending(true);
@@ -664,19 +683,31 @@ function Storage(props) {
 					cancelPurchase();
 					setOperationPending(false);
 					delayedRefresh();
+					//clear notification after 10 seconds
+					delayedClearNotification();
+
 					return;
 				case 'individual':
-				case 'individualCharge':
+				case 'individualChange':
 				case 'individualRenew':
 					// payment method added, now user must confirm charge
-					setAwaitingFinalConfirm(true);
+					if (stripeIntent.intent.object == 'setup_intent') {
+						setAwaitingFinalConfirm(true);
+					}
 					setEditPayment(false);
+
+					if (stripeIntent.intent.object == 'payment_intent') {
+						cancelPurchase();
+					}
+
+					//clear notification after 10 seconds
+					delayedClearNotification();
+
 					// delayed fetch customer so we have payment details from server
-					log.debug("getting customer with updated payment");
+					log.debug("getting customer with updated payment", 4);
 					setOperationPending(true);
 					setTimeout(() => {
 						refresh();
-						// getUserCustomer(setStripeCustomer, setLocation, setShowLocation, setNotification);
 					}, 1000);
 					break;
 				default:
@@ -689,9 +720,12 @@ function Storage(props) {
 		}
 	};
 
-	// create invoice and link to it
+	// create invoice on Zotero server and link to it
 	const handleInvoiceRequest = async (evt) => {
 		evt.preventDefault();
+		if(operationPending) {
+			return;
+		}
 		setOperationPending(true);
 		let result = await createInvoice({ type: 'individual', storageLevel: purchase.storageLevel });
 		setNotification(result);
@@ -727,17 +761,21 @@ function Storage(props) {
 		}
 	}
 
+	//number of MB or "Unlimited"
 	let quotaDescription = userSubscription.quota + ' MB';
 	if (userSubscription.quota >= 1000000) {
 		quotaDescription = 'Unlimited';
 	}
 
+	//build list of storage usage by groups owned the this user
 	let groupUsageNodes = [];
 	for (let groupID in userSubscription.usage.groups) {
 		let usage = parseInt(userSubscription.usage.groups[groupID]);
 		groupUsageNodes.push(<GroupUsage key={groupID} group={storageGroups[groupID]} usage={usage} />);
 	}
 
+	//payment row that shows saved payment method if available, and options for it:
+	// renew immediately (ahead of expiration), remove payment method, update payment method
 	let paymentRow = null;
 	if (userSubscription.storageLevel != 1 || stripeCustomer) {
 		let paymentRowProps = {
@@ -745,15 +783,17 @@ function Storage(props) {
 			updateCardHandler,
 			renewHandler,
 			removePayment,
+			defaultPaymentMethod: defaultPayment(stripeCustomer),
 		};
-		if (stripeCustomer) {
-			paymentRowProps.defaultSource = stripeCustomer.default_source;
-			paymentRowProps.defaultPaymentMethod = stripeCustomer.invoice_settings.default_payment_method;
-		}
 		
 		paymentRow = (<PaymentRow {...paymentRowProps} />);
 	}
 	
+	//based on purchase object and current subscription and customer data, set variables to be passed
+	//to subscription handler so it knows if we need payment info and when a charge needs to be made and for how much
+	//charge time, currency, discount status, and 
+	//Includes constructing plain english description of current subscription, and changes being made before
+	//user confirms.
 	let Payment = null;
 	if(purchase) {
 		// Determine requirements for current purchase
@@ -806,30 +846,43 @@ function Storage(props) {
 			}
 		}
 		
-		log.debug(`immediateChargeRequired: ${immediateChargeRequired}`);
-		log.debug(stripeCustomer);
-		let havePaymentMethod = false;
-		if (stripeCustomer && stripeCustomer.deleted !== true) {
-			if (stripeCustomer.default_source !== null || stripeCustomer.invoice_settings.default_payment_method !== null) {
-				havePaymentMethod = true;
-			}
-		}
-		// (stripeCustomer && (stripeCustomer.deleted !== true) && (stripeCustomer.default_source !== null || stripeCustomer.invoice_settings.default_payment_method !== null));
+		log.debug(`immediateChargeRequired: ${immediateChargeRequired}`, 4);
+		log.debug(stripeCustomer, 4);
+		const havePaymentMethod = defaultPayment(stripeCustomer) !== null;
+
 		if (!awaitingFinalConfirm && !editPayment) {
 			if ((immediateChargeRequired || paymentInfoRequired) && !havePaymentMethod && !editPayment) {
+				log.debug('setting editPayment true - 840');
 				setEditPayment(true);
 			} else if(purchase.type == 'individualPaymentUpdate' && !editPayment) {
+				log.debug('setting editPayment true - 843');
 				setEditPayment(true);
-			}/* else {
-				log.debug("not setting editPayment to true", 4);
-			}*/
+			}
 		}
 
 		if (immediateChargeRequired && !purchase.immediateCharge) {
+			log.debug('immediateChargeRequired and no immediateCharge set on purchase - 858');
 			setPurchase(Object.assign({}, purchase, {immediateCharge: true}));
 		}
 
-		// let chargeDescription = storageLevel ? storageLevelDescriptions[storageLevel] : "Update payment method";
+		let storageState = {
+			description,//multi-para description of update, whether charge or not
+			// userSubscription,
+			stripeCustomer,
+			allowEuro: props.detectedLocation.continent == 'EU',
+			awaitingFinalConfirm,
+			purchase,
+			location,
+			currency,
+			invoicePossible,//whether it's allowed to create an invoice for this purchase
+			chargeAmount,
+			previewPriceMismatch: !!(chargeAmount && (chargeAmount != previewPrice)),
+			error,
+			editPayment,
+			operationPending,
+			notification,
+			returnUrl: storageUrl,
+		};
 
 		let storageCallbacks = {
 			setNotification,
@@ -839,38 +892,24 @@ function Storage(props) {
 			handleInvoiceRequest,
 			setEditPayment,
 			setOperationPending,
-			choosePaymentType,
 			setCurrency,
 			setLocation,
+			refresh,
 		};
 
-		log.debug(`editPayment: ${editPayment}`);
 		if (!props.summary) {
 			Payment = (<SubscriptionHandler
 				{...{
-					description,//multi-para description of update, whether charge or not
-					// chargeDescription,//description for stripe charge
-					// userSubscription,
-					stripeCustomer,
-					allowEuro: props.detectedLocation.continent == 'EU',
-					awaitingFinalConfirm,
-					purchase,
-					location,
-					invoicePossible,//whether it's allowed to create an invoice for this purchase
-					chargeAmount,
-					previewPriceMismatch: !!(chargeAmount && (chargeAmount != previewPrice)),
-					error,
-					editPayment,
-					operationPending,
+					storageState,
 					callbacks: storageCallbacks,
 				}}
-				returnUrl={storageUrl}
 			/>);
 		}
 	}
 
 	return (
 		<ErrorWrapper>
+			<React.StrictMode>
 			<div className='storage-container'>
 				<LastSync />
 				{Payment}
@@ -933,6 +972,7 @@ function Storage(props) {
 					</Row>
 				</div>
 			</div>
+			</React.StrictMode>
 		</ErrorWrapper>
 	);
 }

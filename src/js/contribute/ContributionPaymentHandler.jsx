@@ -8,7 +8,7 @@ import { Card, CardHeader, CardBody, Modal, ModalBody, ModalHeader, Row, Col, Bu
 import { PaymentElementModal } from '../storage/PaymentElementModal.jsx';
 import { PaymentSource } from '../storage/PaymentSource.jsx';
 // import { PaymentContext, NotifierContext, notify, cancelPurchase } from '../storage/actions';
-import { beginStripeIntent } from '../storage/actions.js';
+import { initiatePurchase } from '../storage/actions.js';
 import { postFormData } from '../ajax.js';
 import { LoadingSpinner } from '../LoadingSpinner.js';
 
@@ -103,16 +103,17 @@ async function updateContribution(stripeIntent, purchase) {
 */
 
 function ContributionPaymentHandler(props) {
-	const { purchase, currentUser, setNotification, stripeCustomer, stripeIntent, setStripeIntent, cancelPurchase, handleConfirm } = props;
+	const { contributionState, callbacks } = props;
+	const { purchase, currentUser, stripeCustomer, stripeIntent, operationPending } = contributionState;
+	const { setStripeIntent, setNotification, setOperationPending, cancelPurchase, handleConfirmIntent } = callbacks;
 	// const { type, amount, period } = purchase;
 	
+	const [editPayment, setEditPayment] = useState(false);
+	const [email, setEmail] = useState('');
+
 	let description = [];
 	// let chargeAmount = amount;
 	let error = null;
-	
-	const [editPayment, setEditPayment] = useState(false);
-	const [operationPending, setOperationPending] = useState(false);
-	const [email, setEmail] = useState('');
 
 	// clear the new subscription closing the Handler, because it is either complete, or canceled
 	const cancel = () => {
@@ -121,13 +122,13 @@ function ContributionPaymentHandler(props) {
 	};
 
 	useEffect(async () => {
-		log.debug("useEffect beginStripeIntent");
-		log.debug(purchase);
+		log.debug("useEffect initiatePurchase", 4);
+		log.debug(purchase, 4);
 		if (editPayment && !stripeIntent) {
 			if (purchase.immediateCharge || purchase.type=='contributionPaymentUpdate') {
 				setOperationPending(true);
 				let purchaseData = Object.assign({}, purchase);
-				await beginStripeIntent(purchaseData, setStripeIntent);
+				await initiatePurchase(purchaseData, setStripeIntent);
 				setOperationPending(false);
 			}
 		}
@@ -142,7 +143,7 @@ function ContributionPaymentHandler(props) {
 		description.push(`Your card or bank account will be charged immediately after confirming.`);
 		break;
 	case 'recurringContribution':
-		description.push(`Make a recurring contribution to support Zotero.`);
+		description.push(`Make a ${purchase.period}ly recurring contribution to support Zotero.`);
 		description.push(`Your card or bank account will be charged immediately after confirming.`);
 		break;
 	default:
@@ -209,12 +210,12 @@ function ContributionPaymentHandler(props) {
 			{...{
 				purchase,
 				stripeIntent,
-				handleConfirm,
+				handleConfirmIntent,
 				// chargeAmount,
 				operationPending,
 				setOperationPending,
-				setNotification,
 				buttonLabel,
+				callbacks,
 				useEmail: false,
 				cancelable: true,
 				cancel: cancelPurchase,
@@ -238,7 +239,7 @@ function ContributionPaymentHandler(props) {
 						</CardBody>
 					</Card>
 					<Row className='mt-2'>
-						<Col className='text-center'><Button className='m-auto' onClick={() => { handleConfirm(false); }}>{buttonLabel}</Button></Col>
+						<Col className='text-center'><Button className='m-auto' onClick={() => { handleConfirmIntent(false); }}>{buttonLabel}</Button></Col>
 						<Col className='text-center'><Button className='m-auto' onClick={cancel}>Cancel</Button></Col>
 					</Row>
 				</div>
@@ -267,13 +268,15 @@ function ContributionPaymentHandler(props) {
 }
 
 ContributionPaymentHandler.propTypes = {
-	purchase: PropTypes.shape({
-		type: PropTypes.string.isRequired,
-		amount: PropTypes.number,
-		period: PropTypes.string,
-	}).isRequired,
-	renew: PropTypes.bool,
-	currentUser: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
+	contributionState: PropTypes.shape({
+		purchase: PropTypes.shape({
+			type: PropTypes.string.isRequired,
+			amount: PropTypes.number,
+			period: PropTypes.string,
+		}).isRequired,
+		renew: PropTypes.bool,
+		currentUser: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
+	})
 };
 
 export { ContributionPaymentHandler };

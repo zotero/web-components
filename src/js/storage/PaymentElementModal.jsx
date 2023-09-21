@@ -4,6 +4,7 @@ var log = logger.Logger('PaymentElementModal', 1);
 import { useState } from 'react';
 import { Elements, useElements, PaymentElement } from '@stripe/react-stripe-js';
 import { Button, Card, CardBody, Input, Form, FormGroup } from 'reactstrap';
+import { addPaymentMethod } from './actions.js';
 import { Notifier } from '../Notifier.js';
 import PropTypes from 'prop-types';
 import { LoadingSpinner } from '../LoadingSpinner.js';
@@ -59,6 +60,38 @@ function PECheckoutForm(props) {
 			};
 		}
 
+		// Use PaymentElement to create a payment method without intent so it can be previewed
+		// and checked for country
+		/*
+		// Trigger form validation and wallet collection
+		const {error: submitError} = await elements.submit();
+		if (submitError) {
+			setPaymentNotification({ type: 'error', message: submitError.message });
+			setErrorMessage(submitError.message);
+			return;
+		}
+
+		// Create the PaymentMethod using the details collected by the Payment Element
+		const {error: cpmError, paymentMethod} = await stripe.createPaymentMethod({
+			elements,
+			params: {
+				billing_details: billingDetails
+			}
+		});
+		if (cpmError) {
+			setPaymentNotification({ type: 'error', message: cpmError.message });
+			setErrorMessage(cpmError.message);
+			return;
+		}
+		log.debug('PaymentMethod:');
+		log.debug(paymentMethod);
+		//send payment method to our server to add to customer
+		await addPaymentMethod(paymentMethod);
+
+		callbacks.refresh();
+		// === END independent Payment Method section
+		*/
+
 		if (stripeIntent.intent.object == 'setup_intent') {
 			log.debug("confirming setupIntent");
 			var confirmResult = await stripe.confirmSetup({
@@ -106,6 +139,7 @@ function PECheckoutForm(props) {
 			//handleConfirmIntent will close dialog by removing purchase if necessary
 			handleConfirmIntent(stripeIntent);
 		}
+
 		setOperationPending(false);
 	};
 
@@ -167,7 +201,7 @@ function PECheckoutForm(props) {
 					<Button type='button' color='link' className='w-100 mt-3' onClick={props.onClose}>Cancel</Button> : null
 				}
 			</FormGroup>
-			{errorMessage && <div>{errorMessage}</div>}
+			{/* {errorMessage && <div>{errorMessage}</div>} */}
 			<Notifier {...paymentNotification} />
 		</Form>
 	)
@@ -191,8 +225,9 @@ PECheckoutForm.defaultProps = {
 };
 
 function PaymentElementModal(props) {
-	const { stripe, stripeIntent, cancel } = props;
+	const { stripe, stripeIntent, cancel, storageState } = props;
 	log.debug('PaymentElementModal render');
+	log.debug(props);
 
 	const handleClose = () => {
 		cancel();
@@ -207,7 +242,6 @@ function PaymentElementModal(props) {
 	log.debug(stripeIntent.client_secret);
 
 	const options = {
-		// passing the client secret obtained in step 2
 		clientSecret: stripeIntent.client_secret,
 		// Fully customizable with appearance API.
 		appearance: {

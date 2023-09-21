@@ -5,8 +5,8 @@ import { ajax, postFormData } from '../ajax.js';
 import { discountedCountries } from './constants.js';
 
 // async function beginIntent(amount, description, storageLevel, immediateCharge) {
-async function beginStripeIntent(purchase, setIntent) {
-	log.debug(`beginStripeIntent:`);
+async function initiatePurchase(purchase, setIntent) {
+	log.debug(`initiatePurchase:`);
 	log.debug(purchase);
 	// setIntent({client_secret: 'THIS IS A SECRET', success: true, intent: {id: 'intent_id'}});
 	// return;
@@ -22,7 +22,23 @@ async function beginStripeIntent(purchase, setIntent) {
 	let data = await resp.json();
 	log.debug(data);
 	if (data.success) {
-		log.debug('successful beginStripeIntent: setting returned intent');
+		log.debug('successful initiatePurchase: setting returned intent');
+		setIntent(data);
+		return data.client_secret;
+	} else {
+		throw data;
+	}
+}
+
+//add paymentMethod to the customer for this session
+async function addPaymentMethod(stripePaymentMethod) {
+	log.debug(`addPaymentMethod:`);
+	let resp = await postFormData('/storage/addpaymentmethod', {paymentMethodID: stripePaymentMethod.id}, { withSession:true });
+	log.debug(resp, 1);
+	let data = await resp.json();
+	log.debug(data);
+	if (data.success) {
+		log.debug('successful addPaymentMethod');
 		setIntent(data);
 		return data.client_secret;
 	} else {
@@ -76,20 +92,20 @@ async function createInvoice(invoiceData) {
 async function createInstitutionInvoice(invoiceData) {
 	log.debug('createInstitutionInvoice');
 	log.debug(invoiceData);
-	const { type, fte, additionalFTE, name, institutionID } = invoiceData;
+	const { type, fte, additionalFTE, numUsers, institutionName, institutionID } = invoiceData;
 	try {
 		let resp;
 		switch (type) {
 		case 'labRenew':
-			if (!fte) throw new Error('no fte set');
+			if (!numUsers) throw new Error('no numUsers set');
 			if (!institutionID) throw new Error('no institutionID set');
 			
-			resp = await postFormData('/settings/storage/createinvoice', { type: 'labRenew', numUsers: fte, institutionID }, { withSession: true });
+			resp = await postFormData('/settings/storage/createinvoice', { type: 'labRenew', numUsers, institutionID }, { withSession: true });
 			break;
 		case 'lab':
-			if (!fte) throw new Error('no fte set');
+			if (!numUsers) throw new Error('no numUsers set');
 			
-			let params = { type: 'lab', numUsers: fte };
+			let params = { type: 'lab', numUsers, institutionName };
 			if (institutionID) params.institutionID = institutionID;
 			resp = await postFormData('/settings/storage/createinvoice', params, { withSession: true });
 			break;
@@ -119,13 +135,13 @@ async function createInstitutionInvoice(invoiceData) {
 	}
 }
 
-async function getUserCustomer (setStripeCustomer, setLocation, setShowLocation, setNotification) {
+async function getUserCustomer () {
     log.debug('getUserCustomer', 4);
     try {
         let resp = await ajax({ url: '/storage/getusercustomer' });
         log.debug(resp, 4);
         let data = await resp.json();
-        return {type: 'sucess', success:true, stripeCustomer: data};
+        return {type: 'success', success:true, stripeCustomer: data};
     } catch (e) {
         log.debug('Error retrieving customer data', 2);
         log.debug(e, 2);
@@ -133,10 +149,24 @@ async function getUserCustomer (setStripeCustomer, setLocation, setShowLocation,
     }
 }
 
+async function  deleteInvoice (invoiceID) {
+	let data = { invoiceID };
+	let resp = await postFormData('/storage/deleteinvoice', data, { withSession: true });
+	
+	if (resp.ok) {
+		return { type: 'success', message: <span>Invoice Deleted</span> };
+	} else {
+		throw resp;
+	}
+};
+
+
 export {
-	beginStripeIntent,
+	initiatePurchase,
+	addPaymentMethod,
 	chargeDefaultMethod,
 	createInvoice,
 	createInstitutionInvoice,
 	getUserCustomer,
+	deleteInvoice,
 };

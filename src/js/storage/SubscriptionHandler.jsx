@@ -19,8 +19,9 @@ var log = logger.Logger('SubscriptionHandler');
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Card, CardHeader, CardBody, FormGroup, Input, Modal, ModalBody, ModalHeader, Label, Row, Col, Button, Container } from 'reactstrap';
+import { Notifier } from '../Notifier.js';
 
-import { beginStripeIntent } from './actions.js';
+import { initiatePurchase } from './actions.js';
 import { PaymentElementModal } from './PaymentElementModal.jsx';
 import { PaymentDetails } from './PaymentDetails.jsx';
 
@@ -34,9 +35,11 @@ import { LoadingSpinner } from '../LoadingSpinner.js';
 // type is one of: individualChange, individualUpdate, individualRenew
 
 function SubscriptionHandler(props) {
-	const { callbacks, operationPending, error, editPayment, chargeAmount, previewPriceMismatch, awaitingFinalConfirm, description, stripeCustomer, purchase, allowRenew, returnUrl, location } = props;
-	const { setOperationPending, setNotification, cancelPurchase, handleInvoiceRequest, handleConfirmPurchase, handleConfirmIntent, setCurrency, setLocation } = callbacks;
-	log.debug(props, 2);
+	const { storageState, callbacks } = props;
+	const { operationPending, error, editPayment, chargeAmount, awaitingFinalConfirm, description, stripeCustomer, purchase, allowRenew, returnUrl, location, currency } = storageState;
+	const { setOperationPending, setNotification, cancelPurchase, handleInvoiceRequest, handleConfirmPurchase, setCurrency, setLocation } = callbacks;
+	log.debug('SubscriptionHandler');
+	log.debug(props);
 
 	const [ stripeIntent, setStripeIntent ] = useState(null);
 	const [ autorenew, setAutorenew ] = useState(true);
@@ -47,20 +50,27 @@ function SubscriptionHandler(props) {
 		setOperationPending(false);
 		cancelPurchase();
 	};
+
+	//set defaultSource and set currency to euro if saved payment method is EU bank
+	let defaultSource = false;
+	if (stripeCustomer) {
+		defaultSource = stripeCustomer.default_source || stripeCustomer.invoice_settings.default_payment_method;
+	}
+
 	
 	useEffect(async () => {
-		log.debug("useEffect beginStripeIntent", 4);
+		log.debug("useEffect initiatePurchase", 4);
 		// log.debug(stripeIntent);
 		let validStripeIntent = stripeIntent;
-		if (stripeIntent && stripeIntent.intent.currency != purchase.currency) {
+		if (stripeIntent && stripeIntent.intent.currency != currency) {
 			validStripeIntent = false;
 		}
 		if (editPayment && !validStripeIntent) {
 			if (purchase.immediateCharge || (purchase.type == 'individualPaymentUpdate') ) {
 				setOperationPending(true);
 				try {
-					let locationPurchase = Object.assign({}, purchase, {location});
-					await beginStripeIntent(locationPurchase, setStripeIntent);
+					let locationPurchase = Object.assign({}, purchase, {location, currency});
+					await initiatePurchase(locationPurchase, setStripeIntent);
 				} catch (e) {
 					setNotification({type: "error", message: "There was an error with our payment processor. Please try again."});
 					cancel();
@@ -70,22 +80,19 @@ function SubscriptionHandler(props) {
 		} else {
 			log.debug('not beginning intent');
 		}
-	}, [purchase, chargeAmount, editPayment]);
+	}, [purchase, currency, location, chargeAmount, editPayment]);
 
 	let descriptionPs = description.map((d, i) => {
 		return <p key={i}>{d}</p>;
 	});
 	
-	let defaultSource = false;
-	if (stripeCustomer) {
-		defaultSource = stripeCustomer.default_source || stripeCustomer.invoice_settings.default_payment_method;
-	}
 	let paymentSection = null;
 	if (editPayment && !awaitingFinalConfirm) {
 		// allow entry of new payment details
 		paymentSection = <PaymentElementModal
 			stripe={window.stripe}
 			{...{
+				storageState,
 				callbacks,
 				purchase,
 				stripeIntent,
@@ -99,6 +106,7 @@ function SubscriptionHandler(props) {
 	} else if (chargeAmount) {
 		paymentSection = <PaymentDetails 
 			{...{
+				storageState,
 				callbacks,
 				purchase,
 				stripeCustomer,
@@ -138,7 +146,8 @@ function SubscriptionHandler(props) {
 	}
 	
 	let invoiceSection = null;
-	if (props.invoicePossible) {
+	const { invoicePossible, allowEuro } = storageState;
+	if (invoicePossible) {
 		invoiceSection = (
 			<Container className='mt-4'>
 				<Row>
@@ -146,10 +155,10 @@ function SubscriptionHandler(props) {
 						<p><a href='#' onClick={handleInvoiceRequest}>Create invoice payable by third party</a></p>
 					</Col>
 				</Row>
-				{props.allowEuro ?
+				{allowEuro ?
 				<Row>
 					<Col className='text-center'>
-						{purchase.currency == 'eur' ? 
+						{currency == 'eur' ? 
 							<p><a href='#' onClick={()=>{setCurrency('usd');}}>Make payment in USD</a></p> :
 							<p><a href='#' onClick={()=>{setCurrency('eur'); setLocation('US');}}>Make payment in Euro</a></p> 
 						}
@@ -171,6 +180,7 @@ function SubscriptionHandler(props) {
 			<Modal isOpen={true} toggle={cancel} className='payment-modal'>
 				<ModalHeader>Manage Subscription</ModalHeader>
 				<ModalBody>
+					<Notifier {...storageState.notification} />
 					<Card className='mb-4'>
 						<CardBody>
 							{error}

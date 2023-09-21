@@ -15,7 +15,7 @@ import { formatCurrency } from '../Utils.js';
 
 import { postFormData } from '../ajax.js';
 import { buildUrl } from '../wwwroutes.js';
-import { InstitutionHandler } from '../storage/InstitutionHandler.jsx';
+import { InstitutionHandler } from './InstitutionHandler.jsx';
 // import { LabContext, labReducer, PaymentContext, paymentReducer, setEmails, UPDATE_NAME, UPDATE_PURCHASE } from '../storage/actions.js';
 import { Invoices } from '../storage/Invoices.jsx';
 

@@ -1,3 +1,11 @@
+/*
+TODO:
+ - handlePurchase is maybe unnecessary? Is there ever a Lab operation that gets called for
+ completed purchase without intent?
+ - When lab paid by invoice for new Lab, make sure it is named from name column
+ - 
+*/
+
 import {log as logger} from '../Log.js';
 let log = logger.Logger('LabCheckout');
 
@@ -10,9 +18,10 @@ import { Notifier } from '../Notifier.js';
 import { discountedCountries } from '../storage/constants.js';
 import { LocationSelector } from '../storage/LocationSelector.jsx';
 import { getCurrentUser, formatCurrency } from '../Utils.js';
-import { InstitutionHandler } from '../storage/InstitutionHandler.jsx';
+import { InstitutionHandler } from './InstitutionHandler.jsx';
 import { locationLabPrice, locationLabUserPrice, getCustomerPaymentCountry, isDiscounted } from '../storage/calculations.js';
-import { getUserCustomer, chargeDefaultMethod, createInstitutionInvoice, createInvoice } from '../storage/actions.js';
+import { getUserCustomer, chargeDefaultMethod, createInstitutionInvoice } from '../storage/actions.js';
+import { buildUrl } from '../wwwroutes.js';
 
 const currentUser = getCurrentUser();
 
@@ -25,7 +34,7 @@ function LabCheckout(props) {
 	const [ showLocation, setShowLocation ] = useState(Object.keys(discountedCountries).includes(props.detectedLocation.country));
 	const [ previewPrice, setPreviewPrice ] = useState(null);
 	const [ editPayment, setEditPayment ] = useState(false);
-	const [ awaitingFinalConfirm, setAwaitingFinalConfirm ] = useState(false);
+	// const [ awaitingFinalConfirm, setAwaitingFinalConfirm ] = useState(false);
 	const [ operationPending, setOperationPending ] = useState(false);
 
 	const [labName, setLabName] = useState('');
@@ -33,6 +42,24 @@ function LabCheckout(props) {
 
 	const hasDefaultPayment = (stripeCustomer && stripeCustomer.invoice_settings.default_payment_method)
 	
+	// load stripe customer at start for logged in user if there is one
+	useEffect(
+		() => {
+			if (currentUser && !stripeCustomer) {
+				refreshCustomer();
+			}
+		},
+		[props.stripeCustomer]
+	);
+	
+	//remove the pending purchase, closing payment dialog
+	const cancelPurchase = () => {
+		setPurchase(null);
+		setEditPayment(false);
+		setOperationPending(false);
+	}
+
+	//update FTE from user input, making sure it's a number and if not just set to default 15
 	const handleFTEChange = (evt) => {
 		let nv = evt.target.value;
 		nv = nv.replace(/\D/g, '');
@@ -44,6 +71,10 @@ function LabCheckout(props) {
 		}
 		setFte(nv);
 	};
+
+	// handle purchase button click. Lab must have a name. Set the preview price based on location in order to update later if
+	//payment card location changes the price. Set the purchase object with the filled values and set for an immediate charge since
+	//this is a new purchase
 	const handlePurchase = () => {
 		if (labName == '') {
 			setNotification({type:'error', message: "Please choose a name for your lab. This name will appear as the provider of storage for your users."});
@@ -59,6 +90,8 @@ function LabCheckout(props) {
 		});
 	};
 
+	//re-fetch the stripe customer for logged in user if there is one, and figure out a location
+	//based on their payment data if there is.
 	const refreshCustomer = async () => {
 		if (currentUser) {
 			let customerResponse = await getUserCustomer();
@@ -80,51 +113,87 @@ function LabCheckout(props) {
 		}
 	}
 
+	//show an appropriate success message for a completed payment
+	const successNotification = (purchase, respData) => {
+		let result, invoiceUrl, manageUrl;
+		switch (purchase.type) {
+			case 'paymentUpdate':
+				result = {
+					type: 'success',
+					message: <p>Your payment details have been updated.</p>
+				};
+				break;
+			case 'labRenew':
+				invoiceUrl = `/storage/invoice/${respData.invoiceID}`;
+
+				result = {
+					type: 'success',
+					message: <p>Success. An invoice has been created for this charge. You can <a href={invoiceUrl}>view the invoice now</a>, and it will also be available from your <a href='/settings/storage'>storage settings</a>.</p>
+				};
+				break;
+			case 'lab':
+				manageUrl = respData.institutionID ? buildUrl('manageInstitution', { institutionID: respData.institutionID }) : false;
+				invoiceUrl = respData.invoiceID ? `/storage/invoice/${respData.invoiceID}` : false;
+
+				result = {
+					type: 'success',
+					message: (
+						<>
+							<p>Success. Your Lab subscription is being activated.</p>
+							{manageUrl ? <p>You can now <a href={manageUrl}>manage your Zotero Lab subscription</a>.</p> : null}
+							{invoiceUrl ? <p>You can also <a href={invoiceUrl}>view the invoice for this charge</a>.</p> : null}
+							<p>You can always access your active Zotero Lab subscriptions and payment invoices from your <a href='/settings/storage'>storage settings</a>.</p>
+						</>
+					)
+				};
+				break;
+			case 'addLabUsers':
+				invoiceUrl = `/storage/invoice/${respData.invoiceID}`;
+
+				result = {
+					type: 'success',
+					message: <p>Success. An invoice has been created for this charge. You can <a href={invoiceUrl}>view the invoice now</a>, and it will also be available from your <a href='/settings/storage'>storage settings</a>.</p>
+				};
+				break;
+			case 'institution':
+				// TODO
+				break;
+			default:
+				throw new Error('Unknown purchase type');
+		}
+		return result;
+	};
+
+	//handler for confirming a "purchase" action, which can also be a change in storage subscription
+	//that does not involve immediate payment or a change in payment details
 	const handleConfirmPurchase = async () => {
-		log.debug('handleConfirmPurchase');
-		log.debug(purchase);
+		log.debug('handleConfirmPurchase', 4);
+		log.debug(purchase, 4);
 		if (operationPending) {
-			log.debug('operation already pending');
+			log.debug('operation already pending', 4);
 			return;
 		}
 		setOperationPending(true);
 
+		log.debug('stripeIntent is false');
 		// no payment intent because we're using the payment method on file
 		// start an automatically confirmed payment intent or we are making a change
 		// that does not require payment
 		try {
-			log.debug('stripeIntent is false');
-			// no payment intent because we're using the payment method on file
-			// start an automatically confirmed payment intent or we are making a change
-			// that does not require payment
-			try {
-				switch (purchase.type) {
-					case 'lab':
-					case 'labRenew':
-					case 'addLabUsers':
-						let locationPurchaseData = Object.assign({}, purchase, {location});
-						let result = await chargeDefaultMethod(locationPurchaseData);
-						if (result.success) {
-							setNotification({type: 'success', message: 'Your payment has been processed.'});
-							// refresh storage and subscription again after 3 seconds
-							// delayedRefresh();
-							//TODO: get user's most recent institution and link
-						}
-						break;
-					default:
-						throw new Error(`unexpected purchase.type: ${purchase.type}`);
-				}
-			} catch (err) {
-				log.error(err);
-				if (err.success === false && err.message) {
-					setNotification({type: 'error', message: err.message});
-				} else {
-					log.error("UNEXPECTED THROWN RESPONSE WHEN ATTEMPTING PURCHASE OR CHANGE");
-					setNotification({type: 'error', message: "There was an error processing your request"});
-				}
-			} finally {
-				setPurchase(null);
-				setOperationPending(false);
+			switch (purchase.type) {
+				case 'lab':
+				case 'labRenew':
+				case 'addLabUsers':
+					let locationPurchaseData = Object.assign({}, purchase, {location});
+					let result = await chargeDefaultMethod(locationPurchaseData);
+					if (result.success) {
+						const n = successNotification(locationPurchaseData, result);
+						setNotification(n);
+						//TODO: get user's most recent institution and link
+					}
+					break;
+				default:
+					throw new Error(`unexpected purchase.type: ${purchase.type}`);
 			}
 		} catch (err) {
 			log.error(err);
@@ -136,7 +205,6 @@ function LabCheckout(props) {
 			}
 		} finally {
 			cancelPurchase();
-			setOperationPending(false);
 		}
 	}	
 
@@ -146,11 +214,11 @@ function LabCheckout(props) {
 	// paymentUpdate: intent used to update user's default PaymentMethod
 	// lab, labRenew, addLabUsers: No intent if charging the existing PaymentMethod on file (if user doesn't choose to edit them)
 	const handleConfirmIntent = async (stripeIntent) => {
-		log.debug('Institution handleConfirmIntent');
-		log.debug(stripeIntent);
-		log.debug(purchase);
+		log.debug('Institution handleConfirmIntent', 4);
+		log.debug(stripeIntent, 4);
+		log.debug(purchase, 4);
 		if (operationPending) {
-			log.debug('operation already pending');
+			log.debug('operation already pending', 4);
 			return;
 		}
 		setOperationPending(true);
@@ -170,7 +238,7 @@ function LabCheckout(props) {
 				case 'labRenew':
 				case 'addLabUsers':
 					// payment method added, now user must confirm charge
-					setAwaitingFinalConfirm(true);
+					// setAwaitingFinalConfirm(true);
 					setEditPayment(false);
 					// delayed fetch customer so we have payment details from server
 					log.debug("getting customer with updated payment");
@@ -185,73 +253,33 @@ function LabCheckout(props) {
 			
 			//TODO: get invoice/institutionID/etc from server for payment just made to link user to
 
-			switch (purchase.type) {
-				case 'paymentUpdate':
-					result = {
-						type: 'success',
-						message: <p>Your payment details have been updated.</p>
-					};
-					break;
-				case 'labRenew':
-					invoiceUrl = `/storage/invoice/${respData.invoiceID}`;
-
-					result = {
-						type: 'success',
-						message: <p>Success. An invoice has been created for this charge. You can <a href={invoiceUrl}>view the invoice now</a>, and it will also be available from your <a href='/settings/storage'>storage settings</a>.</p>
-					};
-					break;
-				case 'lab':
-					manageUrl = buildUrl('manageInstitution', { institutionID: respData.institutionID });
-					invoiceUrl = `/storage/invoice/${respData.invoiceID}`;
-
-					result = {
-						type: 'success',
-						message: (
-							<p>Success. You can now <a href={manageUrl}>manage your Zotero Lab subscription</a>.
-								You can also <a href={invoiceUrl}>view the invoice for this charge</a>.
-								Both of these will always be available to you from your <a href='/settings/storage'>storage settings</a>
-							</p>
-						)
-					};
-					break;
-				case 'addLabUsers':
-					invoiceUrl = `/storage/invoice/${respData.invoiceID}`;
-
-					result = {
-						type: 'success',
-						message: <p>Success. An invoice has been created for this charge. You can <a href={invoiceUrl}>view the invoice now</a>, and it will also be available from your <a href='/settings/storage'>storage settings</a>.</p>
-					};
-					break;
-				case 'institution':
-					// TODO
-					break;
-				default:
-					throw new Error('Unknown purchase type');
-				}
+			const result = successNotification(purchase, {});
+			setNotification(result);
 		} catch (err) {
 			log.error(err);
 			log.error("UNEXPECTED THROWN RESPONSE WHEN ATTEMPTING PURCHASE OR CHANGE");
 			setNotification({type: 'error', message: "There was an error processing your request"});
+		} finally {
+			cancelPurchase();
 		}
 	};
 
-	const handleInvoiceRequest = async () => {
+	//when user clicks like to create third-party-payable invoice, send request with current purchase to
+	//server to do so, then provide link (which will also be available in user's storage settings)
+	const handleInvoiceRequest = async (evt) => {
+		log.debug('handleInvoiceRequest', 4);
+		evt.preventDefault();
+		if(operationPending) {
+			return;
+		}
+		log.debug(purchase, 4);
 		setOperationPending(true);
-		let result = await createInstitutionInvoice({type, fte, additionalFTE, labName, institutionID});
+		let result = await createInstitutionInvoice(purchase);
 		setNotification(result);
 		setPurchase(null);
 		setOperationPending(false);
 	};
 	
-	useEffect(
-		() => {
-			if (currentUser && !stripeCustomer) {
-				refreshCustomer();
-			}
-		},
-		[props.stripeCustomer]
-	);
-
 	// Only allow purchase if the user is logged in so the lab will have a managing account. Otherwise provide quote but don't allow purchase
 	let completeAction = null;
 	if (currentUser) {
@@ -265,7 +293,11 @@ function LabCheckout(props) {
 					</div>
 				</div>
 				<div className='form-group row'>
-					<p>You&apos;re currently logged in as &quot;{currentUser.username}&quot;. This will be the account used to manage the user list for your subscription. If you&apos;d like to use a different account to manage your subscription, please log in with that account before completing the purchase.</p>
+					<p>
+						You&apos;re currently logged in as &quot;{currentUser.username}&quot;.
+						This will be the account used to manage the user list for your subscription.
+						If you&apos;d like to use a different account to manage your subscription, please log in with that account before completing the purchase.
+					</p>
 				</div>
 				<div className='form-group row purchase-line'>
 					<Button className='m-auto' color='secondary' onClick={handlePurchase}>Purchase</Button>
@@ -275,11 +307,16 @@ function LabCheckout(props) {
 	} else {
 		completeAction = (
 			<div className='form-group row'>
-				<p>You are not currently logged in. To purchase a Zotero Lab subscription, please log in to the account that will be used to manage the user list for the subscription. You&apos;ll need to use that account to make changes to your subscription in the future.</p>
+				<p>
+					You are not currently logged in.
+					To purchase a Zotero Lab subscription, please <a href='/user/login'>log in</a> to the account that will be used to manage the user list for the subscription.
+					You&apos;ll need to use that account to make changes to your subscription in the future.
+				</p>
 			</div>
 		);
 	}
 
+	//location footer depending on detected location/payment country for differential pricing
 	let locationFooter = null;
 	if (showLocation) {
 		locationFooter = (
@@ -296,6 +333,7 @@ function LabCheckout(props) {
 	let institutionCallbacks = {
 		setPurchase,
 		setNotification,
+		setEditPayment,
 		handleConfirmPurchase,
 		handleConfirmIntent,
 		handleInvoiceRequest,
@@ -342,27 +380,28 @@ function LabCheckout(props) {
 		}
 		
 		if (immediateChargeRequired && !hasDefaultPayment && !editPayment) {
-			log.debug("setting editPayment to true");
+			log.debug("setting editPayment to true", 4);
 			setEditPayment(true);
-		} else {
-			log.debug(`leaving editPayment ${editPayment}`);
 		}
 
-		
+		const institutionState = {
+			purchase,
+			description,
+			stripeCustomer,
+			currentUser,
+			previewPrice,
+			chargeAmount,
+			immediateChargeRequired,
+			error,
+			editPayment,
+			operationPending,
+			previewPriceMismatch: (chargeAmount != previewPrice),
+			// awaitingFinalConfirm,
+		};
+
 		Payment = (<InstitutionHandler
 			{...{
-				purchase,
-				description,
-				stripeCustomer,
-				currentUser,
-				previewPrice,
-				chargeAmount,
-				immediateChargeRequired,
-				error,
-				editPayment,
-				operationPending,
-				previewPriceMismatch: (chargeAmount != previewPrice),
-				awaitingFinalConfirm,
+				institutionState,
 				callbacks: institutionCallbacks,
 			}}
 		/>);

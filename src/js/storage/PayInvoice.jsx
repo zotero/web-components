@@ -10,12 +10,11 @@ import { Notifier } from '../Notifier.js';
 import { getPriceCents, labPrice, labUserPrice } from './calculations.js';
 import { PaymentElementModal } from './PaymentElementModal.jsx';
 import { PaymentSource } from './PaymentSource.jsx';
-import { beginStripeIntent } from './actions.js';
+import { initiatePurchase } from './actions.js';
 
 import { LoadingSpinner } from '../LoadingSpinner.js';
 import { formatCurrency } from '../Utils.js';
-
-const dateFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+import { dateFormatOptions } from './constants.js';
 
 const storageLevelDescriptions = {
 	2: '2 GB',
@@ -92,13 +91,13 @@ function PayInvoice(props) {
 	});
 	
 	useEffect(async () => {
-		log.debug("useEffect beginStripeIntent");
+		log.debug("useEffect initiatePurchase");
 		log.debug(purchase);
 		if (!stripeIntent && !stripeChargeObject) {
 			if (purchase.immediateCharge || purchase.type=='individualPaymentUpdate') {
 				setOperationPending(true);
 				let purchaseData = Object.assign({}, purchase, { type: 'chargePayableInvoice'});
-				await beginStripeIntent(purchaseData, setStripeIntent);
+				await initiatePurchase(purchaseData, setStripeIntent);
 				setOperationPending(false);
 			}
 		}
@@ -107,8 +106,8 @@ function PayInvoice(props) {
 	
 	// processing is done in webhook and payment confirmation in PaymentElement.
 	// No payment modal here or subscription details, so do nothing.
-	const handleConfirm = async (stripeIntent) => {
-		log.debug('handleConfirm - noop');
+	const handleConfirmIntent = async (stripeIntent) => {
+		log.debug('PayInvoice:handleConfirmIntent - noop');
 		log.debug(stripeIntent);
 		setPurchase(null);
 		return;
@@ -122,7 +121,7 @@ function PayInvoice(props) {
 		log.debug(description);
 		
 		const callbacks = {
-			handleConfirm,
+			handleConfirmIntent,
 			setOperationPending,
 			setNotification,
 		};

@@ -4,20 +4,8 @@ var log = logger.Logger('Invoices.jsx', 3);
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Table, Collapse } from 'reactstrap';
-import { postFormData } from '../ajax.js';
-
-const dateFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-
-const deleteInvoice = async (invoiceID) => {
-	let data = { invoiceID };
-	let resp = await postFormData('/storage/deleteinvoice', data, { withSession: true });
-	
-	if (resp.ok) {
-		return { type: 'success', message: <span>Invoice Deleted</span> };
-	} else {
-		throw resp;
-	}
-};
+import { dateFormatOptions } from './constants.js';
+import { deleteInvoice } from './actions.js';
 
 function Invoices(props) {
 	log.debug(props, 4);

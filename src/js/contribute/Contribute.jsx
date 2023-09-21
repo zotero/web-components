@@ -1,3 +1,8 @@
+/*
+TODO:
+ - refresh after successful contribution to load invoices and show status of recurring contribution
+ - link to contribution invoice in notification message?
+*/
 import { log as logger } from '../Log.js';
 let log = logger.Logger('Contribute');
 
@@ -7,7 +12,6 @@ import { Button, Row, Col, Input, InputGroup, InputGroupAddon, Card, CardBody } 
 import { Notifier } from '../Notifier.js';
 import PropTypes from 'prop-types';
 
-// import { PaymentContext, paymentReducer, NotifierContext, notifyReducer, notify, UPDATE_PURCHASE, UPDATE_CUSTOMER } from '../storage/actions.js';
 import { Invoices } from '../storage/Invoices.jsx';
 import { ContributionPaymentHandler } from './ContributionPaymentHandler.jsx';
 import { postFormData } from '../ajax.js';
@@ -15,6 +19,8 @@ import classnames from 'classnames';
 
 const dateFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
 
+//calculate the next charge date after today based on the creation date for the recurring
+//contribution and the period
 function nextContributionCharge(created, period) {
 	let createdDate = new Date(created);
 	let nowDate = new Date();
@@ -97,6 +103,7 @@ function Contribute(props) {
 	const [custom, setCustom] = useState(false);
 	const [currentContribution, setCurrentContribution] = useState(props.currentContribution);
 	const [stripeCustomer, setStripeCustomer] = useState(props.stripeCustomer);
+	const [operationPending, setOperationPending] = useState(false);
 
 	// set values if contribution already in effect
 	useEffect(() => {
@@ -109,12 +116,14 @@ function Contribute(props) {
 		}
 	}, [currentContribution]);
 
-	const handleConfirm = (stripeIntent) => {
+	const handleConfirmIntent = (stripeIntent) => {
 		log.debug(stripeIntent);
-		setNotification({type: 'success', message: "Contribution Submitted. Thanks for supporting Zotero!"})
+		setNotification({type: 'success', message: "Contribution Submitted. Thanks for supporting Zotero!"});
+		cancelPurchase();
 	}
 	const cancelPurchase = () => {
 		setPurchase(null);
+		setOperationPending(false);
 	};
 
 	// don't allow altering amount or period for existing contribution
@@ -229,19 +238,29 @@ function Contribute(props) {
 		setAmount(nv);
 	};
 
+	const contributionCallbacks = {
+		setStripeIntent,
+		setNotification,
+		setOperationPending,
+		cancelPurchase,
+		handleConfirmIntent,
+	};
+
+	const contributionState = {
+		purchase,
+		currentContribution,
+		currentUser,
+		stripeCustomer,
+		stripeIntent,
+		operationPending,
+	};
+
 	let Payment = null;
 	if (purchase) {
 		Payment = (<ContributionPaymentHandler
 			{...{
-				purchase,
-				currentContribution,
-				currentUser,
-				stripeCustomer,
-				stripeIntent,
-				setStripeIntent,
-				setNotification,
-				cancelPurchase,
-				handleConfirm,
+				contributionState,
+				callbacks: contributionCallbacks,
 			}}
 		/>);
 	}
@@ -261,9 +280,9 @@ function Contribute(props) {
 	}
 	let contributionNode = null;
 	if (currentContribution) {
-		let amtDollars = currentContribution.amount / 100;
-		let nextChargeDate = nextContributionCharge(currentContribution.created, currentContribution.period);
-		let description = (
+		const amtDollars = currentContribution.amount / 100;
+		const nextChargeDate = nextContributionCharge(currentContribution.created, currentContribution.period);
+		const description = (
 			<>
 				<p>{`You currently have an active contribution for US $${amtDollars} once per ${currentContribution.period}.`}</p>
 				<p>{`The next charge will be on ${nextChargeDate.toLocaleDateString(undefined, dateFormatOptions)}.`}</p>
@@ -323,7 +342,7 @@ function Contribute(props) {
 			{customNode}
 			{contributionNode}
 			{!currentUser && 
-			<Row>
+			<Row className='mt-3'>
 				<Col>
 					<p className='text-center'>Please <a href='/user/login'>log in</a> to make a contribution</p>
 				</Col>

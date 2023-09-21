@@ -9,12 +9,14 @@ const discountTiers = {
 	'50': {2: 1000, 3: 3000, 6: 6000},
 };
 
+const euroPaymentMethods = ['sepa_debit'];
+
 const discountedCountries = {
-	'BR': '25',
-	'MX': '25',
-	'IN': '10',
-	'EC': '25',
-	'PE': '25'
+	// 'BR': '25',
+	// 'MX': '25',
+	// 'IN': '10',
+	// 'EC': '25',
+	// 'PE': '25'
 };
 
 const discountedPriceStrings = {
@@ -26,6 +28,7 @@ const discountedPriceStrings = {
 const discountedLabPriceStrings = {
 
 };
+
 
 //price per user for different lab discount tiers
 const discountLabTiers = {
@@ -63,13 +66,16 @@ const storageLevelDescriptions = {
 	6: 'Unlimited storage'
 };
 
+const dateFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
 
 export {
     priceCents,
     discountTiers,
+	euroPaymentMethods,
 	discountedCountries,
     discountedPriceStrings,
 	discountLabTiers,
     storagePlans,
     storageLevelDescriptions,
+	dateFormatOptions,
 };

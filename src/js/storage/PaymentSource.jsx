@@ -56,6 +56,7 @@ function PaymentSource(props) {
 		return <p>No payment method saved</p>;
 	}
 	
+	log.debug(source);
 	let type = source.type;
 	if (source.object == 'payment_method') {
 		if (source.type == 'card') {
@@ -65,11 +66,12 @@ function PaymentSource(props) {
 		type = source.object;
 	}
 
+	log.debug(`type: ${type}`);
 	switch (type) {
 	case 'card':
 		return <Card card={source} />;
 	case 'sepa_debit':
-		return <Iban iban={source} />;
+		return <Iban iban={source.sepa_debit} />;
 	case 'paymentMethodCard':
 		return <Card card={source.card} />;
 	default:

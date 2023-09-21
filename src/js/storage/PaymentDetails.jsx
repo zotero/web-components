@@ -6,7 +6,8 @@ import { Card, CardHeader, CardBody, Row, Col, Button } from 'reactstrap';
 import { LoadingSpinner } from '../LoadingSpinner.js';
 import { PaymentSource } from './PaymentSource.jsx';
 
-
+//Show the payment details for the user's stripe customer which will be charged
+//include a link to change the payment details
 function PaymentDetails(props) {
 	const { purchase, stripeCustomer, defaultSource, chargeAmount, previewPriceMismatch, callbacks } = props;
 	const { handleConfirmPurchase, setEditPayment, setOperationPending, cancelPurchase } = callbacks;

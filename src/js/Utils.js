@@ -419,7 +419,11 @@ let relativeTime = function(timestampSeconds){
 	return `${difference} ${periods[j]} ${ending}`;
 };
 
-function getFlagEmoji(countryCode) {
+function getFlagEmoji(countryCode = false) {
+	// console.log(`getFlagEmoji: ${countryCode}`);
+	if(!countryCode) {
+		return '';
+	}
 	const codePoints = countryCode
 		.toUpperCase()
 		.split('')

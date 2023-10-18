@@ -1,3 +1,5 @@
+//component for use in group settings /groups/<groupID>/invite to invite
+//one or more users by email or Zotero username
 import { log as logger } from '../../Log.js';
 let log = logger.Logger('InviteMembers');
 

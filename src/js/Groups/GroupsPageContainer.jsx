@@ -44,9 +44,9 @@ let loadGroups = async (userID = false, start = 0) => {
 	}
 };
 
-function GroupsPageContainer() {
-	const [groupData, setGroupData] = useState({ loading: true, groupsLoaded: false, titleOnly: false, errorLoading: false });
-	const [dataNeeded, setDataNeeded] = useState(true);
+function GroupsPageContainer(props) {
+	const [groupData, setGroupData] = useState(props ?? { loading: true, groupsLoaded: false, titleOnly: false, errorLoading: false });
+	const [dataNeeded, setDataNeeded] = useState(props.dataNeeded ?? true);
 
 	useEffect(() => {
 		log.debug('useEffect');
@@ -90,7 +90,7 @@ function GroupsPageContainer() {
 		return (
 			<div className='row'>
 				<div className='col'>
-					<UserGroups {...groupData} />
+					<UserGroups {...groupData} loadMore={loadMore} />
 				</div>
 			</div>
 		);
@@ -108,7 +108,7 @@ function GroupsPageContainer() {
 				</nav>
 				
 				<div id='group-alerts' className='alerts'>
-					<GroupInvitations reloadGroups={reloadGroups} />
+					<GroupInvitations reloadGroups={reloadGroups} {...{invitations: props.invitations, invitationGroups: props.invitationGroups }} />
 				</div>
 				
 				{groupData.loading ? null : <NewGroupDiscussions allGroups={true} narrow={true} showFields={{ title: true, lastActive: true, lastPoster: true }} />}

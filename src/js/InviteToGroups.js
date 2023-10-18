@@ -1,3 +1,5 @@
+//component for user profile page to invite the profile user to groups the
+//currentUser is admin or owner of.
 import { log as logger } from './Log.js';
 let log = logger.Logger('InviteToGroups');
 

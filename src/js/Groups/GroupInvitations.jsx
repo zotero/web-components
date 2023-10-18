@@ -55,9 +55,9 @@ GroupInvitation.propTypes = {
 };
 
 function GroupInvitations(props) {
-	const [invitations, setInvitations] = useState([]);
-	const [invitationGroups, setInvitiationGroups] = useState([]);
-	const [loaded, setLoaded] = useState(false);
+	const [invitations, setInvitations] = useState(props.invitations ?? []);
+	const [invitationGroups, setInvitiationGroups] = useState(props.invitationGroups ?? []);
+	const [loaded, setLoaded] = useState(props.loaded ?? false);
 
 	const loadInvitations = async () => {
 		if (currentUser) {

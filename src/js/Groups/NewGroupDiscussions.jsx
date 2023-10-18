@@ -164,6 +164,9 @@ function NewGroupDiscussions(props) {
 			</>
 		);
 	}
+	if (!discussions) {
+		return null;
+	}
 	return (
 		<ErrorWrapper>
 			<div className='new-group-discussions card'>

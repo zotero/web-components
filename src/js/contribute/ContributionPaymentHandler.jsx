@@ -121,17 +121,20 @@ function ContributionPaymentHandler(props) {
 		cancelPurchase();
 	};
 
-	useEffect(async () => {
+	useEffect(() => {
 		log.debug("useEffect initiatePurchase", 4);
-		log.debug(purchase, 4);
-		if (editPayment && !stripeIntent) {
-			if (purchase.immediateCharge || purchase.type=='contributionPaymentUpdate') {
-				setOperationPending(true);
-				let purchaseData = Object.assign({}, purchase);
-				await initiatePurchase(purchaseData, setStripeIntent);
-				setOperationPending(false);
+		const startPurchase = async () => {
+			log.debug(purchase, 4);
+			if (editPayment && !stripeIntent) {
+				if (purchase.immediateCharge || purchase.type=='contributionPaymentUpdate') {
+					setOperationPending(true);
+					let purchaseData = Object.assign({}, purchase);
+					await initiatePurchase(purchaseData, setStripeIntent);
+					setOperationPending(false);
+				}
 			}
-		}
+		};
+		startPurchase();
 	}, [purchase, editPayment]);
 
 	switch (purchase.type) {

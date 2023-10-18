@@ -30,27 +30,30 @@ function InstitutionHandler(props) {
 		setOperationPending(false);
 	}
 	
-	useEffect(async () => {
+	useEffect(() => {
 		log.debug("useEffect initiatePurchase");
-		log.debug(purchase);
-		if (!stripeIntent) {
-			if (editPayment) {
-				setOperationPending(true);
-				let purchaseData = Object.assign({}, purchase, {immediateCharge: immediateChargeRequired});
-				if (purchase.fte) {
-					purchaseData.numUsers = purchase.fte;
-				} else if (purchase.additionalFTE) {
-					purchaseData.numUsers = purchase.additionalFTE;
+		const startPurchase = async () => {
+			log.debug(purchase);
+			if (!stripeIntent) {
+				if (editPayment) {
+					setOperationPending(true);
+					let purchaseData = Object.assign({}, purchase, {immediateCharge: immediateChargeRequired});
+					if (purchase.fte) {
+						purchaseData.numUsers = purchase.fte;
+					} else if (purchase.additionalFTE) {
+						purchaseData.numUsers = purchase.additionalFTE;
+					}
+					if (purchase.name) {
+						purchaseData.institutionName = purchase.name;
+					}
+					
+					const locationPurchaseData = Object.assign({}, purchaseData, {location});
+					await initiatePurchase(locationPurchaseData, setStripeIntent);
+					setOperationPending(false);
 				}
-				if (purchase.name) {
-					purchaseData.institutionName = purchase.name;
-				}
-				
-				const locationPurchaseData = Object.assign({}, purchaseData, {location});
-				await initiatePurchase(locationPurchaseData, setStripeIntent);
-				setOperationPending(false);
 			}
-		}
+		};
+		startPurchase();
 	}, [editPayment, chargeAmount]);
 
 	let descriptionPs = description.map((d, i) => {

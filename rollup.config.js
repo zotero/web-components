@@ -20,7 +20,7 @@ const config = {
 			file: './build/web-components.js',
 			format: 'iife',
 			name: '_ZoteroWebComponents',
-			sourcemap: !isProduction,
+			sourcemap: true,
 			compact: isProduction,
 		},
 	],

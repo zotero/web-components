@@ -90,17 +90,20 @@ function PayInvoice(props) {
 		return <p key={i}>{d}</p>;
 	});
 	
-	useEffect(async () => {
+	useEffect(() => {
 		log.debug("useEffect initiatePurchase");
-		log.debug(purchase);
-		if (!stripeIntent && !stripeChargeObject) {
-			if (purchase.immediateCharge || purchase.type=='individualPaymentUpdate') {
-				setOperationPending(true);
-				let purchaseData = Object.assign({}, purchase, { type: 'chargePayableInvoice'});
-				await initiatePurchase(purchaseData, setStripeIntent);
-				setOperationPending(false);
+		const startPurchase = async () => {
+			log.debug(purchase);
+			if (!stripeIntent && !stripeChargeObject) {
+				if (purchase.immediateCharge || purchase.type=='individualPaymentUpdate') {
+					setOperationPending(true);
+					let purchaseData = Object.assign({}, purchase, { type: 'chargePayableInvoice'});
+					await initiatePurchase(purchaseData, setStripeIntent);
+					setOperationPending(false);
+				}
 			}
-		}
+		};
+		startPurchase();
 	}, [purchase, chargeAmount]);
 
 	

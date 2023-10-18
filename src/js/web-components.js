@@ -15,12 +15,14 @@ if (typeof window === 'undefined') {
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+import * as ReactDOMClient from 'react-dom/client';
 import jQuery from 'jquery';
 import Popper from 'popper.js';
 import TWEEN from '@tweenjs/tween.js';
 import BezierEasing from 'bezier-easing';
 
 globalScope.ReactDOM = ReactDOM;
+globalScope.ReactDOMClient = ReactDOMClient;
 globalScope.React = React;
 globalScope.jQuery = jQuery;
 globalScope.$ = jQuery;

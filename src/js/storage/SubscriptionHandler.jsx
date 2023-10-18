@@ -58,28 +58,31 @@ function SubscriptionHandler(props) {
 	}
 
 	
-	useEffect(async () => {
+	useEffect(() => {
 		log.debug("useEffect initiatePurchase", 4);
-		// log.debug(stripeIntent);
-		let validStripeIntent = stripeIntent;
-		if (stripeIntent && stripeIntent.intent.currency != currency) {
-			validStripeIntent = false;
-		}
-		if (editPayment && !validStripeIntent) {
-			if (purchase.immediateCharge || (purchase.type == 'individualPaymentUpdate') ) {
-				setOperationPending(true);
-				try {
-					let locationPurchase = Object.assign({}, purchase, {location, currency});
-					await initiatePurchase(locationPurchase, setStripeIntent);
-				} catch (e) {
-					setNotification({type: "error", message: "There was an error with our payment processor. Please try again."});
-					cancel();
-				}
-				setOperationPending(false);
+		const startPurchase = async () => {
+			// log.debug(stripeIntent);
+			let validStripeIntent = stripeIntent;
+			if (stripeIntent && stripeIntent.intent.currency != currency) {
+				validStripeIntent = false;
 			}
-		} else {
-			log.debug('not beginning intent');
-		}
+			if (editPayment && !validStripeIntent) {
+				if (purchase.immediateCharge || (purchase.type == 'individualPaymentUpdate') ) {
+					setOperationPending(true);
+					try {
+						let locationPurchase = Object.assign({}, purchase, {location, currency});
+						await initiatePurchase(locationPurchase, setStripeIntent);
+					} catch (e) {
+						setNotification({type: "error", message: "There was an error with our payment processor. Please try again."});
+						cancel();
+					}
+					setOperationPending(false);
+				}
+			} else {
+				log.debug('not beginning intent');
+			}
+		};
+		startPurchase();
 	}, [purchase, currency, location, chargeAmount, editPayment]);
 
 	let descriptionPs = description.map((d, i) => {

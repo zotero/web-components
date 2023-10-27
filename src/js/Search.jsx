@@ -6,7 +6,6 @@ import { useState, useEffect } from 'react';
 import { PropTypes } from 'prop-types';
 import { Row, Col, Form, Input, InputGroup, Button, Nav, NavItem, NavLink, InputGroupAddon, Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 import { postFormData } from './ajax.js';
-import { LargeUser } from './components/UserList.jsx';
 import { GroupNugget } from './Groups/UserGroups.jsx';
 import { LocationState } from './LocationState.js';
 import { LoadingSpinner } from './LoadingSpinner.js';
@@ -54,7 +53,8 @@ function Search(props) {
 	const { basePath, searchTypes, defaultType, resultsPerPage } = props;
 	const ls = new LocationState(basePath);
 	ls.parseVars();
-	const [type, setType] = useState(ls.getVar('type') ?? defaultType);
+	// const [type, setType] = useState(ls.getVar('type') ?? defaultType);
+	const type = 'group';
 	const [query, setQuery] = useState(ls.getVar('q') ?? '');
 	const [totalResults, setTotalResults] = useState(null);
 	const [results, setResults] = useState([]);
@@ -67,18 +67,6 @@ function Search(props) {
 			evt.preventDefault();
 		}
 		setSearchSubmitted(true);
-	};
-	const changeType = (evt) => {
-		evt.preventDefault();
-		let newType = evt.target.getAttribute('data-type');
-		setResults([]);
-		setTotalResults(null);
-		setSearchPerformed(false);
-		setType(newType);
-		
-		ls.setQueryVar('type', newType);
-		ls.pushState();
-		search();
 	};
 	const handleQueryChange = (evt) => {
 		setQuery(evt.target.value);
@@ -120,17 +108,11 @@ function Search(props) {
 			</div>
 		);
 	} else if (searchPerformed) {
-		if (type == 'people') {
-			resultNodes = results.map((user) => {
-				return <LargeUser key={user.userID} user={user} />;
-			});
-		} else if (type == 'group') {
+		if (type == 'group') {
 			resultNodes = results.map((group) => {
 				return <GroupNugget key={group.apiObj.id} group={group.apiObj} className='m-2' />;
 			});
 		}
-	} else if (type == 'people') {
-		resultNodes = <p className='my-6 text-center'>Use &quot;double quotes&quot; to search for exact phrases. Otherwise we will search for users with any of the search terms.</p>;
 	} else {
 		resultNodes = null;
 	}
@@ -140,24 +122,8 @@ function Search(props) {
 		pagination = <SearchPagination locationState={ls} totalResults={totalResults} page={page} changePage={changePage} resultsPerPage={resultsPerPage} />;
 	}
 	
-	let typeNavRow = (
-		<Row>
-			<Col className='search-form'>
-				<Nav tabs>
-					<NavItem>
-						<NavLink active={type == 'people'} data-type='people' onClick={changeType} href='#'>People</NavLink>
-					</NavItem>
-					<NavItem>
-						<NavLink active={type == 'group'} data-type='group' onClick={changeType} href='#'>Groups</NavLink>
-					</NavItem>
-				</Nav>
-			</Col>
-		</Row>
-	);
-	
 	return (
 		<div className='search'>
-			{searchTypes.length > 1 ? typeNavRow : null}
 			<Row>
 				<Col className='search-form'>
 					<Form onSubmit={search} className='my-3'>
@@ -183,14 +149,14 @@ function Search(props) {
 
 Search.defaultProps = {
 	basePath: '/search',
-	searchTypes: ['people', 'groups'],
-	defaultType: 'people',
+	searchTypes: ['groups'],
+	defaultType: 'groups',
 	resultsPerPage: 10,
 };
 Search.propTypes = {
 	basePath: PropTypes.string,
 	searchTypes: PropTypes.arrayOf(PropTypes.string),
-	defaultType: PropTypes.oneOf(['people', 'group']),
+	defaultType: PropTypes.oneOf(['groups']),
 	resultsPerPage: PropTypes.number,
 };
 

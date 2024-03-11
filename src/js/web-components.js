@@ -46,7 +46,7 @@ import { CreateGroup } from './CreateGroup.js';
 import { GroupInfo } from './Groups/GroupInfo.jsx';
 import { RecentItems } from './RecentItems.js';
 import { ApiKeyEditor } from './ApiKeyEditor.js';
-import { pageReady, jsError } from './Utils.js';
+import { pageReady, jsError, readCookie } from './Utils.js';
 import { cycleTestCases, cycleTestFuncs } from './TestUtils.js';
 import { Profile } from './profile/profile.jsx';
 import { ChangeUsername } from './ChangeUsername.js';
@@ -75,6 +75,7 @@ import { PayInvoice } from './storage/PayInvoice.jsx';
 import { SuggestableInput } from './components/SuggestableInput.jsx';
 import { RelatedContainer } from './profile/relatedContainer.jsx';
 import { InviteMembers } from './components/GroupSettings/InviteMembers.jsx';
+import { U2FVerifier, ManageTwoFactor } from './components/TwoFactor.jsx';
 
 let ZoteroWebComponents = {
 	Storage,
@@ -93,6 +94,7 @@ let ZoteroWebComponents = {
 	ApiKeyEditor,
 	pageReady,
 	jsError,
+	readCookie,
 	cycleTestCases,
 	cycleTestFuncs,
 	Profile,
@@ -119,6 +121,8 @@ let ZoteroWebComponents = {
 	SuggestableInput,
 	RelatedContainer,
 	InviteMembers,
+	U2FVerifier,
+	ManageTwoFactor,
 };
 
 globalScope.ZoteroWebComponents = ZoteroWebComponents;

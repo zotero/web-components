@@ -8,7 +8,7 @@ import { Notifier } from '../Notifier.js';
 import { postFormData } from '../ajax.js';
 
 const registerFidoUrl = '/settings/setverificationpreference';
-const fidoUrl = '/user/authenticateu2f';
+const fidoUrl = '/user/verifymfa';
 const setVerificationPrefUrl = '/settings/setverificationpreference';
 
 function SavedSecurityKey(props) {
@@ -337,10 +337,11 @@ function AppVerifier(props) {
 
 function U2FVerifier(props) {
 	const [notification, setNotification] = useState(null);
+	const [remember, setRemember] = useState(false);
 	
 	const verify = async () => {
 		try {
-			const result = await verifyU2F();
+			const result = await verifyU2F(remember);
 			if (result.success) {
 				setNotification({type: 'success', message: 'Authenticator Verified'});
 				if (props.redirect) {
@@ -366,6 +367,13 @@ function U2FVerifier(props) {
 			<p>
 				<button className='btn btn-secondary' id='begin-u2f-button' onClick={verify}>Use Security Key</button>
 			</p>
+			<div className='zform'>
+				<div className="form-group">
+					<input type="checkbox" name="remember_device" id="remember_device" value="1" class="checkbox" onChange={(evt) => {setRemember(evt.target.value)}} />
+					&nbsp;<label for="remember_device" class="optional">Remember Device</label>
+					<p class="hint text-muted small">Don't require two-step verification on this device in the future.</p>
+				</div>
+			</div>
 		</div>
 	);
 };
@@ -373,7 +381,7 @@ U2FVerifier.defaultProps = {
 	redirect: true,
 };
 
-async function verifyU2F() {
+async function verifyU2F(remember = false) {
 	log.debug('verifyU2F');
 
 	try {
@@ -383,7 +391,7 @@ async function verifyU2F() {
 		
 		// get auth check args
 		log.debug('getting authArgs');
-		let resp = await postFormData(fidoUrl, {u2fAction: 'startAuth'}, {type:'POST', withSession:true})
+		let resp = await postFormData(fidoUrl, {method: 'u2f', u2fAction: 'startAuth'}, {type:'POST', withSession:true})
 		
 		let asseResp;
 		try {
@@ -395,8 +403,11 @@ async function verifyU2F() {
 		}
 
 		// log.debug(asseResp);
-		
-		resp = await postFormData(fidoUrl, {u2fAction: 'processAuth', u2fPayload: JSON.stringify(asseResp)}, {type:'POST', withSession:true});
+		let processAuthData = {method: 'u2f', u2fAction: 'processAuth', u2fPayload: JSON.stringify(asseResp)};
+		if (remember) {
+			processAuthData.remember_device = '1';
+		}
+		resp = await postFormData(fidoUrl, processAuthData, {type:'POST', withSession:true});
 		// log.debug(resp);
 		const authServerResponse = await resp.json();
 		// log.debug(authServerResponse);

@@ -18,6 +18,7 @@ import { BrowserDetect } from './browserdetect.js';
 let platforms = [
 	'mac',
 	'win32',
+	'win32-zip',
 	'linux-i686',
 	'linux-x86_64'
 ];
@@ -25,12 +26,13 @@ let platforms = [
 let platformMap = {
 	macOS: 'mac',
 	Windows: 'win32',
+	'Windows ZIP': 'win32-zip',
 	'Linux 32-bit': 'linux-i686',
 	'Linux 64-bit': 'linux-x86_64'
 };
 
 let genericClientDownloadUrl = function (platform = 'win32') {
-	// valid platforms are mac, win32, linux-i686, and linux-x86_64
+	// valid platforms are mac, win32, win32-zip, linux-i686, and linux-x86_64
 	return `https://www.zotero.org/download/client/dl?channel=release&platform=${platform}`;
 };
 
@@ -77,6 +79,7 @@ function DownloadStandalone(props) {
 	let otherVersions = [
 		'macOS',
 		'Windows',
+		'Windows ZIP',
 		'Linux 32-bit',
 		'Linux 64-bit'
 	];

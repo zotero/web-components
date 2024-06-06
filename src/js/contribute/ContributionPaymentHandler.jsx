@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import { Card, CardHeader, CardBody, Modal, ModalBody, ModalHeader, Row, Col, Button, Input } from 'reactstrap';
 
 import { PaymentElementModal } from '../storage/PaymentElementModal.jsx';
-import { PaymentSource } from '../storage/PaymentSource.jsx';
+import { PaymentMethod } from '../storage/PaymentMethod.jsx';
 // import { PaymentContext, NotifierContext, notify, cancelPurchase } from '../storage/actions';
 import { initiatePurchase } from '../storage/actions.js';
 import { postFormData } from '../ajax.js';
@@ -231,13 +231,13 @@ function ContributionPaymentHandler(props) {
 		const paymentDetails = stripeCustomer.default_source || stripeCustomer.invoice_settings.default_payment_method;
 		if (paymentDetails) {
 			paymentSection = (
-				<div className='currentPaymentSource'>
+				<div className='currentPaymentMethod'>
 					<Card>
 						<CardHeader>
 							Payment Method
 						</CardHeader>
 						<CardBody>
-							<PaymentSource source={paymentDetails} />
+							<PaymentMethod source={paymentDetails} />
 							<Button color='link' onClick={() => { setEditPayment(true); }}>Change Payment Details</Button>
 						</CardBody>
 					</Card>

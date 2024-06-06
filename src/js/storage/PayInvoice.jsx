@@ -9,7 +9,7 @@ import { ErrorWrapper } from '../components/ErrorWrapper.jsx';
 import { Notifier } from '../Notifier.js';
 import { getPriceCents, labPrice, labUserPrice } from './calculations.js';
 import { PaymentElementModal } from './PaymentElementModal.jsx';
-import { PaymentSource } from './PaymentSource.jsx';
+import { PaymentMethod } from './PaymentMethod.jsx';
 import { initiatePurchase } from './actions.js';
 
 import { LoadingSpinner } from '../LoadingSpinner.js';
@@ -129,13 +129,32 @@ function PayInvoice(props) {
 			setNotification,
 		};
 
+		let storageState = {
+			purchase,
+			stripeIntent,
+			description,
+			stripeCustomer,
+		}
+		paymentSection = <PaymentElementModal
+			stripe={window.stripe}
+			{...{
+				storageState,
+				callbacks,
+				// autorenew,
+				// setAutorenew,
+				buttonLabel,
+				useEmail: true,
+				cancelable: false,
+				returnUrl: window.location.toString(),
+			}}
+		/>;
+		/*
 		paymentSection = <PaymentElementModal
 			stripe={window.stripe}
 			{...{
 				callbacks,
 				purchase,
 				stripeIntent,
-				immediateChargeRequired: true,
 				chargeAmount,
 				operationPending,
 				buttonLabel,
@@ -145,6 +164,7 @@ function PayInvoice(props) {
 			}}
 			chargeDescription={storageLevel ? storageLevelDescriptions[storageLevel] : "Update payment method"}
 		/>;
+		*/
 	} else {
 		const paymentMethodDetails = stripeChargeObject.payment_method_details;
 		log.debug(paymentMethodDetails);
@@ -154,14 +174,14 @@ function PayInvoice(props) {
 		
 		if (paymentMethodDetails) {
 			paymentSection = (
-				<div className='currentPaymentSource'>
+				<div className='currentPaymentMethod'>
 					<Card>
 						<CardHeader>
 							<h3>Invoice Paid - {datePaid.toLocaleDateString('en-US', dateFormatOptions)}</h3>
 						</CardHeader>
 						<CardBody>
 							<h4>Payment Method</h4>
-							<PaymentSource source={paymentMethodDetails} />
+							<PaymentMethod source={paymentMethodDetails} />
 						</CardBody>
 					</Card>
 				</div>

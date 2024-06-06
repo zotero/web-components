@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import { Card, CardHeader, CardBody, FormGroup, Input, Modal, ModalBody, ModalHeader, Label, Row, Col, Button, Container } from 'reactstrap';
 
 import { PaymentElementModal } from '../storage/PaymentElementModal.jsx';
-import { PaymentSource } from '../storage/PaymentSource.jsx';
+import { PaymentMethod } from '../storage/PaymentMethod.jsx';
 import { PaymentDetails } from '../storage/PaymentDetails.jsx';
 
 import { LoadingSpinner } from '../LoadingSpinner.js';
@@ -97,13 +97,13 @@ function InstitutionHandler(props) {
 
 		if (defaultSource) {
 			paymentSection = (
-				<div className='currentPaymentSource'>
+				<div className='currentPaymentMethod'>
 					<Card>
 						<CardHeader>
 							Payment Method
 						</CardHeader>
 						<CardBody>
-							<PaymentSource source={defaultSource} />
+							<PaymentMethod source={defaultSource} />
 							<Button color='link' onClick={() => { setEditPayment(true); }}>Change Payment Details</Button>
 						</CardBody>
 					</Card>

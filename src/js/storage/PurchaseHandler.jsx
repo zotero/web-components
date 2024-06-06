@@ -13,15 +13,27 @@ Flows:
  - Add users to lab?
 */
 
+/*
+Start with purchase describing what we're trying to purchase, stripeCustomer if exists, paymentMethod if stripeCustomer has one, callbacks
+ - Open dialog that shows: what we're purchasing, existing paymentMethod or PaymentElement to gather new payment, option to switch currency, option to toggle renewal
+   - if existing paymentMethod: show details with option to update
+   - else (or on change): get confirmationToken from PaymentElementModal
+
+     - Get full price details from server based on address with confirmationToken or existing paymentMethod
+	   - show base price, tax, total, and purchase button
+	     - on purchase button: submit purchase, confirmationToken, price to server to complete as long as the actual charge matches what is expected 
+ - 
+*/
+
 import { log as logger } from '../Log.js';
-var log = logger.Logger('SubscriptionHandler');
+var log = logger.Logger('PurchaseHandler');
 
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Card, CardHeader, CardBody, FormGroup, Input, Modal, ModalBody, ModalHeader, Label, Row, Col, Button, Container } from 'reactstrap';
 import { Notifier } from '../Notifier.js';
 
-import { initiatePurchase } from './actions.js';
+// import { initiatePurchase } from './actions.js';
 import { PaymentElementModal } from './PaymentElementModal.jsx';
 import { PaymentDetails } from './PaymentDetails.jsx';
 
@@ -34,14 +46,13 @@ import { LoadingSpinner } from '../LoadingSpinner.js';
 // it must contain a type field
 // type is one of: individualChange, individualUpdate, individualRenew
 
-function SubscriptionHandler(props) {
+function PurchaseHandler(props) {
 	const { storageState, callbacks } = props;
-	const { operationPending, error, editPayment, chargeAmount, awaitingFinalConfirm, description, stripeCustomer, purchase, allowRenew, returnUrl, location, currency } = storageState;
-	const { setOperationPending, setNotification, cancelPurchase, handleInvoiceRequest, handleConfirmPurchase, setCurrency, setLocation } = callbacks;
-	log.debug('SubscriptionHandler');
+	const { purchase, price, confirmationToken, operationPending, error, editPayment, description, stripeCustomer, allowRenew, currency, taxPriceError } = storageState;
+	const { setOperationPending, cancelPurchase, handleInvoiceRequest, handleConfirmPurchase, setCurrency, setLocation } = callbacks;
+	log.debug('PurchaseHandler');
 	log.debug(props);
 
-	const [ stripeIntent, setStripeIntent ] = useState(null);
 	const [ autorenew, setAutorenew ] = useState(true);
 	
 	log.debug(stripeCustomer, 4);
@@ -53,71 +64,47 @@ function SubscriptionHandler(props) {
 
 	//set defaultSource and set currency to euro if saved payment method is EU bank
 	let defaultSource = false;
-	if (stripeCustomer) {
-		defaultSource = stripeCustomer.default_source || stripeCustomer.invoice_settings.default_payment_method;
+	if(confirmationToken) {
+		defaultSource = confirmationToken.payment_method_preview;
+	} else if (stripeCustomer) {
+		defaultSource = stripeCustomer.invoice_settings.default_payment_method ?? stripeCustomer.default_source ?? false;
 	}
-
-	
-	useEffect(() => {
-		log.debug("useEffect initiatePurchase", 4);
-		const startPurchase = async () => {
-			// log.debug(stripeIntent);
-			let validStripeIntent = stripeIntent;
-			if (stripeIntent && stripeIntent.intent.currency != currency) {
-				validStripeIntent = false;
-			}
-			if (editPayment && !validStripeIntent) {
-				if (purchase.immediateCharge || (purchase.type == 'individualPaymentUpdate') ) {
-					setOperationPending(true);
-					try {
-						let locationPurchase = Object.assign({}, purchase, {location, currency});
-						await initiatePurchase(locationPurchase, setStripeIntent);
-					} catch (e) {
-						setNotification({type: "error", message: "There was an error with our payment processor. Please try again."});
-						cancel();
-					}
-					setOperationPending(false);
-				}
-			} else {
-				log.debug('not beginning intent');
-			}
-		};
-		startPurchase();
-	}, [purchase, currency, location, chargeAmount, editPayment]);
+	log.debug('Default Source:');
+	log.debug(defaultSource);
 
 	let descriptionPs = description.map((d, i) => {
 		return <p key={i}>{d}</p>;
 	});
 	
 	let paymentSection = null;
-	if (editPayment && !awaitingFinalConfirm) {
+	if (editPayment) {
 		// allow entry of new payment details
 		paymentSection = <PaymentElementModal
 			stripe={window.stripe}
 			{...{
 				storageState,
 				callbacks,
-				purchase,
-				stripeIntent,
-				// awaitingFinalConfirm,
-				operationPending,
+				autorenew,
+				setAutorenew,
 				buttonLabel: 'Submit',
-				returnUrl,
 				cancel,
 			}}
 		/>;
-	} else if (chargeAmount) {
-		paymentSection = <PaymentDetails 
-			{...{
-				storageState,
-				callbacks,
-				purchase,
-				stripeCustomer,
-				defaultSource,
-				chargeAmount,
-			}}
-		/>;
-	} else {
+	} else if (price.total && purchase.immediateCharge) { //if(chargeAmount)
+		log.debug('total price and immediateCharge: showing PaymentDetails with price');
+		paymentSection = <>
+			<PaymentDetails 
+				{...{
+					storageState,
+					callbacks,
+					defaultSource,
+					autorenew,
+					setAutorenew,
+				}}
+			/>
+		</>;
+	} else if (purchase.type == 'individualChange' && !purchase.immediateCharge && !taxPriceError) {
+		log.debug('Showing bare confirmChange');
 		paymentSection = (
 			<div className='confirmChange'>
 				<Row className='mt-2'>
@@ -158,7 +145,14 @@ function SubscriptionHandler(props) {
 						<p><a href='#' onClick={handleInvoiceRequest}>Create invoice payable by third party</a></p>
 					</Col>
 				</Row>
-				{allowEuro ?
+			</Container>
+		);
+	}
+
+	let currencySection = null;
+	if(allowEuro) {
+		currencySection = (
+			<Container className='mt-4'>
 				<Row>
 					<Col className='text-center'>
 						{currency == 'eur' ? 
@@ -167,7 +161,6 @@ function SubscriptionHandler(props) {
 						}
 					</Col>
 				</Row>
-				: null }
 			</Container>
 		);
 	}
@@ -177,12 +170,17 @@ function SubscriptionHandler(props) {
 		invoiceSection = null;
 		renewSection = null;
 	}
+
+	let taxPriceNotifier = taxPriceError ?
+	<Notifier type='error' message="There was an error calculating taxes for the entered address. You may need to update your address or payment details." />
+	: null;
 	
 	return (
 		<div className='subscription-handler'>
 			<Modal isOpen={true} toggle={cancel} className='payment-modal'>
 				<ModalHeader>Manage Subscription</ModalHeader>
 				<ModalBody>
+					{taxPriceNotifier}
 					<Notifier {...storageState.notification} />
 					<Card className='mb-4'>
 						<CardBody>
@@ -190,9 +188,10 @@ function SubscriptionHandler(props) {
 							{descriptionPs}
 						</CardBody>
 					</Card>
-					<LoadingSpinner className='m-auto' loading={operationPending} />
+					{/* <LoadingSpinner className='m-auto' loading={operationPending} /> */}
 					{paymentSection}
 					{invoiceSection}
+					{currencySection}
 					{renewSection}
 				</ModalBody>
 			</Modal>
@@ -200,17 +199,19 @@ function SubscriptionHandler(props) {
 	);
 }
 
-SubscriptionHandler.propTypes = {
-	purchase: PropTypes.shape({
-		type: PropTypes.string.isRequired,
-		storageLevel: PropTypes.number
-	}).isRequired,
-	allowRenew: PropTypes.bool,
-	requestedStorageLevel: PropTypes.number,
-	labUsers: PropTypes.number
+PurchaseHandler.propTypes = {
+	storageState: PropTypes.shape({
+		purchase: PropTypes.shape({
+			type: PropTypes.string.isRequired,
+			storageLevel: PropTypes.number
+		}).isRequired,
+		allowRenew: PropTypes.bool,
+		requestedStorageLevel: PropTypes.number,
+		labUsers: PropTypes.number
+	})
 };
-SubscriptionHandler.defaultProps = {
+PurchaseHandler.defaultProps = {
 	allowRenew: false,
 };
 
-export { SubscriptionHandler };
+export { PurchaseHandler };

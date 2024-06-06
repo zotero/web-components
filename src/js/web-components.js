@@ -76,6 +76,7 @@ import { SuggestableInput } from './components/SuggestableInput.jsx';
 import { RelatedContainer } from './profile/relatedContainer.jsx';
 import { InviteMembers } from './components/GroupSettings/InviteMembers.jsx';
 import { U2FVerifier, ManageTwoFactor } from './components/TwoFactor.jsx';
+import { PaymentDetails } from './storage/PaymentDetails.jsx';
 
 let ZoteroWebComponents = {
 	Storage,
@@ -123,6 +124,7 @@ let ZoteroWebComponents = {
 	InviteMembers,
 	U2FVerifier,
 	ManageTwoFactor,
+	PaymentDetails,
 };
 
 globalScope.ZoteroWebComponents = ZoteroWebComponents;

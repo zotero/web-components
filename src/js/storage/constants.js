@@ -9,7 +9,7 @@ const discountTiers = {
 	'50': {2: 1000, 3: 3000, 6: 6000},
 };
 
-const euroPaymentMethods = ['sepa_debit'];
+const euroPaymentMethods = ['sepa_debit', 'bancontact', 'eps', 'giropay', 'ideal', 'p24', 'sofort'];
 
 const discountedCountries = {
 	// 'BR': '25',

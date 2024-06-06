@@ -5,16 +5,17 @@ import { ajax, postFormData } from '../ajax.js';
 import { discountedCountries } from './constants.js';
 
 // async function beginIntent(amount, description, storageLevel, immediateCharge) {
-async function initiatePurchase(purchase, setIntent) {
+async function initiatePurchase(purchase) {
 	log.debug(`initiatePurchase:`);
 	log.debug(purchase);
 	// setIntent({client_secret: 'THIS IS A SECRET', success: true, intent: {id: 'intent_id'}});
 	// return;
 	// let args = { amount, description, storageLevel, immediateCharge };
 	let resp = await ajax({
-		url: '/storage/newstripeintent',
+		url: '/storage/purchase',
 		type: 'POST',
 		withSession: true,
+		throwOnError: false,
 		data: JSON.stringify(purchase),
 	});
 
@@ -22,9 +23,28 @@ async function initiatePurchase(purchase, setIntent) {
 	let data = await resp.json();
 	log.debug(data);
 	if (data.success) {
-		log.debug('successful initiatePurchase: setting returned intent');
-		setIntent(data);
-		return data.client_secret;
+		return [data.price, data.intent];
+	} else {
+		throw data;
+	}
+}
+
+async function getTaxedPrice(purchase) {
+	log.debug('getTaxedPrice:');
+	log.debug(purchase);
+	let resp = await ajax({
+		url: '/storage/price',
+		type: 'POST',
+		withSession: true,
+		throwOnError: false,
+		data: JSON.stringify(purchase),
+	});
+
+	log.debug(resp, 4);
+	let data = await resp.json();
+	log.debug(data);
+	if (data.success) {
+		return data.price;
 	} else {
 		throw data;
 	}
@@ -51,7 +71,7 @@ async function chargeDefaultMethod(purchase) {
 	log.debug(purchase);
 	let purchaseData = Object.assign({}, purchase, {autoConfirm:true});
 	let resp = await ajax({
-		url: '/storage/newstripeintent',
+		url: '/storage/purchase',
 		type: 'POST',
 		withSession: true,
 		data: JSON.stringify(purchaseData),
@@ -141,7 +161,14 @@ async function getUserCustomer () {
         let resp = await ajax({ url: '/storage/getusercustomer' });
         log.debug(resp, 4);
         let data = await resp.json();
-        return {type: 'success', success:true, stripeCustomer: data};
+		log.debug('got user customer');
+		log.debug(data);
+		let stripeCustomer = data.stripeCustomer;
+		if (data.paymentMethod) {
+			log.debug("")
+			stripeCustomer.default_source = data.paymentMethod;
+		}
+        return {type: 'success', success:true, stripeCustomer};
     } catch (e) {
         log.debug('Error retrieving customer data', 2);
         log.debug(e, 2);
@@ -163,6 +190,7 @@ async function  deleteInvoice (invoiceID) {
 
 export {
 	initiatePurchase,
+	getTaxedPrice,
 	addPaymentMethod,
 	chargeDefaultMethod,
 	createInvoice,

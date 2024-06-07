@@ -5,13 +5,14 @@ import WebFont from 'webfontloader';
 // import {log as logger} from './Log.js';
 // var log = logger.Logger('WebComponents');
 
-var globalScope;
-if (typeof window === 'undefined') {
-	globalScope = global;
-} else {
-	globalScope = window;
-	init();
-}
+var globalScope = globalThis;
+init();
+// if (typeof window === 'undefined') {
+// 	globalScope = global;
+// } else {
+// 	globalScope = window;
+// 	init();
+// }
 
 import React from 'react';
 import ReactDOM from 'react-dom';

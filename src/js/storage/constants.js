@@ -1,6 +1,7 @@
 // import {log as logger} from '../Log.js';
 // var log = logger.Logger('constants.js');
 
+import PropTypes from 'prop-types';
 
 const priceCents = {1: 0, 2: 2000, 3: 6000, 4: 10000, 5: 24000, 6: 12000};
 const discountTiers = {
@@ -68,6 +69,17 @@ const storageLevelDescriptions = {
 
 const dateFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
 
+const userSubscriptionShape = PropTypes.shape({
+	quota: PropTypes.number,
+	storageLevel: PropTypes.number,
+	usage: PropTypes.shape({
+		total: PropTypes.number
+	}),
+	institutionUnlimited: PropTypes.bool,
+	recur: PropTypes.bool,
+	expirationDate: PropTypes.number,
+});
+
 export {
     priceCents,
     discountTiers,
@@ -78,4 +90,5 @@ export {
     storagePlans,
     storageLevelDescriptions,
 	dateFormatOptions,
+	userSubscriptionShape,
 };

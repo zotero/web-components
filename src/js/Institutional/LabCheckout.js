@@ -19,8 +19,9 @@ import { discountedCountries } from '../storage/constants.js';
 import { LocationSelector } from '../storage/LocationSelector.jsx';
 import { getCurrentUser, formatCurrency } from '../Utils.js';
 import { InstitutionHandler } from './InstitutionHandler.jsx';
-import { locationLabPrice, locationLabUserPrice, getCustomerPaymentCountry, isDiscounted } from '../storage/calculations.js';
+import { locationLabPrice, locationLabUserPrice, isDiscounted } from '../storage/calculations.js';
 import { getUserCustomer, chargeDefaultMethod, createInstitutionInvoice } from '../storage/actions.js';
+import { defaultPayment, getPaymentMethodCountry, getCustomerPaymentCountry } from '../storage/storage_util.js';
 import { buildUrl } from '../wwwroutes.js';
 
 const currentUser = getCurrentUser();

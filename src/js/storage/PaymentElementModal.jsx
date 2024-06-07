@@ -4,6 +4,7 @@ var log = logger.Logger('PaymentElementModal', 1);
 import { useState } from 'react';
 import { Elements, useElements, PaymentElement, AddressElement } from '@stripe/react-stripe-js';
 import { Label, Button, Card, CardBody, Input, Form, FormGroup } from 'reactstrap';
+import { useStorageContext } from './Storage.js';
 import { addPaymentMethod } from './actions.js';
 import { Notifier } from '../Notifier.js';
 import PropTypes from 'prop-types';
@@ -13,9 +14,10 @@ function PECheckoutForm(props) {
 // 	if (typeof props.callbacks.handleConfirmIntent != 'function') {
 // 		log.error('props error in PECheckoutForm: handleConfirmIntent must be function');
 // 	}
-	const { storageState, callbacks, buttonLabel, cancelable, cancel } = props;
-	const { confirmationToken, taxID, purchase, returnUrl, operationPending, stripeIntent } = storageState;
-	const { setTaxID, setEditPayment, setPurchase, setConfirmationToken, setLocation, setOperationPending, setNotification, handleConfirmIntent } = callbacks;
+	const { storageState, callbacks } = useStorageContext();
+	const { buttonLabel, cancelable, cancel } = props;
+	const { taxID, operationPending } = storageState;
+	const { setTaxID, setEditPayment, setConfirmationToken, setLocation, setOperationPending, setNotification } = callbacks;
 	const stripe = window.stripe;// useStripe();
 	const elements = useElements();
 
@@ -41,24 +43,6 @@ function PECheckoutForm(props) {
 		callbacks.setOperationPending(true);
 		setNotification(null);
 		let successMessage = "Payment Submitted";
-		/*
-		let billingDetails = {
-			name,
-		};
-		
-		if (props.useEmail && email != '') {
-			billingDetails.email = email;
-		}
-
-		if (props.useAddress) {
-			billingDetails.address = {
-				line1: address1,
-				line2: address2,
-				city: city,
-				state: state,
-			};
-		}
-		*/
 
 		// Use PaymentElement to create a payment method without intent so it can be previewed
 		// and checked for country
@@ -180,8 +164,9 @@ PECheckoutForm.defaultProps = {
 };
 
 function PaymentElementModal(props) {
-	const { stripe, stripeIntent, cancel, storageState } = props;
-	const { price, purchase, returnUrl } = storageState;
+	const { storageState } = useStorageContext();
+	const { stripe, stripeIntent, cancel } = props;
+	const { price, purchase, returnUrl, allowCN } = storageState;
 	log.debug('PaymentElementModal render');
 	log.debug(props);
 
@@ -196,6 +181,9 @@ function PaymentElementModal(props) {
 		mode = 'setup';
 		setupFutureUsage = 'off_session';
 		amount = null;
+	} else if(allowCN) {
+		log.debug("allowCN true, setting future usage to ''");
+		setupFutureUsage = null;
 	}
 	const options = {
 		// Fully customizable with appearance API.

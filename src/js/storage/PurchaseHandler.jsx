@@ -28,11 +28,12 @@ Start with purchase describing what we're trying to purchase, stripeCustomer if 
 import { log as logger } from '../Log.js';
 var log = logger.Logger('PurchaseHandler');
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Card, CardHeader, CardBody, FormGroup, Input, Modal, ModalBody, ModalHeader, Label, Row, Col, Button, Container } from 'reactstrap';
 import { Notifier } from '../Notifier.js';
 
+import { useStorageContext } from './Storage.js';
 // import { initiatePurchase } from './actions.js';
 import { PaymentElementModal } from './PaymentElementModal.jsx';
 import { PaymentDetails } from './PaymentDetails.jsx';
@@ -47,11 +48,11 @@ import { LoadingSpinner } from '../LoadingSpinner.js';
 // type is one of: individualChange, individualUpdate, individualRenew
 
 function PurchaseHandler(props) {
-	const { storageState, callbacks } = props;
-	const { purchase, price, confirmationToken, operationPending, error, editPayment, description, stripeCustomer, allowRenew, currency, taxPriceError } = storageState;
-	const { setOperationPending, cancelPurchase, handleInvoiceRequest, handleConfirmPurchase, setCurrency, setLocation } = callbacks;
+	const { storageState, callbacks } = useStorageContext();
+	const { purchase, price, confirmationToken, defaultPaymentMethod, operationPending, error, editPayment, description, stripeCustomer, allowRenew, currency, taxPriceError } = storageState;
+	const { setOperationPending, cancelPurchase, handleInvoiceRequest, handleConfirmPurchase, setCurrency, /*setLocation*/ } = callbacks;
 	log.debug('PurchaseHandler');
-	log.debug(props);
+	log.debug({storageState, callbacks});
 
 	const [ autorenew, setAutorenew ] = useState(true);
 	
@@ -61,16 +62,6 @@ function PurchaseHandler(props) {
 		setOperationPending(false);
 		cancelPurchase();
 	};
-
-	//set defaultSource and set currency to euro if saved payment method is EU bank
-	let defaultSource = false;
-	if(confirmationToken) {
-		defaultSource = confirmationToken.payment_method_preview;
-	} else if (stripeCustomer) {
-		defaultSource = stripeCustomer.invoice_settings.default_payment_method ?? stripeCustomer.default_source ?? false;
-	}
-	log.debug('Default Source:');
-	log.debug(defaultSource);
 
 	let descriptionPs = description.map((d, i) => {
 		return <p key={i}>{d}</p>;
@@ -82,8 +73,6 @@ function PurchaseHandler(props) {
 		paymentSection = <PaymentElementModal
 			stripe={window.stripe}
 			{...{
-				storageState,
-				callbacks,
 				autorenew,
 				setAutorenew,
 				buttonLabel: 'Submit',
@@ -95,9 +84,7 @@ function PurchaseHandler(props) {
 		paymentSection = <>
 			<PaymentDetails 
 				{...{
-					storageState,
-					callbacks,
-					defaultSource,
+					defaultPaymentMethod,
 					autorenew,
 					setAutorenew,
 				}}
@@ -149,15 +136,16 @@ function PurchaseHandler(props) {
 		);
 	}
 
+	//allow changing of currency between USD and EUR if we don't already have a payment method set
 	let currencySection = null;
-	if(allowEuro) {
+	if(allowEuro && !defaultPaymentMethod) {
 		currencySection = (
 			<Container className='mt-4'>
 				<Row>
 					<Col className='text-center'>
 						{currency == 'eur' ? 
-							<p><a href='#' onClick={()=>{setCurrency('usd');}}>Make payment in USD</a></p> :
-							<p><a href='#' onClick={()=>{setCurrency('eur'); setLocation('US');}}>Make payment in Euro</a></p> 
+							<p><a href='#' onClick={(e)=>{e.preventDefault(); setCurrency('usd');}}>Make payment in USD</a></p> :
+							<p><a href='#' onClick={(e)=>{e.preventDefault(); setCurrency('eur'); /*setLocation('US');*/}}>Make payment in Euro</a></p> 
 						}
 					</Col>
 				</Row>

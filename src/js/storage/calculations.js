@@ -102,18 +102,19 @@ const getStoragePlans = function(location) {
 	return basePlans;
 };
 
-const getCustomerPaymentCountry = function(stripeCustomer) {
-	if (stripeCustomer && stripeCustomer.invoice_settings.default_payment_method) {
-		let dpm = stripeCustomer.invoice_settings.default_payment_method;
-		if (dpm.card && dpm.card.country) {
-			return (dpm.card.country);
-		}
-	}
-	return false;
-};
-
 const isDiscounted = function(country) {
 	return Object.keys(discountedCountries).includes(country);
 };
 
-export {calculateRemainingValue, calculateNewExpiration, imminentExpiration, labPrice, labUserPrice, locationLabPrice, locationLabUserPrice, getPriceCents, getStoragePlans, getCustomerPaymentCountry, isDiscounted};
+export {
+	calculateRemainingValue,
+	calculateNewExpiration,
+	imminentExpiration,
+	labPrice,
+	labUserPrice,
+	locationLabPrice,
+	locationLabUserPrice,
+	getPriceCents,
+	getStoragePlans,
+	isDiscounted
+};

@@ -3,14 +3,15 @@ var log = logger.Logger('PaymentDetails.jsx');
 
 import { formatCurrency } from '../Utils.js';
 import { Card, CardHeader, CardBody, Row, Col, Button } from 'reactstrap';
+import { useStorageContext } from './Storage.js';
 import { LoadingSpinner } from '../LoadingSpinner.js';
 import { PaymentMethod } from './PaymentMethod.jsx';
 
 //Show the payment details for the user's stripe customer which will be charged
 //include a link to change the payment details
 function PaymentDetails(props) {
-	const { storageState,  callbacks, defaultSource, confirmationToken } = props;
-	const { purchase, price, stripeCustomer, previewPriceMismatch, operationPending, taxPriceError } = storageState;
+	const { storageState, callbacks } = useStorageContext();
+	const { purchase, price, defaultPaymentMethod, /*previewPriceMismatch,*/ operationPending, taxPriceError } = storageState;
 	const { handleConfirmPurchase, setEditPayment, setOperationPending, cancelPurchase } = callbacks;
 	
 	log.debug("PaymentSection");
@@ -26,8 +27,8 @@ function PaymentDetails(props) {
 
 	// if (stripeCustomer) {
 		// show existing payment method on file that will be charged, with link to change it if desired
-		if (defaultSource) {
-			log.debug('stripeCustomer defaultSource');
+		if (defaultPaymentMethod) {
+			log.debug('stripeCustomer defaultPaymentMethod');
 			return (
 				<div className='currentPaymentMethod'>
 					<Card>
@@ -35,7 +36,7 @@ function PaymentDetails(props) {
 							Payment Method
 						</CardHeader>
 						<CardBody>
-							<PaymentMethod source={defaultSource} />
+							<PaymentMethod source={defaultPaymentMethod} />
 							<Button color='link' onClick={() => { setEditPayment(true); }}>Change Payment Details</Button>
 						</CardBody>
 					</Card>
@@ -73,11 +74,11 @@ function PaymentDetails(props) {
 							</table>
 						</Col>
 					</Row>
-					{previewPriceMismatch ? 
+					{/* {previewPriceMismatch ? 
 					<Row className='mt-2'>
 						<Col><p className='text-danger'>Note that the price has updated. The price charged is based on the payment method's country.</p></Col>
 					</Row>
-					: null}
+					: null} */}
 					{taxPriceError ?
 					null :
 					<Row className='mt-2'>

@@ -3,17 +3,16 @@ const log = logger.Logger('PaymentRows.jsx');
 
 import PropTypes from 'prop-types';
 import { dateFormatOptions, userSubscriptionShape } from './constants';
-import { defaultPayment } from './storage_util.js';
 import { Button, Row, Col } from 'reactstrap';
 import { PaymentMethod } from './PaymentMethod.jsx';
+import { defaultCustomerPayment } from './usePaymentProcessor.js';
 
 // Row that shows user's payment method and allows updating the method that will be used
 // or forcing an immediate renewal charge regardless of scheduled automatic renewal
 function PaymentRow(props) {
 	log.debug('PaymentRow', 4);
 	log.debug(props, 4);
-	const { defaultPaymentMethod, userSubscription, updatePaymentHandler, renewHandler, removePayment } = props;
-	const paymentMethod = defaultPaymentMethod;
+	const { paymentMethod, userSubscription, updatePaymentHandler, setRecur, renewHandler, removePayment } = props;
 
 	const renewNowButton = <Button color='secondary' size='sm' className='m-1' onClick={renewHandler}>Renew Now</Button>;
 	if (userSubscription.institutionUnlimited) {
@@ -34,6 +33,9 @@ function PaymentRow(props) {
 	}
 	if (!paymentMethod || !userSubscription.recur) {
 		let autoRenewButton = <Button color='secondary' size='sm' className='m-1' onClick={updatePaymentHandler}>Enable Automatic Renewal</Button>;
+		if (paymentMethod && !userSubscription.recur) {
+			autoRenewButton = <Button color='secondary' size='sm' className='m-1' onClick={()=>{setRecur(true)}}>Enable Automatic Renewal</Button>;
+		}
 		let removePaymentButton = <Button color='secondary' size='sm' className='m-1' onClick={removePayment}>Remove Payment Details</Button>;
 		let renewButton = null;
 		
@@ -49,7 +51,7 @@ function PaymentRow(props) {
 		}
 		return (
 			<tr>
-				<th>Payment</th>
+				<th>Payment Method</th>
 				<td>
 					<PaymentMethod source={paymentMethod} />
 					<Row className='mt-2'>
@@ -88,12 +90,12 @@ PaymentRow.propTypes = {
 // show when the next automatic payment will be made, or plan will expire,
 // or that renewal is unnecessary while covered by institution
 function NextPaymentRow(props) {
-	const { userSubscription, cancelRecur, stripeCustomer } = props;
+	const { userSubscription, setRecur, stripeCustomer } = props;
 	const { institutionUnlimited } = userSubscription;
 	
 	let d = new Date(parseInt(userSubscription.expirationDate) * 1000);
 	let formattedExpirationDate = d.toLocaleDateString('en-US', dateFormatOptions);
-	const defaultPM = defaultPayment(stripeCustomer);
+	const defaultPM = defaultCustomerPayment(stripeCustomer);
 	
 	if (userSubscription.recur && (d > Date.now()) && defaultPM) {
 		// autorenew is enabled and set for sometime in the future
@@ -102,11 +104,11 @@ function NextPaymentRow(props) {
 				<th>Next Payment</th>
 				<td>
 					<Row>
-						<Col>{institutionUnlimited ? 'Renewal will be automatically disabled if you remain covered by an institutional storage subscription. ' : null }{formattedExpirationDate}</Col>
+						<Col className='next-payment-date'>{institutionUnlimited ? 'Renewal will be automatically disabled if you remain covered by an institutional storage subscription. ' : null }{formattedExpirationDate}</Col>
 					</Row>
 					<Row>
 						<Col>
-							<Button color='secondary' size='sm' onClick={cancelRecur}>Disable Automatic Renewal</Button>
+							<Button color='secondary' size='sm' onClick={() => {setRecur(false);}}>Disable Automatic Renewal</Button>
 						</Col>
 					</Row>
 				</td>

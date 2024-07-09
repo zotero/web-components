@@ -40,7 +40,7 @@ function Card(props) {
 			</Row>
 			<Row>
 				<Col>
-					Exp: <b>{card.exp_year}-{card.exp_month}</b>
+					Exp: <b>{card.exp_year}-{String(card.exp_month).padStart(2, '0')}</b>
 				</Col>
 			</Row>
 			<Row>
@@ -63,7 +63,7 @@ function Iban(props) {
 		<div className='stripe-iban'>
 			<Row>
 				<Col>
-					IBAN: <b>{getFlagEmoji(iban.country)} {iban.country} ****-****-**** {iban.last4}</b>
+					IBAN: <b>{getFlagEmoji(iban.country)} {iban.country} *****-{iban.last4}</b>
 				</Col>
 			</Row>
 		</div>
@@ -73,43 +73,41 @@ Iban.propTypes = {
 	iban: PropTypes.object.isRequired
 };
 
+function Ideal(props) {
+	const {ideal} = props;
+	log.debug(ideal);
+
+	return (
+		<div className='stripe-ideal'>
+			<Row>
+				<Col>
+					Bank: <b>{ideal.bank}</b>
+				</Col>
+			</Row>
+			<Row>
+				<Col>
+					BIC: <b>{ideal.bic}</b>
+				</Col>
+			</Row>
+		</div>
+	);
+}
 function PaymentMethod(props) {
 	const { source } = props;
+	log.debug(source);
 	if (!source) {
 		return <p>No payment method saved</p>;
 	}
 
-	if (source.object != 'payment_method') {
-		log.error("PaymentMethod source object is not 'payment_method'");
-		throw new Error("PaymentMethod source object is not 'payment_method'");
-	}
-	
-	log.debug(source);
 	let type = source.type;
-	// if (source.object == 'payment_method') {
-	// 	if (source.type == 'card') {
-	// 		type = 'paymentMethodCard';
-	// 	}
-	// } else if (!type && source.object) {
-	// 	type = source.object;
-	// }
 
 	log.debug(`type: ${type}`);
 	switch (type) {
-	/*
-	case 'card':
-		return (
-			<>
-				<BillingDetails {...source.billing_details} />
-				<Card card={source.card} />
-			</>
-		);
-	*/
 	case 'sepa_debit':
 		return (
 			<>
 				<BillingDetails {...source.billing_details} />
-				SEPA Debit
+				Payment Type: SEPA Debit
 				<Iban iban={source.sepa_debit} />
 			</>
 		);
@@ -117,21 +115,30 @@ function PaymentMethod(props) {
 		return (
 			<>
 				<BillingDetails {...source.billing_details} />
+				Payment Type: Card
 				<Card card={source.card} />
 			</>
 		);
+	case 'ideal':
+		return (
+			<>
+				<BillingDetails {...source.billing_details} />
+				Payment Type: iDEAL
+				<Ideal ideal={source.ideal} />
+			</>
+		)
 	default:
 		log.error('Unknown source type passed to PaymentMethod');
 		return (
 			<>
 				<BillingDetails {...source.billing_details} />
-				{type}
+				Payment Type: {type}
 			</>
 		);
 	}
 }
 PaymentMethod.propTypes = {
-	source: PropTypes.object
+	source: PropTypes.oneOfType([PropTypes.object, PropTypes.bool])
 };
 
 export {PaymentMethod};

@@ -5,19 +5,18 @@ import { useState } from 'react';
 import { Elements, useElements, PaymentElement, AddressElement } from '@stripe/react-stripe-js';
 import { Label, Button, Card, CardBody, Input, Form, FormGroup } from 'reactstrap';
 import { useStorageContext } from './Storage.js';
-import { addPaymentMethod } from './actions.js';
 import { Notifier } from '../Notifier.js';
 import PropTypes from 'prop-types';
 import { LoadingSpinner } from '../LoadingSpinner.js';
+import { paymentShape } from './usePaymentProcessor.js';
 
 function PECheckoutForm(props) {
 // 	if (typeof props.callbacks.handleConfirmIntent != 'function') {
 // 		log.error('props error in PECheckoutForm: handleConfirmIntent must be function');
 // 	}
-	const { storageState, callbacks } = useStorageContext();
-	const { buttonLabel, cancelable, cancel } = props;
-	const { taxID, operationPending } = storageState;
-	const { setTaxID, setEditPayment, setConfirmationToken, setLocation, setOperationPending, setNotification } = callbacks;
+	const { storageState } = useStorageContext();
+	const { payment } = storageState;
+	const { buttonLabel } = props;
 	const stripe = window.stripe;// useStripe();
 	const elements = useElements();
 
@@ -29,6 +28,18 @@ function PECheckoutForm(props) {
 	const [elementReady, setElementReady] = useState(false);
 	const [ showTaxID, setShowTaxID ] = useState(false);
 
+	const updateAddress = async (evt) => {
+		if (evt.complete) {
+			const val = evt.value;
+			log.debug(val);
+			const addr = evt.value.address;
+			log.debug("Got completed(?) address.");
+			log.debug(addr);
+			log.debug(val);
+			setName(val.name);
+		}
+	}
+
 	const handleSubmit = async (evt) => {
 		// We don't want to let default form submission happen here,
 		// which would refresh the page.
@@ -39,20 +50,19 @@ function PECheckoutForm(props) {
 			// Make sure to disable form submission until Stripe.js has loaded.
 			return;
 		}
-	
-		callbacks.setOperationPending(true);
-		setNotification(null);
+		
+		payment.callbacks.setOperationPending(true);
+		payment.callbacks.setNotification(null);
 		let successMessage = "Payment Submitted";
 
 		// Use PaymentElement to create a payment method without intent so it can be previewed
 		// and checked for country
-		setOperationPending(true);
 		// Trigger form validation and wallet collection
 		const {error: submitError} = await elements.submit();
 		if (submitError) {
 			setPaymentNotification({ type: 'error', message: submitError.message });
 			setErrorMessage(submitError.message);
-			setOperationPending(false);
+			payment.callbacks.setOperationPending(false);
 			return;
 		}
 
@@ -66,15 +76,15 @@ function PECheckoutForm(props) {
 		if (cpmError) {
 			setPaymentNotification({ type: 'error', message: cpmError.message });
 			setErrorMessage(cpmError.message);
-			setOperationPending(false);
+			payment.callbacks.setOperationPending(false);
 			return;
 		}
 		log.debug('confirmationToken:');
 		log.debug(confirmationToken);
-		setOperationPending(false);
-		setConfirmationToken(confirmationToken);
-		setLocation(confirmationToken.payment_method_preview.billing_details.address);
-		setEditPayment(false);
+		payment.callbacks.setOperationPending(false);
+		payment.callbacks.setConfirmationToken(confirmationToken);
+		// setLocation(confirmationToken.payment_method_preview.billing_details.address);
+		payment.callbacks.setEditPayment(false);
 		/* value is of the form
 		{ name: "Test Buyer",
 		  email: '...',
@@ -95,7 +105,7 @@ function PECheckoutForm(props) {
 
 	let addressDefaults = {
 		name
-	}
+	};
 
 	let emailSection = null;
 	if (props.useEmail) {
@@ -120,8 +130,8 @@ function PECheckoutForm(props) {
 			{showTaxID ?
 			<FormGroup>
 				<Label for="taxID">Tax ID</Label>
-				<Input type="text" name="taxID" id="taxID" placeholder="Tax ID" value={taxID}
-					onChange={(evt) => { setTaxID(evt.target.value); }} />{' '}
+				<Input type="text" name="taxID" id="taxID" placeholder="Tax ID" value={payment.state.taxID}
+					onChange={(evt) => { payment.callbacks.setTaxID(evt.target.value); }} />{' '}
 			</FormGroup>
 			: null}
 		</div>;
@@ -129,14 +139,20 @@ function PECheckoutForm(props) {
 	return (
 		<Form onSubmit={handleSubmit}>
 			{emailSection}
-			<AddressElement options={{mode: 'billing', defaultValues:addressDefaults, autocomplete:{mode:'automatic'}}}/>
-			<PaymentElement onReady={()=>{setElementReady(true);}} />
+			<div className='payment-billing-address'>
+				<h4>Billing Address:</h4>
+				<AddressElement onChange={updateAddress} options={{mode: 'billing', defaultValues:addressDefaults, autocomplete:{mode:'automatic'}}}/>
+			</div>
+			<div className='payment-method-details'>
+				<h4>Payment:</h4>
+				<PaymentElement onReady={()=>{setElementReady(true);}} options={{defaultValues:addressDefaults}} />
+			</div>
 			<LoadingSpinner className='m-auto' loading={!elementReady} />
 			{taxIDSection}
 			<FormGroup row className='mt-4'>
-				<Button disabled={(!elementReady) || (operationPending)} className='w-100' type='submit' color='secondary'>{buttonLabel}</Button>
-				{cancelable ? 
-					<Button type='button' color='link' className='w-100 mt-3' onClick={props.onClose}>Cancel</Button> : null
+				<Button disabled={(!elementReady) || (payment.state.operationPending)} className='w-100' type='submit' color='secondary'>{buttonLabel}</Button>
+				{payment.state.cancelable ? 
+					<Button type='button' color='link' className='w-100 mt-3' onClick={payment.callbacks.cancelPurchase}>Cancel</Button> : null
 				}
 			</FormGroup>
 			<Notifier {...paymentNotification} />
@@ -145,43 +161,40 @@ function PECheckoutForm(props) {
 }
 PECheckoutForm.propTypes = {
 	storageState: PropTypes.shape({
+		payment: paymentShape
 	}),
-	callbacks: PropTypes.shape({
-		setOperationPending: PropTypes.func.isRequired,
-		// handleConfirmIntent: PropTypes.func.isRequired,
-	}),
-	onClose: PropTypes.func.isRequired,
+	// onClose: PropTypes.func.isRequired,
 	buttonLabel: PropTypes.string,
 	useEmail: PropTypes.bool,
 	useAddress: PropTypes.bool,
 	stripeIntent: PropTypes.object,
-	cancelable: PropTypes.bool,
+	// cancelable: PropTypes.bool,
 };
 PECheckoutForm.defaultProps = {
 	useEmail: false,
 	useAddress: false,
-	cancelable: true,
+	// cancelable: true,
 };
 
 function PaymentElementModal(props) {
 	const { storageState } = useStorageContext();
-	const { stripe, stripeIntent, cancel } = props;
-	const { price, purchase, returnUrl, allowCN } = storageState;
+	const { stripe, cancel } = props;
+	const { payment, purchase } = storageState;
 	log.debug('PaymentElementModal render');
 	log.debug(props);
 
-	const handleClose = () => {
-		cancel();
-	};
+	// const handleClose = () => {
+	// 	cancel();
+	// };
 
 	let mode = 'payment';
 	let setupFutureUsage = 'off_session';
-	let amount = price.total;
+	let amount = payment.state.price.total;
 	if (purchase.type == 'individualPaymentUpdate') {
 		mode = 'setup';
 		setupFutureUsage = 'off_session';
 		amount = null;
-	} else if(allowCN) {
+	} else if(payment.state.allowCN) {
 		log.debug("allowCN true, setting future usage to ''");
 		setupFutureUsage = null;
 	}
@@ -202,10 +215,9 @@ function PaymentElementModal(props) {
 		*/
 		amount,
 		mode,
-		currency: storageState.currency,
+		currency: payment.state.currency,
 		paymentMethodCreation: 'manual',
 		setupFutureUsage,
-		returnUrl
 	};
 
 	//add a key for Elements so we can update it when the paymentIntent changes
@@ -218,7 +230,7 @@ function PaymentElementModal(props) {
 					<Elements {...{stripe, options}}>
 						<PECheckoutForm
 							{...props}
-							onClose={handleClose}
+							// onClose={handleClose}
 						/>
 					</Elements>
 				</CardBody>
@@ -228,16 +240,11 @@ function PaymentElementModal(props) {
 }
 PaymentElementModal.propTypes = {
 	storageState: PropTypes.shape({
-		operationPending: PropTypes.bool.isRequired,
-		returnUrl: PropTypes.string.isRequired
-	}),
-	callbacks: PropTypes.shape({
-		setOperationPending: PropTypes.func.isRequired,
-		setNotification: PropTypes.func.isRequired,
-		// handleConfirmIntent: PropTypes.func.isRequired,
+		payment: paymentShape,
 	}),
 	buttonLabel: PropTypes.string,
 	cancelable: PropTypes.bool,
+	cancel: PropTypes.func.isRequired,
 };
 PaymentElementModal.defaultProps = {
 	buttonLabel: 'Confirm',

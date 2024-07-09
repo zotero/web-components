@@ -335,13 +335,21 @@ let formatItemField = function(field, item, trim=false){
 };
 
 let formatCurrency = function(cents, currency = 'USD'){
+	if (currency === false) {
+		currency = 'USD';
+	}
 	currency = currency.toUpperCase();
 	let d = cents / 100;
 	if(typeof(Intl) !== 'undefined') {
-		return new Intl.NumberFormat('en-US', {style:'currency', currency}).format(d);
+		let currencyString = new Intl.NumberFormat('en-US', {style:'currency', currency}).format(d);
+		if (currency == 'USD') {
+			return 'US' + currencyString;
+		}
+		return currencyString;
+		// return new Intl.NumberFormat('en-US', {style:'currency', currency}).format(d);
 	} else {
 		if (currency == 'USD') {
-			return `$${d.toFixed(2)}`;
+			return `US$${d.toFixed(2)}`;
 		} else if (currency == 'EUR') {
 			return `€${d.toFixed(2)}`;
 		}

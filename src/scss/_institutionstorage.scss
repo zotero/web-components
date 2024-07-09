@@ -5,6 +5,11 @@
             background: #ddd;
             cursor: pointer;
             font-size: 16px;
+            text-align: center;
+
+            a {
+                color: inherit;
+            }
 
             a.active {
                 color: inherit;

@@ -4,13 +4,11 @@ const log = logger.Logger('storage/actions.js');
 import { ajax, postFormData } from '../ajax.js';
 import { discountedCountries } from './constants.js';
 
-// async function beginIntent(amount, description, storageLevel, immediateCharge) {
+//request to z.org server to start a purchase
 async function initiatePurchase(purchase) {
 	log.debug(`initiatePurchase:`);
 	log.debug(purchase);
-	// setIntent({client_secret: 'THIS IS A SECRET', success: true, intent: {id: 'intent_id'}});
-	// return;
-	// let args = { amount, description, storageLevel, immediateCharge };
+	
 	let resp = await ajax({
 		url: '/storage/purchase',
 		type: 'POST',
@@ -29,6 +27,8 @@ async function initiatePurchase(purchase) {
 	}
 }
 
+//request to z.org server with purchase details to get the taxed price that will
+//be charged, without initiating a purchase
 async function getTaxedPrice(purchase) {
 	log.debug('getTaxedPrice:');
 	log.debug(purchase);
@@ -47,45 +47,6 @@ async function getTaxedPrice(purchase) {
 		return data.price;
 	} else {
 		throw data;
-	}
-}
-
-//add paymentMethod to the customer for this session
-async function addPaymentMethod(stripePaymentMethod) {
-	log.debug(`addPaymentMethod:`);
-	let resp = await postFormData('/storage/addpaymentmethod', {paymentMethodID: stripePaymentMethod.id}, { withSession:true });
-	log.debug(resp, 1);
-	let data = await resp.json();
-	log.debug(data);
-	if (data.success) {
-		log.debug('successful addPaymentMethod');
-		setIntent(data);
-		return data.client_secret;
-	} else {
-		throw data;
-	}
-}
-
-async function chargeDefaultMethod(purchase) {
-	log.debug(`chargeDefaultMethod:`);
-	log.debug(purchase);
-	let purchaseData = Object.assign({}, purchase, {autoConfirm:true});
-	let resp = await ajax({
-		url: '/storage/purchase',
-		type: 'POST',
-		withSession: true,
-		data: JSON.stringify(purchaseData),
-		throwOnError: false,
-	});
-
-	log.debug(resp, 4);
-	let respData = await resp.json();
-	if (respData.success) {
-		log.debug('successful chargeDefaultMethod: setting returned intent');
-		// setIntent(respData);
-		return respData;
-	} else {
-		throw respData;
 	}
 }
 
@@ -112,7 +73,7 @@ async function createInvoice(invoiceData) {
 async function createInstitutionInvoice(invoiceData) {
 	log.debug('createInstitutionInvoice');
 	log.debug(invoiceData);
-	const { type, fte, additionalFTE, numUsers, institutionName, institutionID } = invoiceData;
+	const { type, fte, numUsers, institutionName, institutionID } = invoiceData;
 	try {
 		let resp;
 		switch (type) {
@@ -131,9 +92,9 @@ async function createInstitutionInvoice(invoiceData) {
 			break;
 		case 'addLabUsers':
 			if (!institutionID) throw new Error('no institutionID set');
-			if (!additionalFTE) throw new Error('no additionalFTE set');
+			if (!numUsers) throw new Error('no numUsers set');
 			
-			resp = await postFormData('/settings/storage/createinvoice', { type: 'addLabUsers', numUsers: additionalFTE, institutionID }, { withSession: true });
+			resp = await postFormData('/settings/storage/createinvoice', { type: 'addLabUsers', numUsers, institutionID }, { withSession: true });
 			break;
 		case 'institution':
 			// TODO
@@ -159,13 +120,14 @@ async function getUserCustomer () {
     log.debug('getUserCustomer', 4);
     try {
         let resp = await ajax({ url: '/storage/getusercustomer' });
-        log.debug(resp, 4);
+        // log.debug(resp, 4);
         let data = await resp.json();
-		log.debug('got user customer');
-		log.debug(data);
+		// log.debug('got user customer');
+		// log.debug(data);
 		let stripeCustomer = data.stripeCustomer;
+		//if data.paymentMethod is set, it's because we fetched a legacy source in the form of a paymentMethod
+		//set that as the default_source so we always have the shape of a new style paymentMethod
 		if (data.paymentMethod) {
-			log.debug("")
 			stripeCustomer.default_source = data.paymentMethod;
 		}
         return {type: 'success', success:true, stripeCustomer};
@@ -191,8 +153,6 @@ async function  deleteInvoice (invoiceID) {
 export {
 	initiatePurchase,
 	getTaxedPrice,
-	addPaymentMethod,
-	chargeDefaultMethod,
 	createInvoice,
 	createInstitutionInvoice,
 	getUserCustomer,

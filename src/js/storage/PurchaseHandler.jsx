@@ -49,26 +49,20 @@ import { LoadingSpinner } from '../LoadingSpinner.js';
 
 function PurchaseHandler(props) {
 	const { storageState, callbacks } = useStorageContext();
-	const { purchase, price, confirmationToken, defaultPaymentMethod, operationPending, error, editPayment, description, stripeCustomer, allowRenew, currency, taxPriceError } = storageState;
-	const { setOperationPending, cancelPurchase, handleInvoiceRequest, handleConfirmPurchase, setCurrency, /*setLocation*/ } = callbacks;
+	const { payment, purchase, error, description, allowRenew, invoicePossible } = storageState;
+	const { handleInvoiceRequest } = callbacks;
 	log.debug('PurchaseHandler');
 	log.debug({storageState, callbacks});
 
 	const [ autorenew, setAutorenew ] = useState(true);
 	
-	log.debug(stripeCustomer, 4);
-	// clear the new subscription closing the Handler, because it is either complete, or canceled
-	const cancel = () => {
-		setOperationPending(false);
-		cancelPurchase();
-	};
-
+	// log.debug(payment.stripeCustomer, 4);
 	let descriptionPs = description.map((d, i) => {
 		return <p key={i}>{d}</p>;
 	});
 	
 	let paymentSection = null;
-	if (editPayment) {
+	if (payment.state.editPayment) {
 		// allow entry of new payment details
 		paymentSection = <PaymentElementModal
 			stripe={window.stripe}
@@ -76,27 +70,27 @@ function PurchaseHandler(props) {
 				autorenew,
 				setAutorenew,
 				buttonLabel: 'Submit',
-				cancel,
+				cancel: payment.callbacks.cancelPurchase,
 			}}
 		/>;
-	} else if (price.total && purchase.immediateCharge) { //if(chargeAmount)
+	} else if (payment.state.price.total && purchase.immediateCharge) { //if(chargeAmount)
 		log.debug('total price and immediateCharge: showing PaymentDetails with price');
 		paymentSection = <>
 			<PaymentDetails 
 				{...{
-					defaultPaymentMethod,
+					defaultPaymentMethod: payment.state.defaultPaymentMethod,
 					autorenew,
 					setAutorenew,
 				}}
 			/>
 		</>;
-	} else if (purchase.type == 'individualChange' && !purchase.immediateCharge && !taxPriceError) {
+	} else if (purchase.type == 'individualChange' && !purchase.immediateCharge && !payment.state.taxPriceError) {
 		log.debug('Showing bare confirmChange');
 		paymentSection = (
 			<div className='confirmChange'>
 				<Row className='mt-2'>
-					<Col className='text-center'><Button className='m-auto' onClick={() => { handleConfirmPurchase(); }}>Confirm Change</Button></Col>
-					<Col className='text-center'><Button className='m-auto' onClick={cancel}>Cancel</Button></Col>
+					<Col className='text-center'><Button className='m-auto' onClick={() => { payment.callbacks.handleConfirmPurchase(); }}>Confirm Change</Button></Col>
+					{payment.state.cancelable ? <Col className='text-center'><Button className='m-auto' onClick={payment.callbacks.cancelPurchase}>Cancel</Button></Col> : null}
 				</Row>
 			</div>
 		);
@@ -123,13 +117,12 @@ function PurchaseHandler(props) {
 	}
 	
 	let invoiceSection = null;
-	const { invoicePossible, allowEuro } = storageState;
 	if (invoicePossible) {
 		invoiceSection = (
 			<Container className='mt-4'>
 				<Row>
 					<Col className='text-center'>
-						<p><a href='#' onClick={handleInvoiceRequest}>Create invoice payable by third party</a></p>
+						<p><a id='create-invoice-link' href='#' onClick={handleInvoiceRequest}>Create invoice payable by third party</a></p>
 					</Col>
 				</Row>
 			</Container>
@@ -138,45 +131,50 @@ function PurchaseHandler(props) {
 
 	//allow changing of currency between USD and EUR if we don't already have a payment method set
 	let currencySection = null;
-	if(allowEuro && !defaultPaymentMethod) {
+	if((payment.state.currency == 'eur' || payment.state.allowEuro) && !payment.state.defaultPaymentMethod) {
 		currencySection = (
 			<Container className='mt-4'>
 				<Row>
 					<Col className='text-center'>
-						{currency == 'eur' ? 
-							<p><a href='#' onClick={(e)=>{e.preventDefault(); setCurrency('usd');}}>Make payment in USD</a></p> :
-							<p><a href='#' onClick={(e)=>{e.preventDefault(); setCurrency('eur'); /*setLocation('US');*/}}>Make payment in Euro</a></p> 
+						{payment.state.currency == 'eur' ? 
+							<p><a href='#' onClick={(e)=>{e.preventDefault(); payment.callbacks.setCurrency('usd');}}>Make payment in USD</a></p> :
+							<p><a href='#' onClick={(e)=>{e.preventDefault(); payment.callbacks.setCurrency('eur'); /*setLocation('US');*/}}>Make payment in Euro</a></p> 
 						}
 					</Col>
 				</Row>
 			</Container>
 		);
+	} else {
+		log.debug(`not showing currency section: allowEuro:${payment.state.allowEuro}, PM:${payment.state.defaultPaymentMethod}`);
 	}
 
 	if (error !== null) {
+		log.debug("error is not null in PurchaseHandler");
 		paymentSection = null;
 		invoiceSection = null;
 		renewSection = null;
 	}
 
-	let taxPriceNotifier = taxPriceError ?
-	<Notifier type='error' message="There was an error calculating taxes for the entered address. You may need to update your address or payment details." />
+	let taxPriceNotifier = payment.state.taxPriceError ?
+	<Notifier id='tax-price-error' type='error' message="There was an error calculating taxes for the entered address. You may need to update your address or payment details." />
 	: null;
 	
 	return (
 		<div className='subscription-handler'>
-			<Modal isOpen={true} toggle={cancel} className='payment-modal'>
-				<ModalHeader>Manage Subscription</ModalHeader>
+			<Modal isOpen={true} toggle={payment.callbacks.cancelPurchase} className='payment-modal'>
+				<ModalHeader>{props.title}</ModalHeader>
 				<ModalBody>
 					{taxPriceNotifier}
-					<Notifier {...storageState.notification} />
+					<Notifier {...payment.state.notification} />
 					<Card className='mb-4'>
 						<CardBody>
 							{error}
-							{descriptionPs}
+							<div className='purchase-description'>
+								{descriptionPs}
+							</div>
 						</CardBody>
 					</Card>
-					{/* <LoadingSpinner className='m-auto' loading={operationPending} /> */}
+					<LoadingSpinner className='m-auto' loading={payment.state.operationPending} />
 					{paymentSection}
 					{invoiceSection}
 					{currencySection}
@@ -188,6 +186,7 @@ function PurchaseHandler(props) {
 }
 
 PurchaseHandler.propTypes = {
+	title: PropTypes.string,
 	storageState: PropTypes.shape({
 		purchase: PropTypes.shape({
 			type: PropTypes.string.isRequired,
@@ -199,6 +198,7 @@ PurchaseHandler.propTypes = {
 	})
 };
 PurchaseHandler.defaultProps = {
+	title: "Manage Subscription",
 	allowRenew: false,
 };
 

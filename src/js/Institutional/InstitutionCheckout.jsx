@@ -10,7 +10,7 @@ import { formatCurrency } from '../Utils.js';
 import { postFormData } from '../ajax.js';
 
 let institutionPrice = function (fte) {
-	return (210000 + ((Math.max(500, fte) - 500) * 42));
+	return (220500 + ((Math.max(500, fte) - 500) * 44));
 };
 
 function FormFieldErrorMessage(props) {
@@ -118,9 +118,8 @@ function InstitutionCheckout(props) {
 			<p>
 				Zotero Institution provides unlimited storage for entire universities, research institutions, and corporations. All members of your organization are automatically added to your Zotero Institution subscription, based on their organizational email addresses.
 			</p>
-			<p>
-				Zotero Institution costs $2000 for the first 500 FTE, plus $0.40 per additional FTE.
-			</p>
+			<p>Pricing is based on institution size rather than usage, and let any user at your institution benefit without the need to individually manage access.</p>
+			<p>These prices offer a very large discount compared to our other plans, as we know that likely only a minority of people at a large institution would be Zotero users. The cost is US$2205 for the first 500 FTE and $0.44 per additional FTE.</p>
 			<div className='form-group row'>
 				<label className='col-sm-2 col-form-label' htmlFor='institution_fte'>FTE:</label>
 				<div className='col-sm-9'>

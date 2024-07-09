@@ -11,6 +11,28 @@ const discountTiers = {
 };
 
 const euroPaymentMethods = ['sepa_debit', 'bancontact', 'eps', 'giropay', 'ideal', 'p24', 'sofort'];
+const euroCountries = [
+	'AT', //Austria
+	'BE', //Belgium
+	'HR', //Croatia
+	'CY', //Cyprus
+	'EE', //Estonia
+	'FI', //Finland
+	'FR', //France
+	'DE', //Germany
+	'GR', //Greece
+	'IE', //Ireland
+	'IT', //Italy
+	'LV', //Latvia
+	'LT', //Lithuania
+	'LU', //Luxembourg
+	'MT', //Malta
+	'NL', //Netherlands
+	'PT', //Portugal
+	'SK', //Slovakia
+	'SI', //Slovenia
+	'ES', //Spain
+];
 
 const discountedCountries = {
 	// 'BR': '25',
@@ -84,6 +106,7 @@ export {
     priceCents,
     discountTiers,
 	euroPaymentMethods,
+	euroCountries,
 	discountedCountries,
     discountedPriceStrings,
 	discountLabTiers,

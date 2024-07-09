@@ -10,108 +10,89 @@ import { PaymentMethod } from './PaymentMethod.jsx';
 //Show the payment details for the user's stripe customer which will be charged
 //include a link to change the payment details
 function PaymentDetails(props) {
-	const { storageState, callbacks } = useStorageContext();
-	const { purchase, price, defaultPaymentMethod, /*previewPriceMismatch,*/ operationPending, taxPriceError } = storageState;
-	const { handleConfirmPurchase, setEditPayment, setOperationPending, cancelPurchase } = callbacks;
-	
 	log.debug("PaymentSection");
 	log.debug(props);
-	const cancel = () => {
-		setOperationPending(false);
-		cancelPurchase();
-	};
-	let buttonLabel = `Pay ${formatCurrency(price.total, purchase.currency)}`;
+	const { storageState } = useStorageContext();
+	const { payment, purchase } = storageState;
+	
+	let buttonLabel = `Pay ${formatCurrency(payment.state.price.total, payment.state.currency)}`;
 	if (!purchase.immediateCharge) {
 		buttonLabel = 'Confirm Change';
 	}
 
-	// if (stripeCustomer) {
-		// show existing payment method on file that will be charged, with link to change it if desired
-		if (defaultPaymentMethod) {
-			log.debug('stripeCustomer defaultPaymentMethod');
-			return (
-				<div className='currentPaymentMethod'>
-					<Card>
-						<CardHeader>
-							Payment Method
-						</CardHeader>
-						<CardBody>
-							<PaymentMethod source={defaultPaymentMethod} />
-							<Button color='link' onClick={() => { setEditPayment(true); }}>Change Payment Details</Button>
-						</CardBody>
-					</Card>
-					<Row className='mt-2'>
-						<Col>
-							<table className='table table-striped'>
-								<tbody>
-									{operationPending ? 
-										<>
-											<tr>
-												<th>Price:</th>
-												<td></td>
-											</tr>
-											<tr>
-												<LoadingSpinner className='m-auto' loading={true} />
-											</tr>
-										</>
-										:
-										<>
+	const cancelButton = payment.state.cancelable ? <Col className='text-center'><Button className='m-auto' onClick={payment.callbacks.cancelPurchase}>Cancel</Button></Col> : null;
+
+	// show existing payment method on file that will be charged, with link to change it if desired
+	if (payment.state.defaultPaymentMethod) {
+		log.debug('stripeCustomer defaultPaymentMethod');
+		return (
+			<div className='currentPaymentMethod'>
+				<Card>
+					<CardHeader>
+						Payment Method
+					</CardHeader>
+					<CardBody>
+						<PaymentMethod source={payment.state.defaultPaymentMethod} />
+						<Button color='link' onClick={() => { payment.callbacks.setEditPayment(true); }}>Change Payment Details</Button>
+					</CardBody>
+				</Card>
+				<Row className='tax-price-details mt-2'>
+					<Col>
+						<table className='table table-striped'>
+							<tbody>
+								{payment.state.operationPending ? 
+									<>
 										<tr>
 											<th>Price:</th>
-											<td>{formatCurrency(price.base, purchase.currency)}</td>
+											<td></td>
 										</tr>
 										<tr>
-											<th>Tax:</th>
-											<td>{formatCurrency(price.tax, purchase.currency)}</td>
+											<td colSpan={2}><LoadingSpinner className='m-auto' loading={true} /></td>
 										</tr>
-										<tr>
-											<th>Total:</th>
-											<td>{formatCurrency(price.total, purchase.currency)}</td>
-										</tr>
-										</>
-									}
-								</tbody>
-							</table>
-						</Col>
-					</Row>
-					{/* {previewPriceMismatch ? 
-					<Row className='mt-2'>
-						<Col><p className='text-danger'>Note that the price has updated. The price charged is based on the payment method's country.</p></Col>
-					</Row>
-					: null} */}
-					{taxPriceError ?
-					null :
-					<Row className='mt-2'>
-						<Col className='text-center'><Button className='m-auto' onClick={() => { handleConfirmPurchase(); }}>{buttonLabel}</Button></Col>
-						<Col className='text-center'><Button className='m-auto' onClick={cancel}>Cancel</Button></Col>
-					</Row>}
-				</div>
-			);
-		} else {
-			return (
-				<div className='PaymentMethodPending'>
-					<Card>
-						<CardHeader>
-							Payment Method
-						</CardHeader>
-						<CardBody>
-							<LoadingSpinner className='m-auto' loading={true} />
-							<p>Adding payment method...</p>
-						</CardBody>
-					</Card>
-				</div>
-			);
-		}/* else {
-			return (
-				<div className='confirmChange'>
-					<Row className='mt-2'>
-						<Col className='text-center'><Button className='m-auto' onClick={() => { handleConfirmPurchase(); }}>{buttonLabel}</Button></Col>
-						<Col className='text-center'><Button className='m-auto' onClick={cancel}>Cancel</Button></Col>
-					</Row>
-				</div>
-			);
-		}*/
-	return <p>There was an error showing payment details</p>;
+									</>
+									:
+									<>
+									<tr>
+										<th>Price:</th>
+										<td>{formatCurrency(payment.state.price.base, payment.state.currency)}</td>
+									</tr>
+									<tr>
+										<th>Tax:</th>
+										<td>{formatCurrency(payment.state.price.tax, payment.state.currency)}</td>
+									</tr>
+									<tr>
+										<th>Total:</th>
+										<td>{formatCurrency(payment.state.price.total, payment.state.currency)}</td>
+									</tr>
+									</>
+								}
+							</tbody>
+						</table>
+					</Col>
+				</Row>
+				{payment.state.taxPriceError ?
+				null :
+				<Row className='complete-transaction-buttons mt-2'>
+					<Col className='text-center'><Button className='m-auto' onClick={() => { payment.callbacks.handleConfirmPurchase(); }}>{buttonLabel}</Button></Col>
+					{cancelButton}
+				</Row>}
+			</div>
+		);
+	} else {
+		return (
+			<div className='PaymentMethodPending'>
+				<Card>
+					<CardHeader>
+						Payment Method
+					</CardHeader>
+					<CardBody>
+						<LoadingSpinner className='m-auto' loading={true} />
+						<p>Adding payment method...</p>
+					</CardBody>
+				</Card>
+			</div>
+		);
+	}
 }
 
 export { PaymentDetails };

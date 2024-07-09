@@ -4,38 +4,6 @@ var log = logger.Logger('storage_util');
 import { storageLevelDescriptions, dateFormatOptions } from './constants.js';
 import { calculateNewExpiration } from './calculations.js';
 
-function defaultPayment(stripeCustomer) {
-	let defaultPM = null;
-	if (stripeCustomer) {
-		if(stripeCustomer.invoice_settings.default_payment_method) {
-			defaultPM = stripeCustomer.invoice_settings.default_payment_method;
-		} else if (stripeCustomer.default_source) {
-			defaultPM = stripeCustomer.default_source;
-		}
-	}
-	return defaultPM;
-};
-
-const getCustomerPaymentCountry = function(stripeCustomer) {
-	if (stripeCustomer) {
-		if (stripeCustomer.invoice_settings.default_payment_method) {
-			return getPaymentMethodCountry(stripeCustomer.invoice_settings.default_payment_method);
-		} else if (stripeCustomer.default_source) {
-			return getPaymentMethodCountry(stripeCustomer.default_source);
-		}
-	}
-	return false;
-};
-
-const getPaymentMethodCountry = function(pm) {
-	if (pm.card && pm.card.country) {
-		return (pm.card.country);
-	} else if (pm.billing_details && pm.billing_details.country) {
-		return pm.billing_details.country;
-	}
-	return false;
-};
-
 //build description array for the given purchase object to describe to the user the changes are being made
 const personalPurchaseDescription = function(purchase, userSubscription) {
 	let description = [];
@@ -68,11 +36,112 @@ const personalPurchaseDescription = function(purchase, userSubscription) {
 	}
 
 	return description;
+};
+
+const institutionalPurchaseDescription = function(purchase) {
+	let description = [];
+	if (purchase && purchase.type) {
+		switch (purchase.type) {
+			case 'paymentUpdate':
+				description.push(`Update your saved payment details for your next renewal. There will be no charge made until your expiration date.`);
+				break;
+			case 'labRenew':
+				description.push(`Renew your current subscription. Zotero Lab for ${purchase.numUsers} users.`);
+				description.push(`Your payment method will be charged immediately after confirming.`);
+				break;
+			case 'lab':
+				description.push(`Purchase 1 year of Zotero Lab for ${purchase.numUsers} users.`);
+				description.push(`Lab Name: ${purchase.institutionName}`);
+				break;
+			case 'addLabUsers':
+				description.push(`Add ${purchase.numUsers} users to your current subscription.`);
+				description.push(`Your payment method will be charged immediately after confirming.`);
+				break;
+			case 'institution':
+				// TODO
+				break;
+			default:
+				throw new Error('Unknown purchase type');
+		}
+	}
+	return description;
+};
+
+const invoicePurchaseDescription = function(purchase, invoiceUser, institutionName=false) {
+	let description = [];
+	switch (purchase.type) {
+		case 'individual':
+			description.push(`Zotero Storage subscription for user ${invoiceUser.username} - ${invoiceUser.email}`);
+			description.push(`1 year of Zotero file storage: ${storageLevelDescriptions[storageLevel]}`);
+			break;
+		case 'lab':
+			if (institutionName) {
+				description.push(`${institutionName}`);
+			}
+			description.push(`Zotero Lab subscription managed by user ${invoiceUser.username} - ${invoiceUser.email}`);
+			description.push(`Zotero Lab subscription will provide one year of unlimited Zotero file storage for ${purchase.numUsers} users`);
+			break;
+		case 'addLabUsers':
+			if (institutionName) {
+				description.push(`${institutionName}`);
+			}
+			description.push(`Add ${purchase.numUsers} users to existing Zotero Lab subscription managed by user ${invoiceUser.username} - ${invoiceUser.email}`);
+			break;
+		case 'contribution':
+			break;
+		default:
+			log.error(purchase.type);
+			throw new Error('Unknown invoice type');
+		}
+	return description;
+}
+
+const delayedReload = function(ms = 3000, clearQueryParams=[]) {
+	log.debug('delayedReload', 4);
+	setTimeout(() => {
+		if (clearQueryParams) {
+			let url = new URL(document.location);
+			let params = url.searchParams;
+			clearQueryParams.forEach((v) => {
+				params.delete(v);
+			});
+			url.search = params.toString();
+			window.location.href = url.toString();
+			return;
+		}
+		window.location.reload();
+	}, ms);
+}
+
+const clearQueryParams = function(clearQueryParams) {
+	let url = new URL(document.location);
+	let params = url.searchParams;
+	clearQueryParams.forEach((v) => {
+		params.delete(v);
+	});
+	url.search = params.toString();
+	history.replaceState(null, '', url.toString());
+	// window.location.href = url.toString();
+	return;
+}
+
+
+const actionAllowed = function(operationPending, paymentPending, setNotification) {
+	if (operationPending) {
+		setNotification({type:'error', message:"Please wait for actions to complete before continuing."});
+		return false;
+	} else if(paymentPending) {
+		setNotification({type:'error', message:"A payment is currently pending. Other updates cannot be made until it completes."});
+		return false;
+	}
+	return true;
 }
 
 export {
-    defaultPayment,
-	getCustomerPaymentCountry,
-	getPaymentMethodCountry,
 	personalPurchaseDescription,
+	institutionalPurchaseDescription,
+	invoicePurchaseDescription,
+	delayedReload,
+	clearQueryParams,
+	actionAllowed,
 };

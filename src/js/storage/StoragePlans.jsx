@@ -1,3 +1,6 @@
+import { log as logger } from '../Log.js';
+var log = logger.Logger('StoragePlans.jsx');
+
 import PropTypes from 'prop-types';
 import { userSubscriptionShape } from './constants';
 import { Button } from 'reactstrap';
@@ -42,8 +45,9 @@ StoragePlanRow.propTypes = {
 
 
 function StoragePlansSection(props) {
-	const { location, setLocation, userSubscription, selectPlan, storagePlans, currency } = props;
-	let currencySymbol = currency.toLowerCase() == 'eur' ? '€' : '$';
+	const { /*location, setLocation,*/ userSubscription, selectPlan, storagePlans, currency } = props;
+	log.debug(`StoragePlansSection currency: ${currency}`);
+	let currencySymbol = (currency && currency.toLowerCase() == 'eur') ? '€' : '$';
 	let planRowNodes = storagePlans.map((plan) => {
 		return <StoragePlanRow 
 			{...{

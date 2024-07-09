@@ -4,135 +4,23 @@
 import { log as logger } from '../Log.js';
 let log = logger.Logger('Manage');
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Button, Collapse, Row, Col, FormGroup, Label, Input, FormText } from 'reactstrap';
 import { Notifier } from '../Notifier.js';
 import PropTypes from 'prop-types';
 import { ButtonEditable } from '../components/ButtonEditable.js';
-import { labPrice, labUserPrice } from '../storage/calculations.js';
-import { formatCurrency } from '../Utils.js';
+import { getCurrentUser } from '../Utils.js';
 
 import { postFormData } from '../ajax.js';
 import { buildUrl } from '../wwwroutes.js';
-import { InstitutionHandler } from './InstitutionHandler.jsx';
-// import { LabContext, labReducer, PaymentContext, paymentReducer, setEmails, UPDATE_NAME, UPDATE_PURCHASE } from '../storage/actions.js';
 import { Invoices } from '../storage/Invoices.jsx';
-
-
-function LabRenew(props) {
-	// const { labState } = useContext(LabContext);
-	// const { paymentDispatch, paymentState } = useContext(PaymentContext);
-	
-	const { setNotification, fte, name, institutionID } = props;
-	const [purchase, setPurchase] = useState(null);
-	// const { purchase } = paymentState;
-	// const {  } = labSubscription;
-	const [showRenew, setShowRenew] = useState(false);
-	const [showAddUsers, setShowAddUsers] = useState(false);
-	const [renewFTE, setRenewFTE] = useState(fte);
-	const [additionalFTE, setAdditionalFTE] = useState(1);
-	
-	const renewLab = () => {
-		let renewFTENum = parseInt(renewFTE);
-		if (renewFTENum < 15) {
-			renewFTENum = 15;
-		}
-		setPurchase({
-			type: 'labRenew',
-			fte: renewFTENum,
-			name,
-			institutionID,
-			institutionName: name,
-		});
-	};
-	
-	const purchaseUsers = () => {
-		let addFTENum = parseInt(additionalFTE);
-		if (!(addFTENum > 0)) {
-			setNotification({type:'error', message: 'Invalid number of additional users'})
-			return;
-		}
-		setPurchase({
-			type: 'addLabUsers',
-			additionalFTE,
-			name,
-			institutionID,
-			institutionName: name,
-		})
-	};
-	
-	const handleRenewFTEChange = (evt) => {
-		let nv = evt.target.value;
-		nv = nv.replace(/\D/g, '');
-		if (nv != '') {
-			nv = parseInt(nv);
-			if (isNaN(nv)) {
-				nv = 15;
-			}
-		}
-		setRenewFTE(nv);
-	};
-	const handleAdditionalFTEChange = (evt) => {
-		let nv = evt.target.value;
-		nv = nv.replace(/\D/g, '');
-		if (nv != '') {
-			nv = parseInt(nv);
-			if (isNaN(nv)) {
-				nv = 15;
-			}
-		}
-		setAdditionalFTE(nv);
-	};
-	
-	let Payment = null;
-	if (purchase) {
-		Payment = (<InstitutionHandler
-			{...{
-				institutionID,
-				purchase,
-				setNotification,
-				setPurchase,
-			}}
-		/>);
-	}
-
-	return (
-		<div>
-			{Payment}
-			<Button className='m-4' onClick={() => { setShowRenew(true); setShowAddUsers(false); }}>Renew</Button>
-			<Button className='m-4' onClick={() => { setShowAddUsers(true); setShowRenew(false); }}>Add Users</Button>
-			<Collapse isOpen={showRenew} className='p-5' timeout={{ exit: 0 }}>
-				<FormGroup row>
-					<Label htmlFor='lab_fte'>Users:</Label>
-					<Input type='text' name='lab_fte' value={renewFTE} onChange={handleRenewFTEChange} />
-				</FormGroup>
-				<FormGroup row>
-					<Label>Price: US</Label>
-					{formatCurrency(labPrice(renewFTE))}
-				</FormGroup>
-				<Button onClick={renewLab}>Purchase</Button>
-			</Collapse>
-			<Collapse isOpen={showAddUsers} className='p-5' timeout={{ exit: 0 }}>
-				<FormGroup row>
-					<Label htmlFor='additionalFTE'>Additional Users:</Label>
-					<Input type='text' name='additionalFTE' value={additionalFTE} onChange={handleAdditionalFTEChange} />
-				</FormGroup>
-				<FormGroup row>
-					<Label>Price: US</Label>
-					{formatCurrency(labUserPrice(additionalFTE))}
-				</FormGroup>
-				<Button onClick={purchaseUsers}>Purchase</Button>
-			</Collapse>
-		</div>
-	);
-}
-LabRenew.defaultProps = {
-	showRenew: false
-};
+import { ReceiptsTable } from '../storage/NonInvoiceReceipts.jsx';
+import { LabRenew } from './LabRenew.jsx';
+import { getUserCustomer } from '../storage/actions.js';
 
 function InstitutionData(props) {
-	const { setNotification, saveInstitutionName, name, fte, userEmails, expirationDate, institutionID } = props;
+	const { setPageNotification, saveInstitutionName, name, numUsers, userEmails, expirationDate, institutionID, detectedLocation, stripeCustomer } = props;
 	let expdate = new Date(expirationDate * 1000);
 	
 	const userCount = userEmails.filter(e => e.length > 2).length;
@@ -140,15 +28,15 @@ function InstitutionData(props) {
 	return (
 		<div>
 			<FormGroup row>
-				<Col sm={3}><Label for='lab_name'>Name:</Label></Col>
+				<Col sm={3}><Label htmlFor='lab_name'>Name:</Label></Col>
 				<Col sm={9}>
 					<ButtonEditable save={saveInstitutionName} value={name} />
 					<FormText color='muted'>This name will appear as the provider of storage for your users.</FormText>
 				</Col>
 			</FormGroup>
 			<FormGroup row>
-				<Col sm={3}><Label for='lab_fte'>Users:</Label></Col>
-				<Col sm={9}><p>{userCount} / {fte}</p></Col>
+				<Col sm={3}><Label htmlFor='lab_num_users'>Users:</Label></Col>
+				<Col sm={9}><p>{userCount} / {numUsers}</p></Col>
 			</FormGroup>
 			<FormGroup row>
 				<Col sm={3}><Label>Expiration:</Label></Col>
@@ -156,10 +44,12 @@ function InstitutionData(props) {
 			</FormGroup>
 			<LabRenew
 				{...{
+					stripeCustomer,
+					detectedLocation,
 					institutionID,
-					fte,
+					numUsers,
 					name,
-					setNotification,
+					setPageNotification,
 				}}
 			/>
 		</div>
@@ -167,71 +57,58 @@ function InstitutionData(props) {
 }
 InstitutionData.defaultProps = {
 	userEmails: [],
-	fte: 15,
+	numUsers: 15,
 	name: '',
 	expirationDate: PropTypes.number,
 	institutionID: PropTypes.number
 };
 InstitutionData.propTypes = {
 	userEmails: PropTypes.arrayOf(PropTypes.string),
-	fte: PropTypes.number,
+	numUsers: PropTypes.number,
 	name: PropTypes.string,
 	expirationDate: PropTypes.number,
 	institutionID: PropTypes.number,
 	saveInstitutionName: PropTypes.func
 };
 
-function ReceiptsTable(props) {
-	// link to all charges that are not already being shown as invoices
-	const { charges, labInvoices } = props;
-	let receiptRows = [];
-	charges.forEach((charge) => {
-		let found = false;
-		for (let i = 0; i < labInvoices.lenghth; i++) {
-			if (labInvoices[i].stripeCharge == charge) {
-				found = true;
-				break;
-			}
-		}
-		if (!found) {
-			receiptRows.push(<tr key={charge}><td><a key={charge} href={`/settings/storage/invoice?chargeID=${charge}`}>Receipt for {charge}</a></td></tr>);
-		}
-	});
-	if (receiptRows.length) {
-		return (
-			<table className='table striped'>
-				{receiptRows}
-			</table>
-		);
-	}
-	return null;
-}
-ReceiptsTable.propTypes = {
-	labInvoices: PropTypes.arrayOf(PropTypes.object),
-	charges: PropTypes.arrayOf(PropTypes.string)
-};
+const currentUser = getCurrentUser();
 
 function Manage(props) {
-	const { institutionID, expirationDate, labInvoices, charges } = props;
-	const [stripeCustomer, setStripeCustomer] =  useState(props.stripeCustomer);
-	const [purchase, setPurchase] =  useState(null);
-	// const [paymentState, paymentDispatch] = useReducer(paymentReducer, {
-	// 	stripeCustomer: props.stripeCustomer,
-	// });
+	const { institutionID, expirationDate, labInvoices, charges, detectedLocation, numUsers } = props;
+	log.debug(props);
 
-	const [notification, setNotification] = useState(null);
+	const [pageNotification, setPageNotification] = useState(null);
+	const [stripeCustomer, setStripeCustomer] = useState(props.stripeCustomer);
 	const [name, setName] = useState(props.name);
 	const [emails, setEmails] = useState(props.userEmails);
-	const [fte, setFTE] = useState(props.fte);
 
-	// const [labState, labDispatch] = useReducer(labReducer, {
-	// 	institutionID,
-	// 	name: props.name,
-	// 	emails: props.userEmails,
-	// 	fte: props.fte
-	// });
-	
-	// const { name, emails, fte } = labState;
+	/** Effect calls */
+	// load stripe customer at start for logged in user if there is one
+	useEffect(
+		() => {
+			if (currentUser && !stripeCustomer) {
+				refreshCustomer();
+			}
+		},
+		[props.stripeCustomer]
+	);
+
+	//re-fetch the stripe customer for logged in user if there is one, and figure out a location
+	//based on their payment data if there is.
+	const refreshCustomer = async () => {
+		log.debug("refreshCustomer");
+		if (currentUser) {
+			let customerResponse = await getUserCustomer();
+			if(!customerResponse.success) {
+				setStripeCustomer(null);
+				setPageNotification(customerResponse);
+			} else {
+				setStripeCustomer(customerResponse.stripeCustomer);
+			}
+		}
+	}
+
+	// const { name, emails, numUsers } = labState;
 	// update email list form
 	const handleEmailChange = (evt) => {
 		setEmails(evt.target.value.split('\n'));
@@ -251,11 +128,10 @@ function Manage(props) {
 			}
 			let respData = await resp.json();
 			log.debug(respData, 4);
-			setNotification({type: 'success', message: (<p>Email list updated</p>)});
-			// labDispatch({type:SET_FTE, fte:emails.length});
+			setPageNotification({type: 'success', message: (<p>Email list updated</p>)});
 		} catch (e) {
 			log.debug(e);
-			setNotification({type: 'error', message: (<p>There was an error updating the email list</p>)});
+			setPageNotification({type: 'error', message: (<p>There was an error updating the email list</p>)});
 		}
 	};
 	
@@ -272,20 +148,20 @@ function Manage(props) {
 			if (respData.success) {
 				setName(name);
 				// labDispatch({ type: UPDATE_NAME, name });
-				setNotification({type: 'success', message:(<p>Institution updated</p>)});
+				setPageNotification({type: 'success', message:(<p>Institution updated</p>)});
 			} else {
 				throw new Error('Request failed');
 			}
 		} catch (e) {
 			log.debug(e);
-			setNotification({type: 'error', message: (<p>There was an error updating the organization.</p>)});
+			setPageNotification({type: 'error', message: (<p>There was an error updating the organization.</p>)});
 		}
 	};
 	
 	let emailsText = emails.join('\n');
 	return (
 		<div className='manage-institution'>
-			<Notifier {...notification} />
+			<Notifier {...pageNotification} />
 			<Row className='my-3'>
 				<Col md='12'>
 					<Invoices invoices={labInvoices} />
@@ -309,13 +185,15 @@ function Manage(props) {
 				<Col md='6'>
 					<div className='current-storage'>
 						<InstitutionData {...{
+							stripeCustomer,
 							userEmails: emails,
-							fte,
+							numUsers,
 							name,
 							expirationDate,
 							institutionID,
 							saveInstitutionName,
-							setNotification,
+							setPageNotification,
+							detectedLocation,
 						}} />
 					</div>
 				</Col>
@@ -326,7 +204,7 @@ function Manage(props) {
 Manage.propTypes = {
 	institutionID: PropTypes.number.isRequired,
 	userEmails: PropTypes.arrayOf(PropTypes.string).isRequired,
-	fte: PropTypes.number,
+	numUsers: PropTypes.number,
 	name: PropTypes.string,
 	expirationDate: PropTypes.number,
 	stripeCustomer: PropTypes.object,

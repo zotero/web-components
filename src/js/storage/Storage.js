@@ -1,48 +1,4 @@
 /* eslint-disable no-duplicate-imports */
-/*
-TODO:
- - always create customer. Don't delete customer when disabling auto-renew. Always re-use customer.
- - update customer email along with account primary email.
- - get tax amount based on address and charge amount, and show to user before purchase.
- 
- - expire unpaid invoice after 30 days?
- - show primary email in dialog unless invoice
- - make sure paid invoices can only be seen if logged in as invoiceUser or returning from successful charge
- - always create a customer, even for invoices, so that a receipt gets sent from stripe
- - get rid of context/dispatch and just pass down functions a couple levels
- - reload after timer or poll since payment updates are now done in webhook
- - allow selection of payment type before starting intent so we can set up for future usage on payment methods that support it
- - clean up
- x clarify when institutional plan makes individual plan unnecessary
- x clarify when charge won't be made right away, allow to force immediate charge
- x present detailed receipt more obviously after payment
- x use new PaymentModal to get token to create source with card or IBAN
- x don't allow automatic renewal if institution provides storage
- x show that individual subscription won't be renewed with institutional storage
- x add support for Alipay which we may want
- - whether payment/recur is enabled not always detected correctly (Enable automatic renewal and Disable autorenew both shown)
- - make sure invoices always show the information we have for whatever payment method/charge object
- - show link to receipt/invoice immediately after processing payment
- - update list of invoices after delete
- - only show list of invoices or receipts, don't duplicate
- - reload invoice after payment
- - update stripe customer email when primary email updated, or expose separately?
- - fix showing notification behind modal that can't be seen
- - after paying with/adding a saved payment method, "Renew Now" button does not recognize saved payment method until page refresh
- - with saved card payment method, switching to Euro does not set editPayment to true
- - immediate payment in euro did not reflect updated storage quota, took too long to process upgrade and the delayed refresh missed it?
- - if saved payment method is EU bank account for SEPA, "Renew Now" still starts as USD instead of EUR
- x properly show paid invoice/receipt was paid in Euro if it was
- x fix invoice layout at various sizes
- - handleConfirmPurchase is creating an intent for no reason on an individual change?
- - testcases that create old style stripe customer with old card method and tests that everything still shows up and works as expected
-  with the new payment intent flow
-  - "Renew Now" after adding payment method on same load does not know about the payment method
- - check for redirect with payment intent query param and check/report status.
- - check if we should combine useEffect initiatePurchase from the various components or they need to be differe
-
- - Updating payment method by enabling automatic renew does not refresh payment details shown in default view
-*/
 
 import { log as logger } from '../Log.js';
 const log = logger.Logger('StorageComponent');
@@ -55,21 +11,22 @@ import { ErrorWrapper } from '../components/ErrorWrapper.jsx';
 import { Notifier } from '../Notifier.js';
 import { PurchaseHandler } from './PurchaseHandler.jsx';
 import { Invoices } from './Invoices.jsx';
-import { LocationSelector } from './LocationSelector.jsx';
+// import { LocationSelector } from './LocationSelector.jsx';
 import { imminentExpiration, getPriceCents, getStoragePlans } from './calculations.js';
 
-import { initiatePurchase, getTaxedPrice, createInvoice, getUserCustomer } from './actions.js';
+import { createInvoice, getUserCustomer } from './actions.js';
 
 import { LastSync } from './LastSync.jsx';
 import { ajax, postFormData } from '../ajax.js';
 import { LoadingSpinner } from '../LoadingSpinner.js';
 
-import { euroPaymentMethods, userSubscriptionShape } from './constants.js';
-import { defaultPayment, getPaymentMethodCountry, personalPurchaseDescription } from './storage_util.js';
+import { userSubscriptionShape } from './constants.js';
+import { actionAllowed, personalPurchaseDescription } from './storage_util.js';
 import { InstitutionalRow } from './InstitutionProvidedStorage.jsx';
 import { CurrentPlanUsageRows } from './CurrentPlanUsage.jsx';
 import { NextPaymentRow, PaymentRow } from './PaymentRows.jsx';
 import { StoragePlansSection } from './StoragePlans.jsx';
+import { usePaymentProcessor } from './usePaymentProcessor.js';
 
 const overQuota = function (storageLevel, userSubscription) {
 	const planQuotas = window.zoteroData.planQuotas;
@@ -82,127 +39,73 @@ const overQuota = function (storageLevel, userSubscription) {
 
 const storageUrl = window.zoteroConfig.baseWebsiteUrl ? `${window.zoteroConfig.baseWebsiteUrl}/settings/storage` : '/settings/storage';
 
-
-/*
-Flows:
- - First time subscription -> purchase object, payment details/confirmationToken, refresh/show price/paymentIntent, confirm charge
- - update payment details -> purchase object, payment details/confirmationToken, save to customer/setupIntent/show renewal price without charging
- - renew now, expiration imminent -> purchase object, show existing paymentDetails/show price, confirmCharge (create/charge paymentIntent with existing customer) OR change paymentDetails/confirmationToken, refresh/show price/paymentIntent, confirmCharge
- - force payment now ^as above
- - Change current plan without immediate payment -> purchase object, confirmChange (no intent)
- - change current plan and pay now (imminent expiration) -> purchaseObject, renewNow flow
- - Lab Payment
- - Lab Renewal
- - Lab receipt
- - create invoice for any type of payment:
-  - allow payments for third parties without Zotero account, needs to be limited to prevent card-testing
-  vars: purchase (type, storageLevel), haveCustomerPayment, confirmationToken, 
-  if (purchase) {
-	if (customerPaymentDetails) {
-		getPrice => {
-			setPrice
-		}
-	} else if (confirmationToken) {
-		initiatePurchase => {
-			setPrice;
-			setStripeIntent;
-		}
-	}
-
-	handleConfirm:
-		if (confirmationToken) {
-			stripe.confirmIntent
-		} else if(customerPaymentDetails) {
-			initiatePurchase (autoConfirm:True) =>
-
-		}
-  }
-*/
-
 const StorageContext = createContext(null);
 function useStorageContext() {
 	return useContext(StorageContext);
 }
 
+/*
+Manage storage subscription for individual user
+- First time subscription -> purchase object, payment details/confirmationToken, refresh/show price/paymentIntent, confirm charge
+- update payment details -> purchase object, payment details/confirmationToken, save to customer/setupIntent/show renewal price without charging
+- renew now, expiration imminent -> purchase object, show existing paymentDetails/show price, confirmCharge (create/charge paymentIntent with existing customer) OR change paymentDetails/confirmationToken, refresh/show price/paymentIntent, confirmCharge
+- force payment now ^as above
+- Change current plan without immediate payment -> purchase object, confirmChange (no intent)
+- change current plan and pay now (imminent expiration) -> purchaseObject, renewNow flow
+*/
 function Storage(props) {
 	log.debug(props);
+	const { detectedLocation } = props;
+	const [ paymentPending, setPaymentPending ] = useState(props.paymentPending);
 	const [ userSubscription, setUserSubscription ] = useState(props.userSubscription);
 	const [ storageGroups, setStorageGroups ] = useState({});
 	const [ stripeCustomer, setStripeCustomer ] = useState(props.stripeCustomer);
 	const [ purchase, setPurchase ] = useState(null);
-	const [ notification, setNotification ] = useState(null);
+	const [ pageNotification, setPageNotification ] = useState(null);
 	const [ operationPending, setOperationPending ] = useState(false);
-	const [ editPayment, setEditPayment ] = useState((purchase && purchase.type == 'individualPaymentUpdate'));
-	// const [ location, setLocation ] = useState('US');
-	// const [ showLocation, setShowLocation ] = useState(false);
-	const [ currency, setCurrency ] = useState(props.detectedLocation.continent == 'EU' ? 'eur' : 'usd');
-	const [ price, setPrice ] = useState({base: 2000, tax:0, total:2000});
 	const [ storagePlans, setStoragePlans ] = useState([]);
-	const [ taxID, setTaxID ] = useState( stripeCustomer ? stripeCustomer.metadata.taxID : '');
-	const [ stripeIntent, setStripeIntent ] = useState(null);
-	const [ confirmationToken, setConfirmationToken ] = useState(null);
-	const [ taxPriceError, setTaxPriceError ] = useState(false);
-
-	const stripe = window.stripe;// useStripe();
+	
+	// const stripe = window.stripe;// useStripe();
 
 	log.debug({userSubscription, stripeCustomer, purchase}, 4);
 
-	//set defaultPaymentMethod, set currency to euro if saved payment method is EU bank, set location if it doesn't match payment method country
-	let defaultPaymentMethod = false;
-	if (!editPayment) {
-		if(confirmationToken) {
-			defaultPaymentMethod = confirmationToken.payment_method_preview;
-		} else if (stripeCustomer) {
-			defaultPaymentMethod = stripeCustomer.default_source || stripeCustomer.invoice_settings.default_payment_method;
+	let paymentResultCallback = (result) => {
+		log.debug("paymentResultCallback");
+		log.debug(result);
+		setPageNotification(result);
+		if (result.delayRequired !== false) {
+			log.debug("delayed refreshing after 3 secs");
+			setPaymentPending(true);
+			delayedRefresh();
+		} else {
+			log.debug("refreshing after 1 sec");
+			delayedRefresh(1000);
 		}
 	}
 
-	let location = 'US';
-	if (defaultPaymentMethod) {
-		log.debug(`have defaultPaymentMethod - ${defaultPaymentMethod.type}`);
-		location = getPaymentMethodCountry(defaultPaymentMethod);
-		
-		if (euroPaymentMethods.includes(defaultPaymentMethod.type) && currency != 'eur') {
-			log.debug("euro payment method. Setting currency");
-			setCurrency('eur');
-		}
-	}
+	const returnUrl = storageUrl;
+	const payment = usePaymentProcessor({purchase, stripeCustomer, userSubscription, detectedLocation, setPurchase, paymentResultCallback, returnUrl, cancelable:true, paymentPending});
+	log.debug('payment:');
+	log.debug(payment);
 
 	let immediateChargeRequired = false;
 	if (purchase) {
 		immediateChargeRequired = (purchase.type != 'individualPaymentUpdate') && (purchase.type == 'individualRenew' || imminentExpiration(userSubscription.expirationDate));
-		purchase.immediateCharge = immediateChargeRequired;
-		// if (!purchase.immediateCharge) {
-		// 	log.debug('immediateChargeRequired - setting immediateCharge on purchase');
-		// 	setPurchase(Object.assign({}, purchase, {immediateCharge: true}));
-		// }
 	}
-
-	if (!editPayment) {
-		if ((immediateChargeRequired) && !defaultPaymentMethod) {
-			log.debug("Need payment and don't have it - setting editPayment true");
-			setEditPayment(true);
+	
+	let paymentPendingNotification = null;
+	if (paymentPending) {
+		let message = `Your payment is processing. Your storage subscription will be updated once it has completed.`;
+		if (userSubscription && userSubscription.paymentPendingMethodType == 'sepa_debit') {
+			message += ` Payment was made using SEPA debit, which may take up to 14 business days to complete.`;
 		}
+		paymentPendingNotification = <Notifier {...{
+			id: 'paymentPendingNotification',
+			type: 'info',
+			message,
+		}} />;
 	}
-
-	
-	//parse query to check for redirect after stripe payment
-	useEffect(() => {
-		let queryParams = new URLSearchParams(window.location.search);
-		const redirectStatus = queryParams.get('redirect_status', null);
-		const setupIntentQ = queryParams.get('setup_intent', null);
-		const setupIntentSecretQ = queryParams.get('setup_intent_client_secret');
-		const paymentIntentQ = queryParams.get('payment_intent', null);
-		const paymentIntentSecretQ = queryParams.get('payment_intent_client_secret');
-		if (redirectStatus == 'succeeded') {
-			if (setupIntentQ) {
-				setNotification({'type': 'success', 'message': 'Payment setup complete'});
-			} else if(paymentIntentQ) {
-				setNotification({'type': 'success', 'message': 'Payment complete'});
-			}
-		}
-	}, [window.location.href]);
-	
+	/** Effect calls */
 	//fetch userSubscription and stripeCustomer if either not included in props
 	useEffect(
 		() => {
@@ -213,107 +116,57 @@ function Storage(props) {
 		[props.userSubscription, props.stripeCustomer]
 	);
 
+	//update purchase object to include various other state when it changes
 	//make sure correct currency is set on purchase object when either changes
 	useEffect(() => {
 		if (purchase) {
 			let update = false;
 			let nv = Object.assign({}, purchase);
-			if (purchase.currency != currency) {
-				nv.currency = currency;
+			/*
+			if (purchase.currency != payment.state.currency && payment.state.currency !== false) {
+				nv.currency = payment.state.currency;
 				update = true;
-				// setPurchase(Object.assign({}, purchase, {currency}));
+			}
+			*/
+			if (payment?.state?.taxID && (purchase.taxID != payment.state.taxID)) {
+				nv.taxID = payment.state.taxID;
+				update = true;
+			}
+			if (immediateChargeRequired != purchase.immediateCharge) {
+				nv.immediateCharge = immediateChargeRequired;
+				update = true;
+			}
+			if (update) {
+				setPurchase(nv);
 			}
 		}
-	}, [purchase, currency]);
-
-	//update prices when the user's location or purchase changes
+	}, [purchase, payment, immediateChargeRequired]);
+	
 	useEffect(() => {
-		setStoragePlans(getStoragePlans(location));
-		const priceAction = async () => {
-			if (purchase) {
-				let customerPaymentDetails = defaultPayment(stripeCustomer) ?? false;
-				if (confirmationToken) {
-					log.debug("have confirmationToken: getting price and creating intent that we'll confirm after price");
-					let locationPurchase = Object.assign({}, purchase, {
-						confirmationTokenID: confirmationToken?.id ?? null,
-						taxID
-					});
-					setOperationPending(true);
-					try{
-						let [taxedPrice, intent] = await initiatePurchase(locationPurchase);
-						if (intent.next_action) {
-							if (intent.next_action.redirect_to_url) {
-								window.location.href = intent.next_action.redirect_to_url.url;
-							}
-						}
-						if (intent.object == 'setup_intent' && intent.status == 'succeeded') {
-							setStripeIntent(null);
-							setNotification({type: 'success', message: 'Payment method updated'});
-							delayedClearNotification(4000);
-							cancelPurchase();
-						} else {
-							setStripeIntent(intent);
-						}
-						setPrice(taxedPrice);
-						setTaxPriceError(false);
-						setEditPayment(false);
-					} catch (e) {
-						log.debug('caught error from initiatePurchase');
-						log.debug(e);
-						if (e.success === false && e.message == "Could not calculate taxes") {
-							setTaxPriceError(true);
-						} else {
-							setNotification({type: "error", message: "There was an error processing your purchase."});
-							cancelPurchase();
-						}
-					} finally {
-						log.debug("finally block for priceAction tax calculation");
-						cancelPurchase();
-						setOperationPending(false);
-					}
-				} else if (customerPaymentDetails && immediateChargeRequired) {
-					log.debug("have customer details, getting price without intent");
-					//get taxed price based on address from existing customer payment details
-					setOperationPending(true);
-					try {
-						let taxedPrice = await getTaxedPrice(purchase);
-						log.debug(taxedPrice);
-						setPrice(taxedPrice);
-						setTaxPriceError(false);
-					} catch (e) {
-						log.debug('caught error from getTaxedPrice');
-						log.debug(e);
-						setTaxPriceError(true);
-						if (e.success === false && e.message == "Could not calculate taxes") {
-							setTaxPriceError(true);
-						} else {
-							setNotification({type: "error", message: "There was an error processing your purchase."});
-							cancelPurchase();
-						}
-					} finally {
-						setOperationPending(false);
-					}
-				}
-			}
-		};
-		priceAction();
-	}, [confirmationToken, purchase]);
+		setStoragePlans(getStoragePlans(payment.state.location));
+	}, [payment.state.location]);
 
 	// *** Callbacks for user actions ***
 	//callback for "Update Payment Details" button
 	const updatePaymentHandler = () => {
+		if (!actionAllowed(operationPending, paymentPending, setPageNotification)) {
+			return;
+		}
 		const nv = Object.assign({}, {
 			type: 'individualPaymentUpdate',
 			storageLevel: userSubscription.storageLevel,
 		});
 		setPurchase(nv);
-		setEditPayment(true);
+		// setEditPayment(true);
 	};
 
 	//callback for "Renew  Now" button
 	const renewHandler = () => {
 		log.debug('renewHandler', 4);
-		setEditPayment(false);
+		if (!actionAllowed(operationPending, paymentPending, setPageNotification)) {
+			return;
+		}
+		// setEditPayment(false);
 		// const price = getPriceCents(location)[userSubscription.storageLevel];
 		// setPreviewPrice(price);
 		const nv = Object.assign({}, {
@@ -323,15 +176,6 @@ function Storage(props) {
 		setPurchase(nv);
 	};
 
-	//remove any in-progress purchase, which will close modal
-	const cancelPurchase = () => {
-		log.debug('cancelling purchase', 4);
-		setEditPayment(false);
-		setPurchase(null);
-		setConfirmationToken(false);
-		setStripeIntent(false);
-	}
-
 	//callback for choosing a storage plan
 	// editPayment to false so that it can be decided if it's necessary
 	// based on the new purchase. Set the preview price from when the user clicked
@@ -339,8 +183,11 @@ function Storage(props) {
 	// tie any discount to their location
 	const selectPlan = (plan) => {
 		log.debug('selectPlan', 4);
-		setEditPayment(false);
-		setNotification(null);
+		if (!actionAllowed(operationPending, paymentPending, setPageNotification)) {
+			return;
+		}
+		// setEditPayment(false);
+		setPageNotification(null);
 		// let price = getPriceCents(location)[plan.storageLevel];
 		// setPreviewPrice(price);
 		const nv = Object.assign({}, {
@@ -357,17 +204,21 @@ function Storage(props) {
 			let resp = await ajax({ url: '/storage/usersubscription' });
 			let data = await resp.json();
 			log.debug(data);
+			if (data.userSubscription.quota == 1000000 && data.userSubscription.institutions.length > 0) {
+				data.userSubscription.institutionUnlimited = true;
+			}
 			setUserSubscription(data.userSubscription);
-			log.debug('got userSubscription - setting price');
+			setPaymentPending(data.userSubscription.paymentPendingMethodType !== null);
+			log.debug('got userSubscription');
 			log.debug(data.userSubscription);
-			let price_base = getPriceCents(location)[data.userSubscription.storageLevel];
+			// let price_base = getPriceCents(location)[data.userSubscription.storageLevel];
 			// setPreviewPrice(price_base);
-			setPrice({base:price_base, tax:0, total:price_base});
+			// setPrice({base:price_base, tax:0, total:price_base});
 			setStorageGroups(data.storageGroups);
 		} catch (e) {
 			log.debug('Error retrieving subscription data', 2);
 			log.debug(e, 2);
-			setNotification({type: 'error', message: 'There was an error retrieving your subscription data'});
+			setPageNotification({type: 'error', message: 'There was an error retrieving your subscription data'});
 		}
 	}
 
@@ -383,7 +234,7 @@ function Storage(props) {
 		let customerResponse = await getUserCustomer();
 		if(!customerResponse.success) {
 			setStripeCustomer(null);
-			setNotification(customerResponse);
+			setPageNotification(customerResponse);
 		} else {
 			log.debug(customerResponse.stripeCustomer);
 			setStripeCustomer(customerResponse.stripeCustomer);
@@ -404,41 +255,51 @@ function Storage(props) {
 	// clear notification message after a given time, default to 10 seconds
 	const delayedClearNotification = (ms = 10000) => {
 		setTimeout(() => {
-			setNotification(null);
+			setPageNotification(null);
 		}, ms);
 	}
 
 	// disable automatic renewal for logged-in user's subscription
-	const cancelRecur = async () => {
+	const setRecur = async (recur) => {
+		if (!actionAllowed(operationPending, paymentPending, setPageNotification)) {
+			return;
+		}
 		setOperationPending(true);
 
+		let recurArg = recur ? '1' : '0';
 		try {
-			let resp = await postFormData('/storage/cancelautorenew', undefined, { withSession: true });
+			let resp = await postFormData('/storage/updateautorenew', { autorenew: recurArg }, { withSession: true });
+			let rd = await resp.json();
 			log.debug(resp, 4);
-			setNotification({type: 'success', message: 'Automatic renewal disabled'});
+			if (!rd.success) {
+				throw new Error("Failed updating recur");
+			}
+			let newStatus = recur ? "enabled" : "disabled";
+			setPageNotification({type: 'success', message: `Automatic renewal ${newStatus}`});
 			delayedClearNotification();
 		} catch (e) {
 			log.debug(e);
-			setNotification({type: 'error', message: 'Error updating payment method. Please try again in a few minutes.'});
+			setPageNotification({type: 'error', message: 'Error updating subscription. Please try again in a few minutes.'});
 		} finally {
+			refresh();
 			setOperationPending(false);
 		}
-
-		refresh();
 	};
 
-	//remove all payment methods and delete stripe customer. This will disable further charges
-	//unless new payment details are entered.
+	//remove all payment methods. This will disable further charges unless new payment details are entered.
 	const removePayment = async () => {
+		if (!actionAllowed(operationPending, paymentPending, setPageNotification)) {
+			return;
+		}
 		setOperationPending(true);
 
 		try {
 			let resp = await postFormData('/storage/removepayment', undefined, { withSession: true });
 			log.debug(resp, 4);
-			setNotification({type: 'success', message: 'Removed payment method'});
+			setPageNotification({type: 'success', message: 'Removed payment method'});
 		} catch (e) {
 			log.error(e);
-			setNotification({type: 'error', message: 'Error updating payment method. Please try again in a few minutes.'});
+			setPageNotification({type: 'error', message: 'Error updating payment method. Please try again in a few minutes.'});
 		} finally {
 			setOperationPending(false);
 		}
@@ -446,97 +307,19 @@ function Storage(props) {
 		refresh();
 	};
 
-	//handler for confirming a "purchase" action, which can also be a change in storage subscription
-	//that does not involve immediate payment or a change in payment details
-	const handleConfirmPurchase = async () => {
-		log.debug('handleConfirmPurchase', 2);
-		log.debug(purchase, 2);
-		log.debug(stripeIntent);
-		log.debug(confirmationToken);
-		if (operationPending) {
-			log.debug('operation already pending', 2);
-			return;
-		}
-		setOperationPending(true);
-
-		let customerPaymentDetails = defaultPayment(stripeCustomer) ?? false;
-
-		if(confirmationToken && stripeIntent) {
-			//confirm clicked for purchase after showing price: confirm stripe intent from client
-			try {
-				let result = await stripe.confirmPayment({
-					clientSecret: stripeIntent.client_secret,
-					confirmParams: {
-						confirmation_token: confirmationToken.id,
-						return_url: window.location.href,
-					},
-					redirect: "always"
-				});
-				if (result.error) {
-					setNotification({type: 'error', message: "There was an error processing your request"});
-					log.error(result);
-				} else {
-					log.error("Successful intent did not redirect");
-					//successful confirmation, reset values and 
-					setStripeIntent(null);
-					setConfirmationToken(null);
-					setEditPayment(false);
-					setNotification({type: 'success', message: ''})
-					delayedRefresh();
-				}
-			}  catch (err) {
-				log.error(err);
-				if (err.success === false && err.message) {
-					setNotification({type: 'error', message: err.message});
-				} else {
-					log.error("UNEXPECTED THROWN RESPONSE WHEN ATTEMPTING PURCHASE OR CHANGE");
-					setNotification({type: 'error', message: "There was an error processing your request"});
-				}
-			} finally {
-				log.debug('finally block for confirmationToken+stripeIntent');
-				cancelPurchase();
-				setOperationPending(false);
-			}
-		} else if(customerPaymentDetails) {
-			//confirm purchase clicked without confirmation token: already have payment details saved - initiate auto-confirmed payment intent
-			setOperationPending(true);
-			try {
-				const autoConfirmPurchase = Object.assign({}, purchase, {autoConfirm:true});
-				let [price, intent] = await initiatePurchase(autoConfirmPurchase);
-				setStripeIntent(intent);
-				setPrice(price);
-				setTaxPriceError(false);
-				setEditPayment(false);
-				delayedRefresh();
-			} catch (e) {
-				log.debug('caught error from initiatePurchase');
-				log.debug(e);
-				if (e.success === false && e.message == "Could not calculate taxes") {
-					setTaxPriceError(true);
-				} else {
-					setNotification({type: "error", message: "There was an error processing your purchase."});
-					cancelPurchase();
-				}
-			} finally {
-				log.debug("finally block for autoconfirm Purchase");
-				cancelPurchase();
-				setOperationPending(false);
-			}
-		};
-		log.debug('done with confirmPurchase');
-		return;
-	}
-
 	// create invoice on Zotero server and link to it
 	const handleInvoiceRequest = async (evt) => {
 		evt.preventDefault();
+		if (!actionAllowed(operationPending, paymentPending, setPageNotification)) {
+			return;
+		}
 		if(operationPending) {
 			return;
 		}
 		setOperationPending(true);
 		let result = await createInvoice({ type: 'individual', storageLevel: purchase.storageLevel });
-		setNotification(result);
-		cancelPurchase();
+		setPageNotification(result);
+		payment.callbacks.cancelPurchase();
 		setOperationPending(false);
 	};
 	
@@ -555,9 +338,11 @@ function Storage(props) {
 		paymentRow = (<PaymentRow {...{
 			userSubscription,
 			updatePaymentHandler,
+			setRecur,
 			renewHandler,
 			removePayment,
-			defaultPaymentMethod,
+			paymentMethod: payment.state.defaultPaymentMethod,
+			// defaultPaymentMethod,
 		}} />);
 	}
 	
@@ -573,7 +358,7 @@ function Storage(props) {
 		let description = personalPurchaseDescription(purchase, userSubscription);
 
 		let error = null;
-		let invoicePossible = (purchase.type != 'individualPaymentUpdate');
+		let invoicePossible = immediateChargeRequired; // (purchase.type != 'individualPaymentUpdate');
 		
 		const { type, storageLevel } = purchase;
 		if (type == 'individualChange' || type == 'individualRenew') {
@@ -584,45 +369,18 @@ function Storage(props) {
 		}
 		
 		storageState = {
+			payment,
 			description,//multi-para description of update, whether charge or not
 			stripeCustomer,
-			stripeIntent,
-			confirmationToken,
-			defaultPaymentMethod,
-			taxID,
-			allowEuro: props.detectedLocation.continent == 'EU',
-			allowCN: props.detectedLocation.continent == 'AS',
 			purchase,
-			location,
-			currency,
 			invoicePossible,//whether it's allowed to create an invoice for this purchase
-			price,
-			// previewPriceMismatch: !!(price.total && (price.base != previewPrice)),
 			error,
-			editPayment,
-			operationPending,
-			notification,
-			returnUrl: storageUrl,
-			taxPriceError
 		};
 
 		callbacks = {
-			setNotification,
 			setPurchase,
-			setPrice,
-			setTaxID,
-			setStripeIntent,
-			setConfirmationToken,
-			cancelPurchase,
-			handleConfirmPurchase,
-			// handleConfirmIntent,
 			handleInvoiceRequest,
-			setEditPayment,
-			setOperationPending,
-			setCurrency,
-			// setLocation,
 			refresh,
-			// setHavePaymentMethod,
 		};
 
 		if (!props.summary) {
@@ -630,23 +388,33 @@ function Storage(props) {
 		}
 	}
 
+	log.debug(`building storagePlansSection. currency:${payment.state.currency}`);
+	let storagePlansSection = userSubscription.institutionUnlimited ? null : <StoragePlansSection {...{
+		storagePlans,
+		selectPlan,
+		userSubscription,
+		location,
+		currency: payment.state.currency ?? 'usd',
+	}} />
+
 	return (
 		<ErrorWrapper>
 			<StorageContext.Provider value={{storageState, callbacks}}>
 			<React.StrictMode>
-			<div className='storage-container'  inert={operationPending ? 'true' : undefined}>
+			<div className='storage-container' >
 				<LastSync />
 				{Payment}
 				{operationPending
 					? <div className='modal'><div className='modal-text'><p className='modal-text'>Updating...</p></div></div>
 					: null
 				}
-				<Notifier {...notification} />
+				<Notifier {...pageNotification} />
+				{paymentPendingNotification}
 				<div className='user-storage'>
 					<Row className='my-3'>
 						<Col md='12'>
-							<Invoices invoices={props.userInvoices} setNotification={setNotification} type={['individual', 'individualRenew']} collapseLabel='Show Invoices' />
-							<Invoices invoices={props.userInvoices} setNotification={setNotification} type='contribution' collapseLabel='Show Contributions' />
+							<Invoices invoices={props.userInvoices} setNotification={setPageNotification} type={['individual', 'individualRenew']} collapseLabel='Show Invoices' />
+							<Invoices invoices={props.userInvoices} setNotification={setPageNotification} type='contribution' collapseLabel='Show Contributions' />
 						</Col>
 					</Row>
 					<Row>
@@ -660,7 +428,7 @@ function Storage(props) {
 										<tbody>
 											{currentPlanRows}
 											{paymentRow}
-											<NextPaymentRow {...{userSubscription, stripeCustomer, cancelRecur}} />
+											<NextPaymentRow {...{userSubscription, stripeCustomer, setRecur}} />
 											<InstitutionalRow institutions={userSubscription.institutions} />
 										</tbody>
 									</table>
@@ -668,15 +436,7 @@ function Storage(props) {
 							</div>
 						</Col>
 						<Col md='6'>
-							{userSubscription.institutionUnlimited ? null : <StoragePlansSection {...{
-								storagePlans,
-								selectPlan,
-								userSubscription,
-								location,
-								// setLocation,
-								currency,
-								// showLocation,
-							}} />}
+							{storagePlansSection}
 						</Col>
 					</Row>
 				</div>

@@ -5,8 +5,9 @@ var log = logger.Logger('Notifier');
 
 import {useState, useEffect, useRef} from 'react';
 
+//type is one of success, info, or error
 let Notifier = function(props) {
-	const {message, type, redirect, redirectLabel} = props;
+	const {message, type, redirect, redirectLabel, id} = props;
 	const [startTime, setStartTime] = useState(Date.now());
 	const [timeLeft, setTimeLeft] = useState(5);
 	const intervalRef = useRef();
@@ -50,8 +51,9 @@ let Notifier = function(props) {
 	}
 
 	let className = `notifier ${type}`;
+	let role = 'alert';
 	return (
-		<div className={className} role='alert'>{message}{timerMessage}</div>
+		<div {...{id, className, role}}>{message}{timerMessage}</div>
 	);
 };
 

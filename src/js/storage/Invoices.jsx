@@ -8,7 +8,7 @@ import { dateFormatOptions } from './constants.js';
 import { deleteInvoice } from './actions.js';
 
 function Invoices(props) {
-	log.debug(props, 4);
+	log.debug(props);
 	let { invoices, type, collapseLabel, setNotification } = props;
 	const [isOpen, setIsOpen] = useState(false);
 

@@ -80,7 +80,7 @@ function usePaymentProcessor({ purchase, stripeCustomer, userSubscription, detec
 	// const [ stripeCustomer, setStripeCustomer ] = useState(props.stripeCustomer);
 	const [ notification, setNotification ] = useState(null);
 	const [ operationPending, setOperationPending ] = useState(false);
-	const [ editPayment, setEditPayment ] = useState((purchase && purchase.type == 'individualPaymentUpdate'));
+	const [ editPayment, setEditPayment ] = useState(purchase && ['individualPaymentUpdate', 'contributionPaymentUpdate'].includes(purchase.type));
 	// const [ location, setLocation ] = useState('US');
 	// const [ showLocation, setShowLocation ] = useState(false);
 	const [ currency, setCurrency ] = useState(false);
@@ -108,7 +108,7 @@ function usePaymentProcessor({ purchase, stripeCustomer, userSubscription, detec
 	}, [stripeCustomer, stripeIntent]);
 
 	if (!editPayment) {
-		if (purchase && purchase.type == 'individualPaymentUpdate') {
+		if (purchase && !confirmationToken && ['individualPaymentUpdate', 'contributionPaymentUpdate'].includes(purchase.type)) {
 			setEditPayment(true);
 		} else if (purchase && purchase.immediateCharge && !defaultPaymentMethod) {
 			log.debug("Need payment and don't have it - setting editPayment true");

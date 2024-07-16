@@ -190,7 +190,7 @@ function PaymentElementModal(props) {
 	let mode = 'payment';
 	let setupFutureUsage = 'off_session';
 	let amount = payment.state.price.total;
-	if (purchase.type == 'individualPaymentUpdate') {
+	if (['individualPaymentUpdate', 'contributionPaymentUpdate'].includes(purchase.type)) {
 		mode = 'setup';
 		setupFutureUsage = 'off_session';
 		amount = null;

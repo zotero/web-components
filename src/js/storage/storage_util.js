@@ -96,6 +96,33 @@ const invoicePurchaseDescription = function(purchase, invoiceUser, institutionNa
 	return description;
 }
 
+const contributionDescription = function(purchase, currentUser) {
+	let description = [];
+	switch (purchase.type) {
+		case 'contributionPaymentUpdate':
+			description.push(`Update your saved payment details for your next contribution. There will be no charge made until your normally scheduled contribution.`);
+			break;
+		case 'contribution':
+			description.push(`Make a one time contribution to support Zotero.`);
+			description.push(`Your card or bank account will be charged immediately after confirming.`);
+			break;
+		case 'recurringContribution':
+			description.push(`Make a ${purchase.period}ly recurring contribution to support Zotero.`);
+			description.push(`Your card or bank account will be charged immediately after confirming.`);
+			break;
+		default:
+			throw new Error('Unknown purchase type');
+	}
+		
+	if (!currentUser) {
+		description.push(<small className='text-muted'>If you&apos;d like your contribution associated with your Zotero account, please <a href='/user/login'>log in</a> before contributing.</small>);
+	} else {
+		description.push(`Receipts will be emailed to ${currentUser.email}`);
+	}
+	
+	return description;
+}
+
 const delayedReload = function(ms = 3000, clearQueryParams=[]) {
 	log.debug('delayedReload', 4);
 	setTimeout(() => {
@@ -141,6 +168,7 @@ export {
 	personalPurchaseDescription,
 	institutionalPurchaseDescription,
 	invoicePurchaseDescription,
+	contributionDescription,
 	delayedReload,
 	clearQueryParams,
 	actionAllowed,

@@ -13,11 +13,17 @@ import { Notifier } from '../Notifier.js';
 import PropTypes from 'prop-types';
 
 import { Invoices } from '../storage/Invoices.jsx';
-import { ContributionPaymentHandler } from './ContributionPaymentHandler.jsx';
 import { postFormData } from '../ajax.js';
 import classnames from 'classnames';
+import { PurchaseHandler } from '../storage/PurchaseHandler.jsx';
+import { usePaymentProcessor } from '../storage/usePaymentProcessor.js';
+import { StorageContext } from '../storage/Storage.js';
+import { contributionDescription } from '../storage/storage_util.js';
+import { getUserCustomer } from '../storage/actions.js';
 
 const dateFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+
+const contributeUrl = window.zoteroConfig.baseWebsiteUrl ? `${window.zoteroConfig.baseWebsiteUrl}/contribute` : '/contribute';
 
 //calculate the next charge date after today based on the creation date for the recurring
 //contribution and the period
@@ -95,8 +101,9 @@ PeriodCell.propTypes = {
 };
 
 function Contribute(props) {
-	const { setNotification, currentUser } = props;
-	const [ stripeIntent, setStripeIntent ] = useState(null);
+	log.debug(props);
+	const { setNotification, currentUser, detectedLocation } = props;
+	const [ paymentPending, setPaymentPending ] = useState(props.paymentPending);
 	const [ purchase, setPurchase ] = useState(null);
 	const [period, setPeriod] = useState('once');
 	const [amount, setAmount] = useState(3000);
@@ -104,6 +111,38 @@ function Contribute(props) {
 	const [currentContribution, setCurrentContribution] = useState(props.currentContribution);
 	const [stripeCustomer, setStripeCustomer] = useState(props.stripeCustomer);
 	const [operationPending, setOperationPending] = useState(false);
+
+	log.debug({stripeCustomer, purchase}, 4);
+
+	let paymentResultCallback = (result) => {
+		log.debug("paymentResultCallback");
+		log.debug(result);
+		setNotification(result);
+		if (result.delayRequired !== false) {
+			log.debug("delayed refreshing after 3 secs");
+			setPaymentPending(true);
+			// delayedRefresh();
+		} else {
+			log.debug("refreshing");
+			refresh();
+		}
+	}
+
+	const returnUrl = contributeUrl;
+	const payment = usePaymentProcessor({purchase, stripeCustomer, detectedLocation, setPurchase, paymentResultCallback, returnUrl, cancelable:true, paymentPending});
+	log.debug('payment:');
+	log.debug(payment);
+
+
+	//fetch stripeCustomer if not included in props
+	useEffect(
+		() => {
+			if (!stripeCustomer) {
+				refresh();
+			}
+		},
+		[props.stripeCustomer]
+	);
 
 	// set values if contribution already in effect
 	useEffect(() => {
@@ -116,13 +155,23 @@ function Contribute(props) {
 		}
 	}, [currentContribution]);
 
-	const handleConfirmIntent = (stripeIntent) => {
-		log.debug(stripeIntent);
-		setNotification({type: 'success', message: "Contribution Submitted. Thanks for supporting Zotero!"});
-		cancelPurchase();
-	}
-	const cancelPurchase = () => {
-		setPurchase(null);
+	// refresh the user subscription and stripe customer in order to update
+	// after changes that may have been processed on Z or stripe server.
+	// Includes setting payment country based on the country of the payment card,
+	// and setting currency to euro if the payment method calls for it.
+	const refresh = async () => {
+		log.debug('refresh');
+		setOperationPending(true);
+
+		let customerResponse = await getUserCustomer();
+		if(!customerResponse.success) {
+			setStripeCustomer(null);
+			setNotification(customerResponse);
+		} else {
+			log.debug(customerResponse.stripeCustomer);
+			setStripeCustomer(customerResponse.stripeCustomer);
+		}
+
 		setOperationPending(false);
 	};
 
@@ -149,7 +198,7 @@ function Contribute(props) {
 		setPeriod(newPeriod);
 	};
 
-	const contribute = () => {
+	const handleContribute = () => {
 		if (amount == 0) {
 			setNotification({type: 'error', message: 'No amount selected for contribution.'});
 			throw new Error('No amount selected for contribution.');
@@ -195,7 +244,7 @@ function Contribute(props) {
 		setPurchase(newPurchase);
 	};
 
-	const stopContribution = async () => {
+	const handleStopContribution = async () => {
 		try {
 			let resp = await postFormData('/storage/cancelcontribution', {}, { withSession: true });
 			
@@ -238,33 +287,6 @@ function Contribute(props) {
 		setAmount(nv);
 	};
 
-	const contributionCallbacks = {
-		setStripeIntent,
-		setNotification,
-		setOperationPending,
-		cancelPurchase,
-		handleConfirmIntent,
-	};
-
-	const contributionState = {
-		purchase,
-		currentContribution,
-		currentUser,
-		stripeCustomer,
-		stripeIntent,
-		operationPending,
-	};
-
-	let Payment = null;
-	if (purchase) {
-		Payment = (<ContributionPaymentHandler
-			{...{
-				contributionState,
-				callbacks: contributionCallbacks,
-			}}
-		/>);
-	}
-
 	let customNode = null;
 	if (custom) {
 		customNode = (
@@ -279,15 +301,16 @@ function Contribute(props) {
 		);
 	}
 	let contributionNode = null;
-	if (currentContribution) {
+	let description = [];
+	if (purchase) {
+		description = contributionDescription(purchase, currentUser);
+	} else if (currentContribution) {
 		const amtDollars = currentContribution.amount / 100;
 		const nextChargeDate = nextContributionCharge(currentContribution.created, currentContribution.period);
-		const description = (
-			<>
-				<p>{`You currently have an active contribution for US $${amtDollars} once per ${currentContribution.period}.`}</p>
-				<p>{`The next charge will be on ${nextChargeDate.toLocaleDateString(undefined, dateFormatOptions)}.`}</p>
-			</>
-		);
+		description = <>
+			<p>{`You currently have an active contribution for US $${amtDollars} once per ${currentContribution.period}.`}</p>
+			<p>{`The next charge will be on ${nextChargeDate.toLocaleDateString(undefined, dateFormatOptions)}.`}</p>
+		</>;
 		
 		contributionNode = (
 			<Row className = 'my-1'>
@@ -295,8 +318,8 @@ function Contribute(props) {
 					<Card>
 						<CardBody>
 							{description}
-							<Button block onClick={stopContribution}>Stop Contribution</Button>
-							<Button block onClick={contribute}>Review Payment</Button>
+							<Button block onClick={handleStopContribution}>Stop Contribution</Button>
+							<Button block onClick={handleContribute}>Update Payment</Button>
 						</CardBody>
 					</Card>
 				</Col>
@@ -308,45 +331,66 @@ function Contribute(props) {
 				<Col>
 					<Button
 						disabled={currentUser ? false : true}
-					 	block onClick={contribute}>Contribute</Button>
+					 	block onClick={handleContribute}>Contribute</Button>
 				</Col>
 			</Row>
 		);
 	}
+
+	storageState = {
+		payment,
+		description,//multi-para description of update, whether charge or not
+		stripeCustomer,
+		purchase,
+		invoicePossible: false,//whether it's allowed to create an invoice for this purchase
+		error:null,
+	};
+
+	callbacks = {
+		setPurchase,
+	};
+
+	let Payment = null;
+	if (purchase) {
+		Payment = (<PurchaseHandler />);
+	}
+
 	return (
 		<div>
-			{Payment}
-			<Row>
-				<PeriodCell currentPeriod={period} period={'once'} label='One Time' setPeriod={handlePeriod} />
-				<PeriodCell currentPeriod={period} period={'month'} label='Monthly' setPeriod={handlePeriod} />
-				<PeriodCell currentPeriod={period} period={'year'} label='Yearly' setPeriod={handlePeriod} />
-			</Row>
-			<hr />
-			<Row>
-				<AmountCell currentAmount={amount} amount={1000} label='$10' setAmount={handleAmount} />
-				<AmountCell currentAmount={amount} amount={2000} label='$20' setAmount={handleAmount} />
-				<AmountCell currentAmount={amount} amount={3000} label='$30' setAmount={handleAmount} />
-			</Row>
-			<Row>
-				<AmountCell currentAmount={amount} amount={5000} label='$50' setAmount={handleAmount} />
-				<AmountCell currentAmount={amount} amount={10000} label='$100' setAmount={handleAmount} />
-				<Col xs='4'>
-					<button
-						className={classnames('btn btn-block my-2 mx-auto', 'amount-cell', (custom ? 'btn-primary' : 'btn-outline-secondary'), { selected: custom })}
-						onClick={() => { setCustom(true); }}
-					>
-						Custom
-					</button>
-				</Col>
-			</Row>
-			{customNode}
-			{contributionNode}
-			{!currentUser && 
-			<Row className='mt-3'>
-				<Col>
-					<p className='text-center'>Please <a href='/user/login'>log in</a> to make a contribution</p>
-				</Col>
-			</Row>}
+			<StorageContext.Provider value={{storageState, callbacks}}>
+				{Payment}
+				<Row>
+					<PeriodCell currentPeriod={period} period={'once'} label='One Time' setPeriod={handlePeriod} />
+					<PeriodCell currentPeriod={period} period={'month'} label='Monthly' setPeriod={handlePeriod} />
+					<PeriodCell currentPeriod={period} period={'year'} label='Yearly' setPeriod={handlePeriod} />
+				</Row>
+				<hr />
+				<Row>
+					<AmountCell currentAmount={amount} amount={1000} label='$10' setAmount={handleAmount} />
+					<AmountCell currentAmount={amount} amount={2000} label='$20' setAmount={handleAmount} />
+					<AmountCell currentAmount={amount} amount={3000} label='$30' setAmount={handleAmount} />
+				</Row>
+				<Row>
+					<AmountCell currentAmount={amount} amount={5000} label='$50' setAmount={handleAmount} />
+					<AmountCell currentAmount={amount} amount={10000} label='$100' setAmount={handleAmount} />
+					<Col xs='4'>
+						<button
+							className={classnames('btn btn-block my-2 mx-auto', 'amount-cell', (custom ? 'btn-primary' : 'btn-outline-secondary'), { selected: custom })}
+							onClick={() => { setCustom(true); }}
+						>
+							Custom
+						</button>
+					</Col>
+				</Row>
+				{customNode}
+				{contributionNode}
+				{!currentUser && 
+				<Row className='mt-3'>
+					<Col>
+						<p className='text-center'>Please <a href='/user/login'>log in</a> to make a contribution</p>
+					</Col>
+				</Row>}
+			</StorageContext.Provider>
 		</div>
 	);
 }
@@ -356,8 +400,9 @@ Contribute.propTypes = {
 };
 
 function ManageContribution(props) {
+	log.debug(props);
 	const [notification, setNotification] = useState(null);
-	const { currentUser, currentContribution, stripeCustomer } = props;
+	const { currentUser, currentContribution, stripeCustomer, detectedLocation } = props;
 	
 	return (
 		<div className='manage-contribution'>
@@ -369,10 +414,11 @@ function ManageContribution(props) {
 						currentContribution,
 						stripeCustomer,
 						setNotification,
+						detectedLocation,
 					 	}}
 					/>
 					<div className='mt-4'>
-						<Invoices invoices={props.userInvoices} type='contribution' collapseLabel='Show Contribution Receipts' />
+						<Invoices invoices={props.userInvoices} type={['contribution', 'recurringContribution']} collapseLabel='Show Contribution Receipts' />
 					</div>
 				</Col>
 			</Row>

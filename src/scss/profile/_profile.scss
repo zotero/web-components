@@ -3,11 +3,13 @@ $color-profile-accent: #337ab7;
 $color-profile-tint: rgba(255, 255, 255, .75);
 
 .profile-avatar {
-	border: 1px solid $color-profile-base;
-	height: 200px;
 	position: relative;
-	width: 200px;
-
+	
+	img {
+		height: 200px;
+		width: 200px;
+		border: 1px solid $color-profile-base;
+	}
 	.profile-editable-actions {
 		background-color: $color-profile-tint;
 		padding: .25em;

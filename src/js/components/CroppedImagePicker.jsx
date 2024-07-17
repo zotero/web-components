@@ -4,12 +4,13 @@ let log = logger.Logger('CroppedImagePicker');
 import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-import ReactCrop from 'react-image-crop';
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Row, Col } from 'reactstrap';
+import ReactCrop, { centerCrop, makeAspectCrop } from 'react-image-crop';
 import { LoadingSpinner } from '../LoadingSpinner.js';
 import { PencilIcon } from '../Icons.js';
 
-const FALLBACK_PORTRAIT = '/static/images/theme/portrait-fallback.png';
+// const FALLBACK_PORTRAIT = '/static/images/theme/portrait-fallback.png';
+const FALLBACK_PORTRAIT = '/static/images/settings/profile/default_squarethumb.png';
 // const AVATAR_UPLOAD_HANDLER_URL = '/settings/profileimage';
 
 function CroppedImagePicker(props) {
@@ -18,8 +19,9 @@ function CroppedImagePicker(props) {
 	const [modalOpen, setModalOpen] = useState(false);
 	const [previous, setPrevious] = useState(null);
 	const [processing, setProcessing] = useState(false);
-	const [crop, setCrop] = useState(props.crop || { aspect: 1, unit: '%', width: 100 });
+	const [crop, setCrop] = useState(props.crop || { unit: '%', width: 100, x:25 });
 	const [imageRef, setImageRef] = useState(null);
+	const [aspect, setAspect] = useState(props.aspect || 1);
 	
 	const fileRef = useRef(null);
 
@@ -27,6 +29,21 @@ function CroppedImagePicker(props) {
 		onCropComplete(crop);
 	}, [imageRef, crop]);
 
+	
+	useEffect(() => {
+		if(!imageRef) {
+			return;
+		}
+
+		let crop = centerCrop(
+			makeAspectCrop({
+				unit: '%',
+				width: 100,
+			}, 1, imageRef.naturalWidth, imageRef.naturalHeight),
+		imageRef.naturalWidth, imageRef.naturalHeight);
+		setCrop(crop);
+	}, [value, imageRef]);
+	
 	useEffect(() => {
 		// reset state value when props.value is null
 		if (props.value === null) {
@@ -51,9 +68,13 @@ function CroppedImagePicker(props) {
 			reader.addEventListener('load', () => {
 				setValue(reader.result);
 			});
+			reader.addEventListener('error', ()=>{
+				log.debug('error event');
+			});
 			reader.readAsDataURL(evt.target.files[0]);
 			setModalOpen(true);
 		} else {
+			log.debug('no file');
 			cancel();
 		}
 	};
@@ -114,12 +135,13 @@ function CroppedImagePicker(props) {
 	let cropper = null;
 	if (value) {
 		// let fileUrl = window.URL.createObjectURL(file);
-		cropper = <ReactCrop
+		cropper = (<ReactCrop
 			src={value}
 			crop={crop}
-			onChange={newCrop => setCrop(newCrop)}
-			onImageLoaded={(img) => { setImageRef(img); onCropComplete(crop); }}
-		/>;
+			aspect={aspect}
+			onChange={(crop, percentCrop) => setCrop(crop)} >
+			<img src={value} onLoad={(e) => { setImageRef(e.currentTarget); onCropComplete(crop); }} />
+		</ReactCrop>);
 	}
 
 	const modal = (
@@ -133,24 +155,28 @@ function CroppedImagePicker(props) {
 				</div>
 			</ModalBody>
 			<ModalFooter>
-				<Button color='danger' className='mr-8' onClick={deleteImage}>Delete Image</Button>
-				<Button onClick={() => { fileRef.current.click(); }}>Choose File...</Button>
-				<Button onClick={save}>Save</Button>
-				<Button onClick={cancel}>Cancel</Button>
+				<Button outline size='sm' onClick={save}>Save</Button>
+				<Button outline size='sm' color='danger' onClick={cancel}>Cancel</Button>
 			</ModalFooter>
 		</Modal>
 	);
 
 	return (
 		<div className='profile-avatar'>
-			<img className='user-profile-avatar' src={croppedValue} />
+			<Row>
+				<Col>
+					<img className='user-profile-avatar' src={croppedValue} />
+				</Col>
+			</Row>
+			<Row>
+				<Col>
+					<Button outline color='secondary' size='sm' className='mt-1 mx-1' onClick={ () => edit() }>Upload</Button>
+				</Col>
+				<Col>
+					{props.hasImage ? <Button outline color='danger' size='sm' className='mt-1 mx-1' onClick={deleteImage}>Remove</Button> : null}
+				</Col>
+			</Row>
 			<input ref={fileRef} onChange={onSelectFile} type='file' name='profile-avatar-file' id='profile-avatar-file' accept='image/png, image/jpeg' />
-			<div className='profile-editable-actions'>
-				<LoadingSpinner loading={processing} />
-				<a className='profile-editable-action' onClick={ () => edit() }>
-					<PencilIcon />
-				</a>
-			</div>
 			{modal}
 		</div>
 	);
@@ -192,8 +218,11 @@ async function getCroppedImg(image, crop, fileName) {
 	// const base64Image = canvas.toDataURL('image/jpeg');
 
 	// As a blob
-	return new Promise((resolve, _) => {
+	return new Promise((resolve, reject) => {
 		canvas.toBlob((blob) => {
+			if (blob == null) {
+				reject("canvas.toBlob passed null. Could not create image.");
+			}
 			blob.name = fileName;
 			resolve(blob);
 		}, 'image/jpeg', 1);

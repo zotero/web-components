@@ -90,8 +90,7 @@ function ProfileImageForm(props) {
 	return (
 		<div className='profile-image-form'>
 			{notifier}
-			<CroppedImagePicker value={value} save={save} deleteImage={deleteImage} crop={{ aspect: 1, unit: '%', width: 100 }}></CroppedImagePicker>
-			{hasImage ? <Button color='danger' size='sm' className='mt-1' onClick={deleteImage}>Delete</Button> : null}
+			<CroppedImagePicker value={value} save={save} deleteImage={deleteImage} aspect={1} hasImage={hasImage}></CroppedImagePicker>
 		</div>
 	);
 }

@@ -8,7 +8,7 @@ import { PropTypes } from 'prop-types';
 import { RTE } from './text.js';
 import { Collection } from './collection.js';
 import { EditableTextInput } from './editableTextInput.js';
-import { Button, ButtonGroup, Card, CardBody } from 'reactstrap';
+import { Button, Col, Row } from 'reactstrap';
 
 // Drag sources and drop targets only interact
 // if they have the same string type.
@@ -95,25 +95,27 @@ const Section = (props) => {
 		typedSection = <Collection {...props} />;
 	}
 	return (
-		<div className='cv_section m-3' ref={ref} >
-			<div className='vert_drag_handle'></div>
-			<Card>
-				<CardBody>
-					<ButtonGroup className='mb-2 cv-section-controls'>
-						<Button outline color="dark" onClick={moveUp} title='Move Section Up'>▲</Button>
-						<Button outline color="dark" onClick={moveDown} title='Move Section Down'>▼</Button>
-						<Button outline color="dark" onClick={remove} title='Remove Section'>x</Button>
-						{/* <Button outline onClick={this.edit} title='Edit Section'>Edit</Button>*/}
-					</ButtonGroup>
+		<section className='settings-section cv_section m-3' ref={ref} >
+			<Row>
+				<Col xs='1'>
+					<div className='vert_drag_handle'></div>
+				</Col>
+				<Col xs='9'>
 					<h2 className='profile_cvHead'>
-						<EditableTextInput value={section.heading} save={updateHeading} placeholder='Section Header' />
+						<EditableTextInput value={section.heading} save={updateHeading} placeholder='Section Title' />
 					</h2>
 					<div className='mt-2'>
 						{typedSection}
 					</div>
-				</CardBody>
-			</Card>
-		</div>
+				</Col>
+				<Col xs='2'>
+					<Button color="link" onClick={moveUp} title='Move Section Up'>Move Up</Button>
+					<Button color="link" onClick={moveDown} title='Move Section Down'>Move Down</Button>
+					<Button color="link" onClick={remove} title='Remove Section'>Delete</Button>
+					{/* <Button outline onClick={this.edit} title='Edit Section'>Edit</Button>*/}
+				</Col>
+			</Row>
+		</section>
 	);
 };
 Section.propTypes = {

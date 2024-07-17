@@ -1,0 +1,47 @@
+main.settings {
+    background-color: #F6F6F6;
+
+    ol.breadcrumb {
+        a {
+            color: black;
+        }
+
+        padding:0;
+        background-color:#F6F6F6;
+    }
+    .breadcrumb-item {
+        + .breadcrumb-item::before {
+            content: ">";
+        }
+    }
+
+    div.settings-tabs {
+        // background-color: #F6F6F6;
+        border-radius: 5px;
+
+        a.nav-item {
+            color: black;
+        }
+
+        a.nav-item.active {
+            background-color: #ECECEC;
+            font-weight: bold;
+        }
+    }
+
+    div.settings-content {
+
+    }
+
+    section.settings-section {
+        background-color: white;
+        border-radius: 5px;
+        padding:24px;
+        margin-bottom: 1.5rem;
+        border: 1px solid #E6E6E6;
+    }
+
+    a.delete-link {
+        color: #CC2936;
+    }
+}

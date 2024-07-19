@@ -1,12 +1,18 @@
 //changeusernametest
 div.react.change-username {
-	.profile-preview.invalid, .username-message.invalid {
-		color:red;
+	margin-top:1rem;
+
+	p {
+		margin-top: 1rem;
+		margin-bottom:0;
 	}
-	.profile-preview.valid, .username-message.valid {
-		color:green;
-	}
-	#username-form {
-		margin-bottom: 2rem;
-	}
+	// .profile-preview.invalid, .username-message.invalid {
+	// 	color:red;
+	// }
+	// .profile-preview.valid, .username-message.valid {
+	// 	color:green;
+	// }
+	// #username-form {
+	// 	margin-bottom: 2rem;
+	// }
 }

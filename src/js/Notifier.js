@@ -8,31 +8,21 @@ import {useState, useEffect, useRef} from 'react';
 //type is one of success, info, or error
 let Notifier = function(props) {
 	const {message, type, redirect, redirectLabel, id} = props;
-	const [startTime, setStartTime] = useState(Date.now());
-	const [timeLeft, setTimeLeft] = useState(5);
+	const [redirectSecs] = useState(props.redirectSecs || 3);//default seconds before redirect if redirecting
+	const [counter, setCounter] = useState(0);
 	const intervalRef = useRef();
 
 	//periodically check how much time is left before we should redirect, then redirect
 	const intervalCallback = () => {
-		let nowMS = Date.now();
-		let elapsedMS = nowMS - startTime;
-		log.debug(`elapsedMS: ${elapsedMS}`);
-		let secsLeft = Math.max(0, Math.floor((5500 - elapsedMS) / 1000));
-		log.debug(`secsLeft: ${secsLeft}`);
-		setTimeLeft(secsLeft);
-		
-		if(elapsedMS >= 5000) {
-			clearInterval(intervalRef.current);
-			window.location.href = redirect;
-		}
+		setCounter(curCount => curCount+1);
 	};
 
 	useEffect(() => {
 		//start timer interval to count down if we have a redirect
 		if (redirect) {
-			intervalRef.current = setInterval(intervalCallback, 500);
+			intervalRef.current = setInterval(intervalCallback, 1000);
 		}
-	}, []);
+	}, [redirect]);
 
 	if(!message){
 		return null;
@@ -40,13 +30,14 @@ let Notifier = function(props) {
 	let timerMessage = null;
 	
 	if (redirect) {
-		if (timeLeft <= 0) {
+		let secsLeft = (redirectSecs - counter);
+		if ((secsLeft) <= 0) {
 			window.location.href = redirect;
 		}
 		if (redirectLabel) {
-			timerMessage = <p>Redirecting to {redirectLabel} in {timeLeft}...</p>;
+			timerMessage = <p>Redirecting to {redirectLabel} in {secsLeft}...</p>;
 		} else {
-			timerMessage = <p>Leaving in {timeLeft}...</p>;
+			timerMessage = <p>Leaving in {secsLeft}...</p>;
 		}
 	}
 

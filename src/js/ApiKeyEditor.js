@@ -97,7 +97,7 @@ const requestedPermissions = function (userGroups = []) {
 		break;
 	}
 	
-	for (let key in userGroups) {
+	for (let key of Object.keys(userGroups)) {
 		const group = userGroups[key];
 		const varname = `group_${group.id}`;
 		if (queryVars[varname] && queryVars[varname] != 'none') {
@@ -146,7 +146,7 @@ const PermissionsSummary = function (props) {
 	
 	let individualGroups = [];
 	if (access.groups) {
-		for (let id in access.groups) {
+		for (let id of Object.keys(access.groups)) {
 			if (id != 'all') {
 				individualGroups.push(id);
 			}
@@ -217,7 +217,7 @@ const PersonalLibraryPermissions = function () {
 	};
 
 	return (
-		<div id='personal-library-permissions'>
+		<section id='personal-library-permissions' className='settings-section apikey-section'>
 			<FormGroup tag='fieldset'>
 				<legend>Personal Library</legend>
 				<FormGroup check>
@@ -242,7 +242,7 @@ const PersonalLibraryPermissions = function () {
 					<p className='text-muted small'>Allow third party to make changes to your library.</p>
 				</FormGroup>
 			</FormGroup>
-		</div>
+		</section>
 	);
 };
 
@@ -278,7 +278,7 @@ const AllGroupsPermissions = function () {
 	}
 
 	return (
-		<div className='all-groups-permissions'>
+		<section className='all-groups-permissions settings-section apikey-section'>
 			<FormGroup tag='fieldset'>
 				<legend>Default Group Permissions</legend>
 				<Label htmlFor='all_groups'>All Groups
@@ -301,7 +301,7 @@ const AllGroupsPermissions = function () {
 				</Label>
 				<p className='text-muted small'>Allow access to all current and future groups.</p>
 			</FormGroup>
-		</div>
+		</section>
 	);
 };
 
@@ -395,7 +395,7 @@ const KeyAccessEditor = function (props) {
 	}
 
 	return (
-		<div>
+		<section className='settings-section apikey-section'>
 			<Form>
 				<PersonalLibraryPermissions />
 				<AllGroupsPermissions />
@@ -411,7 +411,7 @@ const KeyAccessEditor = function (props) {
 					{individualGroupNodes}
 				</FormGroup>
 			</Form>
-		</div>
+		</section>
 	);
 };
 KeyAccessEditor.propTypes = {
@@ -500,6 +500,7 @@ const ApiKeyEditor = function (props) {
 	const [createdKey, setCreatedKey] = useState(null);
 	const [verifier, setVerifier] = useState(null);
 
+	log.debug(access, 4);
 	useEffect(() => {
 		const initializeRequested = async () => {
 			// load usergroups if they weren't passed in as props
@@ -576,9 +577,9 @@ const ApiKeyEditor = function (props) {
 				all: keyObject.access.groups.all
 			};
 		}
-		
+
 		const saveUrl = buildUrl('saveKey', { key: key, oauth: oauthRequest });
-		const resp = await ajax({ url: saveUrl, type: 'POST', withSession: true, data: JSON.stringify(keyObject) });
+		const resp = await ajax({ url: saveUrl, type: 'POST', withSession: true, data: JSON.stringify(keyObject), throwOnError:false });
 	
 		if (!resp.ok) {
 			log.error('Error saving key');
@@ -643,7 +644,7 @@ const ApiKeyEditor = function (props) {
 		}
 		const data = await resp.json();
 		if (data.success) {
-			setNotification({ type: 'success', message: 'Key Revoked' });
+			setNotification({ type: 'success', message: 'Key Revoked', redirect: buildUrl('securityApplications') });
 		} else {
 			setNotification({ type: 'error', message: 'Error deleting key' });
 		}

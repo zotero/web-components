@@ -123,6 +123,8 @@ let buildUrl = function (name, params) {
 		return '/user/follow';
 	case 'addviaemail':
 		return '/settings/updateviaemail';
+	case 'securityApplications':
+		return '/settings/security#applications';
 	}
 	throw new Error('Unknown route in buildUrl');
 };

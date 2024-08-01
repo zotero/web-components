@@ -24,7 +24,7 @@
     "build:postprocess": "postcss build/web-components.css --use autoprefixer --no-map -r",
     "build:scss": "sass --style compressed src/scss/entry_build.scss build/web-components.css",
     "devbuild:scss": "run-s devbuild:scss:build devbuild:scss:post",
-    "devbuild:scss:build": "sass --style compressed src/scss/entry_build.scss build/web-components.css",
+    "devbuild:scss:build": "sass --style compressed src/scss/entry_dev.scss build/web-components.css",
     "devbuild:scss:post": "postcss build/*.css --use autoprefixer -r",
     "watch:scss": "nodemon -q -w src/scss --ext 'scss' --exec 'npm run devbuild:scss'",
     "eslint": "eslint \"src/js/**/*.+(js|jsx)\" || true",

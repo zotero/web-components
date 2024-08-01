@@ -1,97 +1,66 @@
-.downloads {
+main.downloads {
+  background-color: $gray-100;
 
-  .container {
-    padding: 0 15px;
+  border-top: 1px solid $gray-200;
+  padding-top: $spacer-lg;
 
-    @include media-breakpoint-up(sm) {
-      padding: 0 40px;
-    }
+  p.lead {
+    color: $text-muted;
+    max-width: 100%;
   }
 
-  h1 {
-    margin: 0;
-    line-height: 1.1;
-  }
-
-  .downloadButton .btn,
-  .lead + .btn {
-    font-size: 16px;
-    min-width: 160px;
-    text-decoration: none;
-    font-size: 16px;
-    padding: 9px 23px;
-    border-radius: 4px;
-
-    @media (min-width: 1041px) {
-      font-size: 20px;
-    }
-  }
-
-  .jumbotron {
+  section.download-section,div.download-section {
+    background-color: white;
+    border-radius: 5px;
+    padding:32px;
+    padding-bottom:0px;
+    margin-bottom: 1.5rem;
+    border: 1px solid $gray-200;
     text-align: center;
-    //margin-top: 60px; // 96px
-    line-height: 24px;
-    background-color: $white;
+    height: 100%;
 
-    @include media-breakpoint-up(sm) {
-      -js-display: flex;
-      display: flex;
+    div.download-button .btn {
+      margin-top: 8px;
     }
 
-    h1 {
-      font-size: 30px;
-      margin-bottom: 8px;
-      letter-spacing: -1px;
-
-      @media (min-width: 1041px) {
-        font-size: 36px;
-      }
-    }
-    h1:not(.wrap) {
-      white-space: nowrap;
+    @include media-breakpoint-down(md) {
+      margin-top: 1.5rem;
+      height: auto;
     }
 
-    .lead {
-      font-size: 14px;
-      line-height: 24px;
-      margin: 0 auto 20px; // 27px
-      width: auto;
-
-      @media (min-width: 1041px) {
-        font-size: 16px;
-        margin-bottom: 28px; // 40px
-      }
+    div.additional-notes {
+      padding-top: 8px;
+      min-height: 150px;
     }
   }
 
-  .standalone,
-  .connector {
-    flex-grow: 1;
-    flex-shrink: 1;
-    flex-basis: 0;
-    background-color: $gray-100;
-    background-image: linear-gradient($white 0%, $gray-100 33%);
-    padding: 0 20px 57px; // 64px
-    position: relative;
+  .other-versions {
+    padding: 8px 0;
+  }
 
-    @include media-breakpoint-up(sm) {
-      padding: 0 20px 89px; // 96px
-      margin: 0 20px;
+  .bottom-collapse {
+    text-align: left;
+    border-top: 2px solid $gray-200;
+    
+    .toggle {
+      cursor: pointer;
     }
 
-    p {
-      margin-bottom: 0;
+    .toggle a {
+      color: $gray-900;
+      font-weight:bold;
+      font-size: 16px;
     }
   }
 
   .download-image {
-    width: 118px;
-    height: 128px;
+    // width: 118px;
+    // height: 128px;
     margin-bottom: 14px;
 
     @media (min-width: 1041px) {
-      width: 147px;
-      height: 160px;
+      // width: 147px;
+      // height: 160px;
       margin-bottom: 28px; // 48px
     }
   }
@@ -106,27 +75,33 @@
   }
 
   .standalone {
-    .other-versions {
-      color: $gray-600;
-      margin: 38px 0 0 0;
-    }
-
-    ul {
-      margin: 0;
-      padding: 0;
-
-      li {
-        list-style-type: none;
-        display: inline;
-      }
-    }
-
-    .os-list,
+    
     .old-versions ul {
       li {
         & + li:before {
           content: "·";
           margin: 0 8px;
+        }
+      }
+    }
+
+    ul.os-list {
+      li {
+        list-style: disc;
+
+        a {
+          white-space: nowrap;
+          display: inline-block;
+        }
+  
+        a:before {
+          content: "·";
+          margin: 0 8px;
+        }
+        
+        a:first-child:before {
+          content:'';
+          margin: 0 4px;
         }
       }
     }
@@ -176,7 +151,7 @@
       @media (min-width: 1041px) {
         margin: {
           top: 16px;
-          bottom: 50px;
+          bottom: 44px;
         }
       }
 
@@ -187,8 +162,8 @@
         }
 
         @media (min-width: 1041px) {
-          width: 112px;
-          height: 112px;
+          width: 96px;
+          height: 96px;
         }
       }
 
@@ -238,12 +213,6 @@
           padding: 0 calc($grid-gutter-width / 2);
         }
       }
-
-      .bookmarklet {
-        color: #777;
-        max-width: 330px;
-        margin: auto;
-      }
     }
 
     .danger {
@@ -255,44 +224,33 @@
 	}
   }
 
-  .plugins {
+  section#download-mobile-section {
+    border-top: 1px solid $gray-200;
+    background-color: $white;
+    margin-top: $spacer-xl;
+    padding: $spacer-xl 32px;
     text-align: center;
-    margin: 52px 0 51px 0; // 64px
-    padding: 0 5px;
 
-    h1 {
-      font-size: 30px;
-      margin: 0 0 8px 0;
+    @include media-breakpoint-up(lg) {
+      padding: 80px 32px;
     }
 
-    p {
-      font-size: 16px;
-      line-height: 1.5;
-      margin: 0;
+    @include media-breakpoint-down(md) {
+      margin-top: 1.5rem;
+      height: auto;
+    }
 
-      @include media-breakpoint-up(sm) {
-        max-width: 500px;
+    div.mobile-text {
+      text-align: left;
+
+      @include media-breakpoint-down(md) {
+        text-align: center;
       }
     }
-  }
-
-  .plugins-container {
-    display: inline-block;
-    vertical-align: top;
-
-    @include media-breakpoint-up(sm) {
-      text-align: left;
-      margin-left: 80px;
-    }
-  }
-
-  .plugins-icon {
-    margin-bottom: 15px; // 32px
-
-    @include media-breakpoint-up(sm) {
-      float: left;
-      margin-right: 40px;
-      margin-bottom: 0;
+    img.apple-store-link {
+      height:50px;
+      float:left;
+      margin-right: $spacer;
     }
   }
 }

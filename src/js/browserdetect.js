@@ -9,44 +9,15 @@ const dataBrowser = [
 		subString: 'Chrome',
 		identity: 'Chrome'
 	}, {
-		string: navigator.userAgent,
-		subString: 'OmniWeb',
-		versionSearch: 'OmniWeb/',
-		identity: 'OmniWeb',
-	}, {
 		string: navigator.vendor,
 		subString: 'Apple',
 		identity: 'Safari',
 		versionSearch: 'Version'
 	}, {
-		prop: window.opera,
-		identity: 'Opera',
-		versionSearch: 'Version'
-	}, {
-		string: navigator.vendor,
-		subString: 'iCab',
-		identity: 'iCab'
-	}, {
-		string: navigator.vendor,
-		subString: 'KDE',
-		identity: 'Konqueror'
-	}, {
 		string: navigator.userAgent,
 		subString: 'Firefox',
 		identity: 'Firefox'
 	}, {
-		string: navigator.vendor,
-		subString: 'Camino',
-		identity: 'Camino'
-	}, { // for newer Netscapes (6+)
-		string: navigator.userAgent,
-		subString: 'Netscape',
-		identity: 'Netscape'
-	}, {
-		string: navigator.userAgent,
-		subString: 'MSIE',
-		identity: 'Explorer',
-		versionSearch: 'MSIE'
 	}, {
 		string: navigator.userAgent,
 		subString: 'Gecko',
@@ -61,11 +32,11 @@ const dataBrowser = [
 ];
 const dataOS = [
 	{
-		string: navigator.platform,
+		string: navigator.userAgentData?.platform ?? navigator.platform,
 		subString: 'Win',
 		identity: 'Windows'
 	}, {
-		string: navigator.platform,
+		string: navigator.userAgentData?.platform ?? navigator.platform,
 		subString: 'Mac',
 		identity: 'Mac'
 	}, {
@@ -73,7 +44,7 @@ const dataOS = [
 		subString: 'iPhone',
 		identity: 'iPhone/iPod'
 	}, {
-		string: navigator.platform,
+		string: navigator.userAgentData?.platform ?? navigator.platform,
 		subString: 'Linux',
 		identity: 'Linux'
 	}

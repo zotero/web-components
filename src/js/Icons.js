@@ -26,6 +26,24 @@ ZoteroIcon.propTypes = {
 	className: PropTypes.string,
 };
 
+function ZoteroAppIconSVG(props) {
+	let iconImagePath = `${imagePath}/icons/zotero-app-icon`;
+	iconImagePath += '.svg';
+
+	let p = { ...props, src: iconImagePath, className: classnames('zotero-app-icon', props.className) };
+	delete p.browser;
+	return (<img {...p} />);
+}
+ZoteroAppIconSVG.defaultProps = {
+	width: '160',
+	height: '160'
+};
+ZoteroAppIconSVG.propTypes = {
+	width: PropTypes.string,
+	height: PropTypes.string,
+	className: PropTypes.string,
+};
+
 // BrowserIcon returns a browser icon image tag based on browser and size props
 function BrowserIcon(props) {
 	let browserImagePath = `${imagePath}/icons/${props.browser.toLowerCase()}-icon-${props.size}`;
@@ -50,19 +68,21 @@ function BrowserExtensionIcon(props) {
 		<figure className='browser-plus-extension'>
 			<BrowserIcon
 				browser={props.browser}
+				width={props.browserIconWidth}
 				size={props.browserIconSize}/>
 			<span className='icon-plus'></span>
-			<ZoteroIcon
+			<ZoteroAppIconSVG
 				alt='Zotero Extension'
 				width={props.zoteroIconWidth}
 				height={props.zoteroIconHeight}
-				className='zotero-icon'
+				className='zotero-app-icon'
 			/>
 		</figure>
 	);
 }
 BrowserExtensionIcon.defaultProps = {
 	browserIconSize: '128',
+	browserIconWidth: '128',
 	zoteroIconWidth: '128',
 	zoteroIconHeight: '140',
 };
@@ -127,4 +147,4 @@ OrcidIcon.propTypes = {
 	height: PropTypes.string.isRequired,
 };
 
-export { ZoteroIcon, BrowserIcon, BrowserExtensionIcon, PluginsIcon, PencilIcon, TrashIcon, CheckIcon, XIcon, PlusIcon, OrcidIcon };
+export { ZoteroIcon, ZoteroAppIconSVG, BrowserIcon, BrowserExtensionIcon, PluginsIcon, PencilIcon, TrashIcon, CheckIcon, XIcon, PlusIcon, OrcidIcon };

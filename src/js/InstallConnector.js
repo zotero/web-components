@@ -41,18 +41,23 @@ function InstallFirefoxButton(props) {
 
 	if (type == 'button') {
 		return (
-			<a href={firefoxDownload} className='btn' onClick={installFirefox}>{label}</a>
+			<a href={firefoxDownload} className='btn btn-lg' onClick={installFirefox}>{label}</a>
 		);
 	} else if (type == 'image') {
 		return (
 			<a href={firefoxDownload} onClick={installFirefox}><BrowserIcon browser='firefox' /></a>
 		);
+	} else if (type == 'image-link') {
+		return (<div className='download-image-link'>
+			<div className='browser-image'><BrowserIcon browser='firefox' /></div>
+			<a href={firefoxDownload} onClick={installFirefox} id='firefox-connector-download-button' className='download-link'>Firefox Connector</a>
+		</div>);
 	} else if (type == 'full') {
 		return (
 			<div className='download-full'>
 				<div className='browser-image'><BrowserIcon browser='firefox' /></div>
 				<h3>Firefox connector</h3>
-				<div><a href={firefoxDownload} className='btn' onClick={installFirefox}>{label}</a></div>
+				<div><a href={firefoxDownload} className='btn btn-lg' onClick={installFirefox}>{label}</a></div>
 			</div>
 		);
 	}
@@ -65,17 +70,22 @@ InstallFirefoxButton.defaultProps = {
 function InstallChromeButton(props) {
 	const { type, label } = props;
 	if (type == 'button') {
-		return <a href={chromeDownload} id='chrome-connector-download-button' className='btn download-link'>{label}</a>;
+		return <a href={chromeDownload} id='chrome-connector-download-button' className='btn btn-lg download-link'>{label}</a>;
 	} else if (type == 'image') {
 		return (
 			<a href={chromeDownload}><BrowserIcon browser='chrome' /></a>
 		);
+	} else if (type == 'image-link') {
+		return (<div className='download-image-link'>
+			<div className='browser-image'><BrowserIcon browser='chrome' /></div>
+			<a href={chromeDownload} id='chrome-connector-download-button' className='download-link'>Chrome Connector</a>
+		</div>);
 	} else if (type == 'full') {
 		return (
 			<div className='download-full'>
 				<div className='browser-image'><BrowserIcon browser='chrome' /></div>
 				<h3>Chrome connector</h3>
-				<div className='install-button'><a href={chromeDownload} id='chrome-connector-download-button' className='btn download-link'>{label}</a></div>
+				<div className='install-button'><a href={chromeDownload} id='chrome-connector-download-button' className='btn btn-lg download-link'>{label}</a></div>
 			</div>
 		);
 	}
@@ -88,17 +98,22 @@ InstallChromeButton.defaultProps = {
 function InstallEdgeButton(props) {
 	const { type, label } = props;
 	if (type == 'button') {
-		return <a href={edgeDownload} id='edge-connector-download-button' className='btn download-link'>{label}</a>;
+		return <a href={edgeDownload} id='edge-connector-download-button' className='btn btn-lg download-link'>{label}</a>;
 	} else if (type == 'image') {
 		return (
 			<a href={edgeDownload}><BrowserIcon browser='edge' /></a>
 		);
+	} else if (type == 'image-link') {
+		return (<div className='download-image-link'>
+			<div className='browser-image'><BrowserIcon browser='edge' /></div>
+			<a href={edgeDownload} id='chrome-connector-download-button' className='download-link'>Edge Connector</a>
+		</div>);
 	} else if (type == 'full') {
 		return (
 			<div className='download-full'>
 				<div className='browser-image'><BrowserIcon browser='edge' /></div>
 				<h3>Edge connector</h3>
-				<div className='install-button'><a href={edgeDownload} id='edge-connector-download-button' className='btn download-link'>{label}</a></div>
+				<div className='install-button'><a href={edgeDownload} id='edge-connector-download-button' className='btn btn-lg download-link'>{label}</a></div>
 			</div>
 		);
 	}
@@ -118,6 +133,11 @@ function InstallSafariButton(props) {
 		return (
 			<a href={safariDownload}><BrowserIcon browser='safari' /></a>
 		);
+	} else if (type == 'image-link') {
+		return (<div className='download-image-link'>
+			<div className='browser-image'><BrowserIcon browser='safari' /></div>
+			<p id="safari-download-text-small">The Zotero Connector for Safari is bundled with Zotero. You can enable it from the Extensions pane of the Safari preferences.</p>
+		</div>);
 	} else if (type == 'full') {
 		return (
 			<div className='download-full'>
@@ -160,7 +180,8 @@ InstallButton.propTypes = {
 
 function AllExtensionsSection(props) {
 	const { type, except } = props;
-	let otherBrowsers = ['chrome', 'firefox', 'safari', 'edge'].filter((browser) => {
+	let otherBrowsers = props.otherBrowsers ?? ['chrome', 'firefox', 'safari', 'edge'];
+	otherBrowsers = otherBrowsers.filter((browser) => {
 		return browser != except.toLowerCase();
 	});
 
@@ -175,7 +196,10 @@ function AllExtensionsSection(props) {
 	});
 	return (
 		<section className='all-extensions'>
-			<h2 className='visually-hidden'>All connectors</h2>
+			{props.title ? 
+				<h2 className='visually-hidden'>All connectors</h2>
+				: null
+			}
 			<ul>
 				{installNodes}
 			</ul>
@@ -186,7 +210,8 @@ function AllExtensionsSection(props) {
 	);
 }
 AllExtensionsSection.defaultProps = {
-	type: 'full'
+	type: 'full',
+	title: true,
 };
 AllExtensionsSection.propTypes = {
 	type: PropTypes.string.isRequired,

@@ -5,7 +5,7 @@ let log = logger.Logger('EditableTextInput');
 
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Input } from 'reactstrap';
+import { Button, Input } from 'reactstrap';
 
 function EditableTextInput(props) {
 	const { placeholder, save } = props;
@@ -131,7 +131,7 @@ function EditableRichText(props) {
 					defaultValue={value}
 					className='rte'
 				/>
-				<button onClick={blurSave}>Save</button>
+				<Button onClick={blurSave}>Save</Button>
 			</div>
 		);
 	} else {

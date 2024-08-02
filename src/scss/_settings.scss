@@ -1,5 +1,5 @@
 main.settings {
-    background-color: #F6F6F6;
+    background-color: $gray-100;
 
     ol.breadcrumb {
         a {
@@ -7,7 +7,7 @@ main.settings {
         }
 
         padding:0;
-        background-color:#F6F6F6;
+        background-color:$gray-100;
     }
     .breadcrumb-item {
         + .breadcrumb-item::before {
@@ -16,7 +16,7 @@ main.settings {
     }
 
     div.settings-tabs {
-        // background-color: #F6F6F6;
+        // background-color: $gray-100;
         border-radius: 5px;
 
         a.nav-item {
@@ -38,7 +38,7 @@ main.settings {
         border-radius: 5px;
         padding:24px;
         margin-bottom: 1.5rem;
-        border: 1px solid #E6E6E6;
+        border: 1px solid $gray-200;
     }
 
     a.delete-link {

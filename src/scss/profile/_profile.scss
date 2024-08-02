@@ -9,6 +9,7 @@ $color-profile-tint: rgba(255, 255, 255, .75);
 		height: 200px;
 		width: 200px;
 		border: 1px solid $color-profile-base;
+		background-color: $gray-400;
 	}
 	.profile-editable-actions {
 		background-color: $color-profile-tint;
@@ -20,11 +21,6 @@ $color-profile-tint: rgba(255, 255, 255, .75);
 		> a {
 			margin: 0 .1em;
 		}
-	}
-
-	img {
-		height: 100%;
-		width: 100%;
 	}
 
 	[type=file] {

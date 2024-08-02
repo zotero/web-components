@@ -112,7 +112,7 @@ const OAuthVerify = function (props) {
 	const { applicationName, verifier } = props;
 	return (
 		<Alert color='success'>
-			<h1 className='text-center'>Access Granted</h1>
+			<h2 className='text-center'>Access Granted</h2>
 			<p>To complete the transaction, return to {applicationName} and enter the verification code below.</p>
 			<p id='oauth_verifier' className='text-center'>{verifier}</p>
 		</Alert>
@@ -468,10 +468,10 @@ const IdentityRequest = function (props) {
 	return (
 		<ErrorWrapper>
 			<div className='identity-request'>
-				<h1>Permissions Request</h1>
+				<h2>Permissions Request</h2>
 				<Notifier {...notification} />
 				<Alert color='secondary' className='my-3'>
-					<h2>An application would like to connect to your account</h2>
+					<h3>An application would like to connect to your account</h3>
 					<p>The application &quot;{oauthClientName}&quot; would like to access your account.</p>
 				</Alert>
 
@@ -659,9 +659,9 @@ const ApiKeyEditor = function (props) {
 		return <IdentityRequest oauthClientName={oauthClientName} />;
 	}
 
-	let title = <h1>New Key</h1>;
+	let title = <h2>New Key</h2>;
 	if (editKey) {
-		title = <h1>Edit Key</h1>;
+		title = <h2>Edit Key</h2>;
 	}
 
 	if (loading) {

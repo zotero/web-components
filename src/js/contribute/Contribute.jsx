@@ -129,7 +129,17 @@ function Contribute(props) {
 	}
 
 	const returnUrl = contributeUrl;
-	const payment = usePaymentProcessor({purchase, stripeCustomer, detectedLocation, setPurchase, paymentResultCallback, returnUrl, cancelable:true, paymentPending});
+	const payment = usePaymentProcessor({
+		purchase,
+		stripeCustomer,
+		detectedLocation,
+		paymentMethodConfigs: props.paymentMethodConfigs,
+		setPurchase,
+		paymentResultCallback,
+		returnUrl,
+		cancelable:true,
+		paymentPending,
+	});
 	log.debug('payment:');
 	log.debug(payment);
 

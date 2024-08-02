@@ -30,10 +30,11 @@ const stripePaymentCurrency = function(stripeCustomer, paymentMethod, detectedLo
 	} else if(stripeCustomer && stripeCustomer.metadata.currency) {
 		log.debug(`customer has currency set. Setting currency to ${stripeCustomer.metadata.currency}`);
 		currency = stripeCustomer.metadata.currency;
-	} else if(paymentMethod && euroCountries.includes(paymentMethod.country)) {
+	}/* else if(paymentMethod && euroCountries.includes(paymentMethod.country)) {
 		log.debug(`payment method has euro country code ${paymentMethod.country}. Setting currency to eur`);
 		currency = 'eur';
-	}/* else if(detectedLocation.continent == 'EU' ? 'eur' : 'usd') {
+	}*/
+	/* else if(detectedLocation.continent == 'EU' ? 'eur' : 'usd') {
 		currency = 'eur';
 	}*/
 
@@ -75,7 +76,7 @@ const defaultPurchasePaymentMethod = function(editPayment, confirmationToken, st
 	return defaultPaymentMethod;
 }
 
-function usePaymentProcessor({ purchase, stripeCustomer, userSubscription, detectedLocation, setPurchase, paymentResultCallback, returnUrl, cancelable, paymentPending }) {
+function usePaymentProcessor({ purchase, stripeCustomer, userSubscription, detectedLocation, setPurchase, paymentResultCallback, returnUrl, cancelable, paymentPending, paymentMethodConfigs }) {
 	log.debug({purchase, stripeCustomer, userSubscription, detectedLocation, setPurchase});
 	// const [ stripeCustomer, setStripeCustomer ] = useState(props.stripeCustomer);
 	const [ notification, setNotification ] = useState(null);
@@ -94,6 +95,7 @@ function usePaymentProcessor({ purchase, stripeCustomer, userSubscription, detec
 	//set defaultPaymentMethod, set currency to euro if saved payment method is EU bank, set location if it doesn't match payment method country
 	let defaultPaymentMethod = defaultPurchasePaymentMethod(editPayment, confirmationToken, stripeCustomer);
 	let defaultCurrency = stripePaymentCurrency(stripeCustomer, defaultPaymentMethod, detectedLocation);
+	let paymentMethodConfig = paymentMethodConfigs['DefaultUSD'];
 
 	//update currency after getting customer or intent
 	useEffect(() => {
@@ -105,7 +107,7 @@ function usePaymentProcessor({ purchase, stripeCustomer, userSubscription, detec
 				log.debug('currency already set');
 			}
 		}
-	}, [stripeCustomer, stripeIntent]);
+	}, [stripeCustomer, defaultPaymentMethod, detectedLocation, stripeIntent]);
 
 	if (!editPayment) {
 		if (purchase && !confirmationToken && ['individualPaymentUpdate', 'contributionPaymentUpdate'].includes(purchase.type)) {
@@ -119,6 +121,12 @@ function usePaymentProcessor({ purchase, stripeCustomer, userSubscription, detec
 	if (purchase) {
 		if (purchase.currency != currency) {
 			purchase.currency = currency;
+		}
+
+		if (purchase.currency == 'eur') {
+			paymentMethodConfig = paymentMethodConfigs['DefaultEUR'];
+		} else if (detectedLocation.continent == 'AS') {
+			paymentMethodConfig = paymentMethodConfigs['DefaultUSD_CN'];
 		}
 	}
 
@@ -174,7 +182,8 @@ function usePaymentProcessor({ purchase, stripeCustomer, userSubscription, detec
 					log.debug("have confirmationToken: getting price and creating intent that we'll confirm after price");
 					let locationPurchase = Object.assign({}, purchase, {
 						confirmationTokenID: confirmationToken?.id ?? null,
-						taxID
+						taxID,
+						paymentMethodConfig,
 					});
 					setOperationPending(true);
 					try{
@@ -373,6 +382,7 @@ function usePaymentProcessor({ purchase, stripeCustomer, userSubscription, detec
 			defaultPaymentMethod,
 			allowEuro: detectedLocation.continent == 'EU',
 			allowCN: detectedLocation.continent == 'AS',
+			paymentMethodConfig,
 			cancelable,
 			editPayment,
 			notification,

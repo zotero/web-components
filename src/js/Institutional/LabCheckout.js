@@ -62,7 +62,15 @@ function LabCheckout(props) {
 		}
 	}
 
-	const payment = usePaymentProcessor({purchase, stripeCustomer, detectedLocation, setPurchase, paymentResultCallback, cancelable:true});
+	const payment = usePaymentProcessor({
+		purchase,
+		stripeCustomer,
+		detectedLocation,
+		paymentMethodConfigs: props.paymentMethodConfigs,
+		setPurchase,
+		paymentResultCallback,
+		cancelable:true,
+	});
 
 	/** Effect calls */
 	// load stripe customer at start for logged in user if there is one

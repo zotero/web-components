@@ -30,7 +30,14 @@ function LabRenew(props) {
 		delayedReload(3000, ['payment_intent', 'payment_intent_client_secret', 'setup_intent', 'setup_intent_client_secret']);
 	}
 
-	const payment = usePaymentProcessor({purchase, stripeCustomer, detectedLocation, setPurchase, paymentResultCallback});
+	const payment = usePaymentProcessor({
+		purchase,
+		stripeCustomer,
+		detectedLocation,
+		paymentMethodConfigs: props.paymentMethodConfigs,
+		setPurchase,
+		paymentResultCallback
+	});
 
 	/* callbacks */
 	const renewLab = () => {

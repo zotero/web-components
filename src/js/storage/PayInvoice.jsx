@@ -57,7 +57,16 @@ function PayInvoice(props) {
 	}
 
 	const returnUrl = window.location.href;
-	const payment = usePaymentProcessor({purchase, stripeCustomer, detectedLocation, setPurchase, paymentResultCallback, returnUrl, cancelable:false});
+	const payment = usePaymentProcessor({
+		purchase,
+		stripeCustomer,
+		detectedLocation,
+		paymentMethodConfigs: props.paymentMethodConfigs,
+		setPurchase,
+		paymentResultCallback,
+		returnUrl,
+		cancelable:false
+	});
 
 	const refresh = async () => {
 		window.location.reload();

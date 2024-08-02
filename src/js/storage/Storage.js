@@ -84,7 +84,18 @@ function Storage(props) {
 	}
 
 	const returnUrl = storageUrl;
-	const payment = usePaymentProcessor({purchase, stripeCustomer, userSubscription, detectedLocation, setPurchase, paymentResultCallback, returnUrl, cancelable:true, paymentPending});
+	const payment = usePaymentProcessor({
+		purchase,
+		stripeCustomer,
+		userSubscription,
+		detectedLocation,
+		paymentMethodConfigs: props.paymentMethodConfigs,
+		setPurchase,
+		paymentResultCallback,
+		returnUrl,
+		cancelable:true,
+		paymentPending
+	});
 	log.debug('payment:');
 	log.debug(payment);
 
@@ -375,6 +386,7 @@ function Storage(props) {
 			purchase,
 			invoicePossible,//whether it's allowed to create an invoice for this purchase
 			error,
+			paymentMethodConfigs: props.paymentMethodConfigs,
 		};
 
 		callbacks = {
@@ -389,6 +401,7 @@ function Storage(props) {
 	}
 
 	log.debug(`building storagePlansSection. currency:${payment.state.currency}`);
+	log.debug(payment.state);
 	let storagePlansSection = userSubscription.institutionUnlimited ? null : <StoragePlansSection {...{
 		storagePlans,
 		selectPlan,

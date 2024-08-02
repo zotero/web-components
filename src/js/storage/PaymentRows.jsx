@@ -57,7 +57,7 @@ function PaymentRow(props) {
 					<Row className='mt-2'>
 						<Col>
 							{paymentMethod ? removePaymentButton : null}
-							{!userSubscription.recur && (userSubscription.storageLevel > 1) ? autoRenewButton : null}
+							{(!userSubscription.recur || !paymentMethod) && (userSubscription.storageLevel > 1) ? autoRenewButton : null}
 							{userSubscription.storageLevel > 1 ? renewButton : null}
 						</Col>
 					</Row>

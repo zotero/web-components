@@ -128,7 +128,7 @@ function PaymentMethod(props) {
 			</>
 		)
 	default:
-		log.error('Unknown source type passed to PaymentMethod');
+		log.warn('Unknown source type passed to PaymentMethod');
 		return (
 			<>
 				<BillingDetails {...source.billing_details} />

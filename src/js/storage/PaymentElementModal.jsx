@@ -163,38 +163,34 @@ PECheckoutForm.propTypes = {
 	storageState: PropTypes.shape({
 		payment: paymentShape
 	}),
-	// onClose: PropTypes.func.isRequired,
 	buttonLabel: PropTypes.string,
 	useEmail: PropTypes.bool,
 	useAddress: PropTypes.bool,
 	stripeIntent: PropTypes.object,
-	// cancelable: PropTypes.bool,
 };
 PECheckoutForm.defaultProps = {
 	useEmail: false,
 	useAddress: false,
-	// cancelable: true,
 };
 
 function PaymentElementModal(props) {
 	const { storageState } = useStorageContext();
 	const { stripe, cancel } = props;
-	const { payment, purchase } = storageState;
+	const { payment, purchase, paymentMethodConfigs } = storageState;
 	log.debug('PaymentElementModal render');
 	log.debug(props);
-
-	// const handleClose = () => {
-	// 	cancel();
-	// };
 
 	let mode = 'payment';
 	let setupFutureUsage = 'off_session';
 	let amount = payment.state.price.total;
+
+	//setup different modes for payment updates where only future usage is required
 	if (['individualPaymentUpdate', 'contributionPaymentUpdate'].includes(purchase.type)) {
 		mode = 'setup';
 		setupFutureUsage = 'off_session';
 		amount = null;
 	} else if(payment.state.allowCN) {
+		//don't require future usage to CN to allow alipay
 		log.debug("allowCN true, setting future usage to ''");
 		setupFutureUsage = null;
 	}
@@ -218,6 +214,7 @@ function PaymentElementModal(props) {
 		currency: payment.state.currency,
 		paymentMethodCreation: 'manual',
 		setupFutureUsage,
+		paymentMethodConfiguration: payment.state.paymentMethodConfig,
 	};
 
 	//add a key for Elements so we can update it when the paymentIntent changes

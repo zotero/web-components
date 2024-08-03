@@ -29,7 +29,7 @@ let platforms = [
 ];
 
 let platformVariants = {
-	macOS: [
+	Mac: [
 		{platform:'mac', label:'macOS', dlButtonLabel: 'Download'}
 	],
 	Windows: [
@@ -103,7 +103,7 @@ function DownloadStandalone(props) {
 	if (!['Windows', 'Mac', 'macOS', 'Linux', 'iOS'].includes(featuredOS)) {
 		featuredOS = 'Windows';
 	}
-	if (featuredOS == 'Mac') featuredOS = 'macOS';
+	if (featuredOS == 'macOS') featuredOS = 'Mac';
 
 	let featuredButton;
 	let otherVersions = structuredClone(platformVariants);
@@ -118,7 +118,7 @@ function DownloadStandalone(props) {
 			versionNote = <p>Also Available: <a href={downloadUrls['win-arm64']}>Windows ARM</a></p>;
 			break;
 		}
-		case 'macOS': {
+		case 'Mac': {
 			featuredPlatform = 'mac';
 			break;
 		}
@@ -133,7 +133,7 @@ function DownloadStandalone(props) {
 	}
 	let variant = platformVariants[featuredOS].filter(v => v.platform == featuredPlatform)[0];
 	let url = downloadUrls[featuredPlatform];
-	featuredButton = <DownloadStandaloneButton href={url} label={`${variant.dlButtonLabel}`} variant />;
+	featuredButton = <DownloadStandaloneButton href={url} label={`${variant.dlButtonLabel}`} />;
 
 	let otherNodes = [];
 	for (let OS in otherVersions) {

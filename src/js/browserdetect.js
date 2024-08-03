@@ -18,7 +18,6 @@ const dataBrowser = [
 		subString: 'Firefox',
 		identity: 'Firefox'
 	}, {
-	}, {
 		string: navigator.userAgent,
 		subString: 'Gecko',
 		identity: 'Mozilla',
@@ -42,7 +41,15 @@ const dataOS = [
 	}, {
 		string: navigator.userAgent,
 		subString: 'iPhone',
-		identity: 'iPhone/iPod'
+		identity: 'iOS'
+	}, {
+		string: navigator.userAgent,
+		subString: 'iPad',
+		identity: 'iOS'
+	}, {
+		string: navigator.userAgent,
+		subString: 'Android',
+		identity: 'Android'
 	}, {
 		string: navigator.userAgentData?.platform ?? navigator.platform,
 		subString: 'Linux',
@@ -50,11 +57,36 @@ const dataOS = [
 	}
 ];
 
+const dataArch = [
+	{
+		string: navigator.userAgentData?.platform ?? navigator.platform,
+		subString: 'x86_64',
+		identity: 'x86_64',
+	}, {
+		string: navigator.userAgentData?.platform ?? navigator.platform,
+		subString: 'x64',
+		identity: 'x64',
+	}, {
+		string: navigator.userAgentData?.platform ?? navigator.platform,
+		subString: 'i686',
+		identity: 'i686',
+	}, {
+		string: navigator.userAgentData?.platform ?? navigator.platform,
+		subString: 'x86',
+		identity: 'x86',
+	}, {
+		string: navigator.userAgentData?.platform ?? navigator.platform,
+		subString: 'arm',
+		identity: 'arm',
+	}, 
+];
+
 class BrowserDetect {
 	init() {
 		this.browser = this.searchString(dataBrowser) || 'An unknown browser';
 		this.version = this.searchVersion(navigator.userAgent) || this.searchVersion(navigator.appVersion) || 'an unknown version';
 		this.OS = this.searchString(dataOS) || 'an unknown OS';
+		this.arch = this.searchString(dataArch) || 'unknown';
 		// this.oldMac = (this.OS == 'Mac' && navigator.userAgent.includes('OS X 10.6;'));
 	}
 

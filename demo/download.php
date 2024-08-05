@@ -43,8 +43,26 @@ if(isset($_GET['user'])){
 			'win-arm64':"7.0",
 			'win-arm64-zip':"7.0",
 			'linux-i686':"7.0",
-			'linux-x86_64':"7.0",
+			'linux-x86_64':"7.0.1",
 			'iOS':"7.0",
+		};
+		let oldVersions = {
+			'macOS' : {
+				'platform' : 'mac',
+				'version' : '6.0.37',
+			},
+			'Windows' : {
+				'platform' : 'win32',
+				'version' : '6.0.36',
+			},
+			'Windows ZIP' : {
+				'platform' : 'win32-zip',
+				'version' : '6.0.36',
+			},
+			'Linux' : {
+				'platform' : 'linux-x86_64',
+				'version' : '6.0.35',
+			},
 		};
 		window.downloadComponent = ReactDOMClient.createRoot(
 			document.getElementById('react-download')
@@ -56,6 +74,7 @@ if(isset($_GET['user'])){
 				console.log('test1');
 				let props = {
 					standaloneVersions,
+					oldVersions,
 					featuredOS:'Mac',
 					featuredBrowser:'Safari',
 					arch:'x86_64',
@@ -65,6 +84,8 @@ if(isset($_GET['user'])){
 			},
 			test2: function(){
 				let props = {
+					standaloneVersions,
+					oldVersions,
 					featuredOS:'Windows',
 					featuredBrowser:'Chrome',
 					arch:'x86_64'
@@ -73,6 +94,8 @@ if(isset($_GET['user'])){
 			},
 			test3: function(){
 				let props = {
+					standaloneVersions,
+					oldVersions,
 					featuredOS:'Windows',
 					featuredBrowser:'Edge',
 					arch:'x86_64'

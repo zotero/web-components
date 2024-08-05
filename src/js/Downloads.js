@@ -83,9 +83,9 @@ OtherDownloadLinkListItem.propTypes = {
 };
 
 function DownloadStandalone(props) {
-	const [showOldVersions, setShowOldVersions] = useState(false);
+	// const [showOldVersions, setShowOldVersions] = useState(false);
 	const [showOtherPlatforms, setShowOtherPlatforms] = useState(false);
-
+	
 	let downloadUrls = {};
 	platforms.forEach((platform) => {
 		if (platform == 'iOS') {
@@ -123,7 +123,7 @@ function DownloadStandalone(props) {
 			break;
 		}
 		case 'Linux': {
-			featuredPlatform = (props.arch == 'x86_64') ? 'linux-x86_64' : 'linux-i686';
+			featuredPlatform = (props.arch == 'i686') ? 'linux-i686' : 'linux-x86_64';
 			break;
 		}
 		case 'iOS': {
@@ -157,11 +157,21 @@ function DownloadStandalone(props) {
 					return;
 				}
 				let downloadUrl = downloadUrls[variant.platform];
-				links.push(<a href={downloadUrl} key={variant.platform}>{variant.label}</a>);
+				links.push(<li><a href={downloadUrl} key={variant.platform}>{variant.label}</a></li>);
 			});
-			otherNodes.push(<li key={OS} className='platform-list'>{OS}: {links}</li>);
+			otherNodes.push(<li key={OS} className='platform-list'>{OS}: <ul>{links}</ul></li>);
 		}
 	}
+
+	//old versions list
+	let oldVersionNodes = [];
+	for(let OS in props.oldVersions) {
+		let url = specificClientDownloadUrl(props.oldVersions[OS].platform, props.oldVersions[OS].version);
+		oldVersionNodes.push(<li key={OS}><a href={url}>{OS}</a></li>)
+	}
+	let oldVersions = (<ul className='old-versions'>
+		{oldVersionNodes}
+	</ul>);
 
 	return (
 		<div className='col-lg-6'>
@@ -196,7 +206,10 @@ function DownloadStandalone(props) {
 							<a href='#' >Other versions</a>
 						</div>
 						<Collapse isOpen={showOtherPlatforms}>
+							<h3>Zotero 7</h3>
 							<ul className='os-list'>{otherNodes}</ul>
+							<h3>Zotero 6</h3>
+							{oldVersions}
 						</Collapse>
 					</div>
 				</div>
@@ -280,7 +293,7 @@ function Downloads(props) {
 		featuredBrowser = 'Chrome';
 	}
 	const featuredOS = props.featuredOS || BrowserDetect.OS;
-	const arch = props.arch || ((navigator.userAgent.indexOf('x86_64') != -1) ? 'x86_64' : 'x86');
+	const arch = props.arch || BrowserDetect.arch;// ((navigator.userAgent.indexOf('x86_64') != -1) ? 'x86_64' : 'x86');
 	const oldMac = props.oldMac || installData.oldMac;
 	const oldWindows = props.oldWindows || installData.oldWindows;
 	const mobile = props.mobile || navigator.userAgent.includes('mobile');
@@ -314,7 +327,7 @@ function Downloads(props) {
 					: ''}
 				
 				<div className='row'>
-					<DownloadStandalone {...{featuredOS, arch, oldMac, oldWindows, standaloneVersions:props.standaloneVersions}} />
+					<DownloadStandalone {...{featuredOS, arch, oldMac, oldWindows, standaloneVersions:props.standaloneVersions, oldVersions:props.oldVersions}} />
 					<DownloadConnector {...{featuredOS, featuredBrowser}} />
 				</div>
 			</div>

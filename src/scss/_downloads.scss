@@ -39,11 +39,14 @@ main.downloads {
   }
 
   .bottom-collapse {
+    padding: 0px 24px 24px 24px;
     text-align: left;
     border-top: 2px solid $gray-200;
     
     .toggle {
       cursor: pointer;
+      margin-left: -8px;
+      padding: 16px 0px;
     }
 
     .toggle a {
@@ -76,8 +79,12 @@ main.downloads {
 
   .standalone {
     
-    .old-versions ul {
+    ul.old-versions {
+      padding-left:0;
       li {
+        list-style-type: none;
+        display: inline-block;
+
         & + li:before {
           content: "·";
           margin: 0 8px;
@@ -86,20 +93,25 @@ main.downloads {
     }
 
     ul.os-list {
+      padding-left: 16px;
       li {
         list-style: disc;
 
-        a {
+        ul {
+          padding-left: 0;
+          display: inline-block;
+        }
+        li {
           white-space: nowrap;
           display: inline-block;
         }
   
-        a:before {
+        li:before {
           content: "·";
           margin: 0 8px;
         }
         
-        a:first-child:before {
+        li:first-child:before {
           content:'';
           margin: 0 4px;
         }

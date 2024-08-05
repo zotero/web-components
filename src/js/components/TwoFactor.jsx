@@ -6,7 +6,7 @@ let log = logger.Logger('TwoFactor');
 
 import { Notifier } from '../Notifier.js';
 import { postFormData } from '../ajax.js';
-import { Badge, Button, Card, CardBody, Input } from 'reactstrap';
+import { Badge, Button, Card, CardBody, Form, FormGroup, Input, Label } from 'reactstrap';
 
 const registerFidoUrl = '/settings/setverificationpreference';
 const fidoUrl = '/user/verifymfa';
@@ -42,7 +42,7 @@ function SavedSecurityKey(props) {
 		<div className='security-key'>
 			<span className='security-key-nickname'>{props.nickname}</span>
 			<span className='security-key-note'>— registered on {d.toLocaleString()}</span>
-			<Button className='btn btn-secondary' onClick={removeKey}>Remove Key</Button>
+			<Button color='danger' outline onClick={removeKey}>Remove Key</Button>
 		</div>
 	);
 };
@@ -121,29 +121,28 @@ function VerifierForm(props) {
 	
 	const submitFunc = props.onSubmit || verifyActivate;
 	const rememberEl = props.remember ? (
-		<li>
-			<label for="remember_device">Remember Device
+		<FormGroup>
+			<Label for="remember_device">Remember Device
 				<Input type="hidden" name="remember_device" value="0" />
 				<Input type="checkbox" name="remember_device" id="remember_device" value="1" className="checkbox" onChange={(evt)=>{setRememberDevice(evt.target.value);}} />
-			</label>
-			<p className="hint">Don't require two-step verification on this device in the future.</p>
-		</li>
+			</Label>
+			<p className="text-muted small">Don't require two-step verification on this device in the future.</p>
+		</FormGroup>
 	) : null;
 
 	return (
 		<div className='verifier-form-container'>
-			<form className='verifier-form zform' encType="application/x-www-form-urlencoded" acceptCharset="utf-8" method="post" onSubmit={submitFunc}>
-				<ol>
-					<li><label htmlFor="verifier_code">Multifactor Code <Input type="text" name="verifier_code" id="verifier_code" maxLength="6" autoFocus="1" value={verifierCode} onChange={(evt)=>{setVerifierCode(evt.target.value);}} /></label>
-						<p className="hint">Enter the six digit code from your email or authenticator app</p>
-					</li>
+			<Form className='verifier-form' encType="application/x-www-form-urlencoded" acceptCharset="utf-8" method="post" onSubmit={submitFunc}>
+				<FormGroup>
+					<Label htmlFor="verifier_code">Multifactor Code <Input type="text" name="verifier_code" id="verifier_code" maxLength="6" autoFocus="1" value={verifierCode} onChange={(evt)=>{setVerifierCode(evt.target.value);}} /></Label>
+						<p className="text-muted small">Enter the six digit code from your email or authenticator app</p>
+				</FormGroup>
 					{rememberEl}
-					<li>
-						<Button className='btn btn-secondary' name="verify_multifactor_submit" id="verify_multifactor_submit" type="submit" value="verify_multifactor_submit">Verify</Button>
-						<Button className='btn btn-secondary' name="verify_multifactor_cancel" id="verify_multifactor_cancel" type="submit" value="1" onClick={props.cancel}>Cancel</Button>
-					</li>
-				</ol>
-			</form>
+				<FormGroup>
+					<Button color='secondary' className='mx-2' name="verify_multifactor_submit" id="verify_multifactor_submit" type="submit" value="verify_multifactor_submit">Verify</Button>
+					<Button color='secondary' outline name="verify_multifactor_cancel" id="verify_multifactor_cancel" type="submit" value="1" onClick={props.cancel}>Cancel</Button>
+				</FormGroup>
+			</Form>
 		</div>
 	);
 }
@@ -226,14 +225,18 @@ function RegisterFidoKey(props) {
 
 	return (
 		<div id='new-security-key'>
-			<form onSubmit={createFidoRegistration}>
-				<Input 
-					type='text'
-					name='nickname'
-					placeholder='Security Key Nickname'
-					value={newKeyNickname} onChange={(evt) => { setNewKeyNickname(evt.target.value); }} />
-				<Button id='create-security-key-button' disabled={(newKeyNickname.length == 0)}>Add Key</Button>
-			</form>
+			<Form inline onSubmit={createFidoRegistration}>
+				<FormGroup className='mr-2'>
+					<Input 
+						type='text'
+						name='nickname'
+						placeholder='Security Key Nickname'
+						value={newKeyNickname} onChange={(evt) => { setNewKeyNickname(evt.target.value); }} />
+				</FormGroup>
+				<FormGroup>
+					<Button id='create-security-key-button' disabled={(newKeyNickname.length == 0)}>Add Key</Button>
+				</FormGroup>
+			</Form>
 		</div>
 	);
 }
@@ -325,7 +328,7 @@ function ManageTwoFactor(props) {
 	if (verificationTestRequired.includes('totp') && prefResponseData && prefResponseData['qrDataUrl']) {
 		activateTOTPEl = (
 			<div id='activate-totp' className='activation-section'>
-				<div id='secret-code'>
+				<div id='secret-code' className='text-center'>
 					<p className='text-center'>Scan the QR code below using your authenticator app, such as Google Authenticator or Microsoft Authenticator.
 						After you add the key, enter the generated code to verify and activate 2-step verification.</p>
 					<img id='qr-code-img' src={prefResponseData['qrDataUrl']} />
@@ -363,27 +366,27 @@ function ManageTwoFactor(props) {
 			<div id='verifications'>
 				<div className='verification-method-section' id='email'>
 					<h4>Email Authentication</h4><EnabledTag enabled={emailVerificationEnabled} pending={verificationTestRequired.includes('email')} />
-					<p>Receive an authentication code emailed to: <span id='user-email'>{props.primaryEmail}</span></p>
 					{emailVerificationEnabled|verificationTestRequired.includes('email') ?
-							<Button className='btn btn-secondary' id='disable-email-verification-button' onClick={disableEmail}>Disable</Button> :
-							<Button className='btn btn-secondary' id='enable-email-button' onClick={enableEmail}>Enable</Button>
+							<Button color='danger' outline className='float-right' id='disable-email-verification-button' onClick={disableEmail}>Disable</Button> :
+							<Button color='secondary' className='float-right' id='enable-email-button' onClick={enableEmail}>Enable</Button>
 						}
+					<p>Receive an authentication code emailed to: <span id='user-email'>{props.primaryEmail}</span></p>
 					{activateEmailEl}
 				</div>
 				<div className='verification-method-section' id='totp'>
 					<h4>Authenticator App</h4><EnabledTag enabled={TOTPVerificationEnabled} pending={verificationTestRequired.includes('totp')} />
-					<p>Use an authenticator app or browser extension to get two-factor authentication codes when prompted.</p>
 					{TOTPVerificationEnabled|verificationTestRequired.includes('totp') ?
-						<Button className='btn btn-secondary' id='disable-totp-button' onClick={disableTOTP}>Disable</Button> :
-						<Button className='btn btn-secondary' id='enable-totp-button' onClick={enableTOTP}>Enable</Button>
+						<Button color='danger' outline className='float-right' id='disable-totp-button' onClick={disableTOTP}>Disable</Button> :
+						<Button color='secondary' className='float-right' id='enable-totp-button' onClick={enableTOTP}>Enable</Button>
 					}
+					<p>Use an authenticator app or browser extension to get two-factor authentication codes when prompted.</p>
 					{activateTOTPEl}
 				</div>
 				<div className='verification-method-section' id='fido'>
 					<h4>Security Key</h4><EnabledTag enabled={savedKeyEls.length > 0} />
 					{editKeys ? 
-						<Button className='btn btn-secondary float-right' onClick={()=>{setEditKeys(false);}}>Hide</Button>
-						:<Button className='btn btn-secondary float-right' onClick={()=>{setEditKeys(true);}}>Edit</Button>
+						<Button color='secondary' className='float-right' onClick={()=>{setEditKeys(false);}}>Hide</Button>
+						:<Button color='secondary' className='float-right' onClick={()=>{setEditKeys(true);}}>Edit</Button>
 					}
 					<p>Use a hardware device that can act as your second factor of authentication.</p>
 					{editKeys ?
@@ -391,11 +394,10 @@ function ManageTwoFactor(props) {
 							<div id='saved-security-keys'>
 								{savedKeyEls}
 							</div>
-							<div className='security-key'>
-								<Button className='btn btn-secondary' id='show-add-security-key-button' onClick={()=>{setNewKey(true);}}>Register a new security key</Button>
+							<div className='add-security-key'>
 								{newKey ? 
 									<RegisterFidoKey {...{setNotification}} />
-									: null
+									: <Button color='secondary' id='show-add-security-key-button' onClick={()=>{setNewKey(true);}}>Register a new security key</Button>
 								}
 							</div>
 						</div>

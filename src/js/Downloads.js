@@ -4,7 +4,7 @@ let log = logger.Logger('Downloads');
 import { useState, useEffect } from 'react';
 import { PropTypes } from 'prop-types';
 
-import { ZoteroAppIconSVG, BrowserExtensionIcon, ChevronDownIcon, ChevronUpIcon } from './Icons.js';
+import { ZoteroAppIconSVG, BrowserExtensionPlusAppIcon, ChevronDownIcon, ChevronUpIcon } from './Icons.js';
 import { AllExtensionsSection, InstallButton, chromeDownload, edgeDownload, firefoxDownload } from './InstallConnector.js';
 import classnames from 'classnames';
 
@@ -263,7 +263,7 @@ function DownloadConnector(props) {
 		<div className='col-lg-6 d-none d-sm-block'>
 			<section className='connector download-section d-flex flex-column'>
 				<Row><Col>
-					<BrowserExtensionIcon
+					<BrowserExtensionPlusAppIcon
 						className='extension-download-image'
 						alt={props.featuredBrowser + ' Icon'}
 						browser={props.featuredBrowser}

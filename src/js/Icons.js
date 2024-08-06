@@ -60,40 +60,59 @@ BrowserIcon.propTypes = {
 	size: PropTypes.string,
 };
 
-function BrowserExtensionIcon(props={
-	browserIconSize: '128',
-	browserIconWidth: '128',
-	zoteroIconWidth: '128',
-	zoteroIconHeight: '140',
+function BrowserExtensionIcon({
+	browser = undefined,
+	browserIconSize = '128',
+	browserIconWidth = '128',
+	zoteroIconWidth = '128',
+	zoteroIconHeight = '140',
 }) {
 	return (
 		<figure className='browser-plus-extension'>
 			<BrowserIcon
-				browser={props.browser}
-				width={props.browserIconWidth}
-				size={props.browserIconSize}/>
+				browser={browser}
+				width={browserIconWidth}
+				size={browserIconSize}/>
 			<span className='icon-plus'></span>
-			<ZoteroAppIconSVG
+			<ZoteroIcon
 				alt='Zotero Extension'
-				width={props.zoteroIconWidth}
-				height={props.zoteroIconHeight}
+				width={zoteroIconWidth}
+				height={zoteroIconHeight}
 				className='zotero-app-icon'
 			/>
 		</figure>
 	);
 }
-// BrowserExtensionIcon.defaultProps = {
-// 	browserIconSize: '128',
-// 	browserIconWidth: '128',
-// 	zoteroIconWidth: '128',
-// 	zoteroIconHeight: '140',
-// };
 BrowserExtensionIcon.propTypes = {
 	browser: PropTypes.string.isRequired,
-	browserIconSize: PropTypes.string.isRequired,
-	zoteroIconWidth: PropTypes.string.isRequired,
-	zoteroIconHeight: PropTypes.string.isRequired,
+	browserIconSize: PropTypes.string,
+	zoteroIconWidth: PropTypes.string,
+	zoteroIconHeight: PropTypes.string,
 };
+
+function BrowserExtensionPlusAppIcon({
+	browser = undefined,
+	browserIconSize = '128',
+	browserIconWidth = '128',
+	zoteroIconWidth = '128',
+	zoteroIconHeight = '140',
+}) {
+	return (
+		<figure className='browser-plus-extension'>
+			<BrowserIcon
+				browser={browser}
+				width={browserIconWidth}
+				size={browserIconSize}/>
+			<span className='icon-plus'></span>
+			<ZoteroAppIconSVG
+				alt='Zotero Extension'
+				width={zoteroIconWidth}
+				height={zoteroIconHeight}
+				className='zotero-app-icon'
+			/>
+		</figure>
+	);
+}
 
 function PluginsIcon(props) {
 	return (
@@ -161,4 +180,4 @@ function ChevronUpIcon() {
 	</svg>);
 }
 
-export { ZoteroIcon, ZoteroAppIconSVG, BrowserIcon, BrowserExtensionIcon, PluginsIcon, PencilIcon, TrashIcon, CheckIcon, XIcon, PlusIcon, OrcidIcon, ChevronDownIcon, ChevronUpIcon };
+export { ZoteroIcon, ZoteroAppIconSVG, BrowserIcon, BrowserExtensionIcon, BrowserExtensionPlusAppIcon, PluginsIcon, PencilIcon, TrashIcon, CheckIcon, XIcon, PlusIcon, OrcidIcon, ChevronDownIcon, ChevronUpIcon };

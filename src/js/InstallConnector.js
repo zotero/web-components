@@ -21,8 +21,7 @@ const safariDownload = installData.oldSafari
 	? 'https://www.zotero.org/download/connector/dl?browser=safari'
 	: 'https://www.zotero.org/support/kb/safari_12_connector';
 
-function InstallFirefoxButton(props) {
-	const { label, type } = props;
+function InstallFirefoxButton({type = 'button', label = 'Install'}) {
 	const installFirefox = (evt) => {
 		if (typeof InstallTrigger == 'undefined' || InstallTrigger === null) {
 			return true;
@@ -62,13 +61,8 @@ function InstallFirefoxButton(props) {
 		);
 	}
 }
-InstallFirefoxButton.defaultProps = {
-	type: 'button',
-	label: 'Install'
-};
 
-function InstallChromeButton(props) {
-	const { type, label } = props;
+function InstallChromeButton({type = 'button', label = 'Install'}) {
 	if (type == 'button') {
 		return <a href={chromeDownload} id='chrome-connector-download-button' className='btn btn-lg download-link'>{label}</a>;
 	} else if (type == 'image') {
@@ -90,13 +84,8 @@ function InstallChromeButton(props) {
 		);
 	}
 }
-InstallChromeButton.defaultProps = {
-	type: 'button',
-	label: 'Install'
-};
 
-function InstallEdgeButton(props) {
-	const { type, label } = props;
+function InstallEdgeButton({type = 'button', label = 'Install'}) {
 	if (type == 'button') {
 		return <a href={edgeDownload} id='edge-connector-download-button' className='btn btn-lg download-link'>{label}</a>;
 	} else if (type == 'image') {
@@ -118,13 +107,8 @@ function InstallEdgeButton(props) {
 		);
 	}
 }
-InstallEdgeButton.defaultProps = {
-	type: 'button',
-	label: 'Install'
-};
 
-function InstallSafariButton(props) {
-	const { type, label } = props;
+function InstallSafariButton({type = 'button'}) {
 	if (type == 'button') {
 		return (
 			<p id="safari-download-text">The Zotero Connector for Safari is bundled with Zotero. You can enable it from the Extensions pane in the Safari settings.</p>
@@ -148,14 +132,8 @@ function InstallSafariButton(props) {
 		);
 	}
 }
-InstallSafariButton.defaultProps = {
-	type: 'button',
-	label: 'Install'
-};
 
-function InstallButton(props) {
-	const { browser, label } = props;
-
+function InstallButton({browser, label = 'Install'}) {
 	switch (browser.toLowerCase()) {
 	case 'firefox':
 		return <InstallFirefoxButton label={label} />;
@@ -170,17 +148,13 @@ function InstallButton(props) {
 		return null;
 	}
 }
-InstallButton.defaultProps = {
-	label: 'Install'
-};
 InstallButton.propTypes = {
 	browser: PropTypes.string.isRequired,
 	label: PropTypes.string,
 };
 
-function AllExtensionsSection(props) {
-	const { type, except } = props;
-	let otherBrowsers = props.otherBrowsers ?? ['chrome', 'firefox', 'safari', 'edge'];
+function AllExtensionsSection({type = 'full', title = true, except, otherBrowsers}) {
+	otherBrowsers = otherBrowsers ?? ['chrome', 'firefox', 'safari', 'edge'];
 	otherBrowsers = otherBrowsers.filter((browser) => {
 		return browser != except.toLowerCase();
 	});
@@ -196,7 +170,7 @@ function AllExtensionsSection(props) {
 	});
 	return (
 		<section className='all-extensions'>
-			{props.title ? 
+			{title ? 
 				<h2 className='visually-hidden'>All connectors</h2>
 				: null
 			}
@@ -209,10 +183,10 @@ function AllExtensionsSection(props) {
 		</section>
 	);
 }
-AllExtensionsSection.defaultProps = {
-	type: 'full',
-	title: true,
-};
+// AllExtensionsSection.defaultProps = {
+// 	type: 'full',
+// 	title: true,
+// };
 AllExtensionsSection.propTypes = {
 	type: PropTypes.string.isRequired,
 	except: PropTypes.string,
@@ -350,4 +324,4 @@ InstallConnectorPrompt.propTypes = {
 	oldSafari: PropTypes.bool,
 };
 
-export { InstallConnectorPrompt, AllExtensionsSection, InstallButton };
+export { InstallConnectorPrompt, AllExtensionsSection, InstallButton, chromeDownload, edgeDownload, firefoxDownload, safariDownload };

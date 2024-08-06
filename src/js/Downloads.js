@@ -1,11 +1,11 @@
-// import {log as logger} from './Log.js';
-// let log = logger.Logger('Downloads');
+import {log as logger} from './Log.js';
+let log = logger.Logger('Downloads');
 
 import { useState, useEffect } from 'react';
 import { PropTypes } from 'prop-types';
 
-import { ZoteroAppIconSVG, BrowserExtensionIcon } from './Icons.js';
-import { AllExtensionsSection, InstallButton } from './InstallConnector.js';
+import { ZoteroAppIconSVG, BrowserExtensionIcon, ChevronDownIcon, ChevronUpIcon } from './Icons.js';
+import { AllExtensionsSection, InstallButton, chromeDownload, edgeDownload, firefoxDownload, safariDownload } from './InstallConnector.js';
 import classnames from 'classnames';
 
 const config = window.zoteroConfig;
@@ -60,12 +60,9 @@ let specificClientDownloadUrl = function (platform, version) {
 	return `https://www.zotero.org/download/client/dl?channel=release&platform=${platform}&version=${version}`;
 };
 
-function DownloadStandaloneButton(props) {
-	return (<div className='downloadButton'><a className='btn btn-lg' href={props.href}>{props.label}</a></div>);
+function DownloadStandaloneButton({label = 'Download', href=''}) {
+	return (<div className='downloadButton'><a className='btn btn-lg' href={href}>{label}</a></div>);
 }
-DownloadStandaloneButton.defaultProps = {
-	label: 'Download'
-};
 DownloadStandaloneButton.propTypes = {
 	href: PropTypes.string.isRequired,
 };
@@ -132,11 +129,12 @@ function DownloadStandalone(props) {
 		}
 	}
 	let variant = platformVariants[featuredOS].filter(v => v.platform == featuredPlatform)[0];
-	let url = downloadUrls[featuredPlatform];
-	featuredButton = <DownloadStandaloneButton href={url} label={`${variant.dlButtonLabel}`} />;
-
+	let featuredUrl = downloadUrls[featuredPlatform];
+	featuredButton = <DownloadStandaloneButton href={featuredUrl} label={`${variant.dlButtonLabel}`} />;
+	
 	let otherNodes = [];
 	for (let OS in otherVersions) {
+		// log.debug(variant.platform);
 		if (!otherVersions[OS]) {
 			throw new Error("unexpected OS not in otherVersions");
 		}
@@ -144,24 +142,28 @@ function DownloadStandalone(props) {
 			continue;
 		} else if(otherVersions[OS].length == 1) {
 			let variant = otherVersions[OS][0];
+			let className = 'platform-list';
 			if (variant.platform == featuredPlatform) {
-				continue;
+				// continue;
+				className += ' d-sm-none'
 			}
 			let downloadUrl = downloadUrls[variant.platform];
 			let link = <a href={downloadUrl}>{variant.label}</a>;
-			otherNodes.push(<li key={OS} className='platform-list'>{link}</li>);
+			otherNodes.push(<li key={OS} {...{className}}>{link}</li>);
 		} else {
 			let links = [];
 			otherVersions[OS].forEach(variant => {
+				let className = '';
 				if (variant.platform == featuredPlatform) {
-					return;
+					className += ' d-sm-none';
 				}
 				let downloadUrl = downloadUrls[variant.platform];
-				links.push(<li><a href={downloadUrl} key={variant.platform}>{variant.label}</a></li>);
+				links.push(<li key={variant.platform} {...{className}}><a href={downloadUrl}>{variant.label}</a></li>);
 			});
 			otherNodes.push(<li key={OS} className='platform-list'>{OS}: <ul>{links}</ul></li>);
 		}
 	}
+	otherNodes.push(<li key='android' className='d-sm-none text-muted'><p className='android-teaser'>Stay tuned — Android app is coming soon.</p></li>);
 
 	//old versions list
 	let oldVersionNodes = [];
@@ -173,8 +175,8 @@ function DownloadStandalone(props) {
 		{oldVersionNodes}
 	</ul>);
 
-	return (
-		<div className='col-lg-6'>
+	return (<>
+		<div className='col-lg-6 d-none d-sm-block'>
 			<div className='standalone download-section d-flex flex-column'>
 				<Row><Col>
 					<ZoteroAppIconSVG
@@ -204,6 +206,12 @@ function DownloadStandalone(props) {
 					<div className='col other-versions bottom-collapse'>
 						<div className='toggle' onClick={(evt) => { setShowOtherPlatforms(!showOtherPlatforms); evt.preventDefault(); }}>
 							<a href='#' >Other versions</a>
+							<span className='float-right'>
+							{showOtherPlatforms ?
+								<ChevronDownIcon /> 
+								: <ChevronUpIcon />
+							}
+							</span>
 						</div>
 						<Collapse isOpen={showOtherPlatforms}>
 							<h3>Zotero 7</h3>
@@ -215,7 +223,18 @@ function DownloadStandalone(props) {
 				</div>
 			</div>
 		</div>
-	);
+		<div className='standalone d-sm-none'>
+			<Row className='xs-section'><Col>
+			<h2>Download Zotero 7</h2>
+			<ul className='os-list'>{otherNodes}</ul>
+			{versionNote}
+
+			<div className='margin-help-div mb-8'>
+				<p className='installation-help'><a href='https://www.zotero.org/support/installation'>Installation Help</a></p>
+			</div>
+			</Col></Row>
+		</div>
+	</>);
 }
 DownloadStandalone.propTypes = {
 	standaloneVersions: PropTypes.object,
@@ -243,8 +262,8 @@ function DownloadConnector(props) {
 	if (iOS) {
 		installAndDescription = <p>The Zotero iOS app automatically includes share-sheet functionality to save from your browser or other apps using the share button.</p>;
 	}
-	return (
-		<div className='col-lg-6'>
+	return (<>
+		<div className='col-lg-6 d-none d-sm-block'>
 			<section className='connector download-section d-flex flex-column'>
 				<Row><Col>
 					<BrowserExtensionIcon
@@ -271,6 +290,12 @@ function DownloadConnector(props) {
 					<Col className='col other-versions bottom-collapse' >
 						<div className='toggle' onClick={(evt) => { setShowAllExtensions(!showAllExtensions); evt.preventDefault(); }}>
 							<a href='#' >Zotero Connectors for other browsers</a>
+							<span className='float-right'>
+							{showAllExtensions ?
+								<ChevronDownIcon /> 
+								: <ChevronUpIcon />
+							}
+							</span>
 						</div>
 						<Collapse isOpen={showAllExtensions}>
 							<AllExtensionsSection title={false} except={props.featuredBrowser} type='image-link' otherBrowsers={['chrome', 'firefox', 'edge', 'safari']} />
@@ -279,11 +304,69 @@ function DownloadConnector(props) {
 				</Row>
 			</section>
 		</div>
-	);
+		<div className='d-sm-none'>
+			<Row className='xs-section'><Col>
+			<h2>Download Zotero Connector</h2>
+			<p><b>Zotero Connectors are for desktop only.</b> On mobile, you can easily save items and PDFs from the web to Zotero via the Share button in browsers and other apps.</p>
+			<ul>
+				<li>
+					<a href={chromeDownload}>Chrome</a>
+				</li>
+				<li>
+					<a href={firefoxDownload}>Firefox</a>
+				</li>
+				<li>
+					<a href={edgeDownload}>Edge</a>
+				</li>
+				<li>
+					<p>The Zotero Connector for Safari is bundled with Zotero. You can enable it from the Extensions pane in the Safari settings.</p>
+					<p className='installation-help'>
+						<a href='https://www.zotero.org/support/kb/safari_compatibility'>Don’t see the Zotero Connector in Safari?</a>
+					</p>
+				</li>
+			</ul>
+			</Col></Row>
+		</div>
+	</>);
 }
 DownloadConnector.propTypes = {
 	featuredBrowser: PropTypes.string.isRequired
 };
+
+function XSDownloads() {
+	return (
+		<div className='d-sm-none'>
+			<Row className='xs-section'><Col>
+			<h2>Download Zotero 7</h2>
+			<ul className='os-list'>{otherNodes}</ul>
+			{versionNote}
+
+			<div className='margin-help-div mb-8'>
+				<p className='installation-help'><a href='https://www.zotero.org/support/installation'>Installation Help</a></p>
+			</div>
+			<h2>Download Zotero Connector</h2>
+			<p><b>Zotero Connectors are for desktop only.</b> On mobile, you can easily save items and PDFs from the web to Zotero via the Share button in browsers and other apps.</p>
+			<ul>
+				<li>
+					<a href={chromeDownload}>Chrome</a>
+				</li>
+				<li>
+					<a href={firefoxDownload}>Firefox</a>
+				</li>
+				<li>
+					<a href={edgeDownload}>Edge</a>
+				</li>
+				<li>
+					<p>The Zotero Connector for Safari is bundled with Zotero. You can enable it from the Extensions pane in the Safari settings.</p>
+					<p className='installation-help'>
+						<a href='https://www.zotero.org/support/kb/safari_compatibility'>Don’t see the Zotero Connector in Safari?</a>
+					</p>
+				</li>
+			</ul>
+			</Col></Row>
+		</div>
+	);
+}
 
 function Downloads(props) {
 	// log.debug(BrowserDetect);
@@ -307,25 +390,6 @@ function Downloads(props) {
 	return (
 		<div className={classnames('downloads', mobile ? 'mobile' : '')}>
 			<div className='container'>
-				{featuredBrowser == 'none'
-					? <p style={{
-						width: '90%',
-						marginLeft: 'auto',
-						marginRight: 'auto',
-						fontSize: '16px',
-						fontWeight: 'bold',
-						textAlign: 'center',
-						backgroundColor: '#fff9b7',
-						paddingTop: '9px',
-						paddingBottom: '9px',
-						borderRadius: '4px'
-					}}>
-						Using Zotero with Firefox? We’ve made some{' '}
-						<a href='/blog/a-unified-zotero-experience/'>important changes</a> to the way
-						Zotero works.
-					</p>
-					: ''}
-				
 				<div className='row'>
 					<DownloadStandalone {...{featuredOS, arch, oldMac, oldWindows, standaloneVersions:props.standaloneVersions, oldVersions:props.oldVersions}} />
 					<DownloadConnector {...{featuredOS, featuredBrowser}} />

@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { PropTypes } from 'prop-types';
 
 import { ZoteroAppIconSVG, BrowserExtensionIcon, ChevronDownIcon, ChevronUpIcon } from './Icons.js';
-import { AllExtensionsSection, InstallButton, chromeDownload, edgeDownload, firefoxDownload, safariDownload } from './InstallConnector.js';
+import { AllExtensionsSection, InstallButton, chromeDownload, edgeDownload, firefoxDownload } from './InstallConnector.js';
 import classnames from 'classnames';
 
 const config = window.zoteroConfig;
@@ -102,7 +102,6 @@ function DownloadStandalone(props) {
 	}
 	if (featuredOS == 'macOS') featuredOS = 'Mac';
 
-	let featuredButton;
 	let otherVersions = structuredClone(platformVariants);
 	let OSLabel = featuredOS;
 	let wrapHeader = false;
@@ -130,7 +129,7 @@ function DownloadStandalone(props) {
 	}
 	let variant = platformVariants[featuredOS].filter(v => v.platform == featuredPlatform)[0];
 	let featuredUrl = downloadUrls[featuredPlatform];
-	featuredButton = <DownloadStandaloneButton href={featuredUrl} label={`${variant.dlButtonLabel}`} />;
+	let featuredButton = <DownloadStandaloneButton href={featuredUrl} label={`${variant.dlButtonLabel}`} />;
 	
 	let otherNodes = [];
 	for (let OS in otherVersions) {
@@ -171,9 +170,9 @@ function DownloadStandalone(props) {
 		let url = specificClientDownloadUrl(props.oldVersions[OS].platform, props.oldVersions[OS].version);
 		oldVersionNodes.push(<li key={OS}><a href={url}>{OS}</a></li>)
 	}
-	let oldVersions = (<ul className='old-versions'>
+	let oldVersions = (<div className='old-versions'><ul>
 		{oldVersionNodes}
-	</ul>);
+	</ul></div>);
 
 	return (<>
 		<div className='col-lg-6 d-none d-sm-block'>
@@ -239,8 +238,6 @@ function DownloadStandalone(props) {
 DownloadStandalone.propTypes = {
 	standaloneVersions: PropTypes.object,
 	featuredOS: PropTypes.string,
-	oldMac: PropTypes.bool,
-	oldWindows: PropTypes.bool,
 	arch: PropTypes.string,
 };
 
@@ -377,8 +374,6 @@ function Downloads(props) {
 	}
 	const featuredOS = props.featuredOS || BrowserDetect.OS;
 	const arch = props.arch || BrowserDetect.arch;// ((navigator.userAgent.indexOf('x86_64') != -1) ? 'x86_64' : 'x86');
-	const oldMac = props.oldMac || installData.oldMac;
-	const oldWindows = props.oldWindows || installData.oldWindows;
 	const mobile = props.mobile || navigator.userAgent.includes('mobile');
 	
 	useEffect(() => {
@@ -391,7 +386,7 @@ function Downloads(props) {
 		<div className={classnames('downloads', mobile ? 'mobile' : '')}>
 			<div className='container'>
 				<div className='row'>
-					<DownloadStandalone {...{featuredOS, arch, oldMac, oldWindows, standaloneVersions:props.standaloneVersions, oldVersions:props.oldVersions}} />
+					<DownloadStandalone {...{featuredOS, arch, standaloneVersions:props.standaloneVersions, oldVersions:props.oldVersions}} />
 					<DownloadConnector {...{featuredOS, featuredBrowser}} />
 				</div>
 			</div>
@@ -403,8 +398,6 @@ Downloads.propTypes = {
 	featuredBrowser: PropTypes.string,
 	featuredOS: PropTypes.string,
 	arch: PropTypes.string,
-	oldMac: PropTypes.bool,
-	oldWindows: PropTypes.bool,
 	mobile: PropTypes.bool,
 };
 

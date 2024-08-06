@@ -35,7 +35,6 @@ main.downloads {
 
     div.additional-notes {
       padding-top: 8px;
-      min-height: 150px;
     }
   }
 
@@ -82,18 +81,21 @@ main.downloads {
     margin: 21px 0 -21px;
   }
 
-  .standalone {    
-    ul.old-versions {
-      padding-left:16px;
+  .standalone {
+    .old-versions {
+      h3 {
+        font-size: 16px;
+        line-height: inherit;
+        color: #444;
+        font-weight: 700;
+        margin: 14px 0 0;
+      }
+      ul {
+        padding-left:16px;
 
-      li {
-        list-style-type: none;
-        // display: inline-block;
-
-        // & + li::before {
-        //   content: "·";
-        //   margin: 0 8px;
-        // }
+        li {
+          list-style-type: none;
+        }
       }
     }
 
@@ -105,47 +107,11 @@ main.downloads {
 
         ul {
           padding-left: 16px;
-          // display: inline-block;
         }
 
         li {
           list-style: none;
-          // white-space: nowrap;
-          // display: inline-block;
         }
-  
-        // li::before {
-        //   content: "·";
-        //   margin: 0 8px;
-        // }
-        
-        // li:first-child::before {
-        //   content:'';
-        //   margin: 0 4px;
-        // }
-      }
-    }
-
-    .old-versions {
-      @media (width <= 1040px) {
-        li {
-          display: block;
-          margin-top: 5px;
-        }
-
-        // ul li {
-        //   & + li::before {
-        //     content: none;
-        //   }
-        // }
-      }
-
-      h3 {
-        font-size: 16px;
-        line-height: inherit;
-        color: #444;
-        font-weight: 700;
-        margin: 14px 0 0;
       }
     }
   }

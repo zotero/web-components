@@ -12,6 +12,11 @@ main.downloads {
   p.lead {
     color: $text-muted;
     max-width: 100%;
+    margin-bottom: 2rem;
+  }
+
+  div.margin-help-div {
+    margin-bottom: 1rem;
   }
 
   section.download-section,div.download-section {

@@ -7,12 +7,12 @@ import { PropTypes } from 'prop-types';
 const config = window.zoteroConfig;
 const imagePath = config.imagePath;
 
-function ZoteroIcon(props = {width: '147', height: '160'}) {
-	let iconImagePath = `${imagePath}/icons/zotero-icon-${props.width}-${props.height}`;
+function ZoteroIcon({width = '147', height = '160', className = undefined}) {
+	let iconImagePath = `${imagePath}/icons/zotero-icon-${width}-${height}`;
 	let iconImagePath2x = iconImagePath + '@2x.png';
 	iconImagePath += '.png';
 
-	let p = { ...props, src: iconImagePath, srcSet: `${iconImagePath2x} 2x`, className: classnames('zotero-icon', props.className) };
+	let p = { ...{width, height}, src: iconImagePath, srcSet: `${iconImagePath2x} 2x`, className: classnames('zotero-icon', className) };
 	delete p.browser;
 	return (<img {...p} />);
 }
@@ -26,18 +26,12 @@ ZoteroIcon.propTypes = {
 	className: PropTypes.string,
 };
 
-function ZoteroAppIconSVG(props = {width: '160', height: '160'}) {
-	let iconImagePath = `${imagePath}/icons/zotero-app-icon`;
-	iconImagePath += '.svg';
+function ZoteroAppIconSVG({width = '160', height = '160', className = undefined}) {
+	let iconImagePath = `${imagePath}/icons/zotero-app-icon.svg`;
 
-	let p = { ...props, src: iconImagePath, className: classnames('zotero-app-icon', props.className) };
-	delete p.browser;
+	let p = { ...{width, height}, src: iconImagePath, className: classnames('zotero-app-icon', className) };
 	return (<img {...p} />);
 }
-// ZoteroAppIconSVG.defaultProps = {
-// 	width: '160',
-// 	height: '160'
-// };
 ZoteroAppIconSVG.propTypes = {
 	width: PropTypes.string,
 	height: PropTypes.string,
@@ -45,14 +39,23 @@ ZoteroAppIconSVG.propTypes = {
 };
 
 // BrowserIcon returns a browser icon image tag based on browser and size props
-function BrowserIcon({browser = '', size = '64', className = undefined}) {
-	let browserImagePath = `${imagePath}/icons/${browser.toLowerCase()}-icon-${size}`;
-	let browserImagePath2x = browserImagePath + '@2x.png';
-	browserImagePath += '.png';
+function BrowserIcon({browser = '', size = '64', svg = undefined, className = undefined}) {
+	if (typeof svg == 'undefined' && browser.toLowerCase() != 'safari') {
+		svg = true;
+	}
+	if (svg) {
+		let src = `${imagePath}/icons/${browser.toLowerCase()}-icon.svg`;
+		let p = { ...{size, src, width:size}, className: classnames('browser-icon', className) };
+		return (<img {...p} />);
+	} else {
+		let browserImagePath = `${imagePath}/icons/${browser.toLowerCase()}-icon-${size}`;
+		let browserImagePath2x = browserImagePath + '@2x.png';
+		browserImagePath += '.png';
 
-	let p = { ...{browser, size, className}, src: browserImagePath, srcSet: `${browserImagePath2x} 2x`, className: classnames('browser-icon', className) };
-	delete p.browser;
-	return (<img {...p} />);
+		let p = { ...{browser, size, className}, src: browserImagePath, srcSet: `${browserImagePath2x} 2x`, className: classnames('browser-icon', className) };
+		delete p.browser;
+		return (<img {...p} />);
+	}
 }
 BrowserIcon.propTypes = {
 	browser: PropTypes.string.isRequired,

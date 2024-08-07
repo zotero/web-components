@@ -196,7 +196,7 @@ function DownloadStandalone(props) {
 				<Row className='additional-notes'><Col>
 					{versionNote}
 
-					<div className='margin-help-div mb-8'>
+					<div className='margin-help-div'>
 						<p className='installation-help'><a href='https://www.zotero.org/support/installation'>Installation Help</a></p>
 					</div>
 				</Col></Row>
@@ -228,7 +228,7 @@ function DownloadStandalone(props) {
 			<ul className='os-list'>{otherNodes}</ul>
 			{versionNote}
 
-			<div className='margin-help-div mb-8'>
+			<div className='margin-help-div'>
 				<p className='installation-help'><a href='https://www.zotero.org/support/installation'>Installation Help</a></p>
 			</div>
 			</Col></Row>
@@ -329,41 +329,6 @@ function DownloadConnector(props) {
 DownloadConnector.propTypes = {
 	featuredBrowser: PropTypes.string.isRequired
 };
-
-function XSDownloads() {
-	return (
-		<div className='d-sm-none'>
-			<Row className='xs-section'><Col>
-			<h2>Download Zotero 7</h2>
-			<ul className='os-list'>{otherNodes}</ul>
-			{versionNote}
-
-			<div className='margin-help-div mb-8'>
-				<p className='installation-help'><a href='https://www.zotero.org/support/installation'>Installation Help</a></p>
-			</div>
-			<h2>Download Zotero Connector</h2>
-			<p><b>Zotero Connectors are for desktop only.</b> On mobile, you can easily save items and PDFs from the web to Zotero via the Share button in browsers and other apps.</p>
-			<ul>
-				<li>
-					<a href={chromeDownload}>Chrome</a>
-				</li>
-				<li>
-					<a href={firefoxDownload}>Firefox</a>
-				</li>
-				<li>
-					<a href={edgeDownload}>Edge</a>
-				</li>
-				<li>
-					<p>The Zotero Connector for Safari is bundled with Zotero. You can enable it from the Extensions pane in the Safari settings.</p>
-					<p className='installation-help'>
-						<a href='https://www.zotero.org/support/kb/safari_compatibility'>Don’t see the Zotero Connector in Safari?</a>
-					</p>
-				</li>
-			</ul>
-			</Col></Row>
-		</div>
-	);
-}
 
 function Downloads(props) {
 	// log.debug(BrowserDetect);

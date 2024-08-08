@@ -35,10 +35,10 @@ let platformVariants = {
 	Windows: [
 		{platform: 'win-x64', label: '64-bit Installer', dlButtonLabel: 'Download (64-bit)'},
 		{platform: 'win-x64-zip', label: '64-bit ZIP', dlButtonLabel: 'Download (64-bit ZIP)'},
-		{platform: 'win32', label: '32-bit Installer', dlButtonLabel: 'Download (32-bit Installer)'},
-		{platform: 'win32-zip', label: '32-bit ZIP', dlButtonLabel: 'Download (32-bit ZIP)'},
 		{platform: 'win-arm64', label: 'ARM Installer', dlButtonLabel: 'Download (ARM Installer)'},
 		{platform: 'win-arm64-zip', label: 'ARM ZIP', dlButtonLabel: 'Download (ARM ZIP)'},
+		{platform: 'win32', label: '32-bit Installer', dlButtonLabel: 'Download (32-bit Installer)'},
+		{platform: 'win32-zip', label: '32-bit ZIP', dlButtonLabel: 'Download (32-bit ZIP)'},
 	],
 	Linux: [
 		{platform: 'linux-x86_64', label: '64-bit', dlButtonLabel: 'Download (64-bit)'},

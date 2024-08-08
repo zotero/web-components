@@ -33,7 +33,7 @@ let platformVariants = {
 		{platform:'mac', label:'macOS', dlButtonLabel: 'Download'}
 	],
 	Windows: [
-		{platform: 'win-x64', label: '64-bit Installer', dlButtonLabel: 'Download'},
+		{platform: 'win-x64', label: '64-bit Installer', dlButtonLabel: 'Download (64-bit)'},
 		{platform: 'win-x64-zip', label: '64-bit ZIP', dlButtonLabel: 'Download (64-bit ZIP)'},
 		{platform: 'win32', label: '32-bit Installer', dlButtonLabel: 'Download (32-bit Installer)'},
 		{platform: 'win32-zip', label: '32-bit ZIP', dlButtonLabel: 'Download (32-bit ZIP)'},

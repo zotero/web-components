@@ -111,7 +111,7 @@ function DownloadStandalone(props) {
 	switch (featuredOS) {
 		case 'Windows': {
 			featuredPlatform = 'win-x64';
-			versionNote = <p>Also Available: <a href={downloadUrls['win-arm64']}>Windows ARM</a></p>;
+			versionNote = <p>Also available: <a href={downloadUrls['win-arm64']}>Windows ARM</a></p>;
 			break;
 		}
 		case 'Mac': {

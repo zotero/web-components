@@ -68,6 +68,7 @@ const institutionalPurchaseDescription = function(purchase) {
 };
 
 const invoicePurchaseDescription = function(purchase, invoiceUser, institutionName=false) {
+	const {storageLevel} = purchase;
 	let description = [];
 	switch (purchase.type) {
 		case 'individual':

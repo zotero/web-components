@@ -212,7 +212,12 @@ function usePaymentProcessor({ purchase, stripeCustomer, userSubscription, detec
 						if (e.success === false && e.message == "Could not calculate taxes") {
 							setTaxPriceError(true);
 						} else {
-							paymentResultCallback({success:false, type: "error", message: "There was an error processing your purchase."});
+							paymentResultCallback({
+								success:false,
+								type: "error",
+								message: "There was an error processing your purchase.",
+								delayRequired:false,
+							});
 							cancelPurchase();
 						}
 					} finally {
@@ -230,13 +235,26 @@ function usePaymentProcessor({ purchase, stripeCustomer, userSubscription, detec
 						setPrice(taxedPrice);
 						setTaxPriceError(false);
 					} catch (e) {
-						log.debug('caught error from getTaxedPrice');
+						log.debug('caught error from getTaxedPrice - checking for known errors');
 						log.debug(e);
 						setTaxPriceError(true);
 						if (e.success === false && e.message == "Could not calculate taxes") {
 							setTaxPriceError(true);
+						} else if(e.success === false && e.message == "Location required for purchase") {
+							paymentResultCallback({
+								success:false,
+								type: "error",
+								message: "There was an error processing your purchase. You may need to remove any saved payment details and enter them again.",
+								delayRequired:false
+							});
+							cancelPurchase();
 						} else {
-							paymentResultCallback({success:false, type: "error", message: "There was an error processing your purchase."});
+							paymentResultCallback({
+								success:false,
+								type: "error",
+								message: "There was an error processing your purchase.",
+								delayRequired:false
+							});
 							cancelPurchase();
 						}
 					} finally {

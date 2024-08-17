@@ -117,7 +117,7 @@ function PurchaseHandler(props) {
 	}
 	
 	let invoiceSection = null;
-	if (invoicePossible) {
+	if (false) { //if(invoicePossible) {
 		invoiceSection = (
 			<Container className='mt-4'>
 				<Row>

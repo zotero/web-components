@@ -34,7 +34,6 @@ function LabRenew(props) {
 		purchase,
 		stripeCustomer,
 		detectedLocation,
-		paymentMethodConfigs: props.paymentMethodConfigs,
 		setPurchase,
 		paymentResultCallback
 	});

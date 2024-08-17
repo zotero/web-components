@@ -176,7 +176,7 @@ PECheckoutForm.defaultProps = {
 function PaymentElementModal(props) {
 	const { storageState } = useStorageContext();
 	const { stripe, cancel } = props;
-	const { payment, purchase, paymentMethodConfigs } = storageState;
+	const { payment, purchase } = storageState;
 	log.debug('PaymentElementModal render');
 	log.debug(props);
 

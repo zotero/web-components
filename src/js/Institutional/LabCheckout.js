@@ -66,7 +66,6 @@ function LabCheckout(props) {
 		purchase,
 		stripeCustomer,
 		detectedLocation,
-		paymentMethodConfigs: props.paymentMethodConfigs,
 		setPurchase,
 		paymentResultCallback,
 		cancelable:true,
@@ -263,7 +262,6 @@ LabCheckout.defaultProps = {
 };
 
 LabCheckout.propTypes = {
-	// purchase: PropTypes.func.isRequired,
 	fte: PropTypes.number,
 	labName: PropTypes.string,
 	institutionID: PropTypes.number,

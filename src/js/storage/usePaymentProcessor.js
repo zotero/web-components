@@ -76,7 +76,7 @@ const defaultPurchasePaymentMethod = function(editPayment, confirmationToken, st
 	return defaultPaymentMethod;
 }
 
-function usePaymentProcessor({ purchase, stripeCustomer, userSubscription, detectedLocation, setPurchase, paymentResultCallback, returnUrl, cancelable, paymentPending, paymentMethodConfigs }) {
+function usePaymentProcessor({ purchase, stripeCustomer, userSubscription, detectedLocation, setPurchase, paymentResultCallback, returnUrl, cancelable, paymentPending }) {
 	log.debug({purchase, stripeCustomer, userSubscription, detectedLocation, setPurchase});
 	// const [ stripeCustomer, setStripeCustomer ] = useState(props.stripeCustomer);
 	const [ notification, setNotification ] = useState(null);
@@ -95,6 +95,8 @@ function usePaymentProcessor({ purchase, stripeCustomer, userSubscription, detec
 	//set defaultPaymentMethod, set currency to euro if saved payment method is EU bank, set location if it doesn't match payment method country
 	let defaultPaymentMethod = defaultPurchasePaymentMethod(editPayment, confirmationToken, stripeCustomer);
 	let defaultCurrency = stripePaymentCurrency(stripeCustomer, defaultPaymentMethod, detectedLocation);
+
+	const paymentMethodConfigs = window.zoteroData.paymentMethodConfigs;
 	let paymentMethodConfig = paymentMethodConfigs['DefaultUSD'];
 
 	//update currency after getting customer or intent

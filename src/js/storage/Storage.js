@@ -89,7 +89,6 @@ function Storage(props) {
 		stripeCustomer,
 		userSubscription,
 		detectedLocation,
-		paymentMethodConfigs: props.paymentMethodConfigs,
 		setPurchase,
 		paymentResultCallback,
 		returnUrl,
@@ -386,7 +385,6 @@ function Storage(props) {
 			purchase,
 			invoicePossible,//whether it's allowed to create an invoice for this purchase
 			error,
-			paymentMethodConfigs: props.paymentMethodConfigs,
 		};
 
 		callbacks = {

@@ -133,7 +133,6 @@ function Contribute(props) {
 		purchase,
 		stripeCustomer,
 		detectedLocation,
-		paymentMethodConfigs: props.paymentMethodConfigs,
 		setPurchase,
 		paymentResultCallback,
 		returnUrl,

@@ -96,7 +96,7 @@ class BrowserDetect {
 			var dataProp = data[i].prop;
 			this.versionSearchString = data[i].versionSearch || data[i].identity;
 			if (dataString) {
-				if (dataString.toLowerCase().indexOf(data[i].toLowerCase().subString) != -1) return data[i].identity;
+				if (dataString.toLowerCase().indexOf(data[i].subString.toLowerCase()) != -1) return data[i].identity;
 			} else if (dataProp) return data[i].identity;
 		}
 		return false;

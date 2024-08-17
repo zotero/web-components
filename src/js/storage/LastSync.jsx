@@ -35,10 +35,20 @@ function LastSync(){
 	}
 
 	let {lastUsedRelative, recentIPs, locations} = lastSync.lastSyncData;
+	let lastIP = recentIPs[0]['ip'];
+	let lastLocation = locations[lastIP];
+
+	if (!(lastIP && lastLocation && lastUsedRelative)) {
+		return (
+			<div className='lastSync'>
+				<p>There was an error retrieving last sync data.</p>
+			</div>
+		);
+	}
 
 	return (
 		<div className='lastSync'>
-			<p>Last Zotero client sync: {lastUsedRelative} from {recentIPs[0]} ({locations[recentIPs[0]]})</p>
+			<p>Last Zotero client sync: {lastUsedRelative} from {lastIP} ({lastLocation})</p>
 		</div>
 	);
 }

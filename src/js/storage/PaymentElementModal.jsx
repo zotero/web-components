@@ -141,7 +141,7 @@ function PECheckoutForm(props) {
 			{emailSection}
 			<div className='payment-billing-address'>
 				<h4>Billing Address:</h4>
-				<AddressElement onChange={updateAddress} options={{mode: 'billing', defaultValues:addressDefaults, autocomplete:{mode:'automatic'}}}/>
+				<AddressElement onChange={updateAddress} options={{mode: 'billing', defaultValues:addressDefaults, autocomplete:{mode:'disabled'}}}/>
 			</div>
 			<div className='payment-method-details'>
 				<h4>Payment:</h4>

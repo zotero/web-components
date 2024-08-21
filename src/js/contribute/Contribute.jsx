@@ -346,7 +346,7 @@ function Contribute(props) {
 		);
 	}
 
-	storageState = {
+	let storageState = {
 		payment,
 		description,//multi-para description of update, whether charge or not
 		stripeCustomer,
@@ -355,7 +355,7 @@ function Contribute(props) {
 		error:null,
 	};
 
-	callbacks = {
+	let callbacks = {
 		setPurchase,
 	};
 

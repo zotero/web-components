@@ -194,7 +194,7 @@ function LabCheckout(props) {
 		);
 	}
 	*/
-	callbacks = {
+	let callbacks = {
 		setPurchase,
 		handleInvoiceRequest,
 	};

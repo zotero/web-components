@@ -40,7 +40,7 @@ function LabRenew(props) {
 
 	/* callbacks */
 	const renewLab = () => {
-		usersInt = parseInt(renewNumUsers);
+		let usersInt = parseInt(renewNumUsers);
 		if (usersInt < 15) {
 			usersInt = 15;
 		}

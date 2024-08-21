@@ -18,7 +18,7 @@ function BillingDetails(props) {
 				<span className='line2'>{line2 ? [line2, <br />]  : ''}</span>
 				<span className='city'>{city ? `${city}, ` : ''}</span>
 				<span className='state'>{state ? `${state}, ` : ''}</span>
-				<span className='postal'>{postal_code + ' '} </span>
+				<span className='postal'>{postal_code ? `${postal_code}` : ' '} </span>
 				<span className='country'>{country}</span>
 			</p>
 			<p>{email}</p>

@@ -424,7 +424,7 @@ function Storage(props) {
 				<div className='user-storage'>
 					<Row className='my-3'>
 						<Col md='12'>
-							<Invoices invoices={props.userInvoices} setNotification={setPageNotification} type={['individual', 'individualRenew']} collapseLabel='Show Invoices' />
+							<Invoices invoices={props.userInvoices} setNotification={setPageNotification} type={['individual', 'individualRenew', 'individualChange']} collapseLabel='Show Invoices' />
 							<Invoices invoices={props.userInvoices} setNotification={setPageNotification} type='contribution' collapseLabel='Show Contributions' />
 						</Col>
 					</Row>

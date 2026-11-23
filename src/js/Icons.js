@@ -7,33 +7,50 @@ import { PropTypes } from 'prop-types';
 const config = window.zoteroConfig;
 const imagePath = config.imagePath;
 
-function ZoteroIcon(props) {
-	let iconImagePath = `${imagePath}/icons/zotero-icon-${props.width}-${props.height}`;
-	let iconImagePath2x = iconImagePath + '@2x.png';
-	iconImagePath += '.png';
+// Available sizes of zotero-app-icon-{size}.png
+const zoteroIconSizes = [16, 32, 64, 128, 256, 512];
 
-	let p = { ...props, src: iconImagePath, srcSet: `${iconImagePath2x} 2x`, className: classnames('zotero-icon', props.className) };
+// Smallest available app icon at least `px` wide (or the largest one)
+function zoteroIconSize(px) {
+	return zoteroIconSizes.find(size => size >= px) || zoteroIconSizes[zoteroIconSizes.length - 1];
+}
+
+// ZoteroIcon returns the Zotero app icon at the given width
+function ZoteroIcon(props) {
+	const width = parseInt(props.width);
+	const iconImagePath = `${imagePath}/icons/zotero-app-icon-${zoteroIconSize(width)}.png`;
+	const iconImagePath2x = `${imagePath}/icons/zotero-app-icon-${zoteroIconSize(width * 2)}.png`;
+
+	let p = { ...props, height: props.width, src: iconImagePath, srcSet: `${iconImagePath2x} 2x`, className: classnames('zotero-icon', props.className) };
 	delete p.browser;
 	return (<img {...p} />);
 }
 ZoteroIcon.defaultProps = {
-	width: '147',
-	height: '160'
+	width: '160'
 };
 ZoteroIcon.propTypes = {
 	width: PropTypes.string,
-	height: PropTypes.string,
 	className: PropTypes.string,
 };
 
 // BrowserIcon returns a browser icon image tag based on browser and size props
 function BrowserIcon(props) {
-	let browserImagePath = `${imagePath}/icons/${props.browser.toLowerCase()}-icon-${props.size}`;
-	let browserImagePath2x = browserImagePath + '@2x.png';
-	browserImagePath += '.png';
+	const browser = props.browser.toLowerCase();
+	let src;
+	let srcSet;
+	if (browser == 'safari') {
+		// Safari icon is only available as PNG (32, 64, 128, with @2x)
+		const fileSize = props.size > 64 ? 128 : (props.size > 32 ? 64 : 32);
+		src = `${imagePath}/icons/safari-icon-${fileSize}.png`;
+		srcSet = `${imagePath}/icons/safari-icon-${fileSize}@2x.png 2x`;
+	}
+	else {
+		src = `${imagePath}/icons/${browser}-icon.svg`;
+	}
 
-	let p = { ...props, src: browserImagePath, srcSet: `${browserImagePath2x} 2x`, className: classnames('browser-icon', props.className) };
+	let p = { ...props, src, srcSet, width: props.size, height: props.size, className: classnames('browser-icon', props.className) };
 	delete p.browser;
+	delete p.size;
 	return (<img {...p} />);
 }
 BrowserIcon.defaultProps = {
@@ -55,7 +72,6 @@ function BrowserExtensionIcon(props) {
 			<ZoteroIcon
 				alt='Zotero Extension'
 				width={props.zoteroIconWidth}
-				height={props.zoteroIconHeight}
 				className='zotero-icon'
 			/>
 		</figure>
@@ -64,13 +80,11 @@ function BrowserExtensionIcon(props) {
 BrowserExtensionIcon.defaultProps = {
 	browserIconSize: '128',
 	zoteroIconWidth: '128',
-	zoteroIconHeight: '140',
 };
 BrowserExtensionIcon.propTypes = {
 	browser: PropTypes.string.isRequired,
 	browserIconSize: PropTypes.string.isRequired,
 	zoteroIconWidth: PropTypes.string.isRequired,
-	zoteroIconHeight: PropTypes.string.isRequired,
 };
 
 function PluginsIcon(props) {

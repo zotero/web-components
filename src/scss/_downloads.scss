@@ -85,12 +85,12 @@
 	}
 
 	.download-image {
-		width: 118px;
+		width: 128px;
 		height: 128px;
 		margin-bottom: 14px;
 
 		@media (min-width: 1041px) {
-			width: 147px;
+			width: 160px;
 			height: 160px;
 			margin-bottom: 28px; // 48px
 		}
@@ -195,12 +195,12 @@
 			.zotero-icon {
 				@media (min-width: $screen-sm-min) {
 					width: 96px;
-					height: 105px;
+					height: 96px;
 				}
 
 				@media (min-width: 1041px) {
 					width: 112px;
-					height: 122px;
+					height: 112px;
 				}
 			}
 		}

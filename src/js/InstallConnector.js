@@ -279,7 +279,6 @@ function InstallConnectorPrompt(props) {
 			<p className='get-zotero-standalone'>
 				<ZoteroIcon
 					width='32'
-					height='35'
 					alt=''/>
 				<br />
 				<a href={buildUrl('download')}>Get Zotero</a>

@@ -159,8 +159,7 @@ function DownloadStandalone(props) {
 			<ZoteroIcon
 				alt='Zotero'
 				className='download-image'
-				width='147'
-				height='160'
+				width='160'
 			/>
 			<h1 className={wrapHeader ? 'wrap' : null}>Zotero 6 for {OSLabel}</h1>
 			<p className='lead'>Your personal research assistant</p>
@@ -265,7 +264,6 @@ function DownloadConnector(props) {
 				browser={props.featuredBrowser}
 				browserIconSize='112'
 				zoteroIconWidth='112'
-				zoteroIconHeight='122'
 			/>
 			<h1>Zotero Connector</h1>
 			<p className='lead'>Save to Zotero from your browser</p>
